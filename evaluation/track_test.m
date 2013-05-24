@@ -4,6 +4,8 @@
 util_dir = fullfile(pwd, 'utilities');
 rmpath(util_dir); addpath(util_dir);
 
+track_debug = 1;
+
 test_sequence = '<TODO: set path to sequence directory>';
 
 track_dummy = fullfile(pwd, '..', 'examples', 'c', 'track_dummy');
@@ -14,6 +16,6 @@ track_dummy = fullfile(pwd, '..', 'examples', 'c', 'track_dummy');
 tracker = track_create_tracker(track_dummy);
 sequence = track_create_sequence(test_sequence);
 
-[trajectory, time] = track_trial(tracker, sequence, 1);
+[trajectory, time] = track_run(tracker, sequence);
 
 time
