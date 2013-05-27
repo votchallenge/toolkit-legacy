@@ -1,3 +1,5 @@
-function [tracker] = track_create_tracker(command)
+function [tracker] = track_create_tracker(identifier, command, result_directory)
 
-tracker = struct('command', command);
+mkpath(result_directory);
+
+tracker = struct('identifier', identifier, 'command', command, 'directory', result_directory);
