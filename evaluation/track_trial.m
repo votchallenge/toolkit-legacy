@@ -1,7 +1,5 @@
 function [trajectory, time] = track_trial(tracker, sequence, start)
 
-global track_debug;
-
 confirm_recursive_rmdir(0, "local");
 
 % create temporary directory and generate input data
@@ -13,18 +11,16 @@ output_file = fullfile(working_directory, 'output.txt');
 old_directory = pwd;
 try
 
-    if track_debug
-        disp(['INFO: Executing "', tracker.command, '" in "', working_directory, '".']);
-    end;
+    print_debug(['INFO: Executing "', tracker.command, '" in "', working_directory, '".']);
 
     cd(working_directory);
 
     tic;
-    [status] = system(tracker.command);
+    [output, status] = system(tracker.command, 1);
     time = toc;
 
-    if status ~= 0 && track_debug
-        disp('WARNING: System command has not exited normally.');
+    if status ~= 0 
+        print_debug('WARNING: System command has not exited normally.');
     end;
 
 catch e
@@ -56,5 +52,5 @@ end;
 
 % clean-up temporary directory
 
-%rmdir(working_directory, 's');
+rmdir(working_directory, 's');
 

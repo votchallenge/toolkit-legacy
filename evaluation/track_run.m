@@ -1,7 +1,5 @@
 function [trajectory, time] = track_run(tracker, sequence)
 
-global track_debug;
-
 start = 1;
 
 total_time = 0;
@@ -27,7 +25,6 @@ while start < sequence.length
     failures = find(overlap' < 0.1);
     failures = failures(failures > 1);
 
-overlap
     trajectory(start:min(sequence.length - 1, size(Tr, 1) + start), :) = ...
             Tr(1:min(sequence.length - start, size(Tr, 1)), :);
 
@@ -35,9 +32,7 @@ overlap
         first_failure = failures(1) + start - 1;
         trajectory(first_failure, :) = [0, 0, -1, -1];
         start = first_failure + 1;
-        if track_debug
-            disp(['INFO: Detected failure at frame ', num2str(first_failure), '. Reinitializing.']);
-        end;
+        print_debug(['INFO: Detected failure at frame ', num2str(first_failure), '. Reinitializing.']);
 
     else
         start = sequence.length;
