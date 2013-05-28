@@ -2,7 +2,7 @@ function [resultfile] = pack_results(tracker, sequences, experiments)
 
 global track_properties;
 
-files = cell();
+files = cell(0);
 
 for j = 1:length(experiments)
     experiment_directory = fullfile(tracker.directory, experiments{j});

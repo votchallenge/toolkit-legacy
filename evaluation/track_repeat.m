@@ -24,8 +24,9 @@ for i = 1:repetitions
 
     total_time = total_time + t;
     
-    csvwrite(result_file, trajectory);
-
+    if ~isempty(trajectory)
+        csvwrite(result_file, trajectory);
+    end;
 end;
 
 time = total_time / repetitions;

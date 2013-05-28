@@ -1,8 +1,6 @@
 
-script_directory = fileparts(mfilename('fullpathext'));
-include_dirs = cellfun(@(x) fullfile(script_directory,x), {'utilities', 'tracker'},'UniformOutput', false); 
-%fullfile(fileparts(mfilename('fullpathext')), 'utilities');
-
+script_directory = fileparts(mfilename('fullpath'));
+include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', 'tracker'},'UniformOutput', false); 
 rmpath(include_dirs{:}); addpath(include_dirs{:});
 
 global track_properties;
@@ -10,6 +8,12 @@ track_properties = struct('debug', 0, 'cache', 1, 'indent', 0, ...
      'bundle', 'http://box.vicos.si/vot/vot2013.zip', 'repeat', 5);
 
 print_text('Running VOT experiments ...');
+
+if exist('track_setup') ~= 2
+	print_text('Setup file does not exist.');
+	print_text('Please copy track_setup_template.m to track_setup.m and configure it.');
+	return;
+end;
 
 track_setup;
 

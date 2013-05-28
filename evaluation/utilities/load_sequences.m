@@ -4,7 +4,7 @@ global track_properties;
 
 list_file = fullfile(directory, 'list.txt');
 
-sequences = cell();
+sequences = cell(0);
 
 mkpath(directory);
 

@@ -1,7 +1,5 @@
 function [trajectory, time] = track_trial(tracker, sequence, start)
 
-%confirm_recursive_rmdir(0, "local");
-
 % create temporary directory and generate input data
 working_directory = track_prepare_trial_data(sequence, start);
 
@@ -15,16 +13,22 @@ try
 
     cd(working_directory);
 
-    tic;
-    [output, status] = system(tracker.command, 1);
-    time = toc;
-
+    if is_octave()
+        tic;
+        [status, output] = system(tracker.command, 1);
+        time = toc;
+    else
+        tic;
+        [status, output] = system(tracker.command, '');
+        time = toc;
+    end;
+        
     if status ~= 0 
         print_debug('WARNING: System command has not exited normally.');
     end;
 
 catch e
-
+    print_debug('ERROR: Exception thrown "%s".', e.message);
 end;
 
 cd(old_directory);
@@ -46,6 +50,7 @@ if exist(output_file, 'file')
     end;
 
 else
+    print_debug('WARNING: Tracker did not produce a trajectory file.');
     trajectory = [];
     time = NaN;
 end;
