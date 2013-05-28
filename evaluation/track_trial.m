@@ -1,6 +1,6 @@
 function [trajectory, time] = track_trial(tracker, sequence, start)
 
-confirm_recursive_rmdir(0, "local");
+%confirm_recursive_rmdir(0, "local");
 
 % create temporary directory and generate input data
 working_directory = track_prepare_trial_data(sequence, start);
@@ -52,5 +52,5 @@ end;
 
 % clean-up temporary directory
 
-rmdir(working_directory, 's');
+recursive_rmdir(working_directory);
 

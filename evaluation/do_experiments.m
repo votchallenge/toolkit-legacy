@@ -7,7 +7,7 @@ rmpath(include_dirs{:}); addpath(include_dirs{:});
 
 global track_properties;
 track_properties = struct('debug', 0, 'cache', 1, 'indent', 0, ...
-     'bundle', 'http://box.vicos.si/vot/bundle2013.zip', 'repeat', 5);
+     'bundle', 'http://box.vicos.si/vot/vot2013.zip', 'repeat', 5);
 
 print_text('Running VOT experiments ...');
 
@@ -23,6 +23,11 @@ results_directory = fullfile(track_properties.directory, 'results');
 print_text('Loading sequences ...');
 
 sequences = load_sequences(sequences_directory);
+
+if isempty(sequences)
+	print_text('No sequences available. Stopping.');
+	return;
+end;
 
 print_text('Preparing tracker %s ...', tracker_identifier);
 

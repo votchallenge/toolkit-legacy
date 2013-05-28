@@ -6,12 +6,15 @@ list_file = fullfile(directory, 'list.txt');
 
 sequences = cell();
 
+mkpath(directory);
+
 if ~exist(list_file, 'file') && ~isempty(track_properties.bundle)
     print_text('Downloading sequence bundle from "%s". This may take a while ...', track_properties.bundle);
-    bundle = tempname;
+    bundle = [tempname, '.zip'];
     try
         urlwrite(track_properties.bundle, bundle);
         unzip(bundle, directory);
+		delete(bundle);
     catch e
         print_text('Unable to retreive sequence bundle. Follow the instructions in README.md to install it manually.');
         return;
