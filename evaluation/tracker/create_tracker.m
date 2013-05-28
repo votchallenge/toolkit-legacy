@@ -1,4 +1,4 @@
-function [tracker] = track_create_tracker(identifier, command, result_directory)
+function [tracker] = create_tracker(identifier, command, result_directory)
 
 mkpath(result_directory);
 

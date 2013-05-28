@@ -35,7 +35,7 @@ while true
         continue;
     end;
 
-    sequences{end+1} = track_create_sequence(sequence_name, sequence_directory);
+    sequences{end+1} = create_sequence(sequence_name, sequence_directory);
 
 end;
 

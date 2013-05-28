@@ -1,4 +1,4 @@
-function [trajectory, time] = track_run(tracker, sequence)
+function [trajectory, time] = run_trial(tracker, sequence)
 
 start = 1;
 
@@ -9,7 +9,7 @@ trajectory = zeros(sequence.length, 4);
 
 while start < sequence.length
 
-    [Tr, Tm] = track_trial(tracker, sequence, start);
+    [Tr, Tm] = run_tracker(tracker, sequence, start);
 
     if isempty(Tr)
         trajectory = [];
@@ -20,7 +20,7 @@ while start < sequence.length
     total_time = total_time + Tm * size(Tr, 1);
     total_frames = total_frames + size(Tr, 1);
 
-    overlap = calculate_overlap(Tr, track_get_region(sequence, start:sequence.length));
+    overlap = calculate_overlap(Tr, get_region(sequence, start:sequence.length));
 
     failures = find(overlap' < 0.1);
     failures = failures(failures > 1);

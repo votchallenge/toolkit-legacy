@@ -1,7 +1,7 @@
-function [trajectory, time] = track_trial(tracker, sequence, start)
+function [trajectory, time] = run_tracker(tracker, sequence, start)
 
 % create temporary directory and generate input data
-working_directory = track_prepare_trial_data(sequence, start);
+working_directory = prepare_trial_data(sequence, start);
 
 output_file = fullfile(working_directory, 'output.txt');
 

@@ -1,6 +1,6 @@
 
 script_directory = fileparts(mfilename('fullpath'));
-include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', 'tracker'},'UniformOutput', false); 
+include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', 'tracker', 'sequence', 'measures', 'experiment'}, 'UniformOutput', false); 
 rmpath(include_dirs{:}); addpath(include_dirs{:});
 
 global track_properties;
@@ -9,13 +9,13 @@ track_properties = struct('debug', 0, 'cache', 1, 'indent', 0, ...
 
 print_text('Running VOT experiments ...');
 
-if exist('track_setup') ~= 2
+if exist('configuration') ~= 2
 	print_text('Setup file does not exist.');
-	print_text('Please copy track_setup_template.m to track_setup.m and configure it.');
+	print_text('Please copy configuration_template.m to configuration.m and configure it.');
 	return;
 end;
 
-track_setup;
+configuration;
 
 if ~exist(track_properties.directory, 'dir')
     mkdir(track_properties.directory);
@@ -35,7 +35,7 @@ end;
 
 print_text('Preparing tracker %s ...', tracker_identifier);
 
-tracker = track_create_tracker(tracker_identifier, tracker_command, fullfile(results_directory, tracker_identifier));
+tracker = create_tracker(tracker_identifier, tracker_command, fullfile(results_directory, tracker_identifier));
 
 print_text('Running Experiment 1 ...');
 
@@ -45,7 +45,7 @@ experiment_directory = fullfile(tracker.directory, 'experiment_1');
 
 for i = 1:length(sequences)
     print_text('Sequence "%s" (%d/%d)', sequences{i}.name, i, length(sequences));
-    track_repeat(tracker, sequences{i}, track_properties.repeat, fullfile(experiment_directory, sequences{i}.name));
+    repeat_trial(tracker, sequences{i}, track_properties.repeat, fullfile(experiment_directory, sequences{i}.name));
 end;
 
 print_indent(-1);

@@ -1,4 +1,4 @@
-function [image_path] = track_get_image(sequence, index)
+function [image_path] = get_image(sequence, index)
 
 image_path = fullfile(sequence.directory, sprintf(sequence.mask, index));
 

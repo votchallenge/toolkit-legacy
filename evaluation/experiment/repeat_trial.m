@@ -1,4 +1,4 @@
-function [time] = track_repeat(tracker, sequence, repetitions, directory)
+function [time] = repeat_trial(tracker, sequence, repetitions, directory)
 
 global track_properties;
 
@@ -18,7 +18,7 @@ for i = 1:repetitions
 
     print_text('Repetition %d', i);
 
-    [trajectory, t] = track_run(tracker, sequence);
+    [trajectory, t] = run_trial(tracker, sequence);
 
     print_indent(-1);
 
