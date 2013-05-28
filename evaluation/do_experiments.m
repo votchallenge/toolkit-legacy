@@ -1,6 +1,9 @@
 
-util_dir = fullfile(fileparts(mfilename('fullpathext')), 'utilities');
-rmpath(util_dir); addpath(util_dir);
+script_directory = fileparts(mfilename('fullpathext'));
+include_dirs = cellfun(@(x) fullfile(script_directory,x), {'utilities', 'tracker'},'UniformOutput', false); 
+%fullfile(fileparts(mfilename('fullpathext')), 'utilities');
+
+rmpath(include_dirs{:}); addpath(include_dirs{:});
 
 global track_properties;
 track_properties = struct('debug', 0, 'cache', 1, 'indent', 0, ...
@@ -37,5 +40,15 @@ for i = 1:length(sequences)
 end;
 
 print_indent(-1);
+
+print_text('Packing results ...');
+
+print_indent(1);
+
+resultfile = pack_results(tracker, sequences, {'experiment_1'});
+
+print_indent(-1);
+
+print_text('Result pack stored to "%s"', resultfile);
 
 print_text('Done.');
