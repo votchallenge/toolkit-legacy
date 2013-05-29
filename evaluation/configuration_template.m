@@ -9,6 +9,9 @@ track_properties.directory = '<TODO: set a working directory for sequences and r
 % Disable result caching
 % track_properties.cache = 0;
 
+% Disable result packaging
+% track_properties.pack = 0;
+
 tracker_identifier = '<TODO: set a tracker identifier>';
 
 tracker_command = '<TODO: set a tracker executable command>';

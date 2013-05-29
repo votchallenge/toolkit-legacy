@@ -34,28 +34,16 @@ end;
 cd(old_directory);
 
 % validate and process results
+trajectory = load_trajectory(output_file);
 
-if exist(output_file, 'file')
-    trajectory = double(csvread(output_file));
+n_frames = size(trajectory, 1);
 
-    [n_frames, n_values] = size(trajectory);
-
-    if n_values ~= 4
-        trajectory = [];
-    end;
-
-    if (n_frames ~= (sequence.length-start) + 1)
-        trajectory = [];
-        time = NaN;
-    end;
-
-else
+if (n_frames ~= (sequence.length-start) + 1)
     print_debug('WARNING: Tracker did not produce a trajectory file.');
     trajectory = [];
     time = NaN;
 end;
 
 % clean-up temporary directory
-
 recursive_rmdir(working_directory);
 

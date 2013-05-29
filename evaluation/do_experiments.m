@@ -4,7 +4,7 @@ include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', 'tra
 rmpath(include_dirs{:}); addpath(include_dirs{:});
 
 global track_properties;
-track_properties = struct('debug', 0, 'cache', 1, 'indent', 0, ...
+track_properties = struct('debug', 0, 'cache', 1, 'indent', 0, 'pack', 1, ...
      'bundle', 'http://box.vicos.si/vot/vot2013.zip', 'repeat', 5);
 
 print_text('Running VOT experiments ...');
@@ -17,9 +17,7 @@ end;
 
 configuration;
 
-if ~exist(track_properties.directory, 'dir')
-    mkdir(track_properties.directory);
-end;
+mkpath(track_properties.directory);
 
 sequences_directory = fullfile(track_properties.directory, 'sequences');
 results_directory = fullfile(track_properties.directory, 'results');
@@ -37,27 +35,54 @@ print_text('Preparing tracker %s ...', tracker_identifier);
 
 tracker = create_tracker(tracker_identifier, tracker_command, fullfile(results_directory, tracker_identifier));
 
-print_text('Running Experiment 1 ...');
+experiments = {'baseline', 'region_noise', 'skipping'};
 
-print_indent(1);
+for e = 1:length(experiments)
 
-experiment_directory = fullfile(tracker.directory, 'experiment_1');
+    if exist(['experiment_', experiments{e}]) ~= 2
+        continue;
+    end;
 
-for i = 1:length(sequences)
-    print_text('Sequence "%s" (%d/%d)', sequences{i}.name, i, length(sequences));
-    repeat_trial(tracker, sequences{i}, track_properties.repeat, fullfile(experiment_directory, sequences{i}.name));
+    experiment_function = str2func(['experiment_', experiments{e}]);
+
+    print_text('Running Experiment "%s" ...', experiments{e});
+
+    print_indent(1);
+
+    experiment_directory = fullfile(tracker.directory, experiments{e});
+
+    experiment_function(tracker, sequences, experiment_directory)
+
+    scores = calculate_ar_score(tracker, sequences, experiment_directory);
+
+    print_text('Experiment complete. Outputting final A-R scores:');
+
+    print_indent(1);
+
+    for i = 1:length(sequences)
+        print_text('Sequence "%s" - Accuracy: %.3f, Reliability: %.3f', sequences{i}.name, scores(i, 1), scores(i, 2));
+    end;
+
+    print_indent(-2);
+
 end;
 
-print_indent(-1);
+if track_properties.pack
 
-print_text('Packing results ...');
+    print_text('Packing results ...');
 
-print_indent(1);
+    print_indent(1);
 
-resultfile = pack_results(tracker, sequences, {'experiment_1'});
+    resultfile = pack_results(tracker, sequences, experiments);
 
-print_indent(-1);
+    print_indent(-1);
 
-print_text('Result pack stored to "%s"', resultfile);
+    print_text('Result pack stored to "%s"', resultfile);
+
+else
+
+    print_debug('Omitting result packaging.');
+
+end;
 
 print_text('Done.');
