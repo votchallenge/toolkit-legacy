@@ -7,7 +7,7 @@ mkdir(working_directory);
 region_file = fullfile(working_directory, 'region.txt');
 images_file = fullfile(working_directory, 'images.txt');
 
-region = get_region(sequence, start);
+region = get_initialization_region(sequence, start);
 
 csvwrite(region_file, region);
 
