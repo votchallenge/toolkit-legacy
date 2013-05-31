@@ -1,7 +1,11 @@
 
 script_directory = fileparts(mfilename('fullpath'));
 include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', 'tracker', 'sequence', 'measures', 'experiment'}, 'UniformOutput', false); 
-rmpath(include_dirs{:}); addpath(include_dirs{:});
+remove_dirs = include_dirs(find(ismember(include_dirs, strsplit(path, pathsep))));
+if ~isempty(remove_dirs) 
+	rmpath(remove_dirs{:});
+end;
+addpath(include_dirs{:});
 
 global track_properties;
 track_properties = struct('debug', 0, 'cache', 1, 'indent', 0, 'pack', 1, ...
@@ -51,19 +55,11 @@ for e = 1:length(experiments)
 
     experiment_directory = fullfile(tracker.directory, experiments{e});
 
-    experiment_function(tracker, sequences, experiment_directory)
+    experiment_function(tracker, sequences, experiment_directory);
 
     scores = calculate_ar_score(tracker, sequences, experiment_directory);
 
-    print_text('Experiment complete. Outputting final A-R scores:');
-
-    print_indent(1);
-
-    for i = 1:length(sequences)
-        print_text('Sequence "%s" - Accuracy: %.3f, Reliability: %.3f', sequences{i}.name, scores(i, 1), scores(i, 2));
-    end;
-
-    print_indent(-2);
+    print_indent(-1);
 
 end;
 

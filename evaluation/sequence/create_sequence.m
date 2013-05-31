@@ -7,19 +7,21 @@ groundtruth = double(csvread(groundtruth_file));
 mask = '%08d.jpg';
 
 sequence = struct('name', name, 'directory', directory, ...
-        'mask', '%08d.jpg', 'groundtruth', groundtruth, 'length', 0, ...
-        'images', cell(0));
+        'mask', '%08d.jpg', 'groundtruth', groundtruth, 'length', 0);
+
+sequence.images = cell(size(groundtruth, 1), 1);
 
 while true
-    image_name = fsprintf(mask, sequence.length + 1);
+    image_name = sprintf(mask, sequence.length + 1);
 
-    if ~exist(fullfile(sequence.directory, image_name, 'file'))
+    if ~exist(fullfile(sequence.directory, image_name), 'file')
         break;
     end;
 
-    sequence.images{end+1} = image_name;
+    sequence.images{sequence.length + 1} = image_name;
 
-    sequence.length = sequence.length + 1;
+	sequence.length = sequence.length + 1;
 end;
 
 sequence.length = min(sequence.length, size(groundtruth, 1));
+
