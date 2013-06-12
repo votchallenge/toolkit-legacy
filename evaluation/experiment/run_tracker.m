@@ -1,6 +1,6 @@
 function [trajectory, time] = run_tracker(tracker, sequence, start)
 % RUN_TRACKER  Generates input data for the tracker, runs the tracker and
-%              validates results.
+% validates results.
 %
 %   [TRAJECTORY, TIME] = RUN_TRACKER(TRACKER, SEQUENCE, START)
 %              Runs the tracker on a sequence that with a specified offset.

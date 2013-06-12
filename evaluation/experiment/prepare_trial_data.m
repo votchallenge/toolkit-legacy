@@ -1,4 +1,13 @@
 function [working_directory] = prepare_trial_data(sequence, start)
+% PREPARE_TRIAL_DATA Prepares a temporary directory and populates it with
+% necessary data for the tracker.
+%
+%   [DIR] = PREPARE_TRIAL_DATA(SEQUENCE, START)
+%              Creates a directory and writes the image sequence and the
+%              initial region file based on the sequence and the starting
+%              offset.
+%
+%   See also RUN_TRIAL, SYSTEM.
 
 % create temporary directory and generate input data
 working_directory = tempname;

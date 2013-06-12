@@ -1,4 +1,14 @@
 function [trajectory, time] = run_trial(tracker, sequence)
+% RUN_TRIAL  A wrapper around run_tracker that handles reinicialization
+% when the tracker fails.
+%
+%   [TRAJECTORY, TIME] = RUN_TRIAL(TRACKER, SEQUENCE)
+%              Runs the tracker on a sequence. The resulting trajectory is
+%              a composite of all correctly tracked fragments. Where
+%              reinitialization occured, the frame is marked using a
+%              special bounding box (0, 0, -1, -1).
+%
+%   See also RUN_TRACKER.
 
 start = 1;
 
