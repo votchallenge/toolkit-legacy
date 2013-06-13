@@ -20,8 +20,8 @@ For better understanding we begin with a definition of important terms:
 * _Repetition_ - To properly address the potential stochastic nature of the algorithm, several trials are performed on each sequence. Each trial is therefore called a repetition.
 * _Experiment_ - Evaluation of a tracker on a set of sequences in specific conditions. Specific experiment may change the original sequences to simulate some specific kind of circumstances (e.g. noise).
 * _Evaluation_ - Performing a set of experiments on a specific tracker.
-* Measure
-* Overlap
+* _Region overlap_ - Overlap distance between two regions, in our case this is usually the ground-truth bouning box and the tracker predicted bouning-box. Calculated as the intersection divided by union and therefore bounded between 1 and 0.
+* _Performance measure_ 
 
 Structure
 ---------
@@ -33,7 +33,15 @@ Set up the toolkit
 
 In order to set up the toolkit, you have to copy the `configuration_template.m` to `configuration.m` and edit it to set the required variables.
 
-TODO
+The first variable that has to be set is an absolute path to a working directory. This is the directory where all the sequences and results are stored.
+
+    track_properties.directory = '<TODO: set a working directory for sequences and results>';
+
+Then the evaluated tracker has to be configured as well. This is done by setting an unique tracker identifier (used to determine the tracker at the VOT on-line result repository) as well as the exact executable command (consult the `integration.md` guide for details).
+
+    tracker_identifier = '<TODO: set a tracker identifier>';
+    
+    tracker_command = '<TODO: set a tracker executable command>';
 
 Perform an evaluation
 ---------------------
@@ -43,11 +51,13 @@ The entire evaluation is currently performed by executing the `do_experiments` s
 Submit the results
 ------------------
 
-TODO
+At the end of the evaluation the toolkit generates a ZIP file containing all the results. In order to publish the results to the VOT on-line result repository, this file has to be submitted to the repository maintainers (consult the on-line instructions at the repository website).
 
 Additional configuration
 ------------------------
 
 There are several non-essential parameters available in `configuration.m` file.
 
-TODO
+* `track_properties.debug` sets the debug output option (disabled by default). Using this option it is possible to get additional information regarding the progress of the evaluation, however, its usage is mainly indented for development purposes.
+* `track_properties.cache` sets the result caching (enabled by default). By disabling this option all the results are generated every time the evaluation is run instead of preserving results for trials that were already successfully executed.
+* `track_properties.pack` sets the result packaging (enabled by default). If enabled, the results of the evaluation are packed into a ZIP archive at the end of the evaluation. This file is ready to be submitted to the VOT on-line result repository.
