@@ -8,6 +8,8 @@ function [trajectory, time] = run_tracker(tracker, sequence, start)
 %   See also RUN_TRIAL, SYSTEM.
 
 % create temporary directory and generate input data
+global track_properties;
+
 working_directory = prepare_trial_data(sequence, start);
 
 output_file = fullfile(working_directory, 'output.txt');
@@ -74,6 +76,8 @@ if (n_frames ~= (sequence.length-start) + 1)
     time = NaN;
 end;
 
-% clean-up temporary directory
-recursive_rmdir(working_directory);
+if track_properties.cleanup
+    % clean-up temporary directory
+    recursive_rmdir(working_directory);
+end;
 
