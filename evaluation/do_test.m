@@ -13,7 +13,12 @@ addpath(include_dirs{:});
 
 initialize_environment;
 
-trajectory = [];
+global trajectory;
+
+if ~exist('trajectory', 'var')
+	trajectory = [];
+end;
+
 i = 0;
 while 1
     print_text('Choose action:');
@@ -25,6 +30,7 @@ while 1
     if ~isempty(trajectory)
         print_text('c - Visually compare results with groundtruth');
     end;
+	print_text('d - Toggle debug output');
     print_text('e - Exit');
     print_indent(-1);
 
@@ -36,6 +42,8 @@ while 1
             visualize_sequence(sequences{sq}, trajectory);
         end;
         continue;
+	case 'd'
+		track_properties.debug = ~track_properties.debug;
     case 'e'
         break;
     default
@@ -43,7 +51,7 @@ while 1
     end;
 
     sq = int32(str2num(option));
-sq
+
     if isempty(sq) || sq < 1 || sq > length(sequences)
         continue;
     end;
