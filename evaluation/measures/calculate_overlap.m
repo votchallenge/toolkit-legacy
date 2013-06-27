@@ -20,4 +20,4 @@ union = (T1(:, 3) .* T1(:, 4)) + (T2(:, 3) .* T2(:, 4)) - intersection;
 
 overlap = intersection ./ union;
 
-overlap(any(isnan(T1)) | any(isnan(T2))) = NaN;
+overlap(any(isnan(T1),2) | any(isnan(T2),2)) = NaN;
