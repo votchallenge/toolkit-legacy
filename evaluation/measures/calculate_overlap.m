@@ -11,9 +11,9 @@ T1 = T1(1:len, :);
 T2 = T2(1:len, :);
 
 hrzInt = min(T1(:, 1) + T1(:, 3), T2(:, 1) + T2(:, 3)) - max(T1(:, 1), T2(:, 1));
-hrzInt = max(0,hrzInt)
+hrzInt = max(0,hrzInt);
 vrtInt = min(T1(:, 2) + T1(:, 4), T2(:, 2) + T2(:, 4)) - max(T1(:, 2), T2(:, 2));
-vrtInt = max(0,vrtInt)
+vrtInt = max(0,vrtInt);
 intersection = hrzInt .* vrtInt; 
 
 union = (T1(:, 3) .* T1(:, 4)) + (T2(:, 3) .* T2(:, 4)) - intersection;
