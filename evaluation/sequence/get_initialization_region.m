@@ -18,5 +18,7 @@ if isfield(sequence, 'noise')
         region(:, 4) = region(:, 4) + normrnd(0, noise(4), size(region, 1), 1);
 
     end;
+    
+    region = round(region)
 
 end;

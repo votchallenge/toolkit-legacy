@@ -10,14 +10,14 @@ len = min(size(T1, 1), size(T2, 1));
 T1 = T1(1:len, :);
 T2 = T2(1:len, :);
 
-intersection = ... 
-   (min(T1(:, 1) + T1(:, 3), T2(:, 1) + T2(:, 3)) - max(T1(:, 1), T2(:, 1))) ...
-   .* (min(T1(:, 2) + T1(:, 4), T2(:, 2) + T2(:, 4)) - max(T1(:, 2), T2(:, 2)));
-
-intersection(intersection < 0) = 0;
+hrzInt = min(T1(:, 1) + T1(:, 3), T2(:, 1) + T2(:, 3)) - max(T1(:, 1), T2(:, 1));
+hrzInt = max(0,hrzInt);
+vrtInt = min(T1(:, 2) + T1(:, 4), T2(:, 2) + T2(:, 4)) - max(T1(:, 2), T2(:, 2));
+vrtInt = max(0,vrtInt);
+intersection = hrzInt .* vrtInt; 
 
 union = (T1(:, 3) .* T1(:, 4)) + (T2(:, 3) .* T2(:, 4)) - intersection;
 
 overlap = intersection ./ union;
 
-overlap(any(isnan(T1)) | any(isnan(T2))) = NaN;
+overlap(any(isnan(T1),2) | any(isnan(T2),2)) = NaN;

@@ -6,7 +6,7 @@ sequences = cellfun(@(x) sequence_skipping(x, 3), sequences,'UniformOutput',fals
 
 for i = 1:length(sequences)
     print_text('Sequence "%s" (%d/%d)', sequences{i}.name, i, length(sequences));
-    sequence = sequence_skipping(sequences{i}, 3);
+    sequence = sequences{i};
     repeat_trial(tracker, sequence, track_properties.repeat, fullfile(directory, sequences{i}.name));
 end;
 
