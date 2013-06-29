@@ -22,6 +22,11 @@ for i = 1:repetitions
         continue;
     end;
 
+    if i == 4 && is_deterministic(sequence, 3, directory)
+        print_text('Detected a deterministic tracker, skipping remaining trials.');
+        break;
+    end;
+
     print_indent(1);
 
     print_text('Repetition %d', i);
