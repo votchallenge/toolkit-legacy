@@ -16,7 +16,13 @@ initialize_environment;
 
 experiments = {'baseline', 'grayscale'};
 
-for e = 1:length(experiments)
+if exist('select_experiment', 'var')
+	selected_experiments = select_experiment(select_experiment > 0 && select_experiment <= length(experiments));
+else
+	selected_experiments = 1:length(experiments);
+end;
+
+for e = selected_experiments
 
     if exist(['experiment_', experiments{e}]) ~= 2
         continue;

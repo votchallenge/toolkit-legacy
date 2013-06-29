@@ -22,8 +22,6 @@ The working directory automatically populated with several subdirectories:
    			* `<sequence name>_<iteration>.txt` - Result data for iteration.
 * `cache/` - Cached data that can be deleted and can be generated on demand. An example of this are gray-scale sequences that are generated from their color originals on demand.
 
-
-
 Evaluation execution and parallelism
 ------------------------------------
 
@@ -46,8 +44,9 @@ Because of this methodology, the entire execution time can be quite long. If we 
 
 To speed up the execution, the evaluation can be parallelized. Due to simplicity, the toolkit does not support parallel execution explicitly, however, it is possible to execute individual experiments in parallel on multiple computers or on a single multi-core computer with a bit of manual work, thus reducing the evaluation time back to 2-3 days.
 
-To do this 
+To separate execution of the evaluation on a single multi-core computer simply run three instances of the interpreter (Matlab or Octave). Disable result package creation (using `track_properties.pack`). In each of the interactive shells set a variable `selected_experiment` to one of the values from 1 to 3. Then execute the evaluation by calling `do_experiments`. After all three experiments are done, re-enable result package creation, clear the variables, and call `do_experiments` again in one of the interactive shells.
 
+To separate execution on multiple computers more manual work is needed. On each computer configure the toolkit, run an interpreter (Matlab or Octave), and proceed in similar manner than with the multi-core computer. Note that by default sequences will be downloaded on each computer, which can be avoided by copying the initialized workspace from one computer to the rest. The results have to be manually merged on a single computer by copying the result data for each experiment in the `results` directory. Only then re-enable result package creation, clear the variables, and call `do_experiments` again.
 
 Results bundle
 --------------
