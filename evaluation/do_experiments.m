@@ -14,7 +14,7 @@ addpath(include_dirs{:});
 
 initialize_environment;
 
-experiments = {'baseline', 'region_noise', 'skipping'};
+experiments = {'baseline', 'grayscale'};
 
 for e = 1:length(experiments)
 
