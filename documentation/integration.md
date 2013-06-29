@@ -49,3 +49,15 @@ When specifying the `tracker_command` variable in the configuration file please 
 
 Of course all the directories, containing required Matlab scripts should be registered with Matlab prior to running the evaluation. Also note that any unhandled exception thrown in the script will result in Matlab breaking to interactive mode and that this will prevent the evaluation from continuing. It is therefore advised that all exceptions are handled explicitly so that the wrapper script always terminates the interpreter.
 
+Integration rules
+-----------------
+
+To make the tracker evaluation fair we list several rules that you should be aware of:
+
+* _Stochastic processes_ - Many trackers use pseudo-random sampling at certain parts of the algorithm. To properly evaluate such trackers the random seed should not be fixed to a certain value. The best way to ensure this is to initialize seed with a different value every time, for example using current time. In C this is done by calling `srandom(time(NULL))` at the beginning of the program, while one way of doing this in Matlab is by calling `	RandStream.setGlobalStream(RandStreams('mt19937ar', 'Seed', sum(clock)))`.
+* _Image stream_ - The tracking scenario specifies input images as a stream. Therefore the tracker should always only access images in the specified order and not skip ahead. 
+* _Tracker parameters_ - The tracker is supposed to be run with the same parameters for all the sequences. Any effort to determine the parameter values that were pre-tuned to a specific challenge sequence from the given images is prohibited.
+* _Resources access_ - The tracker program should only access the files in the directory that it is executed in (that is `images.txt` and `region.txt`).
+
+While we cannot enforce these guidelines in the current toolkit, the adherence of these rules is mandatory. Any violation is considered as cheating and could result in disqualification.
+
