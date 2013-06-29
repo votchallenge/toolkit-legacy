@@ -6,6 +6,10 @@ if track_properties.indent > 0
     fprintf(repmat(sprintf('  '), 1, track_properties.indent));
 end;
 
+if ispc
+   text = regexprep(text, '\', '\\\\');
+end
+
 if nargin > 1
     fprintf([text, '\n'], varargin{:});
 else
