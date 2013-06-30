@@ -16,9 +16,9 @@ The working directory automatically populated with several subdirectories:
    		* `00000003.jpg`
    		* `...`
 * `results/` - Results of the tracking for multiple trackers.
-	- `<tracker identifier>/` - Results for a specific tracker.
-		* `<experiment name>/` - Results for a specific experiment.
-   		* `<sequence name>/` - Results for a sequence
+	- `<tracker identifier>/` - All results for a specific tracker.
+		* `<experiment name>/` - All results for a specific experiment.
+   		* `<sequence name>/` - All results for a sequence.
    			* `<sequence name>_<iteration>.txt` - Result data for iteration.
 * `cache/` - Cached data that can be deleted and can be generated on demand. An example of this are gray-scale sequences that are generated from their color originals on demand.
 
@@ -47,6 +47,23 @@ To speed up the execution, the evaluation can be parallelized. Due to simplicity
 To separate execution of the evaluation on a single multi-core computer simply run three instances of the interpreter (Matlab or Octave). Disable result package creation (using `track_properties.pack`). In each of the interactive shells set a variable `selected_experiment` to one of the values from 1 to 3. Then execute the evaluation by calling `do_experiments`. After all three experiments are done, re-enable result package creation, clear the variables, and call `do_experiments` again in one of the interactive shells.
 
 To separate execution on multiple computers more manual work is needed. On each computer configure the toolkit, run an interpreter (Matlab or Octave), and proceed in similar manner than with the multi-core computer. Note that by default sequences will be downloaded on each computer, which can be avoided by copying the initialized workspace from one computer to the rest. The results have to be manually merged on a single computer by copying the result data for each experiment in the `results` directory. Only then re-enable result package creation, clear the variables, and call `do_experiments` again.
+
+Trajectory format
+-----------------
+
+Similarly to the output of the tracker, the final combined bounding-box trajectory is encoded as a comma-separated list of four values per frame:
+
+    <left_1>,<top_1>,<width_1>,<height_1>
+    <left_2>,<top_2>,<width_2>,<height_2>
+    <left_3>,<top_3>,<width_3>,<height_3>
+    <left_4>,<top_4>,<width_4>,<height_4>
+    ...
+
+This stored sequence describes the entire tracking trial process with failures and re-initializations encoded between regular frames in a special format. All irregular frame states have `left`, `top` and `width` values set to `NaN`. The `height` negative values define the type of the special frame:
+
+* Initialization of the tracker: `height = -1`.
+* Failure of the tracker: `height = -2`.
+* Undefined state due to frame skipping: `height = 0`.
 
 Results bundle
 --------------
