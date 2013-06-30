@@ -1,4 +1,4 @@
-function experiment_region_noise(tracker, sequences, directory)
+function scores = experiment_region_noise(tracker, sequences, directory)
 
 global track_properties;
 

@@ -1,4 +1,4 @@
-function experiment_grayscale(tracker, sequences, directory)
+function scores = experiment_grayscale(tracker, sequences, directory)
 
 global track_properties;
 

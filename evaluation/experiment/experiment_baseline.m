@@ -1,4 +1,4 @@
-function experiment_baseline(tracker, sequences, directory)
+function scores = experiment_baseline(tracker, sequences, directory)
 
 global track_properties;
 

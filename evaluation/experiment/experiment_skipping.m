@@ -1,4 +1,4 @@
-function experiment_skipping(tracker, sequences, directory)
+function scores = experiment_skipping(tracker, sequences, directory)
 
 global track_properties;
 
