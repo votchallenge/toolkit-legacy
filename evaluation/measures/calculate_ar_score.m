@@ -1,4 +1,4 @@
-function [scores] = calculate_ar_score(tracker, sequences, result_directory);
+function [scores] = calculate_ar_score(tracker, sequences, result_directory)
 
 global track_properties;
 
@@ -20,7 +20,7 @@ for i = 1:length(sequences)
             continue;
         end;
 
-        accuracy(j) = estimate_accuracy(trajectory, sequences{i});
+        accuracy(j) = estimate_accuracy(trajectory, sequences{i}, 'burnout', track_properties.burnout);
         reliability(j) = estimate_reliability(trajectory, sequences{i});
 
     end;
