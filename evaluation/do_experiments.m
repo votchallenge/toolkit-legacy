@@ -14,13 +14,16 @@ addpath(include_dirs{:});
 
 initialize_environment;
 
-experiments = {'baseline', 'grayscale'};
+experiments = {'baseline', 'grayscale', 'region_noise'};
 
 if exist('select_experiment', 'var')
-	selected_experiments = select_experiment(select_experiment > 0 && select_experiment <= length(experiments));
+	selected_experiments = unique(select_experiment(select_experiment > 0 && ...
+        select_experiment <= length(experiments)));
 else
 	selected_experiments = 1:length(experiments);
 end;
+
+summary = cell(length(experiments), 1);
 
 for e = selected_experiments
 
@@ -36,7 +39,7 @@ for e = selected_experiments
 
     experiment_directory = fullfile(tracker.directory, experiments{e});
 
-    experiment_function(tracker, sequences, experiment_directory);
+    summary{e} = experiment_function(tracker, sequences, experiment_directory);
 
     scores = calculate_ar_score(tracker, sequences, experiment_directory);
 

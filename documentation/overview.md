@@ -67,15 +67,16 @@ The entire evaluation is currently performed by executing the `do_experiments` s
 
 The time required for the evaluation depends on the speed of your tracker. Because of the rigorous testing methodology the entire evaluation can take up to several days. For a more detailed explanation of the testing procedure consult the `internals.md` guide.
 
-Submit the results
-------------------
+View and submit the results
+---------------------------
 
-At the end of the evaluation the toolkit generates a ZIP file containing all the results. In order to publish the results to the VOT on-line result repository, this file has to be submitted to the repository maintainers (consult the on-line instructions at the repository website).
+At the end of the evaluation the toolkit generates a ZIP file containing all the raw results and an overview HTML document of calculated result scores. This second document is for your use and does not have to be submitted. 
+
+In order to publish the results to the VOT on-line result repository, the ZIP file has to be submitted to the repository maintainers (consult the on-line instructions at the repository website).
 
 Tips and tricks
 ---------------
 
-* _Compute results_ - TODO
 * _Parallel execution_ - A full evaluation can be extremely time-consuming. Due to simplicity, the toolkit does not support parallel execution, however, it is possible to execute individual experiments in parallel on multiple computers or on a single multi-core computer with a bit of manual work. The process is described in `internals.md` guide.
 * _Clearing results_ - By default the toolkit caches already calculated trials, so that the evaluation can be stopped at any time and resumed later with as little lost data as possible. If you, however, wish to clear the already stored data there are two options. The first one is to disable `track_properties.cache` parameter in your `configuration.m`. The second option is to delete the appropriate directory in the results subdirectory of your working directory. This subdirectory has the same name as your tracker, so make sure that you do not delete the wrong one if you are evaluating multiple trackers.
 
