@@ -1,6 +1,5 @@
-global track_properties;
-track_properties = struct('debug', 0, 'cache', 1, 'indent', 0, 'pack', 1, ...
-     'bundle', 'http://box.vicos.si/vot/vot2013.zip', 'repeat', 5, 'cleanup', 1);
+
+initialize_defaults;
 
 print_text('Running VOT experiments ...');
 
