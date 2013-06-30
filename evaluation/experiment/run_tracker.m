@@ -1,8 +1,8 @@
-function [trajectory, time] = run_tracker(tracker, sequence, start)
+function [trajectory, time] = run_tracker(tracker, sequence, start, context)
 % RUN_TRACKER  Generates input data for the tracker, runs the tracker and
 % validates results.
 %
-%   [TRAJECTORY, TIME] = RUN_TRACKER(TRACKER, SEQUENCE, START)
+%   [TRAJECTORY, TIME] = RUN_TRACKER(TRACKER, SEQUENCE, START, CONTEXT)
 %              Runs the tracker on a sequence that with a specified offset.
 %
 %   See also RUN_TRIAL, SYSTEM.
@@ -10,7 +10,7 @@ function [trajectory, time] = run_tracker(tracker, sequence, start)
 % create temporary directory and generate input data
 global track_properties;
 
-working_directory = prepare_trial_data(sequence, start);
+working_directory = prepare_trial_data(sequence, start, context);
 
 output_file = fullfile(working_directory, 'output.txt');
 

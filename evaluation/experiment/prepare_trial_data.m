@@ -1,4 +1,4 @@
-function [working_directory] = prepare_trial_data(sequence, start)
+function [working_directory] = prepare_trial_data(sequence, start, context)
 % PREPARE_TRIAL_DATA Prepares a temporary directory and populates it with
 % necessary data for the tracker.
 %
@@ -16,7 +16,7 @@ mkdir(working_directory);
 region_file = fullfile(working_directory, 'region.txt');
 images_file = fullfile(working_directory, 'images.txt');
 
-region = get_initialization_region(sequence, start);
+region = sequence.initialize(sequence, start, context);
 
 csvwrite(region_file, region);
 

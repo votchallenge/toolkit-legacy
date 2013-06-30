@@ -11,6 +11,8 @@ sequence = struct('name', name, 'directory', directory, ...
 
 sequence.images = cell(size(groundtruth, 1), 1);
 
+sequence.initialization = @(sequence, index, context) get_region(sequence, index);
+
 while true
     image_name = sprintf(mask, sequence.length + 1);
 

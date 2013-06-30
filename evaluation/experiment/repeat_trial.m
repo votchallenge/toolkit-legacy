@@ -31,7 +31,9 @@ for i = 1:repetitions
 
     print_text('Repetition %d', i);
 
-    [trajectory, t] = run_trial(tracker, sequence);
+    context = struct('repetition', repetition, 'repetitions', repetitions);
+    
+    [trajectory, t] = run_trial(tracker, sequence, context);
 
     print_indent(-1);
 
