@@ -1,22 +1,22 @@
 function [accuracy] = estimate_accuracy(trajectory, sequence, varargin)
 
-burnout = 0;
+burnin = 0;
 
 args = varargin;
 for j=1:2:length(args)
     switch varargin{j}
-        case 'burnout', burnout = max(0, args{j+1});
+        case 'burnin', burnin = max(0, args{j+1});
         otherwise, error(['unrecognized argument ' args{j}]);
     end
 end
 
-if burnout > 0
+if burnin > 0
     
     mask = trajectory(:, 4) == -1; % determine initialization frames
     
-    % ignore the next 'burnout' frames
+    % ignore the next 'burnin' frames
     mask = imdilate(mask, strel('arbitrary', ...
-        [zeros(burnout - 1, 1); ones(burnout, 1)]));
+        [zeros(burnin - 1, 1); ones(burnin, 1)]));
 
     trajectory(mask, 4) = 0;
     

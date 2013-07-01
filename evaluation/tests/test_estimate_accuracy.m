@@ -11,4 +11,4 @@ groundtruth(11:14, 1) = 0;
 
 acc2 = estimate_accuracy(groundtruth, sequence);
 
-acc3 = estimate_accuracy(groundtruth, sequence, 'burnout', 5);
+acc3 = estimate_accuracy(groundtruth, sequence, 'burnin', 5);

@@ -20,7 +20,7 @@ for i = 1:length(sequences)
             continue;
         end;
 
-        accuracy(j) = estimate_accuracy(trajectory, sequences{i}, 'burnout', track_properties.burnout);
+        accuracy(j) = estimate_accuracy(trajectory, sequences{i}, 'burnin', track_properties.burnin);
         reliability(j) = estimate_reliability(trajectory, sequences{i});
 
     end;
