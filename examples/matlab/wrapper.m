@@ -1,6 +1,10 @@
+function wrapper()
 %% VOT integration example for MeanShift tracker
-%
-% 
+
+% *************************************************************
+% VOT: Always call exit command at the end to terminate Matlab!
+% *************************************************************
+onCleanup(@() exit() );
 
 tracker_directory = fullfile(fileparts(mfilename('fullpath')), 'tracker');
 rmpath(tracker_directory);
@@ -69,7 +73,3 @@ end
 
 vot_deinitialize(results);
 
-% *************************************************************
-% VOT: Always call exit command at the end to terminate Matlab!
-% *************************************************************
-exit;

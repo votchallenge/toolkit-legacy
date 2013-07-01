@@ -41,13 +41,19 @@ To register a binary tracker in the environment, simply set the `tracker_command
 Matlab trackers
 ---------------
 
-Matlab-based trackers are a bit more tricky to integrate as the scripts are typically run in an integrated development environment. In order to integrate a Matlab tracker into the evaluation, a wrapper script has to be created. This script will usually read the input files, but more importantly it should call `exit` command at the end in order to terminate Matlab interpreter completely. This is very important as the toolkit waits for the tracker executable to exit before it continues. For the details please check out the Matlab tracker example in the `examples` directory.
+Matlab-based trackers are a bit more tricky to integrate as the scripts are typically run in an integrated development environment. In order to integrate a Matlab tracker into the evaluation, a wrapper function has to be created. This function will usually read the input files, but more importantly it should call `exit` command at the end in order to terminate Matlab interpreter completely. This is very important as the toolkit waits for the tracker executable to stop before it continues with the evaluation of produced results. Another issue that has to be addressed is the user-issued termination. When a Ctrl+C command is issued during the `system` call the command is forwarded to the child process. Because of this the child Matlab will break the execution and return to interactive mode. In order to tell Matlab to quit in this case we can use the [onCleanup](http://www.mathworks.com/help/matlab/ref/oncleanup.html) function which also addresses the normal termination scenario:
+
+	function wrapper()
+		onCleanup(@() exit() ); % Tell Matlab to exit once the function exits
+		... tracking code ...
+
+ For an example of integration please check out the Matlab tracker example in the `examples` directory.
 
 When specifying the `tracker_command` variable in the configuration file please note that the wrapper script file is not the one being executed but only a parameter to the Matlab executable. The actual command therefore looks like this:
 
     tracker_command = '<TODO: path to Matlab executable> -nodesktop -nosplash -r <TODO: name of the wrapper script>';
 
-Of course all the directories, containing required Matlab scripts should be registered with Matlab prior to running the evaluation. Also note that any unhandled exception thrown in the script will result in Matlab breaking to interactive mode and that this will prevent the evaluation from continuing. It is therefore advised that all exceptions are handled explicitly so that the wrapper script always terminates the interpreter.
+Of course all the directories, containing required Matlab scripts should be registered with Matlab prior to running the evaluation. Also note that any unhanded exception thrown in the script will result in Matlab breaking to interactive mode and that this will prevent the evaluation from continuing. It is therefore advised that all exceptions are handled explicitly so that the wrapper script always terminates the interpreter.
 
 Integration rules
 -----------------
