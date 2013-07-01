@@ -48,7 +48,7 @@ while start < sequence.length
         trajectory(start + 1:min(first_failure, size(Tr, 1) + start - 1), :) = ...
             Tr(2:min(first_failure - start + 1, size(Tr, 1)), :);
 
-        trajectory(first_failure, 4) = -2;
+        trajectory(first_failure, :) = [NaN, NaN, NaN, -2];
         start = first_failure + track_properties.skipping;
         print_debug(['INFO: Detected failure at frame ', num2str(first_failure), '. Reinitializing.']);
 
