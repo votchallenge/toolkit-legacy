@@ -66,7 +66,7 @@ while 1
     end;
 
     print_text('Sequence "%s"', sequences{current_sequence}.name);
-    [trajectory, time] = run_tracker(tracker, sequences{current_sequence}, 1);
+    [trajectory, time] = tracker.run(tracker, sequences{current_sequence}, 1, struct('repetition', 1, 'repetitions', 1));
 
 end;
 
