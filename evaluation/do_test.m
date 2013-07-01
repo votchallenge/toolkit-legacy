@@ -13,10 +13,15 @@ addpath(include_dirs{:});
 
 initialize_environment;
 
+global current_sequence;
 global trajectory;
 
 if ~exist('trajectory', 'var')
 	trajectory = [];
+end;
+
+if ~exist('current_sequence', 'var')
+	current_sequence = 1;
 end;
 
 i = 0;
@@ -28,9 +33,13 @@ while 1
         print_text('%d - Use sequence "%s"', i, sequences{i}.name);
     end;
     if ~isempty(trajectory)
-        print_text('c - Visually compare results with groundtruth');
+        print_text('c - Visually compare results with the groundtruth');
     end;
-	print_text('d - Toggle debug output');
+    if track_properties.debug
+        print_text('d - Disable debug output');
+    else
+        print_text('d - Enable debug output');
+    end;
     print_text('e - Exit');
     print_indent(-1);
 
@@ -38,26 +47,26 @@ while 1
 
     switch option
     case 'c'
-        if ~isempty(trajectory) && sq > 0 && sq <= length(sequences)
-            visualize_sequence(sequences{sq}, trajectory);
-        end;
-        continue;
+        if ~isempty(trajectory) && current_sequence > 0 && current_sequence <= length(sequences)
+            visualize_sequence(sequences{current_sequence}, trajectory);
+        end;        
 	case 'd'
 		track_properties.debug = ~track_properties.debug;
     case 'e'
         break;
-    default
+    case 'q'
+        break;
 
     end;
 
-    sq = int32(str2num(option));
+    current_sequence = int32(str2double(option));
 
-    if isempty(sq) || sq < 1 || sq > length(sequences)
+    if isempty(current_sequence) || current_sequence < 1 || current_sequence > length(sequences)
         continue;
     end;
 
-    print_text('Sequence "%s"', sequences{sq}.name);
-    [trajectory, time] = run_tracker(tracker, sequences{sq}, 1);
+    print_text('Sequence "%s"', sequences{current_sequence}.name);
+    [trajectory, time] = run_tracker(tracker, sequences{current_sequence}, 1);
 
 end;
 
