@@ -72,6 +72,9 @@ time = time / (sequence.length-start);
 
 if (n_frames ~= (sequence.length-start) + 1)
     print_debug('WARNING: Tracker did not produce a trajectory file.');
+    if isempty(trajectory)
+        error('No result produced by tracker. Stopping.');
+    end;
     trajectory = [];
     time = NaN;
 end;

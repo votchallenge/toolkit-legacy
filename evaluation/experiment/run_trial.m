@@ -62,6 +62,8 @@ while start < sequence.length
         start = sequence.length;
     end;
 
+    drawnow;
+    
 end;
 
 time = total_time / total_frames;
