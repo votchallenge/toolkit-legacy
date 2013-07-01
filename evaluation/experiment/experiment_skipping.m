@@ -10,7 +10,7 @@ for i = 1:length(sequences)
     repeat_trial(tracker, sequence, track_properties.repeat, fullfile(directory, sequences{i}.name));
 end;
 
-scores = calculate_ar_score(tracker, sequences, directory);
+scores = calculate_scores(tracker, sequences, directory);
 
 print_text('Experiment complete. Outputting final A-R scores:');
 

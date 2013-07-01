@@ -1,8 +1,8 @@
-function [scores] = calculate_ar_score(tracker, sequences, result_directory)
+function [scores] = calculate_scores(tracker, sequences, result_directory)
 
 global track_properties;
 
-scores = nan(length(sequences), 2);
+scores = nan(length(sequences), 3);
 
 for i = 1:length(sequences)
 
@@ -25,11 +25,13 @@ for i = 1:length(sequences)
 
     end;
 
+    times = csvread(fullfile(directory, sprintf('%s_time.txt', sequences{i}.name)));
+    
     if all(isnan(accuracy))
         continue;
     end;
 
-    scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability)))];
+    scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability))), mean(times(times > 0))];
 
 end;
 
