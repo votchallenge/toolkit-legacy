@@ -42,10 +42,22 @@ for e = selected_experiments
 
     summary{e} = experiment_function(tracker, sequences, experiment_directory);
 
-    scores = calculate_ar_score(tracker, sequences, experiment_directory);
-
     print_indent(-1);
 
+end;
+
+if track_properties.report
+
+    print_text('Generating report ...');
+    
+    print_indent(1);
+    
+    reportfile = write_report(tracker, sequences, experiments, summary);
+
+    print_indent(-1);
+    
+    print_text('Report document written to "%s"', reportfile);
+    
 end;
 
 if track_properties.pack
