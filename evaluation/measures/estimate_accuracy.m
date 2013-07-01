@@ -14,9 +14,14 @@ if burnin > 0
     
     mask = trajectory(:, 4) == -1; % determine initialization frames
     
+    if is_octave()
+        se = [zeros(burnin - 1, 1); ones(burnin, 1)];
+    else
+        se = strel('arbitrary', [zeros(burnin - 1, 1); ones(burnin, 1)]);
+    end;
+    
     % ignore the next 'burnin' frames
-    mask = imdilate(mask, strel('arbitrary', ...
-        [zeros(burnin - 1, 1); ones(burnin, 1)]));
+    mask = imdilate(mask, se);
 
     trajectory(mask, 4) = 0;
     
