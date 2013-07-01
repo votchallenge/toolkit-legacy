@@ -1,6 +1,7 @@
 
 script_directory = fileparts(mfilename('fullpath'));
-include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', 'tracker', 'sequence', 'measures', 'experiment'}, 'UniformOutput', false); 
+include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
+    'tracker', 'sequence', 'measures', 'experiment', 'tests'}, 'UniformOutput', false); 
 if exist('strsplit') ~= 2
 	remove_dirs = include_dirs;
 else
