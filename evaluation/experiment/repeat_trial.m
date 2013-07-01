@@ -31,7 +31,7 @@ for i = 1:repetitions
 
     print_text('Repetition %d', i);
 
-    context = struct('repetition', repetition, 'repetitions', repetitions);
+    context = struct('repetition', i, 'repetitions', repetitions);
     
     [trajectory, t] = run_trial(tracker, sequence, context);
 

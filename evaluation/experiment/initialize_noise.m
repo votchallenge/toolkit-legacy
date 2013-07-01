@@ -1,12 +1,12 @@
-function [region] = initialize_noise(sequence, index)
+function [region] = initialize_noise(sequence, index, context)
 
-region = get_region(sequence, index, context);
+region = get_region(sequence, index);
 
 noise = [0, 0, 1, 1];
 
 if isfield(sequence, 'noise')
 
-    noise = squeeze(sequence.noise(mod(index, size(sequence.noise, 1)), :));
+    noise = squeeze(sequence.noise(mod(context.repetition, size(sequence.noise, 1)) + 1, :));
     
 end;
 
