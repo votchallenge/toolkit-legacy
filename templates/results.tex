@@ -1,0 +1,68 @@
+\documentclass[10pt,twoside]{article}
+
+\usepackage{times}
+\date{}
+
+\usepackage[breaklinks=true,colorlinks,bookmarks=false]{hyperref}
+
+\begin{document}
+
+%%%%%%%%% TITLE
+\title{The VOT2013 Challenge Results and Short Description Page}
+
+\author{First Author\\
+Institution1\\
+Institution1 address\\
+{\tt\small firstauthor@i1.org}
+\and
+Second Author\\
+Institution2\\
+First line of institution2 address\\
+{\tt\small secondauthor@i2.org}
+}
+
+\maketitle
+%\thispagestyle{empty}
+
+\section{Full name of the tracker} 
+*Replace this text with the full name of the tracker, e.g., Persistent Adaptive Tracker.*
+
+\section{Abbreviated name of the tracker}
+*Replace this text with an abbreviation of the tracker's name, e.g. PAT.*
+
+\section{Brief description of the method}
+*Replace this text with a short description of the method used for tracking, not longer than 15 lines,
+and not using more than 4 references.\\
+Line 3 \\
+Line 4 \\
+Line 5 \\
+Line 6 \\
+Line 7 \\
+Line 8 \\
+Line 9 \\
+Line 10\\
+Line 11\\
+Line 12\\
+Line 13\\
+Line 14\\
+Line 15*\\
+
+\section{The VOT2013 challenge results}
+This tracker was evaluated according to the rules of the VOT2013 challenge
+as specified in the VOT2013 evaluation kit document~\cite{VOT2013}.
+The authors guarantee that they have exactly followed the guidelines
+and have not modified the obtained results in any way that would violate the challenge rules.
+The results are given in Table \ref{tab:results}.
+
+\begin{table}
+%Paste the results of the evaluation toolkit here
+  \caption{The results of the VOT2013 challenge for the tracker *insert abbreviated tracker name here*.}
+  \label{tab:results}
+
+\end{table}
+{\small
+  \bibliographystyle{abbrv}
+  \bibliography{results}
+}
+
+\end{document}
