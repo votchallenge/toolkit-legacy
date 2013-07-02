@@ -13,17 +13,13 @@ A tracker is written as a GUI-less executable or a script that receives its inpu
 
 Every time the tracker is run, the toolkit generates a new temporary directory and populates it with the input data. The tracker is then executed in this (working) directory.
 
-**Input**
+**Input**: There are two input files available in the working directory:
 
-There are two input files available in the working directory:
-
-* `images.txt` - A text file containing a new-line separated list of absolute file paths. Each line therefore determines an image file on the hard-drive. Images are in JPEG or PNG format. Note that no assumptions should be made regarding the names of the files. The only legal order of the images is the one provided in the file.
+* `images.txt` - A text file containing a new-line separated list of absolute file paths. Each line therefore determines an image file on the hard-drive. Images are in JPEG format. Note that no assumptions should be made regarding the names of the files. The only legal order of the images is the one provided in the file.
 
 * `region.txt` - A text file containing four comma-separated values that denote the left,top coordinate of the initial object bounding-box as well as its width and height.
 
-**Output**
-
-In order to consider a tracker execution as successful the tracker has to produce a `output.txt` file before it exits. This file should contain a sequence of object's bounding-boxes that correspond to the appropriate frames in the input image sequence. The bounding-box sequence is encoded as a comma-separated list of four values per frame:
+**Output**: In order to consider a tracker execution as successful the tracker has to produce a `output.txt` file before it exits. This file should contain a sequence of object's bounding-boxes that correspond to the appropriate frames in the input image sequence. The bounding-box sequence is encoded as a comma-separated list of four values per frame:
 
     <left_1>,<top_1>,<width_1>,<height_1>
     <left_2>,<top_2>,<width_2>,<height_2>
@@ -41,7 +37,7 @@ To register a binary tracker in the environment, simply set the `tracker_command
 Matlab trackers
 ---------------
 
-Matlab-based trackers are a bit more tricky to integrate as the scripts are typically run in an integrated development environment. In order to integrate a Matlab tracker into the evaluation, a wrapper function has to be created. This function will usually read the input files, but more importantly it should call `exit` command at the end in order to terminate Matlab interpreter completely. This is very important as the toolkit waits for the tracker executable to stop before it continues with the evaluation of produced results. Another issue that has to be addressed is the user-issued termination. When a Ctrl+C command is issued during the `system` call the command is forwarded to the child process. Because of this the child Matlab will break the execution and return to interactive mode. In order to tell Matlab to quit in this case we can use the [onCleanup](http://www.mathworks.com/help/matlab/ref/oncleanup.html) function which also addresses the normal termination scenario:
+Matlab-based trackers are a bit more tricky to integrate as the scripts are typically run in an integrated development environment. In order to integrate a Matlab tracker into the evaluation, a wrapper function has to be created. This function will usually read the input files, but more importantly it should call `exit` command at the end in order to terminate Matlab interpreter completely. This is very important as the toolkit waits for the tracker executable to stop before it continues with the evaluation of produced results. Another issue that has to be addressed is the user-issued termination. When a `Ctrl+C` command is issued during the `system` call the command is forwarded to the child process. Because of this the child Matlab will break the execution and return to interactive mode. In order to tell Matlab to quit in this case we can use the [onCleanup](http://www.mathworks.com/help/matlab/ref/oncleanup.html) function which also addresses the normal termination scenario:
 
 	function wrapper()
 		onCleanup(@() exit() ); % Tell Matlab to exit once the function exits
@@ -60,10 +56,19 @@ Integration rules
 
 To make the tracker evaluation fair we list several rules that you should be aware of:
 
-* _Stochastic processes_ - Many trackers use pseudo-random sampling at certain parts of the algorithm. To properly evaluate such trackers the random seed should not be fixed to a certain value. The best way to ensure this is to initialize seed with a different value every time, for example using current time. In C this is done by calling `srandom(time(NULL))` at the beginning of the program, while one way of doing this in Matlab is by calling `	RandStream.setGlobalStream(RandStreams('mt19937ar', 'Seed', sum(clock)))`.
+* _Stochastic processes_ - Many trackers use pseudo-random sampling at certain parts of the algorithm. To properly evaluate such trackers the random seed should not be fixed to a certain value. The best way to ensure this is to initialize seed with a different value every time, for example using current time. In C this is done by calling `srandom(time(NULL))` at the beginning of the program, while one way of doing this in Matlab is by calling:
+
+	`	RandStream.setGlobalStream(RandStreams('mt19937ar', 'Seed', sum(clock)))`
+
 * _Image stream_ - The tracking scenario specifies input images as a stream. Therefore the tracker should always only access images in the specified order and not skip ahead. 
 * _Tracker parameters_ - The tracker is supposed to be run with the same parameters for all the sequences. Any effort to determine the parameter values that were pre-tuned to a specific challenge sequence from the given images is prohibited.
 * _Resources access_ - The tracker program should only access the files in the directory that it is executed in (that is `images.txt` and `region.txt`).
 
 While we cannot enforce these guidelines in the current toolkit, the adherence of these rules is mandatory. Any violation is considered as cheating and could result in disqualification.
 
+Testing integration
+-------------------
+
+It is not recommended to immediately run the entire evaluation without testing the integration on a simpler task. For this the toolkit provides the `do_test` function that provides an interactive environment for testing your tracker on various sequences.
+
+Using this environment you can verify the correct interpretation of input and output data (at the moment the interactive visualization only works in Matlab) as well as estimate the entire evaluation time based on several runs of the tracker on various sequences (run the tracker on several sequences, then select the option to display required estimate).

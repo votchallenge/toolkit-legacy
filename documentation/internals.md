@@ -22,8 +22,8 @@ The working directory automatically populated with several subdirectories:
    			* `<sequence name>_<iteration>.txt` - Result data for iteration.
 * `cache/` - Cached data that can be deleted and can be generated on demand. An example of this are gray-scale sequences that are generated from their color originals on demand.
 
-Evaluation execution and parallelism
-------------------------------------
+Evaluation execution
+--------------------
 
 By default the entire evaluation is performed sequentially as described by the following pseudo-code:
 
@@ -40,13 +40,22 @@ Each trial contains one or more executions of the tracker. The idea is that if t
 
 In the case of stochastic trackers, each sequence is evaluated multiple times. If the tracker produces identical trajectories two times in a row, the tracker is considered deterministic and further iterations are omitted. It is therefore important that the stochastic nature of a tracker is appropriately addressed (proper random seed initialization).
 
-Because of this methodology, the entire execution time can be quite long. If we assume that we have a stochastic tracker that runs less than real-time. Let’s assume that it takes 0.5 second per frame. The average length of a sequence is 350 frames. The tracker performs 15 trials on each sequence, and there are 15 sequences in the dataset. We pessimistically assume that a tracker fails uniformly 8 times throughout the sequence, which approximately amounts to equivalent of 5 re-runs over entire sequence. We get the following rule-of-thumb estimate of the time required to perform the experiment is more than two days for a single experiment. The entire evaluation contains three experiments which results in roughly 7 days of execution.
+Because of the thorough methodology, the entire execution time can be quite long. If we assume that we have a stochastic tracker that runs less than real-time. Let’s assume that it takes 0.5 second per frame. The average length of a sequence is 350 frames. The tracker performs 15 trials on each sequence, and there are 16 sequences in the dataset. We pessimistically assume that a tracker fails uniformly 8 times throughout the sequence, which approximately amounts to equivalent of 5 re-runs over entire sequence. We get the following rule-of-thumb estimate of the time required to perform the experiment is more than two days for a single experiment. The entire evaluation contains three experiments which results in roughly 7 days of execution.
 
-To speed up the execution, the evaluation can be parallelized. Due to simplicity, the toolkit does not support parallel execution explicitly, however, it is possible to execute individual experiments in parallel on multiple computers or on a single multi-core computer with a bit of manual work, thus reducing the evaluation time back to 2-3 days.
+Parallelism
+-----------
 
-To separate execution of the evaluation on a single multi-core computer simply run three instances of the interpreter (Matlab or Octave). Disable result package creation (using `track_properties.pack`). In each of the interactive shells set a variable `selected_experiment` to one of the values from 1 to 3. Then execute the evaluation by calling `do_experiments`. After all three experiments are done, re-enable result package creation, clear the variables, and call `do_experiments` again in one of the interactive shells.
+To speed up the execution, the evaluation can be parallelized. Due to simplicity, the toolkit does not support parallel execution explicitly, however, it is possible to execute individual experiments in parallel on multiple computers or on a single multi-core computer with a bit of manual work, thus reducing the evaluation time back to 2-3 days. The other, more complicated option is to separate the execution by sequence dataset partitioning.
+
+**Parallelize by experiment**: To separate execution of the evaluation on a single multi-core computer simply run three instances of the interpreter (Matlab or Octave). Disable result package creation (using `track_properties.pack`). In each of the interactive shells set a variable `selected_experiment` to one of the values from 1 to 3. Then execute the evaluation by calling `do_experiments`. After all three experiments are done, re-enable result package creation, clear the variables, and call `do_experiments` again in one of the interactive shells.
 
 To separate execution on multiple computers more manual work is needed. On each computer configure the toolkit, run an interpreter (Matlab or Octave), and proceed in similar manner than with the multi-core computer. Note that by default sequences will be downloaded on each computer, which can be avoided by copying the initialized workspace from one computer to the rest. The results have to be manually merged on a single computer by copying the result data for each experiment in the `results` directory. Only then re-enable result package creation, clear the variables, and call `do_experiments` again.
+
+**Parallelize by dataset partitioning**: Another option to speed up the evaluation is to form dataset partitioning. This option requires more manual work, but also offers better options of parallelization.
+
+By default the toolkit assembles a list of sequences by reading the `list.txt` file in the `sequences` directory. This file contains a list of all the sequences in the evaluation. To split the execution into multiple parts prepare files `list1.txt`, `list2.txt` ... `listN.txt` in the `sequences` directory and copy appropriate subsets of sequences from the `list.txt` into each of them. Then open N interpreters (one one or more computers) and set the variable `selected_sequences` to `list<I>.txt` where `I` = 1 ... N on each of the environments before running the `do_experiments` function. 
+
+Other instructions (disabling package creation and result merging for multi-computer setup) are the same as with the parallelization by experiment.
 
 Trajectory format
 -----------------
