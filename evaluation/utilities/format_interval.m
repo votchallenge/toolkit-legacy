@@ -8,7 +8,7 @@ hours = floor(time / (60*60));
 
 time = time - hours * (60*60);
 
-minutes = floor(time / (60*60));
+minutes = floor(time / (60));
 
 %time = time - minutes * (60);
 

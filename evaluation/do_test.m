@@ -59,9 +59,11 @@ while 1
     case 't'
         if performance.frames > 0
             
-            estimate = estimate_completion_time(sequences, 'fps', performance.time / performance.frames);
+            fps = performance.frames / performance.time;
             
-            print_test('Based on current estimate, the completion time for %d sequences is %s', length(sequences), format_interval(estimate));
+            estimate = estimate_completion_time(sequences, 'fps', fps);
+            
+            print_text('Based on the current estimate (fps = %.2f), the completion time for %d sequences is %s', fps, length(sequences), format_interval(estimate));
             
         end;   
 	case 'd'
