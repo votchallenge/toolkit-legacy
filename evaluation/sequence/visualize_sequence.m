@@ -20,7 +20,11 @@ while 1
     end;
     hold off;
     drawnow;
-	k = waitforbuttonpress; 
+    try
+	k = waitforbuttonpress;
+    catch 
+        break
+    end
     if (k == 1)
         c = get(hf, 'CurrentCharacter');
         try
