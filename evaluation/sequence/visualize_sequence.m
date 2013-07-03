@@ -1,6 +1,6 @@
 function visualize_sequence(sequence, varargin)
 
-print_text('Press arrow keys or S,D,F,G to navigate the sequence.');
+print_text('Press arrow keys or S,D,F,G to navigate the sequence, Q to quit.');
 
 figure(1);
 i = 1;
