@@ -4,7 +4,7 @@ Overview and usage instructions
 Introduction
 ------------
 
-This document describes the structure of the VOT toolkit code and its basic usage. To perform an evaluation you must have your tracker adapted to perform in a specified way. For this you should consult the `integration.md` guide. For a detailed overview of the toolkits structure consult the `internals.md` guide.
+This document describes the structure of the VOT evaluation kit (also called the VOT toolkit) code and its basic usage. To perform an evaluation you must have your tracker adapted to perform in a specified way. For this you should consult the `integration.md` guide. For a detailed overview of the toolkits structure consult the `internals.md` guide.
 
 Terminology
 -----------
@@ -20,7 +20,7 @@ For better understanding we begin with a definition of important terms:
 * _Repetition_ - To properly address the potential stochastic nature of the algorithm, several trials are performed on each sequence. Each trial is therefore called a repetition.
 * _Experiment_ - Evaluation of a tracker on a set of sequences in specific conditions. Specific experiment may change the original sequences to simulate some specific kind of circumstances (e.g. noise).
 * _Evaluation_ - Performing a set of experiments on a specific tracker.
-* _Region overlap_ - Overlap distance between two regions, in our case this is usually the ground-truth bouning box and the tracker predicted bouning-box. Calculated as the intersection divided by union and therefore bounded between 1 and 0.
+* _Region overlap_ - Overlap distance between two regions, in our case this is usually the ground-truth bounding box and the tracker predicted bounding-box. Calculated as the intersection divided by union and therefore bounded between 1 and 0.
 
 Directory structure
 -------------------
@@ -30,6 +30,7 @@ The code and the documents are organized in the following directory structure:
 * `documentation` - Contains documentation files
 * `evaluation` - contains the evaluation toolkit
 * `examples` - Contains example source code in various languages
+* `templates` - Contains templates for writing a supplementary description of the tracker
 
 The evaluation source code resides in the `evaluation` directory and is structured into several subdirectories according to the main function of individual parts. 
 
@@ -45,20 +46,17 @@ Set up the toolkit
 
 In order to set up the toolkit, you have to copy the `configuration_template.m` to `configuration.m` and edit it to set the required variables.
 
-The first variable that has to be set is an absolute path to a working directory. This is the directory where all the sequences and results are stored.
+**Working directory**: The first variable that has to be set is an absolute path to a working directory. Working directory is a directory where the toolkit stores sequences, results and cached data. It is recommended that the directory is empty before the first use, however, it can be used for multiple trackers later on. For more information regarding the directory structure consult the `internals.md` document.
 
     track_properties.directory = '<TODO: set a working directory>';
 
-Then the evaluated tracker has to be configured as well. This is done by setting an unique tracker identifier (used to determine the tracker at the VOT on-line result repository) as well as the exact executable command (consult the `integration.md` guide for details).
+**Tracker**: The evaluated tracker has to be configured as well. This is done by setting an unique tracker identifier (used to determine the tracker at the VOT on-line result repository) as well as the exact executable command (consult the `integration.md` guide for details).
 
     tracker_identifier = '<TODO: set a tracker identifier>';
     
     tracker_command = '<TODO: set a tracker executable command>';
 
-Working directory
------------------
-
-Working directory is a directory where the toolkit stores sequences, results and cached data. It is recommended that the directory is empty before the first use, however, it can be used for multiple trackers later on. For more information regarding the directory structure consult the `internals.md` guide.
+It is recommended that you test the evaluation with one of the example trackers, contained in the `examples` directory. To configure the ''static'' C tracker, compile `static.c` to executable using a C compiler (on Linux you can use `build.sh` script) and then configure the `tracker_identifier` and `tracker_command` variables appropriately.
 
 Perform tracker evaluation
 --------------------------
@@ -72,12 +70,14 @@ View and submit the results
 
 At the end of the evaluation the toolkit generates a ZIP file containing all the raw results and an overview HTML document of calculated result scores. This second document is for your use and does not have to be submitted. 
 
-In order to publish the results to the VOT on-line result repository, the ZIP file has to be submitted to the repository maintainers (consult the on-line instructions at the repository website).
+In order to publish the results to the VOT on-line result repository, the ZIP file has to be submitted to the repository maintainers along with a short description of the tracker (consult the on-line instructions at the repository website).
+
+**Note on meta-data acquisition**: In order to get some technical statistics that will help us improve the evaluation methodology and the toolkit itself the generated ZIP file contains certain information regarding the software and hardware specifications of the computer that the experiments were performed on. These informations range from the information about the operating system type to Matlab/Octave version. All the aggregated information about your computer can be verified prior to submission by checking the `manifest.txt` file in the corresponding ZIP file. Note that this data is not required for a valid submission and can be deleted from the file if you deem it necessary. 
 
 Tips and tricks
 ---------------
 
-* _Parallel execution_ - A full evaluation can be extremely time-consuming. Due to simplicity, the toolkit does not support parallel execution, however, it is possible to execute individual experiments in parallel on multiple computers or on a single multi-core computer with a bit of manual work. The process is described in `internals.md` guide.
+* _Parallel execution_ - A full evaluation can be extremely time-consuming. Due to simplicity, the toolkit does not support parallel execution, however, it is possible to execute parts of the evaluation in parallel on multiple computers or on a single multi-core computer with a bit of manual work. The process is described in `internals.md` guide.
 * _Clearing results_ - By default the toolkit caches already calculated trials, so that the evaluation can be stopped at any time and resumed later with as little lost data as possible. If you, however, wish to clear the already stored data there are two options. The first one is to disable `track_properties.cache` parameter in your `configuration.m`. The second option is to delete the appropriate directory in the results subdirectory of your working directory. This subdirectory has the same name as your tracker, so make sure that you do not delete the wrong one if you are evaluating multiple trackers.
 * _Measuring execution time_ - One of the aspects of trackers performance that is being measured in the evaluation is also execution time. Of course this depends on the hardware, however, some conclusions can also be drawn from these estimates. To make them as reliable as possible it is advisable to perform experiments on a single computer or multiple computers with same the hardware specifications. It is also advisable that the computer is not being used extensively during the evaluation. 
 

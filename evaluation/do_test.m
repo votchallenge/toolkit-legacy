@@ -1,5 +1,6 @@
 script_directory = fileparts(mfilename('fullpath'));
-include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', 'tracker', 'sequence', 'measures', 'experiment'}, 'UniformOutput', false); 
+include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
+    'tracker', 'sequence', 'measures', 'experiment' , 'tests'}, 'UniformOutput', false); 
 if exist('strsplit') ~= 2
 	remove_dirs = include_dirs;
 else
@@ -24,6 +25,8 @@ if ~exist('current_sequence', 'var')
 	current_sequence = 1;
 end;
 
+performance = struct('frames', 0, 'time', 0);
+
 i = 0;
 while 1
     print_text('Choose action:');
@@ -34,6 +37,9 @@ while 1
     end;
     if ~isempty(trajectory)
         print_text('c - Visually compare results with the groundtruth');
+    end;
+    if performance.frames > 0
+        print_text('t - Display required estimate');
     end;
     if track_properties.debug
         print_text('d - Disable debug output');
@@ -49,7 +55,17 @@ while 1
     case 'c'
         if ~isempty(trajectory) && current_sequence > 0 && current_sequence <= length(sequences)
             visualize_sequence(sequences{current_sequence}, trajectory);
-        end;        
+        end;
+    case 't'
+        if performance.frames > 0
+            
+            fps = performance.frames / performance.time;
+            
+            estimate = estimate_completion_time(sequences, 'fps', fps);
+            
+            print_text('Based on the current estimate (fps = %.2f), the completion time for %d sequences is %s', fps, length(sequences), format_interval(estimate));
+            
+        end;   
 	case 'd'
 		track_properties.debug = ~track_properties.debug;
     case 'e'
@@ -68,6 +84,10 @@ while 1
     print_text('Sequence "%s"', sequences{current_sequence}.name);
     [trajectory, time] = tracker.run(tracker, sequences{current_sequence}, 1, struct('repetition', 1, 'repetitions', 1));
 
+    performance.time = performance.time + time * sequences{current_sequence}.length;
+    
+    performance.frames = performance.frames + sequences{current_sequence}.length;
+    
 end;
 
 

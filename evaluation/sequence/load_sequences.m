@@ -1,8 +1,8 @@
-function [sequences] = load_sequences(directory)
+function [sequences] = load_sequences(directory, listfile)
 
 global track_properties;
 
-list_file = fullfile(directory, 'list.txt');
+list_file = fullfile(directory, listfile);
 
 sequences = cell(0);
 
@@ -15,6 +15,7 @@ if ~exist(list_file, 'file') && ~isempty(track_properties.bundle)
         urlwrite(track_properties.bundle, bundle);
         unzip(bundle, directory);
 		delete(bundle);
+        list_file = fullfile(directory, 'list.txt');
     catch e
         print_text('Unable to retreive sequence bundle. Follow the instructions in README.md to install it manually.');
         return;

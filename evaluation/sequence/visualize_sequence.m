@@ -22,7 +22,7 @@ while 1
     drawnow;
 	k = waitforbuttonpress; 
     if (k == 1)
-        c = get(hf, 'CurrentCharacter')
+        c = get(hf, 'CurrentCharacter');
         try
             if c == ' ' || c == 'f' || uint8(c) == 29
                 i = i + 1;
