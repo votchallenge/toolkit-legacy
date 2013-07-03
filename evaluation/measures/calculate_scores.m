@@ -21,7 +21,7 @@ for i = 1:length(sequences)
         end;
 
         accuracy(j) = estimate_accuracy(trajectory, sequences{i}, 'burnin', track_properties.burnin);
-        reliability(j) = estimate_reliability(trajectory, sequences{i}, 'skipping', track_properties.skipping);
+        reliability(j) = estimate_failures(trajectory, sequences{i});
 
     end;
 

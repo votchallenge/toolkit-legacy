@@ -12,12 +12,6 @@ end;
 
 scores = calculate_scores(tracker, sequences, directory);
 
-print_text('Experiment complete. Outputting final A-R scores:');
+print_text('Experiment complete.');
 
-print_indent(1);
-
-for i = 1:length(sequences)
-    print_text('Sequence "%s" - Accuracy: %.3f, Reliability: %.3f', sequences{i}.name, scores(i, 1), scores(i, 2));
-end;
-
-print_indent(-1);
+print_scores(sequences, scores);
