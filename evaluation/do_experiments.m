@@ -15,7 +15,7 @@ addpath(include_dirs{:});
 
 initialize_environment;
 
-experiments = {'baseline', 'grayscale', 'region_noise'};
+experiments = {'baseline', 'region_noise', 'grayscale'};
 
 if exist('select_experiment', 'var')
 	selected_experiments = unique(select_experiment(select_experiment > 0 && ...
