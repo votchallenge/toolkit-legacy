@@ -47,9 +47,9 @@ Matlab-based trackers are a bit more tricky to integrate as the scripts are typi
 
 When specifying the `tracker_command` variable in the configuration file please note that the wrapper script file is not the one being executed but only a parameter to the Matlab executable. The actual command therefore looks like this:
 
-    tracker_command = '<TODO: path to Matlab executable> -nodesktop -nosplash -r <TODO: name of the wrapper script>';
+    tracker_command = '<TODO: path to Matlab executable> -nodesktop -nosplash -wait -r <TODO: name of the wrapper script>';
 
-Of course all the directories, containing required Matlab scripts should be registered with Matlab prior to running the evaluation. Also note that any unhanded exception thrown in the script will result in Matlab breaking to interactive mode and that this will prevent the evaluation from continuing. It is therefore advised that all exceptions are handled explicitly so that the wrapper script always terminates the interpreter.
+The parameter '-wait' is forces Matlab on Windows to wait for the script that was executed to finish before returning control to the toolkit. It is important that all the directories containing required Matlab scripts are contained in the MATLAB path when the evaluation is run. Also note that any unhandled exception thrown in the script will result in Matlab breaking to interactive mode and that this will prevent the evaluation from continuing. It is therefore advised that all exceptions are handled explicitly so that the wrapper script always terminates the interpreter.
 
 Integration rules
 -----------------

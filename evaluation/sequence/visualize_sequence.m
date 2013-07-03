@@ -1,6 +1,6 @@
 function visualize_sequence(sequence, varargin)
 
-print_text('Press arrow keys or S,D,F,G to navigate the sequence.');
+print_text('Press arrow keys or S,D,F,G to navigate the sequence, Q to quit.');
 
 figure(1);
 i = 1;
@@ -20,7 +20,11 @@ while 1
     end;
     hold off;
     drawnow;
-	k = waitforbuttonpress; 
+    try
+	k = waitforbuttonpress;
+    catch 
+        break
+    end
     if (k == 1)
         c = get(hf, 'CurrentCharacter');
         try
