@@ -63,8 +63,6 @@ while f(f_indx)<f_thresh && step<max_it
     % Detection of target loss or out of frame boundaries
     if (y<1 || y>height-H) || (x<1 || x>width-W)
         loss = 1;
-        Target_Loss_Dialog_Box();
-        uiwait(Target_Loss_Dialog_Box);
         break;
     end
     % Update the target

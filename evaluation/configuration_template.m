@@ -22,5 +22,5 @@ tracker_command = '<TODO: set a tracker executable command>';
 % tracker_command = fullfile(pwd, '..', 'examples', 'c', 'track_dummy');
 %
 % For MATLAB scripts use the following template:
-% tracker_command = '<TODO: path to Matlab installation>/bin/matlab -nodesktop -nosplash -r MS_Tracker_Example'
+% tracker_command = '<TODO: path to Matlab installation>/bin/matlab -wait -nodesktop -nosplash -r wrapper'
 

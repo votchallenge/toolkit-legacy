@@ -17,7 +17,7 @@ if ~exist(list_file, 'file') && ~isempty(track_properties.bundle)
 		delete(bundle);
         list_file = fullfile(directory, 'list.txt');
     catch e
-        print_text('Unable to retreive sequence bundle. Follow the instructions in README.md to install it manually.');
+        print_text('Unable to retrieve sequence bundle. Follow the instructions in README.md to install it manually.');
         return;
     end;
 end;
