@@ -19,8 +19,9 @@ tracker_command = '<TODO: set a tracker executable command>';
 % For classical executables this is usually just a full path to the executable plus
 % some optional arguments
 %
-% tracker_command = fullfile(pwd, '..', 'examples', 'c', 'track_dummy');
+% tracker_command = fullfile(pwd, '..', 'examples', 'c', 'static');
 %
 % For MATLAB scripts use the following template:
-% tracker_command = '<TODO: path to Matlab installation>/bin/matlab -wait -nodesktop -nosplash -r wrapper'
-
+% 
+% tracker_command = '<TODO: path to Matlab installation>/bin/matlab -wait -nodesktop -nosplash -r wrapper' % Windows version
+% tracker_command = '<TODO: path to Matlab installation>/bin/matlab -nodesktop -nosplash -r wrapper' % Linux and OSX version
