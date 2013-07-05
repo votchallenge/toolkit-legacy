@@ -6,7 +6,7 @@ This document contains a detailed description of the several internal mechanisms
 Working directory
 -----------------
 
-The working directory automatically populated with several subdirectories:
+The working directory is automatically populated with several subdirectories:
 
 * `sequences/` - This subdirectory contains sequence data. By default the testing sequence dataset will be automatically downloaded the first time the evaluation starts in a specific working directory. Alternatively you can download the entire dataset manually and extract it to this directory. Each sequence is contained in a separate directory with the following structure:
 	- `<sequence name>/` - A directory that contains a sequence.
@@ -36,11 +36,11 @@ By default the entire evaluation is performed sequentially as described by the f
         end
     end
 
-Each trial contains one or more executions of the tracker. The idea is that if the tracker fails during tracking the execution is repeated from the point of the failure (plus additional offset frames). Tracker failure is determined using the overlap criterion with threshold 0 (the tracker fails if the overlap between the ground-truth and the predicted region is 0).
+Each trial contains one or more executions of the tracker. The idea is that if the tracker fails during tracking the execution is repeated from the point of the failure (plus additional offset frames). A tracker failure is declared on the first frame where there is no overlap between the ground-truth and the predicted region (the tracker fails if the overlap between the ground-truth and the predicted region is 0).
 
 In the case of stochastic trackers, each sequence is evaluated multiple times. If the tracker produces identical trajectories two times in a row, the tracker is considered deterministic and further iterations are omitted. It is therefore important that the stochastic nature of a tracker is appropriately addressed (proper random seed initialization).
 
-Because of the thorough methodology, the entire execution time can be quite long. If we assume that we have a stochastic tracker that runs less than real-time. Let’s assume that it takes 0.5 second per frame. The average length of a sequence is 350 frames. The tracker performs 15 trials on each sequence, and there are 16 sequences in the dataset. We pessimistically assume that a tracker fails uniformly 8 times throughout the sequence, which approximately amounts to equivalent of 5 re-runs over entire sequence. We get the following rule-of-thumb estimate of the time required to perform the experiment is more than two days for a single experiment. The entire evaluation contains three experiments which results in roughly 7 days of execution. The function 'do_test()' provides an option for estimating the processing time for the entire evaluation based on a single run on one sequence.
+Because of the thorough methodology, the entire execution time can be quite long. Let’s assume that we have a stochastic tracker that requires 0.5 seconds to process a single frame. The average length of a sequence is 350 frames. The tracker performs 15 trials on each sequence, and there are 16 sequences in the dataset. We pessimistically assume that a tracker fails uniformly 8 times throughout the sequence, which approximately amounts to equivalent of 5 re-runs over entire sequence. Based on these assumptions a rule-of-thumb estimate of the time required to perform a single experiment is more than two days. The entire evaluation contains three experiments which results in roughly 7 days. The function `do_test()` provides an option for estimating the processing time for the entire evaluation based on a single run on one sequence.
 
 Parallelism
 -----------

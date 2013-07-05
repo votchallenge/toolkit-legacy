@@ -47,9 +47,11 @@ Matlab-based trackers are a bit more tricky to integrate as the scripts are typi
 
 When specifying the `tracker_command` variable in the configuration file please note that the wrapper script file is not the one being executed but only a parameter to the Matlab executable. The actual command therefore looks like this:
 
-    tracker_command = '<TODO: path to Matlab executable> -nodesktop -nosplash -wait -r <TODO: name of the wrapper script>';
+    tracker_command = '<TODO: path to Matlab executable> -nodesktop -nosplash [-wait] -r <TODO: name of the wrapper script>';
 
-The parameter '-wait' is forces Matlab on Windows to wait for the script that was executed to finish before returning control to the toolkit. It is important that all the directories containing required Matlab scripts are contained in the MATLAB path when the evaluation is run. Also note that any unhandled exception thrown in the script will result in Matlab breaking to interactive mode and that this will prevent the evaluation from continuing. It is therefore advised that all exceptions are handled explicitly so that the wrapper script always terminates the interpreter.
+_Windows specific parameters_: The parameter `-wait` forces Matlab to wait for the script that was executed to finish before returning control to the toolkit and is required when running Matlab trackers on Windows.
+
+It is important that all the directories containing required Matlab scripts are contained in the MATLAB path when the evaluation is run. Also note that any unhandled exception thrown in the script will result in Matlab breaking to interactive mode and that this will prevent the evaluation from continuing. It is therefore advised that all exceptions are handled explicitly so that the wrapper script always terminates the interpreter.
 
 Integration rules
 -----------------
@@ -58,10 +60,10 @@ To make the tracker evaluation fair we list several rules that you should be awa
 
 * _Stochastic processes_ - Many trackers use pseudo-random sampling at certain parts of the algorithm. To properly evaluate such trackers the random seed should not be fixed to a certain value. The best way to ensure this is to initialize seed with a different value every time, for example using current time. In C this is done by calling `srandom(time(NULL))` at the beginning of the program, while one way of doing this in Matlab is by calling:
 
-	`	RandStream.setGlobalStream(RandStreams('mt19937ar', 'Seed', sum(clock)))`
+	RandStream.setGlobalStream(RandStreams('mt19937ar', 'Seed', sum(clock)))
 
 * _Image stream_ - The tracking scenario specifies input images as a stream. Therefore the tracker should always only access images in the specified order and not skip ahead. 
-* _Tracker parameters_ - The tracker is supposed to be run with the same parameters for all the sequences. Any effort to determine the parameter values that were pre-tuned to a specific challenge sequence from the given images is prohibited.
+* _Tracker parameters_ - The tracker is supposed to be executed with the same set of parameters on all the sequences. Any effort to determine the parameter values that were pre-tuned to a specific challenge sequence from the given images is prohibited.
 * _Resources access_ - The tracker program should only access the files in the directory that it is executed in (that is `images.txt` and `region.txt`).
 
 While we cannot enforce these guidelines in the current toolkit, the adherence of these rules is mandatory. Any violation is considered as cheating and could result in disqualification.
