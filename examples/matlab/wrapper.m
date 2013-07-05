@@ -6,6 +6,11 @@ function wrapper()
 % *************************************************************
 onCleanup(@() exit() );
 
+% *************************************************************
+% VOT: Set random seed to a different value every time.
+% *************************************************************
+RandStream.setGlobalStream(RandStream('mt19937ar', 'Seed', sum(clock)));
+
 tracker_directory = fullfile(fileparts(mfilename('fullpath')), 'tracker');
 rmpath(tracker_directory);
 addpath(tracker_directory);
