@@ -39,7 +39,7 @@ try
             if length(tracker.linkpath) > 1
                 userpath = [sprintf(['%s', pathsep], tracker.linkpath{1:end-1}), userpath];
             end;
-            setenv('LD_LIBRARY_PATH', [usetpath, pathsep, getenv('PATH')]);
+            setenv('LD_LIBRARY_PATH', [userpath, pathsep, getenv('PATH')]);
         else
 		    setenv('LD_LIBRARY_PATH', getenv('PATH'));
         end;
