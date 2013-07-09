@@ -33,8 +33,16 @@ try
 		% Save library paths
 		library_path = getenv('LD_LIBRARY_PATH');
 
-		% Make Matlab use system libraries
-		setenv('LD_LIBRARY_PATH', getenv('PATH'));
+        % Make Matlab use system libraries
+        if ~isempty(tracker.linkpath)
+            userpath = tracker.linkpath{end};
+            if length(tracker.linkpath) > 1
+                userpath = [sprintf(['%s', pathsep], tracker.linkpath{1:end-1}), userpath];
+            end;
+            setenv('LD_LIBRARY_PATH', [usetpath, pathsep, getenv('PATH')]);
+        else
+		    setenv('LD_LIBRARY_PATH', getenv('PATH'));
+        end;
 
 		if verLessThan('matlab', '7.14.0')
 		    tic;

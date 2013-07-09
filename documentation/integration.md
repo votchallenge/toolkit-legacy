@@ -34,6 +34,10 @@ For trackers that are compiled into a binary executable form languages, such as 
 
 To register a binary tracker in the environment, simply set the `tracker_command` variable value in the `configuration.m` to the full absolute path to the executable (optionally together with required parameters if the tracker requires some).
 
+**Linking problems**: In some cases the executable requires access to some additional libraries, found in non-standard directories. Matlab overrides the default linking path environmental variable, which can cause linking problems in some cases. For this we have introduced a `tracker_linkpath` variable in the `configuration.m`. This variable should be a cell-array of all directories that should be included in the linking path. An example below adds two custom directories to the library path list in Linux:
+
+    tracker_linkpath = {'/usr/lib64/qt4/', '/usr/lib64/opencv/'};
+
 Matlab trackers
 ---------------
 

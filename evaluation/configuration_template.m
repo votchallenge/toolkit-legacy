@@ -16,6 +16,8 @@ tracker_identifier = '<TODO: set a tracker identifier>';
 
 tracker_command = '<TODO: set a tracker executable command>';
 
+tracker_linkpath = {}; % A cell array of custom library directories used by the tracker executable.
+
 % For classical executables this is usually just a full path to the executable plus
 % some optional arguments
 %

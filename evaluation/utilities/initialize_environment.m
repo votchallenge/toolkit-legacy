@@ -32,5 +32,6 @@ end;
 
 print_text('Preparing tracker %s ...', tracker_identifier);
 
-tracker = create_tracker(tracker_identifier, tracker_command, fullfile(results_directory, tracker_identifier));
+tracker = create_tracker(tracker_identifier, tracker_command, ...
+        fullfile(results_directory, tracker_identifier), 'linkpath', tracker_linkpath);
 
