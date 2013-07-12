@@ -2,7 +2,7 @@ function visualize_sequence(sequence, varargin)
 
 print_text('Press arrow keys or S,D,F,G to navigate the sequence, Q to quit.');
 
-figure(1);
+fh = figure(1);
 i = 1;
 while 1
     image_path = get_image(sequence, i);
@@ -61,5 +61,5 @@ while 1
 
 end;
 
-
+close(fh);
 

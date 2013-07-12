@@ -27,24 +27,34 @@ end;
 
 performance = struct('frames', 0, 'time', 0);
 
+print_text('');
+print_text('***************************************************************************');
+print_text('');
+print_text('Welcome to the VOT sandbox!');
+print_text('This process will help you prepare your tracker for the evaluation.');
+print_text('When beginning with the integration it is recommended to follow the steps ');
+print_text('a, b, c to verify the execution and the output data.');
+print_text('');
+print_text('***************************************************************************');
+print_text('');
+
 i = 0;
 while 1
     print_text('Choose action:');
     print_indent(1);
 
-    for i = 1:length(sequences)
-        print_text('%d - Use sequence "%s"', i, sequences{i}.name);
-    end;
+    print_text('a - Generate a directory with input data for manual test');
+    print_text('b - Run tracker once within the evaluation');
     if ~isempty(trajectory)
         print_text('c - Visually compare results with the groundtruth');
-    end;
-    if performance.frames > 0
-        print_text('t - Display required estimate');
     end;
     if track_properties.debug
         print_text('d - Disable debug output');
     else
         print_text('d - Enable debug output');
+    end;
+    if performance.frames > 0
+        print_text('t - Estimate required time for a single experiment on the given sequence set');
     end;
     print_text('e - Exit');
     print_indent(-1);
@@ -52,6 +62,30 @@ while 1
     option = input('Choose action: ', 's');
 
     switch option
+    case 'a'
+        current_sequence = select_sequence(sequences);       
+        
+        if ~isempty(current_sequence)
+            
+            directory = prepare_trial_data(sequences{current_sequence}, 1, struct('repetition', 1, 'repetitions', 1));
+            
+            print_text('Input data generated in directory "%s"', directory);
+            print_text('Open the directory in a terminal and manually execute the tracker command.');
+            print_text('The current command as defined in the environment is: %s', tracker.command);
+            print_text('Once the tracker is working as expected, delete the directory.');
+        end;
+    case 'b'
+        current_sequence = select_sequence(sequences);       
+        
+        if ~isempty(current_sequence)
+
+            print_text('Sequence "%s"', sequences{current_sequence}.name);
+            [trajectory, time] = tracker.run(tracker, sequences{current_sequence}, 1, struct('repetition', 1, 'repetitions', 1));
+
+            performance.time = performance.time + time * sequences{current_sequence}.length;
+
+            performance.frames = performance.frames + sequences{current_sequence}.length;
+        end;        
     case 'c'
         if ~isempty(trajectory) && current_sequence > 0 && current_sequence <= length(sequences)
             visualize_sequence(sequences{current_sequence}, trajectory);
@@ -74,19 +108,6 @@ while 1
         break;
 
     end;
-
-    current_sequence = int32(str2double(option));
-
-    if isempty(current_sequence) || current_sequence < 1 || current_sequence > length(sequences)
-        continue;
-    end;
-
-    print_text('Sequence "%s"', sequences{current_sequence}.name);
-    [trajectory, time] = tracker.run(tracker, sequences{current_sequence}, 1, struct('repetition', 1, 'repetitions', 1));
-
-    performance.time = performance.time + time * sequences{current_sequence}.length;
-    
-    performance.frames = performance.frames + sequences{current_sequence}.length;
     
 end;
 
