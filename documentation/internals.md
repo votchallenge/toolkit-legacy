@@ -60,7 +60,7 @@ Other instructions (disabling package creation and result merging for multi-comp
 Trajectory format
 -----------------
 
-Similarly to the output of the tracker, the final combined bounding-box trajectory is encoded as a comma-separated list of four values per frame:
+The tracker has to output a single bounding box per frame. The final output of the tracker (the final combined bounding-box trajectory) is encoded as a comma-separated list of four values per frame:
 
     <left_1>,<top_1>,<width_1>,<height_1>
     <left_2>,<top_2>,<width_2>,<height_2>

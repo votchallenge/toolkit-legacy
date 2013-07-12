@@ -27,6 +27,8 @@ Every time the tracker is run, the toolkit generates a new temporary directory a
     <left_4>,<top_4>,<width_4>,<height_4>
     ...
 
+Note that each line corresponds to a single frame and only a single bounding box should be outputted by the tracker per each frame. Please not that the tracker is required to produce the bounding box for each frame and it is up to tracker to decide how to predict that frame in case it does not detect any target. The most naive output in such situation, for example, would be setting the bounding box to the size of the entire image with its center corresponding to the center of the image.
+
 Binary trackers
 ---------------
 
@@ -41,7 +43,7 @@ To register a binary tracker in the environment, simply set the `tracker_command
 Matlab trackers
 ---------------
 
-Matlab-based trackers are a bit more tricky to integrate as the scripts are typically run in an integrated development environment. In order to integrate a Matlab tracker into the evaluation, a wrapper function has to be created. This function will usually read the input files, but more importantly it should call `exit` command at the end in order to terminate Matlab interpreter completely. This is very important as the toolkit waits for the tracker executable to stop before it continues with the evaluation of produced results. Another issue that has to be addressed is the user-issued termination. When a `Ctrl+C` command is issued during the `system` call the command is forwarded to the child process. Because of this the child Matlab will break the execution and return to interactive mode. In order to tell Matlab to quit in this case we can use the [onCleanup](http://www.mathworks.com/help/matlab/ref/oncleanup.html) function which also addresses the normal termination scenario:
+Matlab-based trackers are a bit more tricky to integrate as the scripts are typically run in an integrated development environment. In order to integrate a Matlab tracker into the evaluation, a wrapper function has to be created. This function will usually read the input files, but more importantly it should call `exit` command at the end in order to terminate Matlab interpreter completely. This is very important as the toolkit waits for the tracker executable to stop before it continues with the evaluation of the generated results. Another issue that has to be addressed is the user-issued termination. When a `Ctrl+C` command is issued during the `system` call the command is forwarded to the child process. Because of this the child Matlab will break the execution and return to interactive mode. In order to tell Matlab to quit in this case we can use the [onCleanup](http://www.mathworks.com/help/matlab/ref/oncleanup.html) function which also addresses the normal termination scenario:
 
 	function wrapper()
 		onCleanup(@() exit() ); % Tell Matlab to exit once the function exits
@@ -70,7 +72,7 @@ To make the tracker evaluation fair we list several rules that you should be awa
 * _Tracker parameters_ - The tracker is supposed to be executed with the same set of parameters on all the sequences. Any effort to determine the parameter values that were pre-tuned to a specific challenge sequence from the given images is prohibited.
 * _Resources access_ - The tracker program should only access the files in the directory that it is executed in (that is `images.txt` and `region.txt`).
 
-While we cannot enforce these guidelines in the current toolkit, the adherence of these rules is mandatory. Any violation is considered as cheating and could result in disqualification.
+While we cannot enforce these guidelines in the current toolkit, the adherence of these rules is mandatory. Any violation is considered as cheating and could result in disqualification from the challenge.
 
 Testing integration
 -------------------

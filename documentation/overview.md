@@ -1,7 +1,7 @@
 Overview and usage instructions
 ===============================
 
-This document describes the structure of the VOT evaluation kit (also called the VOT toolkit) code and its basic usage. To perform an evaluation you must have your tracker adapted to behave in a specified way that is described in the `integration.md` document. For a detailed overview of the toolkits structure consult the `internals.md` document.
+This document describes the structure of the VOT evaluation kit (also called the VOT toolkit) code and its basic usage. Note that in order to perform an evaluation you must have your tracker adapted to behave in a specified way that is described in the `integration.md` document. For a detailed overview of the toolkits structure move to `internals.md` document.
 
 Terminology
 -----------
@@ -95,7 +95,7 @@ The time required for the evaluation depends on the speed of your tracker. Becau
 View and submit the results
 ---------------------------
 
-At the end of the evaluation the toolkit generates a ZIP file containing all the raw results and an overview HTML document of calculated result scores.
+At the end of the evaluation the toolkit generates a ZIP file containing all the raw results and an overview HTML document of calculated result scores. Note that this requires having ZIP utilities installed on your computer. Alternatively, the author will have to manually generate the zip file containing the results.
 
 In order to publish the results to the VOT on-line result repository, the ZIP file has to be submitted to the repository maintainers along with a short description of the tracker (consult the on-line instructions at the [VOT website](http://votchallenge.net)).
 
