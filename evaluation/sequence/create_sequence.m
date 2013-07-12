@@ -27,3 +27,14 @@ end;
 
 sequence.length = min(sequence.length, size(groundtruth, 1));
 
+if sequence.length < 1
+    error('Empty sequence: %s', name);
+end;
+
+[height, width, channels] = size(imread(get_image(sequence, 1)));
+
+sequence.width = width;
+sequence.height = height;
+sequence.channels = channels;
+
+

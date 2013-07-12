@@ -16,6 +16,8 @@ output_file = fullfile(working_directory, 'output.txt');
 
 library_path = '';
 
+output = [];
+
 % run the tracker
 old_directory = pwd;
 try
@@ -79,12 +81,20 @@ n_frames = size(trajectory, 1);
 time = time / (sequence.length-start);
 
 if (n_frames ~= (sequence.length-start) + 1)
-    print_debug('WARNING: Tracker did not produce a trajectory file.');
+    print_debug('WARNING: Tracker did not produce a valid trajectory file.');
+    
+    if ~isempty(output)
+        print_text('Printing command line output:');
+        print_text('-------------------- Begin raw output ------------------------');
+        disp(output);
+        print_text('--------------------- End raw output -------------------------');
+    end;
+    
     if isempty(trajectory)
         error('No result produced by tracker. Stopping.');
+    else
+        error('The number of frames is not the same as in groundtruth. Stopping.');
     end;
-    trajectory = [];
-    time = NaN;
 end;
 
 if track_properties.cleanup
