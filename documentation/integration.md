@@ -46,7 +46,7 @@ Matlab trackers
 Matlab-based trackers are a bit more tricky to integrate as the scripts are typically run in an integrated development environment. In order to integrate a Matlab tracker into the evaluation, a wrapper function has to be created. This function will usually read the input files, but more importantly it should call `exit` command at the end in order to terminate Matlab interpreter completely. This is very important as the toolkit waits for the tracker executable to stop before it continues with the evaluation of the generated results. Another issue that has to be addressed is the user-issued termination. When a `Ctrl+C` command is issued during the `system` call the command is forwarded to the child process. Because of this the child Matlab will break the execution and return to interactive mode. In order to tell Matlab to quit in this case we can use the [onCleanup](http://www.mathworks.com/help/matlab/ref/oncleanup.html) function which also addresses the normal termination scenario:
 
 	function wrapper()
-		onCleanup(@() exit() ); % Tell Matlab to exit once the function exits
+		cleanup = onCleanup(@() exit() ); % Tell Matlab to exit once the function exits
 		... tracking code ...
 
  For an example of integration please check out the Matlab tracker example in the `examples` directory.
