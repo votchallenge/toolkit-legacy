@@ -15,7 +15,7 @@ if burnin > 0
     mask = trajectory(:, 4) == -1; % determine initialization frames
     
     if is_octave()
-        se = [zeros(burnin - 1, 1); ones(burnin, 1)];
+        se = logical([zeros(burnin - 1, 1); ones(burnin, 1)]);
     else
         se = strel('arbitrary', [zeros(burnin - 1, 1); ones(burnin, 1)]);
     end;

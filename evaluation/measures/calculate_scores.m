@@ -31,7 +31,12 @@ for i = 1:length(sequences)
         continue;
     end;
 
-    scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability))), mean(times(times > 0))];
+    average_time = mean(times(times > 0));
+    if isempty(average_time)
+        average_time = NaN;
+    end;
+    
+    scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability))), average_time];
 
 end;
 
