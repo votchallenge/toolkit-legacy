@@ -7,7 +7,7 @@ if track_properties.indent > 0
 end;
 
 if ispc
-   text = regexprep(text, '\', '\\\\');
+    text = strrep(text, '\', '\\');
 end
 
 if nargin > 1

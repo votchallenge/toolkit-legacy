@@ -36,7 +36,7 @@ while start < sequence.length
 
     overlap = calculate_overlap(Tr, get_region(sequence, start:sequence.length));
 
-    failures = find(overlap' < 0.0000001);
+    failures = find(overlap' < 0.0000001 | ~isfinite(overlap'));
     failures = failures(failures > 1);
 
     trajectory(start, 4) = -1;
