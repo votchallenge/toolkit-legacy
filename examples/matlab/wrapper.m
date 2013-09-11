@@ -4,7 +4,7 @@ function wrapper()
 % *************************************************************
 % VOT: Always call exit command at the end to terminate Matlab!
 % *************************************************************
-onCleanup(@() exit() );
+cleanup = onCleanup(@() exit() );
 
 % *************************************************************
 % VOT: Set random seed to a different value every time.
