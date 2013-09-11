@@ -27,7 +27,7 @@ for i = 1:length(sequences)
 
     times = csvread(fullfile(directory, sprintf('%s_time.txt', sequences{i}.name)));
     
-    if all(isnan(accuracy))
+    if all(isnan(reliability))
         continue;
     end;
 
