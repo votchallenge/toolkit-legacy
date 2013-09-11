@@ -53,14 +53,14 @@ public:
 
     inline int getNextImage(cv::Mat & img)
     {
+		if (p_images_stream.eof() || !p_images_stream.is_open())
+            return -1;
+
 		std::string line;
 		std::getline (p_images_stream, line);
 		img = cv::imread(line, CV_LOAD_IMAGE_COLOR);
 		
-		if (p_images_stream.eof() || !p_images_stream.is_open())
-            return -1;
-		else
-			return 1;
+		return 1;
 	}
 
 private:
