@@ -43,13 +43,15 @@ function matrix2latex(matrix, filename, varargin)
     rowLabels = [];
     colLabels = [];
     alignment = 'l';
+	prefix = [];
+	suffix = [];
     format = [];
     textsize = [];
     if (rem(nargin,2) == 1 || nargin < 2)
         error('matrix2latex: ', 'Incorrect number of arguments to %s.', mfilename);
     end
 
-    okargs = {'rowlabels','columnlabels', 'alignment', 'format', 'size'};
+    okargs = {'rowlabels','columnlabels', 'alignment', 'format', 'size', 'prefix', 'suffix'};
     for j=1:2:(nargin-2)
         pname = varargin{j};
         pval = varargin{j+1};
@@ -87,8 +89,12 @@ function matrix2latex(matrix, filename, varargin)
                     end
                 case 4  % format
                     format = lower(pval);
-                case 5  % format
+                case 5  % size
                     textsize = pval;
+                case 6
+                    prefix = pval;
+                case 7
+                    suffix = pval;
             end
         end
     end
@@ -133,6 +139,10 @@ function matrix2latex(matrix, filename, varargin)
     
     fprintf(fid, '\\hline\r\n');
     
+	if (~isempty(prefix))
+	    fprintf(fid, '%s\\\\\r\n\\hline\r\n', prefix);
+	end;
+
     if(~isempty(colLabels))
         if(~isempty(rowLabels))
             fprintf(fid, '&');
@@ -152,6 +162,11 @@ function matrix2latex(matrix, filename, varargin)
         end
         fprintf(fid, '%s\\\\\\hline\r\n', matrix{h, width});
     end
+
+	if (~isempty(suffix))
+	    fprintf(fid, '%s\\\\\r\n\\hline\r\n', suffix);
+	end;
+
 
     fprintf(fid, '\\end{tabular}\r\n');
     

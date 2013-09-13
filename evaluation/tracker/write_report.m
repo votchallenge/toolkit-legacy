@@ -16,19 +16,35 @@ html_fid = fopen(temporary_file, 'w');
 
 latex_fid = fopen(table_file, 'w');
 
+measure_labels = {'accuracy', 'robustness', 'speed (fps)'};
+
+fprintf(latex_fid, '%% Per-experiment tables \n\n');
+
 for e = 1:length(experiments)
     
     fprintf(html_fid, '<h2>Experiment <em>%s</em></h2>\n', experiments{e});
 
-    fprintf(latex_fid, '\\begin{table}[h]\\caption{Experiment %s}\\label{tab:results-%s}\n', strrep(experiments{e}, '_', '\_'), strrep(experiments{e}, '_', '-'));
+    fprintf(latex_fid, '\\begin{table}[h!]\\caption{Experiment {\\em %s} results for tracker {\\em %s} }\\label{tab:results-%s-%s}\n\\centering', ...
+			str2latex(experiments{e}), str2latex(tracker.identifier), strrep(experiments{e}, '_', '-'), strrep(tracker.identifier, '_', '-'));
 
-    matrix2html(scores{e}, html_fid, 'columnLabels', {'accuracy', 'robustness', 'speed (fps)'}, 'rowLabels', sequence_names);
+    matrix2html(scores{e}, html_fid, 'columnLabels', measure_labels, 'rowLabels', sequence_names);
 
-    matrix2latex(scores{e}, latex_fid, 'columnLabels', {'accuracy', 'robustness', 'speed (fps)'}, 'rowLabels', strrep(sequence_names, '_', '\_'), 'format', '%.2f');
+    matrix2latex(scores{e}, latex_fid, 'columnLabels', measure_labels, 'rowLabels', strrep(sequence_names, '_', '\_'), 'format', '%.2f');
 
     fprintf(latex_fid, '\\end{table}\n');
 
 end;
+
+fprintf(latex_fid, '\n\n%% Single results table \n\n');
+
+fprintf(latex_fid, '\\begin{table}[h!]\\caption{Results for tracker {\\em %s}}\\label{tab:results}\n\\centering', ...
+		str2latex(tracker.identifier));
+
+matrix2latex([scores{:}], latex_fid, 'columnLabels', measure_labels(repmat(1:length(measure_labels), ...
+		1, numel(scores))), 'rowLabels', strrep(sequence_names, '_', '\_'), 'format', '%.2f', ...
+		'prefix', str2latex(sprintf([' & \\multicolumn{' num2str(length(measure_labels)) '}{|c|}{ %s } '], experiments{:})));
+
+fprintf(latex_fid, '\\end{table}\n');
 
 fclose(html_fid);
 
