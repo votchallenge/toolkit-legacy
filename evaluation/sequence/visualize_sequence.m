@@ -8,6 +8,7 @@ while 1
     image_path = get_image(sequence, i);
     image = imread(image_path);
     hf = sfigure(1);
+	set(hf, 'Name', sprintf('%s (%d / %d)', sequence.name, i, sequence.length), 'NumberTitle', 'off');
     imshow(image);
     hold on;
     draw_region(get_region(sequence, i), [1 0 0], 2);
@@ -16,6 +17,9 @@ while 1
             continue;
         end;
         trajectory = varargin{j-1};
+		if any(isnan(trajectory(i, :)))
+			continue;
+		end;
         draw_region(trajectory(i, :), [0 1 0], 1);
     end;
     hold off;

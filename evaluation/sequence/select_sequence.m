@@ -1,6 +1,6 @@
 function [selected_sequence] = select_sequence(sequences)
 
-print_text('Please choose a sequence:');
+print_text('Choose a sequence:');
 print_indent(1);
 
 for i = 1:length(sequences)

@@ -86,7 +86,8 @@ if (n_frames ~= (sequence.length-start) + 1)
     if ~isempty(output)
         print_text('Printing command line output:');
         print_text('-------------------- Begin raw output ------------------------');
-        disp(output);
+        % This prevents printing of backspaces and such
+        disp(output(output > 31 | output == 10 | output == 13));
         print_text('--------------------- End raw output -------------------------');
     end;
     
