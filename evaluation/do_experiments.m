@@ -1,34 +1,27 @@
+function do_experiments()
 
-script_directory = fileparts(mfilename('fullpath'));
-include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-    'tracker', 'sequence', 'measures', 'experiment', 'tests'}, 'UniformOutput', false); 
-if exist('strsplit') ~= 2
-	remove_dirs = include_dirs;
-else
-	% if strsplit is available we can filter out missing paths to avoid warnings
-	remove_dirs = include_dirs(ismember(include_dirs, strsplit(path, pathsep)));
-end;
-if ~isempty(remove_dirs) 
-	rmpath(remove_dirs{:});
-end;
-addpath(include_dirs{:});
+% script_directory = fileparts(mfilename('fullpath'));
+% include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
+%     'tracker', 'sequence', 'measures', 'experiment', 'tests'}, 'UniformOutput', false); 
+% if exist('strsplit') ~= 2
+% 	remove_dirs = include_dirs;
+% else
+% 	% if strsplit is available we can filter out missing paths to avoid warnings
+% 	remove_dirs = include_dirs(ismember(include_dirs, strsplit(path, pathsep)));
+% end;
+% if ~isempty(remove_dirs) 
+% 	rmpath(remove_dirs{:});
+% end;
+% addpath(include_dirs{:});
 
 initialize_environment;
-
-experiments = {'baseline', 'region_noise', 'grayscale'};
-
-if exist('select_experiment', 'var')
-	selected_experiments = unique(select_experiment(select_experiment > 0 && ...
-        select_experiment <= length(experiments)));
-else
-	selected_experiments = 1:length(experiments);
-end;
 
 summary = cell(length(experiments), 1);
 
 for e = selected_experiments
 
     if exist(['experiment_', experiments{e}]) ~= 2
+        print_debug('Warning: experiment %s not found. Skipping.', experiments{e});
         continue;
     end;
 

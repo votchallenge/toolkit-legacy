@@ -1,3 +1,5 @@
+function do_test()
+
 script_directory = fileparts(mfilename('fullpath'));
 include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
     'tracker', 'sequence', 'measures', 'experiment' , 'tests'}, 'UniformOutput', false); 
@@ -13,6 +15,10 @@ end;
 addpath(include_dirs{:});
 
 initialize_environment;
+
+stack_configuration = str2func(['stack_', experiment_stack]);
+
+stack_configuration();
 
 global current_sequence;
 global trajectory;
