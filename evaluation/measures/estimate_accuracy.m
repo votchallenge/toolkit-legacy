@@ -33,5 +33,9 @@ overlap = calculate_overlap(trajectory, get_region(sequence, 1:sequence.length))
 
 overlap = overlap(~isnan(overlap)); % filter-out illegal values
 
-accuracy = mean(overlap);
-
+% Handle cases, where no overlap is available
+if isempty(overlap)
+    accuracy = 0;
+else
+    accuracy = mean(overlap);
+end;
