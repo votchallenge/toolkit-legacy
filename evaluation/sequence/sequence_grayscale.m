@@ -30,3 +30,7 @@ end;
 csvwrite(cache_groundtruth, sequence.groundtruth);
 
 grayscale_sequence = create_sequence(sequence.name, cache_directory);
+
+grayscale_sequence.labels.names = sequence.labels.names;
+grayscale_sequence.labels.data = sequence.labels.data;
+

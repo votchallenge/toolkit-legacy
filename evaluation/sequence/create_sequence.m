@@ -37,4 +37,32 @@ sequence.width = width;
 sequence.height = height;
 sequence.channels = channels;
 
+labelnames = {};
+labeldata = false(sequence.length, 0);
+
+print_indent(1);
+
+for file = dir(fullfile(directory, '*.label'))
+
+    try
+        data = csvread(fullfile(directory, file.name));
+
+        if size(data, 1) ~= sequence.length || size(data, 2) ~= 1
+            continue;
+        end;
+
+        print_debug('Found label %s', file.name(1:end-6));
+
+        labelnames{end+1} = file.name(1:end-6);
+        labeldata = cat(labeldata, data > 0, 1);
+
+    catch
+
+    end;
+end;
+
+print_indent(-1);
+
+sequence.labels.names = labelnames;
+sequence.labels.data = labeldata;
 

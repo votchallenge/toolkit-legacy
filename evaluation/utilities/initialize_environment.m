@@ -1,27 +1,28 @@
 
-global experiment_stack;
-global select_configuration;
-global select_sequences;
 global select_experiment;
 global using_trackers;
 
 initialize_defaults;
 
-print_text('Running VOT experiments ...');
+print_text('Initializing VOT environment ...');
 
-if exist('select_configuration', 'var')
+select_configuration = get_global_variable('select_configuration', 'configuration');
+
+try
 	environment_configuration = str2func(select_configuration);
     environment_configuration();
-else
-    if exist('configuration') ~= 2
-        print_text('Please copy configuration_template.m to configuration.m in your workspace and edit it.');
+catch e
+    if exist(select_configuration) ~= 2
+        print_text('Please copy configuration_template.m to %s.m in your workspace and edit it.', select_configuration);
         error('Setup file does not exist.');
     else
-        configuration();
+        error(e);
     end; 
 end;
 
 mkpath(track_properties.directory);
+
+experiment_stack = get_global_variable('experiment_stack', 'vot2013');
 
 if exist(['stack_', experiment_stack]) ~= 2
     error('Experiment stack %s not available.', experiment_stack);
@@ -38,14 +39,14 @@ results_directory = fullfile(track_properties.directory, 'results');
 
 print_text('Loading sequences ...');
 
-selected_sequences = 'list.txt';
-if exist('select_sequences', 'var') && ~isempty(select_sequences)
-    if exist(fullfile(sequences_directory, select_sequences), 'file')
-        selected_sequences = select_sequences;
-    end;
-end;
+%selected_sequences = get_global_variable('select_sequences', 'list.txt');
+%if exist('select_sequences', 'var') && ~isempty(select_sequences)
+%    if exist(fullfile(sequences_directory, select_sequences), 'file')
+%        selected_sequences = select_sequences;
+%    end;
+%end;
 
-sequences = load_sequences(sequences_directory, selected_sequences);
+sequences = load_sequences(sequences_directory, get_global_variable('select_sequences', 'list.txt'));
 
 if isempty(sequences)
 	error('No sequences available. Stopping.');
