@@ -1,19 +1,16 @@
-function [tracker] = create_tracker(identifier, command, result_directory, varargin)
+function [tracker] = create_tracker(identifier, result_directory)
 
-linkpath = {};
+if exist(['tracker_' , identifier]) ~= 2
+    error('Configuration for tracker %s does not exist.', identifier);
+end;
 
-args = varargin;
-for j=1:2:length(args)
-    switch varargin{j}
-        case 'linkpath', linkpath = args{j+1};
-        otherwise, error(['unrecognized argument ' args{j}]);
-    end
-end
+tracker_configuration = str2func(['tracker_' , identifier]);
+tracker_configuration();
 
 
 mkpath(result_directory);
 
-tracker = struct('identifier', identifier, 'command', command, ...
-        'directory', result_directory, 'linkpath', {linkpath});
+tracker = struct('identifier', identifier, 'command', tracker_command, ...
+        'directory', result_directory, 'linkpath', {tracker_linkpath});
 
 tracker.run = @run_tracker;

@@ -1,10 +1,14 @@
-function [report_file] = write_report(tracker, sequences, experiments, scores)
+function [report_file] = write_report(name, tracker, sequences, experiments, scores)
 
 global track_properties;
 
-report_file = fullfile(track_properties.directory, sprintf('%s-%s.html', tracker.identifier, datestr(now, 30)));
+directory = fullfile(track_properties.directory, 'reports', name);
 
-table_file = fullfile(track_properties.directory, sprintf('%s-%s.tex', tracker.identifier, datestr(now, 30)));
+mkpath(directory);
+
+report_file = fullfile(directory, sprintf('%s.html', tracker.identifier));
+
+table_file = fullfile(directory, sprintf('%s.tex', tracker.identifier));
 
 sequence_names = cellfun(@(x) x.name, sequences,'UniformOutput',false);
 
