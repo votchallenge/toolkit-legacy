@@ -1,8 +1,9 @@
 
-global select_configuration;
 global experiment_stack;
+global select_configuration;
 global select_sequences;
 global select_experiment;
+global using_trackers;
 
 initialize_defaults;
 
@@ -22,6 +23,16 @@ end;
 
 mkpath(track_properties.directory);
 
+if exist(['stack_', experiment_stack]) ~= 2
+    error('Experiment stack %s not available.', experiment_stack);
+end;
+
+stack_configuration = str2func(['stack_', experiment_stack]);
+
+experiments = {};
+
+stack_configuration();
+
 sequences_directory = fullfile(track_properties.directory, 'sequences');
 results_directory = fullfile(track_properties.directory, 'results');
 
@@ -40,20 +51,22 @@ if isempty(sequences)
 	error('No sequences available. Stopping.');
 end;
 
-print_text('Preparing tracker %s ...', tracker_identifier);
+trackers = cell(length(using_trackers), 1);
 
-tracker = create_tracker(tracker_identifier, tracker_command, ...
-        fullfile(results_directory, tracker_identifier), 'linkpath', tracker_linkpath);
+print_text('Preparing trackers ...');
 
-if exist(['stack_', experiment_stack]) ~= 2
-    error('Experiment stack %s not available.', experiment_stack);
+for t = 1:length(using_trackers)
+
+    print_indent(1);
+    
+    print_text('Preparing tracker %s ...', using_trackers{t});
+
+    trackers{t} = create_tracker(using_trackers{t}, ...
+        fullfile(results_directory, using_trackers{t}));
+
+    print_indent(-1);
+    
 end;
-
-stack_configuration = str2func(['stack_', experiment_stack]);
-
-experiments = {};
-
-stack_configuration();
 
 if exist('select_experiment', 'var') && ~isempty(select_experiment)
 	selected_experiments = unique(select_experiment(select_experiment > 0 & ...

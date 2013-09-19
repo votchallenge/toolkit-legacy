@@ -10,6 +10,10 @@ function [trajectory, time] = run_tracker(tracker, sequence, start, context)
 % create temporary directory and generate input data
 global track_properties;
 
+if isempty(tracker.command)
+    error('Unable to execute tracker %s. No command given.', tracker.identifier);
+end;
+
 working_directory = prepare_trial_data(sequence, start, context);
 
 output_file = fullfile(working_directory, 'output.txt');

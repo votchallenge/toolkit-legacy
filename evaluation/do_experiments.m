@@ -45,7 +45,8 @@ if track_properties.report
     
     print_indent(1);
     
-    reportfile = write_report(tracker, sequences, experiments, summary);
+    reportfile = write_report(sprintf('%s_%s', datestr(now, 30), ...
+        tracker.identifier), tracker, sequences, experiments, summary);
 
     print_indent(-1);
     
