@@ -22,6 +22,12 @@ while 1
 		end;
         draw_region(trajectory(i, :), [0 1 0], 1);
     end;
+    if ~isempty(sequence.labels.names)
+        active = sequence.labels.names(sequence.labels.data(i, :));
+        if ~isempty(active)
+            text(10, 10, strjoin(active, ', '), 'Color', 'w', 'BackgroundColor', [0, 0, 0]);
+        end;
+    end;
     hold off;
     drawnow;
     try

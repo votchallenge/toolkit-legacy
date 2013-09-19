@@ -46,19 +46,19 @@ for file = dir(fullfile(directory, '*.label'))
 
     try
         data = csvread(fullfile(directory, file.name));
-
-        if size(data, 1) ~= sequence.length || size(data, 2) ~= 1
-            continue;
-        end;
-
-        print_debug('Found label %s', file.name(1:end-6));
-
-        labelnames{end+1} = file.name(1:end-6);
-        labeldata = cat(labeldata, data > 0, 1);
-
-    catch
-
+    catch 
+        continue
     end;
+
+    if size(data, 1) ~= sequence.length || size(data, 2) ~= 1
+        continue;
+    end;
+
+    print_debug('Found label %s', file.name(1:end-6));
+
+    labelnames{end+1} = file.name(1:end-6);
+    labeldata = cat(2, labeldata, data > 0);
+
 end;
 
 print_indent(-1);

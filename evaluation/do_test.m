@@ -1,18 +1,18 @@
 function do_test()
 
-script_directory = fileparts(mfilename('fullpath'));
-include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-    'tracker', 'sequence', 'measures', 'experiment' , 'tests'}, 'UniformOutput', false); 
-if exist('strsplit') ~= 2
-	remove_dirs = include_dirs;
-else
-	% if strsplit is available we can filter out missing paths to avoid warnings
-	remove_dirs = include_dirs(ismember(include_dirs, strsplit(path, pathsep)));
-end;
-if ~isempty(remove_dirs) 
-	rmpath(remove_dirs{:});
-end;
-addpath(include_dirs{:});
+% script_directory = fileparts(mfilename('fullpath'));
+% include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
+%     'tracker', 'sequence', 'measures', 'experiment' , 'tests'}, 'UniformOutput', false); 
+% if exist('strsplit') ~= 2
+% 	remove_dirs = include_dirs;
+% else
+% 	% if strsplit is available we can filter out missing paths to avoid warnings
+% 	remove_dirs = include_dirs(ismember(include_dirs, strsplit(path, pathsep)));
+% end;
+% if ~isempty(remove_dirs) 
+% 	rmpath(remove_dirs{:});
+% end;
+% addpath(include_dirs{:});
 
 initialize_environment;
 
