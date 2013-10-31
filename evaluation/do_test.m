@@ -1,18 +1,9 @@
 function do_test()
 
-% script_directory = fileparts(mfilename('fullpath'));
-% include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-%     'tracker', 'sequence', 'measures', 'experiment' , 'tests'}, 'UniformOutput', false); 
-% if exist('strsplit') ~= 2
-% 	remove_dirs = include_dirs;
-% else
-% 	% if strsplit is available we can filter out missing paths to avoid warnings
-% 	remove_dirs = include_dirs(ismember(include_dirs, strsplit(path, pathsep)));
-% end;
-% if ~isempty(remove_dirs) 
-% 	rmpath(remove_dirs{:});
-% end;
-% addpath(include_dirs{:});
+script_directory = fileparts(mfilename('fullpath'));
+include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
+     'tracker', 'sequence', 'measures', 'experiment' , 'tests'}, 'UniformOutput', false); 
+addpath(include_dirs{:});
 
 initialize_environment;
 
@@ -21,7 +12,6 @@ stack_configuration = str2func(['stack_', experiment_stack]);
 stack_configuration();
 
 global current_sequence;
-global trajectory;
 
 if ~exist('trajectory', 'var')
 	trajectory = [];
@@ -43,6 +33,38 @@ print_text('a, b, c to verify the execution and the output data.');
 print_text('');
 print_text('***************************************************************************');
 print_text('');
+
+
+if length(trackers) == 1
+    selected_tracker = 1;
+else
+
+    print_text('Choose tracker:');
+    print_indent(1);
+
+    for i = 1:length(trackers)
+        print_text('%d - "%s"', i, trackers{i}.identifier);
+    end;
+
+    print_text('e - Exit');
+    print_indent(-1);
+
+    option = input('Selected tracker: ', 's');
+
+    if (option == 'q' || option == 'e')
+        return;
+    end;
+
+    selected_tracker = int32(str2double(option));
+
+    if isempty(selected_tracker) || selected_tracker < 1 || selected_tracker > length(trackers)
+        return;
+    end;
+
+end;
+
+
+tracker = trackers{selected_tracker};
 
 i = 0;
 while 1

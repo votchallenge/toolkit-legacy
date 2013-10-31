@@ -20,10 +20,47 @@ stack_configuration = str2func(['stack_', experiment_stack]);
 
 stack_configuration();
 
+selected_tracker = [];
 selected_experiment = [];
 selected_sequence = [];
 
 while 1
+    
+    if isempty(selected_tracker)
+
+        if length(trackers) == 1
+            selected_tracker = 1;
+            
+            continue;
+        else
+        
+            print_text('Choose tracker:');
+            print_indent(1);
+
+            for i = 1:length(trackers)
+                print_text('%d - "%s"', i, trackers{i}.identifier);
+            end;
+
+            print_text('e - Exit');
+            print_indent(-1);
+
+
+            option = input('Selected tracker: ', 's');
+
+            if (option == 'q' || option == 'e')
+                break
+            end;
+
+            selected_tracker = int32(str2double(option));
+
+            if isempty(selected_tracker) || selected_tracker < 1 || selected_tracker > length(trackers)
+                selected_tracker = [];
+            end;
+
+            continue;
+        
+        end;
+    end;
     
     if isempty(selected_experiment)
 
@@ -38,7 +75,7 @@ while 1
         print_indent(-1);
 
 
-        option = input('Selected sequence: ', 's');
+        option = input('Select experiment: ', 's');
 
         if (option == 'q' || option == 'e')
             break
@@ -66,6 +103,8 @@ while 1
         
     end;
     
+    tracker = trackers{selected_tracker};
+    
     experiment_directory = fullfile(tracker.directory, experiments{selected_experiment});
     
     sequence_directory = fullfile(experiment_directory, sequences{selected_sequence}.name);
@@ -89,7 +128,7 @@ while 1
         continue;
     end;
     
-    visualize_analysis(sequences{selected_sequence}, trajectories{:});
+    %visualize_analysis(sequences{selected_sequence}, trajectories{:});
     
     visualize_sequence(sequences{selected_sequence}, trajectories{:});
     

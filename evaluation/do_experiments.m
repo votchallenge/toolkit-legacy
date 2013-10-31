@@ -18,6 +18,36 @@ initialize_environment;
 
 summary = cell(length(experiments), 1);
 
+if length(trackers) == 1
+    selected_tracker = 1;
+else
+
+    print_text('Choose tracker:');
+    print_indent(1);
+
+    for i = 1:length(trackers)
+        print_text('%d - "%s"', i, trackers{i}.identifier);
+    end;
+
+    print_text('e - Exit');
+    print_indent(-1);
+
+    option = input('Selected tracker: ', 's');
+
+    if (option == 'q' || option == 'e')
+        return;
+    end;
+
+    selected_tracker = int32(str2double(option));
+
+    if isempty(selected_tracker) || selected_tracker < 1 || selected_tracker > length(trackers)
+        return;
+    end;
+
+end;
+
+tracker = trackers{selected_tracker};
+
 for e = selected_experiments
 
     if exist(['experiment_', experiments{e}]) ~= 2
