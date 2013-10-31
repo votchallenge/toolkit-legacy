@@ -37,7 +37,7 @@ sequence.width = width;
 sequence.height = height;
 sequence.channels = channels;
 
-labelnames = {};
+sequence.labels.names = {};
 labeldata = false(sequence.length, 0);
 
 for file = dir(fullfile(directory, '*.label'))'
@@ -53,11 +53,10 @@ for file = dir(fullfile(directory, '*.label'))'
         continue;
     end;
 
-    labelnames{end+1} = file.name(1:end-6);
+    sequence.labels.names{end+1} = file.name(1:end-6);
     labeldata = cat(2, labeldata, data > 0);
 
 end;
 
-sequence.labels.names = labelnames;
 sequence.labels.data = labeldata;
 
