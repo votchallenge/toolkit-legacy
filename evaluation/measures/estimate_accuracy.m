@@ -1,4 +1,4 @@
-function [accuracy] = estimate_accuracy(trajectory, sequence, varargin)
+function [accuracy, frames] = estimate_accuracy(trajectory, sequence, varargin)
 
 burnin = 0;
 
@@ -29,9 +29,13 @@ end;
 
 trajectory(trajectory(:, 4) <= 0, :) = NaN; % do not estimate overlap where the tracker was initialized
 
-overlap = calculate_overlap(trajectory, get_region(sequence, 1:sequence.length));
+if isstruct(sequence)
+    frames = calculate_overlap(trajectory, get_region(sequence, 1:sequence.length));
+else
+    frames = calculate_overlap(trajectory, sequence);
+end;
 
-overlap = overlap(~isnan(overlap)); % filter-out illegal values
+overlap = frames(~isnan(frames)); % filter-out illegal values
 
 % Handle cases, where no overlap is available
 if isempty(overlap)
