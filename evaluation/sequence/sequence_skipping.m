@@ -1,8 +1,14 @@
-function [skipped_sequence] = sequence_skipping(sequence, skipping)
+function [skipped_sequence] = sequence_skipping(sequence, skip, keep)
+
+skip = min(10, max(1, skip));
+keep = min(10, max(1, keep));
 
 skipped_sequence = sequence;
 
-indices = 1:skipping:sequence.length;
+indices = 1:sequence.length;
+
+mask = mod(indices, skip + keep);
+indices = indices(mask > 0 & mask < (keep + 1));
 
 skipped_sequence.groundtruth = sequence.groundtruth(indices, :);
 

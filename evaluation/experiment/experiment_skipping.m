@@ -2,7 +2,7 @@ function scores = experiment_skipping(tracker, sequences, directory)
 
 global track_properties;
 
-sequences = cellfun(@(x) sequence_skipping(x, 3), sequences,'UniformOutput',false);
+sequences = cellfun(@(x) sequence_skipping(x, 2, 2), sequences,'UniformOutput',false);
 
 for i = 1:length(sequences)
     print_text('Sequence "%s" (%d/%d)', sequences{i}.name, i, length(sequences));
