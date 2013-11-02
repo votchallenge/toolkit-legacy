@@ -2,12 +2,39 @@ function visualize_sequence(sequence, varargin)
 
 print_text('Press arrow keys or S,D,F,G to navigate the sequence, Q to quit.');
 
-fh = figure(1);
+fh = figure;
+
+
+names = sequence.labels.names;
+labels = sequence.labels.data;
+labelsplit = mat2cell(labels, size(labels, 1), ones(1, size(labels, 2)));
+
+for j = 2:nargin
+    if size(varargin{j-1}, 2) ~= 4
+        continue;
+    end;
+    trajectory = varargin{j-1};
+    labelsplit{end+1} = any(isnan(trajectory), 2);
+    names{end+1} = sprintf('Trajectory %d', j-1);
+end;
+
+starts = cellfun(@(x) find(diff([0; x; 0]) > 0), labelsplit, 'UniformOutput', 0);
+ends = cellfun(@(x) find(diff([0; x; 0]) < 0), labelsplit, 'UniformOutput', 0);
+
+
+subplot(2,1,2);
+hold on;
+timeline(names, starts, ends);
+set(gca,'xlim',[0 sequence.length]);
+slider = line([1 1], [0 numel(names)+1], 'LineWidth', 3, 'Color', [0 0 0 ]);
+hold off;
+
 i = 1;
 while 1
     image_path = get_image(sequence, i);
     image = imread(image_path);
-    hf = sfigure(1);
+    hf = sfigure(fh);
+    subplot(2,1,1, 'replace');
 	set(hf, 'Name', sprintf('%s (%d / %d)', sequence.name, i, sequence.length), 'NumberTitle', 'off');
     imshow(image);
     hold on;
@@ -25,13 +52,14 @@ while 1
     if ~isempty(sequence.labels.names)
         active = sequence.labels.names(sequence.labels.data(i, :));
         if ~isempty(active)
-            text(10, 10, strjoin(active, ', '), 'Color', 'w', 'BackgroundColor', [0, 0, 0]);
+            text(10, 10, strrep(strjoin(active, ', '), '_', '\_'), 'Color', 'w', 'BackgroundColor', [0, 0, 0]);
         end;
     end;
     hold off;
+    set(slider, 'XData', [i i]);
     drawnow;
     try
-	k = waitforbuttonpress;
+        k = waitforbuttonpress;
     catch 
         break
     end
@@ -61,10 +89,10 @@ while 1
             elseif c == 'q'
                 break;
             else
-                disp(uint8(c));
+                %disp(uint8(c));
             end
         catch e
-            print_text('Error %s', e);
+            print_text('Error %s', e.message);
         end
         set(hf, 'CurrentCharacter', '?');
     end;

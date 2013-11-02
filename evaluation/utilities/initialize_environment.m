@@ -39,13 +39,6 @@ results_directory = fullfile(track_properties.directory, 'results');
 
 print_text('Loading sequences ...');
 
-%selected_sequences = get_global_variable('select_sequences', 'list.txt');
-%if exist('select_sequences', 'var') && ~isempty(select_sequences)
-%    if exist(fullfile(sequences_directory, select_sequences), 'file')
-%        selected_sequences = select_sequences;
-%    end;
-%end;
-
 sequences = load_sequences(sequences_directory, get_global_variable('select_sequences', 'list.txt'));
 
 if isempty(sequences)
