@@ -20,18 +20,31 @@ sequence_groundtruth = fullfile(sequence.directory, 'groundtruth.txt');
 
 if file_newer_than(cache_groundtruth, sequence_groundtruth)
     transformed_sequence = create_sequence(sequence.name, cache_directory);
-    transformed_sequence.labels.names = sequence.labels.names;
-    transformed_sequence.labels.data = sequence.labels.data;
+%     transformed_sequence.labels.names = sequence.labels.names;
+%     transformed_sequence.labels.data = sequence.labels.data;
     return;
 end;
 
 print_debug('Generating cached sequence ''%s'' for operation ''%s''...', sequence.name, operation_name);
 
+labels_cache_names = cell(0, 0);
+labels_cache_data = false(sequence.length, 0); 
+
 for i = 1:sequence.length
     
     original_image = imread(get_image(sequence, i));
-    
-    transformed_image = operation(original_image, i, sequence.length);
+    original_labels = get_labels(sequence, i);
+
+    [transformed_image, transformed_labels] = operation(original_image, ...
+        original_labels, i, sequence.length);
+
+    for l = 1:length(transformed_labels)
+        if ~ismember(transformed_labels{l}, labels_cache_names)
+            labels_cache_data = cat(2, labels_cache_data, false(sequence.length, 0));
+            labels_cache_names{end+1} = transformed_labels{l};  %#ok<AGROW>
+        end;
+        labels_cache_data(i, strcmp(labels_cache_names, transformed_labels{l})) = 1;
+    end;
     
     if size(transformed_image, 3) == 1
         transformed_image = repmat(rgb2gray(transformed_image), [1 1 3]);
@@ -46,10 +59,15 @@ for i = 1:sequence.length
     
 end;
 
+for l = 1:length(labels_cache_names)
+    csvwrite(fullfile(cache_directory, sprintf('%s.label', ...
+        labels_cache_names{l})), labels_cache_data(:, l));
+end;
+
 csvwrite(cache_groundtruth, sequence.groundtruth);
 
 transformed_sequence = create_sequence(sequence.name, cache_directory);
 
-transformed_sequence.labels.names = sequence.labels.names;
-transformed_sequence.labels.data = sequence.labels.data;
+% transformed_sequence.labels.names = sequence.labels.names;
+% transformed_sequence.labels.data = sequence.labels.data;
 

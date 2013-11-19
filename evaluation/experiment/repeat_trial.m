@@ -1,6 +1,16 @@
-function [time] = repeat_trial(tracker, sequence, repetitions, directory)
+function [time] = repeat_trial(tracker, sequence, repetitions, directory, varargin)
 
 global track_properties;
+
+skip_initialize = {};
+
+args = varargin;
+for j=1:2:length(args)
+    switch varargin{j}
+        case 'skip_initialize', skip_initialize = args{j+1};
+        otherwise, error(['unrecognized argument ' args{j}]);
+    end
+end
 
 mkpath(directory);
 
@@ -33,7 +43,7 @@ for i = 1:repetitions
 
     context = struct('repetition', i, 'repetitions', repetitions);
     
-    [trajectory, t] = run_trial(tracker, sequence, context);
+    [trajectory, t] = run_trial(tracker, sequence, context, 'skip_initialize', skip_initialize);
 
     print_indent(-1);
 

@@ -1,4 +1,4 @@
-function [trajectory, time] = run_trial(tracker, sequence, context)
+function [trajectory, time] = run_trial(tracker, sequence, context, varargin)
 % RUN_TRIAL  A wrapper around run_tracker that handles reinicialization
 % when the tracker fails.
 %
@@ -11,6 +11,17 @@ function [trajectory, time] = run_trial(tracker, sequence, context)
 %   See also RUN_TRACKER.
 
 global track_properties;
+
+skip_initialize = {};
+
+args = varargin;
+for j=1:2:length(args)
+    switch varargin{j}
+        case 'skip_initialize', skip_initialize = args{j+1};
+        otherwise, error(['unrecognized argument ' args{j}]);
+    end
+end
+
 
 start = 1;
 
@@ -50,8 +61,19 @@ while start < sequence.length
 
         trajectory(first_failure, :) = [NaN, NaN, NaN, -2];
         start = first_failure + track_properties.skipping;
-        print_debug(['INFO: Detected failure at frame ', num2str(first_failure), '. Reinitializing.']);
+                
+        print_debug('INFO: Detected failure at frame %d.', first_failure);
+        
+        if ~isempty(skip_initialize)
+            for i = start:sequence.length
+                if isempty(intersect(get_labels(sequence, i), skip_initialize))
+                    start = i;
+                    break;
+                end;                
+            end;
+        end;
 
+        print_debug('INFO: Reinitializing at frame %d.', start);
     else
         
         if size(Tr, 1) > 1

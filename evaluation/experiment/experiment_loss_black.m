@@ -7,7 +7,8 @@ sequences = cellfun(@(x) sequence_pixelchange(x, @loss_black), sequences,'Unifor
 
 for i = 1:length(sequences)
     print_text('Sequence "%s" (%d/%d)', sequences{i}.name, i, length(sequences));
-    repeat_trial(tracker, sequences{i}, track_properties.repeat, fullfile(directory, sequences{i}.name));
+    repeat_trial(tracker, sequences{i}, track_properties.repeat, ...
+        fullfile(directory, sequences{i}.name), 'skip_initialize', {'hidden'});
 end;
 
 scores = calculate_scores(tracker, sequences, directory);
@@ -18,12 +19,13 @@ print_scores(sequences, scores);
 
 end
 
-function T = loss_black(I, i, len)
+function [T, L] = loss_black(I, L, i, len)
 
     T = I;
     
-    if mod(i, 3) == 0
+    if mod(i, 5) == 0
         T(:, :, :) = 0;
+        L = union(L, {'hidden'});
     end;
     
 end
