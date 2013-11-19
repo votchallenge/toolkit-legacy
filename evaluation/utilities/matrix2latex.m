@@ -121,6 +121,21 @@ function matrix2latex(matrix, filename, varargin)
                 end
             end
         end
+        
+    else
+        if iscell(matrix)
+            for h=1:height
+                for w=1:width
+                    if isnumeric(matrix{h, w})
+                        if(~isempty(format))
+                            matrix{h, w} = num2str(matrix{h, w}, format);
+                        else
+                            matrix{h, w} = num2str(matrix{h, w});
+                        end
+                    end;
+                end
+            end
+        end;
     end
     
     if(~isempty(textsize))
