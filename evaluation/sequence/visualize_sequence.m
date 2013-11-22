@@ -4,37 +4,41 @@ print_text('Press arrow keys or S,D,F,G to navigate the sequence, Q to quit.');
 
 fh = figure;
 
+if ~isempty(sequence.labels.names)
 
-names = sequence.labels.names;
-labels = sequence.labels.data;
-labelsplit = mat2cell(labels, size(labels, 1), ones(1, size(labels, 2)));
+    names = sequence.labels.names;
+    labels = sequence.labels.data;
+    labelsplit = mat2cell(labels, size(labels, 1), ones(1, size(labels, 2)));
 
-for j = 2:nargin
-    if size(varargin{j-1}, 2) ~= 4
-        continue;
+    for j = 2:nargin
+        if size(varargin{j-1}, 2) ~= 4
+            continue;
+        end;
+        trajectory = varargin{j-1};
+        labelsplit{end+1} = any(isnan(trajectory), 2);
+        names{end+1} = sprintf('Trajectory %d', j-1);
     end;
-    trajectory = varargin{j-1};
-    labelsplit{end+1} = any(isnan(trajectory), 2);
-    names{end+1} = sprintf('Trajectory %d', j-1);
+
+    starts = cellfun(@(x) find(diff([0; x; 0]) > 0), labelsplit, 'UniformOutput', 0);
+    ends = cellfun(@(x) find(diff([0; x; 0]) < 0), labelsplit, 'UniformOutput', 0);
+
+    subplot(2,1,2);
+    hold on;
+    timeline(names, starts, ends);
+    set(gca,'xlim',[0 sequence.length]);
+    slider = line([1 1], [0 numel(names)+1], 'LineWidth', 3, 'Color', [0 0 0 ]);
+    hold off;
+
 end;
-
-starts = cellfun(@(x) find(diff([0; x; 0]) > 0), labelsplit, 'UniformOutput', 0);
-ends = cellfun(@(x) find(diff([0; x; 0]) < 0), labelsplit, 'UniformOutput', 0);
-
-
-subplot(2,1,2);
-hold on;
-timeline(names, starts, ends);
-set(gca,'xlim',[0 sequence.length]);
-slider = line([1 1], [0 numel(names)+1], 'LineWidth', 3, 'Color', [0 0 0 ]);
-hold off;
 
 i = 1;
 while 1
     image_path = get_image(sequence, i);
     image = imread(image_path);
     hf = sfigure(fh);
-    subplot(2,1,1, 'replace');
+    if ~isempty(sequence.labels.names)
+        subplot(2,1,1, 'replace');
+    end;
 	set(hf, 'Name', sprintf('%s (%d / %d)', sequence.name, i, sequence.length), 'NumberTitle', 'off');
     imshow(image);
     hold on;
@@ -56,7 +60,9 @@ while 1
         end;
     end;
     hold off;
-    set(slider, 'XData', [i i]);
+    if ~isempty(sequence.labels.names)
+        set(slider, 'XData', [i i]);
+    end;
     drawnow;
     try
         k = waitforbuttonpress;
