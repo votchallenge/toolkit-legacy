@@ -12,7 +12,7 @@ try
 	environment_configuration = str2func(select_configuration);
     environment_configuration();
 catch e
-    if exist(select_configuration) ~= 2
+    if exist(select_configuration) ~= 2 %#ok<EXIST>
         print_text('Please copy configuration_template.m to %s.m in your workspace and edit it.', select_configuration);
         error('Setup file does not exist.');
     else
@@ -24,7 +24,7 @@ mkpath(track_properties.directory);
 
 experiment_stack = get_global_variable('experiment_stack', 'vot2013');
 
-if exist(['stack_', experiment_stack]) ~= 2
+if exist(['stack_', experiment_stack]) ~= 2 %#ok<EXIST>
     error('Experiment stack %s not available.', experiment_stack);
 end;
 

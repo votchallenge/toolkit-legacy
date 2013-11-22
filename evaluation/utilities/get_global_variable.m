@@ -14,6 +14,6 @@ try
             eval(['value = ', name , ';']);
         end;
     end;
-catch 
+catch  %#ok<CTCH>
     value = default;
 end;
