@@ -5,7 +5,7 @@ global track_properties;
 files = cell(0);
 
 for j = 1:length(experiments)
-    experiment_directory = fullfile(tracker.directory, experiments{j});
+    experiment_directory = fullfile(tracker.directory, experiments{j}.name);
     if ~exist(experiment_directory, 'dir')
         continue;
     end;
@@ -13,9 +13,8 @@ for j = 1:length(experiments)
     for i = 1:length(sequences)
         sequence_directory = fullfile(experiment_directory, sequences{i}.name);
         if exist(sequence_directory, 'dir')
-            files{end+1} = fullfile(experiments{j}, sequences{i}.name);
+            files{end+1} = fullfile(experiments{j}.name, sequences{i}.name); %#ok<AGROW>
             print_debug('Adding "%s" ...', sequence_directory);
-            %files = [files; recursive_dir(sequence_directory)];
         end;
     end;
 end;
@@ -36,6 +35,7 @@ try
 
 catch e
 
+    print_debug('Warning: problem with creating a result package: %s', e.message);
     resultfile = [];
 
 end;

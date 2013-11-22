@@ -12,6 +12,8 @@ table_file = fullfile(directory, sprintf('%s.tex', tracker.identifier));
 
 sequence_names = cellfun(@(x) x.name, sequences,'UniformOutput',false);
 
+experiment_names = cellfun(@(x) x.name, experiments,'UniformOutput',false);
+
 temporary_dir = tempdir;
 
 temporary_file = fullfile(temporary_dir, 'tables.tmp');
@@ -26,10 +28,10 @@ fprintf(latex_fid, '%% Per-experiment tables \n\n');
 
 for e = 1:length(experiments)
     
-    fprintf(html_fid, '<h2>Experiment <em>%s</em></h2>\n', experiments{e});
+    fprintf(html_fid, '<h2>Experiment <em>%s</em></h2>\n', experiments{e}.name);
 
     fprintf(latex_fid, '\\begin{table}[h!]\\caption{Experiment {\\em %s} results for tracker {\\em %s} }\\label{tab:results-%s-%s}\n\\centering', ...
-			str2latex(experiments{e}), str2latex(tracker.identifier), strrep(experiments{e}, '_', '-'), strrep(tracker.identifier, '_', '-'));
+			str2latex(experiments{e}.name), str2latex(tracker.identifier), strrep(experiments{e}.name, '_', '-'), strrep(tracker.identifier, '_', '-'));
 
     matrix2html(scores{e}, html_fid, 'columnLabels', measure_labels, 'rowLabels', sequence_names);
 
@@ -46,7 +48,7 @@ fprintf(latex_fid, '\\begin{table}[h!]\\caption{Results for tracker {\\em %s}}\\
 
 matrix2latex([scores{:}], latex_fid, 'columnLabels', measure_labels(repmat(1:length(measure_labels), ...
 		1, numel(scores))), 'rowLabels', strrep(sequence_names, '_', '\_'), 'format', '%.2f', ...
-		'prefix', str2latex(sprintf([' & \\multicolumn{' num2str(length(measure_labels)) '}{|c|}{ %s } '], experiments{:})));
+		'prefix', str2latex(sprintf([' & \\multicolumn{' num2str(length(measure_labels)) '}{|c|}{ %s } '], experiment_names{:})));
 
 fprintf(latex_fid, '\\end{table}\n');
 

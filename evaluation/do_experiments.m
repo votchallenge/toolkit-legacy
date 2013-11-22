@@ -16,9 +16,9 @@ function do_experiments()
 
 initialize_environment;
 
-summary = cell(length(experiments), 1);
+summary = cell(length(experiments), 1); %#ok<USENS>
 
-if length(trackers) == 1
+if length(trackers) == 1 %#ok<USENS>
     selected_tracker = 1;
 else
 
@@ -50,20 +50,29 @@ tracker = trackers{selected_tracker};
 
 for e = selected_experiments
 
-    if exist(['experiment_', experiments{e}]) ~= 2
-        print_debug('Warning: experiment %s not found. Skipping.', experiments{e});
+    name = experiments{e}.name;
+    execution = experiments{e}.execution;
+    converter = experiments{e}.converter;
+        
+    if exist(['execution_', execution]) ~= 2
+        print_debug('Warning: execution function %s not found. Skipping.', execution);
         continue;
     end;
 
-    experiment_function = str2func(['experiment_', experiments{e}]);
+    execution_function = str2func(['execution_', execution]);
 
-    print_text('Running Experiment "%s" ...', experiments{e});
+    print_text('Running Experiment "%s" ...', name);
 
     print_indent(1);
 
-    experiment_directory = fullfile(tracker.directory, experiments{e});
+    experiment_directory = fullfile(tracker.directory, experiments{e}.name);
 
-    summary{e} = experiment_function(tracker, sequences, experiment_directory);
+    arguments = {};
+    if isfield(experiments{e}, 'parameters')
+        arguments = struct2opt(experiments{e}.parameters);
+    end;
+    
+    summary{e} = execution_function(tracker, convert_sequences(sequences, converter), experiment_directory, arguments{:});
 
     print_indent(-1);
 

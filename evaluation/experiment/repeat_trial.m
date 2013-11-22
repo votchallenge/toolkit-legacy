@@ -1,13 +1,19 @@
-function [time] = repeat_trial(tracker, sequence, repetitions, directory, varargin)
+function [time] = repeat_trial(tracker, sequence, directory, varargin)
 
 global track_properties;
 
-skip_initialize = {};
+repetitions = 15;
+skip_labels = {};
+skip_initialize = 0;
+fail_overlap = 0;
 
 args = varargin;
 for j=1:2:length(args)
     switch varargin{j}
-        case 'skip_initialize', skip_initialize = args{j+1};
+        case 'repetitions', repetitions = args{j+1};
+        case 'skip_labels', skip_labels = args{j+1};
+        case 'skip_initialize', skip_initialize = args{j+1};            
+        case 'fail_overlap', fail_overlap = args{j+1};            
         otherwise, error(['unrecognized argument ' args{j}]);
     end
 end
@@ -43,7 +49,8 @@ for i = 1:repetitions
 
     context = struct('repetition', i, 'repetitions', repetitions);
     
-    [trajectory, t] = run_trial(tracker, sequence, context, 'skip_initialize', skip_initialize);
+    [trajectory, t] = run_trial(tracker, sequence, context, ...
+        'skip_labels', skip_labels, 'fail_overlap', fail_overlap, 'skip_initialize', skip_initialize);
 
     print_indent(-1);
 

@@ -1,4 +1,4 @@
-function [transformed_sequence] = sequence_pixelchange(sequence, operation)
+function [transformed_sequence] = sequence_pixelchange(sequence, operation, name)
 
 global track_properties;
 
@@ -7,6 +7,10 @@ if ischar(operation)
     operation = str2func(operation_name);
 else
     operation_name = func2str(operation);
+end;
+
+if ~isempty(name) && ischar(name)
+    operation_name = name;
 end;
 
 cache_directory = fullfile(track_properties.directory, 'cache', ...

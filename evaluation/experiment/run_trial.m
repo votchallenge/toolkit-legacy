@@ -10,14 +10,18 @@ function [trajectory, time] = run_trial(tracker, sequence, context, varargin)
 %
 %   See also RUN_TRACKER.
 
-global track_properties;
+skip_labels = {};
 
-skip_initialize = {};
+skip_initialize = 0;
+
+fail_overlap = 0;
 
 args = varargin;
 for j=1:2:length(args)
     switch varargin{j}
-        case 'skip_initialize', skip_initialize = args{j+1};
+        case 'skip_labels', skip_labels = args{j+1};
+        case 'skip_initialize', skip_initialize = args{j+1};            
+        case 'fail_overlap', fail_overlap = args{j+1};            
         otherwise, error(['unrecognized argument ' args{j}]);
     end
 end
@@ -47,7 +51,7 @@ while start < sequence.length
 
     overlap = calculate_overlap(Tr, get_region(sequence, start:sequence.length));
 
-    failures = find(overlap' < 0.0000001 | ~isfinite(overlap'));
+    failures = find(overlap' <= fail_overlap | ~isfinite(overlap'));
     failures = failures(failures > 1);
 
     trajectory(start, 4) = -1;
@@ -60,13 +64,13 @@ while start < sequence.length
             Tr(2:min(first_failure - start + 1, size(Tr, 1)), :);
 
         trajectory(first_failure, :) = [NaN, NaN, NaN, -2];
-        start = first_failure + track_properties.skipping;
+        start = first_failure + skip_initialize;
                 
         print_debug('INFO: Detected failure at frame %d.', first_failure);
         
-        if ~isempty(skip_initialize)
+        if ~isempty(skip_labels)
             for i = start:sequence.length
-                if isempty(intersect(get_labels(sequence, i), skip_initialize))
+                if isempty(intersect(get_labels(sequence, i), skip_labels))
                     start = i;
                     break;
                 end;                
