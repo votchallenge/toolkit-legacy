@@ -64,7 +64,7 @@ end
  
 % check whether pairs are statistically different in accuracy
 [ Hacc, ~ ] = compare_pairs_statistical_significance(...
-        N_trackers, S, type_comparison, alpha, minimal_difference_acc, 'paired') ;
+        N_trackers, S, type_comparison, alpha, minimal_difference_acc, 'paired-prob') ;
 
 % check whether pairs are different in failure rate
 if (test_fail == 1)
@@ -126,10 +126,12 @@ end
 
 % ----------------------------------------------------------------------- %
 function [ H, P ] = compare_pairs_statistical_significance(N_trackers, S, ...
-                                        type_comparison, alpha, minimal_difference_acc, pairing)
+                                        type_comparison, alpha, minimal_difference, pairing)
 
 H = zeros(N_trackers) ; % results of statistical testing
 P = zeros(N_trackers) ; % results of statistical testing
+
+
 for i = 1 : N_trackers
     for j = i+1 : N_trackers
         switch type_comparison
@@ -138,7 +140,6 @@ for i = 1 : N_trackers
                     case 'paired'                    
                         dif = S(i,:)-S(j,:) ;
                         dif = dif(~isnan(dif)) ;
-                        dif(abs(dif) <= minimal_difference_acc) = 0 ;
                         if (length(dif) < 5)
                             print_text('Warning: less than 5 samples comparing tracker %d and %d', i, j);
                             p = 1;
@@ -146,19 +147,48 @@ for i = 1 : N_trackers
                         else
                             [p, h, ~] = signrank(dif, [], 'alpha', alpha ) ;
                         end;
-
+                    case 'paired-mean'
+                        dif = S(i,:)-S(j,:) ;
+                        dif = dif(~isnan(dif)) ;
+                        if (length(dif) < 5)
+                            print_text('Warning: less than 5 samples comparing tracker %d and %d', i, j);
+                            p = 1;
+                            h = 0;
+                        else
+                            [p, h, ~] = signrank(dif, [], 'alpha', alpha ) ;                            
+                            m1 = nanmean(S(i,:));
+                            m2 = nanmean(S(j,:));
+                            if (abs(m1 - m2) <= minimal_difference)
+                                h = 0;
+                            end;  
+                        end;
+                    case 'paired-prob'                    
+                        dif = S(i,:)-S(j,:) ;
+                        dif = dif(~isnan(dif)) ;
+                        if (length(dif) < 5)
+                            print_text('Warning: less than 5 samples comparing tracker %d and %d', i, j);
+                            p = 1;
+                            h = 0;
+                        else
+                            [p, h, ~] = signrank(dif, [], 'alpha', alpha ) ;
+                            e = sum(abs(dif) <= minimal_difference) / length(dif);
+                            if (e > 0.95)
+                                h = 0;
+                            end;  
+                        end;                        
                     case 'nonpaired'
                         [p,h] = ranksum(S(i,:),S(j,:), 'alpha', alpha) ;
                     otherwise 
                         error('Unknown type or pairing: %s', pairing) ;
                 end
-            case 'Prob_better'                
-                [ p, h ] = prob_of_better( S(i,:),S(j,:), 'min_difference', minimal_difference_acc  ) ;             
+%             case 'Prob_better'                
+%                 [ p, h ] = prob_of_better( S(i,:),S(j,:), 'min_difference', minimal_difference) ;             
         end
         H(i,j) = h ; H(j,i) = H(i,j) ;
         P(i,j) = p ; P(j,i) = P(i,j) ;        
     end
 end
+
 
 % ----------------------------------------------------------------------- %
 function [ p, h ] = prob_of_better( S1, S2, varargin )

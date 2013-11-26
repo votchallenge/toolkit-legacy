@@ -5,8 +5,8 @@ type_comparison = 'Wilcoxon' ; % Wilcoxon,  Prob_better
 minimal_difference_acc = 0 ;% minimal difference at which two trackers are actually different
 alpha = 0.05 ;
 
-for i = 1 :2: length(varargin)
-    switch varargin{i}
+for i = 1 : 2 : length(varargin)
+    switch lower(varargin{i})
         case 'alpha'
             alpha = varargin{i+1} ;
         case 'minimal_difference_acc'
