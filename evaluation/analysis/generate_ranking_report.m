@@ -6,12 +6,12 @@ sequence_labels = [];
 combine_weight = 0.5 ;
 
 for i = 1:2:length(varargin)
-    switch varargin{i}
-        case 'combineWeight'
+    switch lower(varargin{i})
+        case 'combineweight'
             combine_weight = varargin{i+1}; 
-        case 'trackerLabels'
+        case 'trackerlabels'
             tracker_labels = varargin{i+1};   
-        case 'sequenceLabels'
+        case 'sequencelabels'
             sequence_labels = varargin{i+1};             
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;

@@ -7,10 +7,10 @@ temporary_index_file = fullfile(temporary_dir, 'index.tmp');
 template_file = fullfile(fileparts(mfilename('fullpath')), 'report.html');
 
 for i = 1:2:length(varargin)
-    switch varargin{i}
-        case 'LaTeXFile'
+    switch lower(varargin{i})
+        case 'latexfile'
             latex_fid = varargin{i+1};
-        case 'ReportTemplate'
+        case 'reporttemplate'
             template_file = varargin{i+1};           
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
@@ -25,14 +25,15 @@ for e = 1:numel(experiments)
 
     experiment = experiments{e};
 
-    print_text('Label analysis for experiment %s ...', experiment);
+    print_text('Label analysis for experiment %s ...', experiment.name);
 
     print_indent(1);
 
     print_text('Loading data ...');
 
     [S_all, F_all, t_available] = ...
-        process_results_labels(trackers, sequences, labels, experiment);
+        process_results_labels(trackers, convert_sequences(sequences, ...
+        experiment.converter), labels, experiment.name);
 
     S_all = cellfun(@(x) x(t_available, :), S_all, 'UniformOutput', 0);
     F_all = cellfun(@(x) x(t_available, :), F_all, 'UniformOutput', 0);
