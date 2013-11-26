@@ -12,7 +12,7 @@ function [trajectory, time] = run_trial(tracker, sequence, context, varargin)
 
 skip_labels = {};
 
-skip_initialize = 0;
+skip_initialize = 1;
 
 fail_overlap = 0;
 
@@ -20,7 +20,7 @@ args = varargin;
 for j=1:2:length(args)
     switch varargin{j}
         case 'skip_labels', skip_labels = args{j+1};
-        case 'skip_initialize', skip_initialize = args{j+1};            
+        case 'skip_initialize', skip_initialize = max(1, args{j+1}); 
         case 'fail_overlap', fail_overlap = args{j+1};            
         otherwise, error(['unrecognized argument ' args{j}]);
     end
