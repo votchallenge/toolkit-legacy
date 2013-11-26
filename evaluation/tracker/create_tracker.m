@@ -1,5 +1,11 @@
 function [tracker] = create_tracker(identifier, result_directory)
 
+global track_properties;
+
+if isempty(result_directory)    
+    result_directory = fullfile(track_properties.directory, 'results', identifier);
+end;
+
 mkpath(result_directory);
 
 if exist(['tracker_' , identifier]) ~= 2
