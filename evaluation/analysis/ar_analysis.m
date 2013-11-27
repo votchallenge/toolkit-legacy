@@ -1,27 +1,13 @@
-function [index_file] = ar_analysis(directory, trackers, sequences, experiments, varargin)
+function [index_file] = ar_analysis(context, trackers, sequences, experiments, varargin)
 
 global track_properties;
 
-temporary_dir = tempdir;
-
-index_file = fullfile(directory, 'arplot.html');
-temporary_index_file = fullfile(temporary_dir, 'index.tmp');
+index_file = sprintf('%sarplots.html', context.prefix);
+temporary_index_file = tempname;
 template_file = fullfile(fileparts(mfilename('fullpath')), 'report.html');
-
-tracker_labels = cellfun(@(x) x.identifier, trackers, 'UniformOutput', 0);
 
 index_fid = fopen(temporary_index_file, 'w');
 latex_fid = [];
-
-image_directory = fullfile(directory, 'images');
-
-mkpath(image_directory);
-
-sensitivity = 50;
-
-lines = hsv(length(trackers));
-lines = lines(randperm(length(lines)), :);
-dashes = {'o', 'x', '*', 'v', 'd', '+', '<', 'p', '>'};
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
@@ -85,40 +71,12 @@ for e = 1:numel(experiments)
 
         end;
 
-        hf = figure('Visible', 'off');
-
-        hold on;
-        grid on;
-        title(sprintf('Sequence %s', experiment_sequences{s}.name), 'interpreter', 'none'); 
-
-        available = true(length(trackers), 1);
+        hf = generate_ar_plot(trackers, accuracy, failures);
         
-        for t = 1:length(trackers)
-
-            if all(isnan(accuracy(:, t)))
-                available(t) = 0;
-                continue;
-            end;
-            
-            ar_mean = mean([accuracy(:, t), failures(:, t)]);
-
-        	plot(exp(-ar_mean(2) / sensitivity), ar_mean(1), dashes{mod(t, length(dashes))+1}, 'Color', lines(t, :),'MarkerSize',10,  'LineWidth', mod(t+1, 2) + 1);
+        insert_figure(context, index_fid, hf, sprintf('arplot_%s_%s.png', ...
+            experiment.name, experiment_sequences{s}.name), ...
+            sprintf('Sequence %s', experiment_sequences{s}.name));
     
-        end;
-        legend(tracker_labels(available), 'Location', 'NorthWestOutside'); 
-        xlabel(sprintf('Reliability (S = %d)', sensitivity));
-        ylabel('Accuracy');
-        xlim([0, 1]); 
-        ylim([0, 1]);
-        hold off;
-        
-        print( hf, '-dpng', '-r130', fullfile(image_directory, sprintf('arplot_%s_%s.png', experiment.name, experiment_sequences{s}.name)));
-        
-        fprintf(index_fid, '<h3>Sequence %s</h3>\n', experiment_sequences{s}.name);
-        
-        fprintf(index_fid, '<p><img src="images/arplot_%s_%s.png" alt="%s" /></p>\n', ...
-            experiment.name, experiment_sequences{s}.name, experiment_sequences{s}.name);
-        
         print_indent(-1);
 
     end;
@@ -132,6 +90,59 @@ end;
 
 fclose(index_fid);
 
-generate_from_template(index_file, template_file, ...
+generate_from_template(fullfile(context.root, index_file), template_file, ...
     'body', fileread(temporary_index_file), 'title', 'A-R analysis report', ...
     'timestamp', datestr(now, 31));
+
+delete(temporary_index_file);
+
+
+function hf = generate_ar_plot(trackers, accuracy, failures, varargin)
+
+    plot_title = [];
+    sensitivity = 30;
+    
+    for i = 1:2:length(varargin)
+        switch lower(varargin{i})
+            case 'title'
+                plot_title = varargin{i+1};
+            case 'sensitivity'
+                sensitivity = varargin{i+1};                 
+            otherwise 
+                error(['Unknown switch ', varargin{i},'!']) ;
+        end
+    end 
+
+    hf = figure('Visible', 'off');
+
+    hold on;
+    grid on;
+    
+    if ~isempty(plot_title)
+        title(plot_title, 'interpreter', 'none'); 
+    end;
+    available = true(length(trackers), 1);
+
+    for t = 1:length(trackers)
+
+        if all(isnan(accuracy(:, t)))
+            available(t) = 0;
+            continue;
+        end;
+
+        ar_mean = mean([accuracy(:, t), failures(:, t)]);
+
+        plot(exp(-ar_mean(2) / sensitivity), ar_mean(1), ...
+            trackers{t}.style.symbol, 'Color', trackers{t}.style.color, ...
+            'MarkerSize', 10, 'LineWidth', trackers{t}.style.width);
+
+    end;
+    
+    tracker_labels = cellfun(@(x) x.label, trackers, 'UniformOutput', 0);
+
+    legend(tracker_labels(available), 'Location', 'NorthWestOutside'); 
+    xlabel(sprintf('Reliability (S = %d)', sensitivity));
+    ylabel('Accuracy');
+    xlim([0, 1]); 
+    ylim([0, 1]);
+    hold off;
