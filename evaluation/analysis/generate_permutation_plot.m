@@ -1,9 +1,9 @@
-function hf = generate_permutation_plot(ranks, criteria, plot_labels, plot_style, varargin)
+function hf = generate_permutation_plot(trackers, ranks, criteria, varargin)
 
     plot_title = [];
     normalized = 0;
     width = 9;
-    height = 3;
+    height = max(3, numel(trackers) / 3);
     
     
     for i = 1:2:length(varargin)
@@ -29,12 +29,12 @@ function hf = generate_permutation_plot(ranks, criteria, plot_labels, plot_style
 
     if ~normalized
     
-        for t = 1:length(plot_labels)
+        for t = 1:length(trackers)
 
             x = ranks(:, t);
 
-            plot(x, 1:length(criteria), [plot_style{1, t}, '--'], ...
-                'Color', plot_style{2, t}, 'MarkerSize', 10,  'LineWidth', plot_style{3, t});
+            plot(x, 1:length(criteria), [trackers{t}.style.symbol, '--'], ...
+                'Color', trackers{t}.style.color, 'MarkerSize', 10,  'LineWidth', trackers{t}.style.width);
 
         end;
 
@@ -43,12 +43,12 @@ function hf = generate_permutation_plot(ranks, criteria, plot_labels, plot_style
         end;
     else
        
-        for t = 1:length(plot_labels)
+        for t = 1:length(trackers)
 
-            x = mod(find(I' == t)-1, length(plot_labels))+1;
+            x = mod(find(I' == t)-1, length(trackers))+1;
 
-            plot(x, 1:length(criteria), [plot_style{1, t}, '--'], ...
-                'Color', plot_style{2, t}, 'MarkerSize', 10,  'LineWidth', plot_style{3, t});
+            plot(x, 1:length(criteria), [trackers{t}.style.symbol, '--'], ...
+                'Color', trackers{t}.style.color, 'MarkerSize', 10,  'LineWidth', trackers{t}.style.width);
 
         end;
 
@@ -56,10 +56,12 @@ function hf = generate_permutation_plot(ranks, criteria, plot_labels, plot_style
             title([plot_title, '(normalized)'],'interpreter','none');
         end;
     end;
+    
+    plot_labels = cellfun(@(tracker) tracker.label, trackers, 'UniformOutput', 0);
     legend(plot_labels, 'Location', 'NorthEastOutside'); 
     xlabel('Rank'); 
 
-    set(gca,'ytick', 1:numel(criteria),'yticklabel', criteria, 'YDir','Reverse');
+    set(gca,'ytick', 1:numel(criteria),'yticklabel', criteria, 'YDir','Reverse', 'ylim', [0.9, numel(criteria)+0.1]);
     set(gca,'xtick', 1:length(plot_labels), 'xlim', [0.9, length(plot_labels)+0.1]);
 
     hold off;

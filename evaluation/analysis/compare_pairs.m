@@ -1,5 +1,5 @@
 function [Hacc, Hfail, Racc, Rfail, average_results] = compare_pairs...
-                            ( S, F, labels, varargin )
+                            ( S, F, varargin )
 % 1. Rank trackers by average accuracy
 % 2. Perform paired Wilcoxon test on pairs of trackers
 % 3. Display number of failures per tracker as well and rank them
@@ -24,7 +24,6 @@ test_fail = 1 ;
 alpha = 0.05 ;
 minimal_difference_acc = 0 ;
 minimal_difference_fail = 0 ;
-display_results = 0 ;
 
 for i = 1 :2: length(varargin)
     switch varargin{i}
@@ -34,8 +33,6 @@ for i = 1 :2: length(varargin)
             minimal_difference_acc = varargin{i+1} ;
         case 'minimal_difference_fail'
             minimal_difference_fail = varargin{i+1} ;            
-        case 'display_results'
-            display_results = varargin{i+1} ;
         case 'type_comparison'
             type_comparison = varargin{i+1} ;
         case 'test_fail'
@@ -90,40 +87,6 @@ average_failures.std = std(F,0,2) ;
 average_results.average_accuracy = average_accuracy ;
 average_results.average_failures = average_failures ;
  
-% display results
-if display_results == 1  
-    t_labels_sorted_by_acc = labels(order_by_acc) ;
-    S = S(order_by_acc,:) ;
-    
-    figure(1) ; clf ; 
-    subplot(1,3,1) ; boxplot(S', 'labels', t_labels_sorted_by_acc) ; title('Boxplots of trackers')
-
-    subplot(1,3,2) ; imagesc(H) ;
-    set(gca,'XTickLabel',t_labels_sorted_by_acc) ;  set(gca,'YTickLabel',t_labels_sorted_by_acc) ;
-    title('Rejection of null hypothesis H_0 = zero median (equal)') ;
-    
-    subplot(1,3,3) ; plot(1:length(average_failures.mu),average_failures.mu(order_by_acc),'*') ;  
-    title('Number of failures') ;
-    set(gca,'XTickLabel',t_labels_sorted_by_acc) ;
-    
-    disp('Rank according to accuracy:') ;
-
-    for i = 1 : length(t_labels_sorted_by_acc)
-        fprintf('%s, ', t_labels_sorted_by_acc{i});
-    end
-
-    fprintf('\n');
-    
-    disp('Rank according to failure rate:') ;
-    t_labels_ranked_fails = labels(order_by_fail) ;
-
-    for i = 1 : length(t_labels_ranked_fails)
-        fprintf('%s, ', t_labels_ranked_fails{i});
-    end
-    
-    fprintf('\n');
-end
-
 % ----------------------------------------------------------------------- %
 function [ H, P ] = compare_pairs_statistical_significance(N_trackers, S, ...
                                         type_comparison, alpha, minimal_difference, pairing)
@@ -191,30 +154,30 @@ end
 
 
 % ----------------------------------------------------------------------- %
-function [ p, h ] = prob_of_better( S1, S2, varargin )
- 
-min_difference = 0.1 ;
-for i = 1 :2: length(varargin)
-    switch varargin{i}
-        case 'min_difference'
-            min_difference = varargin{i+1} ;       
-        otherwise 
-            error(['Unknown switch ', varargin{i},'!']) ;
-    end
-end 
-
-valid = ~isnan(S1) & ~isnan(S2) ;
-id_better_S1 = (S1 > S2) & (abs(S1-S2)>min_difference) & valid ;
-id_better_S2 = (S1 < S2) & (abs(S1-S2)>min_difference) & valid ;
- 
-id_better_S1 = id_better_S1(valid) ;
-id_better_S2 = id_better_S2(valid) ;
-
-mu1 = mean(id_better_S1) ;
-mu2 = mean(id_better_S2) ;
- 
-p = max([mu1, mu2]) ;
-h = p > 0.5 ;
+% function [ p, h ] = prob_of_better( S1, S2, varargin )
+%  
+% min_difference = 0.1 ;
+% for i = 1 :2: length(varargin)
+%     switch varargin{i}
+%         case 'min_difference'
+%             min_difference = varargin{i+1} ;       
+%         otherwise 
+%             error(['Unknown switch ', varargin{i},'!']) ;
+%     end
+% end 
+% 
+% valid = ~isnan(S1) & ~isnan(S2) ;
+% id_better_S1 = (S1 > S2) & (abs(S1-S2)>min_difference) & valid ;
+% id_better_S2 = (S1 < S2) & (abs(S1-S2)>min_difference) & valid ;
+%  
+% id_better_S1 = id_better_S1(valid) ;
+% id_better_S2 = id_better_S2(valid) ;
+% 
+% mu1 = mean(id_better_S1) ;
+% mu2 = mean(id_better_S2) ;
+%  
+% p = max([mu1, mu2]) ;
+% h = p > 0.5 ;
  
 
 

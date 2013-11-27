@@ -1,8 +1,8 @@
-function [A, R] = ranking(S, F, labels, varargin)
+function [A, R] = ranking(S, F, varargin)
 
-display_results = 0 ;
-type_comparison = 'Wilcoxon' ; % Wilcoxon,  Prob_better
-minimal_difference_acc = 0 ;% minimal difference at which two trackers are actually different
+type_comparison = 'Wilcoxon' ;
+minimal_difference_acc = 0; % minimal difference at which two trackers are actually different
+minimal_difference_fail = 0;
 alpha = 0.05 ;
 
 for i = 1 : 2 : length(varargin)
@@ -36,11 +36,10 @@ for i_seq = 1 : length(S)
     
     % rank trackers and calculate statistical significance of differences
     [H_acc, H_fail, accuracy_ranks, failure_ranks, average_results] = ...
-        compare_pairs( S{i_seq}, F{i_seq}, labels, ...
+        compare_pairs( S{i_seq}, F{i_seq}, ...
                    'minimal_difference_acc', minimal_difference_acc, ...
                    'minimal_difference_fail', minimal_difference_fail,...
-                   'alpha', alpha, 'display_results', display_results,...
-                   'type_comparison', type_comparison) ;
+                   'alpha', alpha, 'type_comparison', type_comparison) ;
     
     % get adapted ranks
     adapted_rank_acc  = adapted_ranks(accuracy_ranks, H_acc) ;

@@ -1,23 +1,24 @@
-function hf = generate_ranking_plot(accuracy, robustness, plot_title, plot_labels, plot_style, plot_limit)
+function hf = generate_ranking_plot(trackers, accuracy, robustness, plot_title, plot_limit)
 
     hf = figure('Visible', 'off');
 
     hold on; box on; grid on;
     title(plot_title,'interpreter','none');
 
-    available = true(length(plot_labels), 1);
+    available = true(length(trackers), 1);
 
-    for t = 1:length(plot_labels)
+    for t = 1:length(trackers)
 
         if isnan(accuracy(t))
             available(t) = 0;
             continue;
         end;
 
-        plot(robustness(t), accuracy(t), plot_style{1, t}, 'Color', ...
-            plot_style{2, t},'MarkerSize',10,  'LineWidth', plot_style{3, t});
+        plot(robustness(t), accuracy(t), trackers{t}.style.symbol, 'Color', ...
+            trackers{t}.style.color, 'MarkerSize',10,  'LineWidth', trackers{t}.style.width);
 
     end;
+    plot_labels = cellfun(@(tracker) tracker.label, trackers, 'UniformOutput', 0);
     legend(plot_labels(available), 'Location', 'NorthWestOutside'); 
     xlabel('Robustness rank'); set(gca,'XDir','Reverse');
     ylabel('Accuracy rank'); set(gca,'YDir','Reverse');
