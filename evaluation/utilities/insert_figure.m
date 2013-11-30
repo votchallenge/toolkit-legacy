@@ -20,5 +20,15 @@ switch lower(format)
             context.imagesurl, context.prefix, id, title, title);
     case 'data'
         
-        export_figure(hf, fullfile(context.data, [context.prefix, id]), 'fig');
+        file = export_figure(hf, fullfile(context.data, [context.prefix, id]), 'fig');
+        
+        % Hack : try to fix potential figure invisibility
+        try
+            f=load(file,'-mat');
+            n=fieldnames(f);
+            f.(n{1}).properties.Visible='on';
+            save(file,'-struct','f'); 
+        catch e
+            print_debug('Warning: unable to fix figure visibility: %s', e.message);
+        end;
 end;
