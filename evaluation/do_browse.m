@@ -68,7 +68,7 @@ while 1
         print_indent(1);
 
         for i = 1:length(experiments)
-            print_text('%d - "%s"', i, experiments{i});
+            print_text('%d - "%s"', i, experiments{i}.name);
         end;
 
         print_text('e - Exit');
@@ -105,7 +105,7 @@ while 1
     
     tracker = trackers{selected_tracker};
     
-    experiment_directory = fullfile(tracker.directory, experiments{selected_experiment});
+    experiment_directory = fullfile(tracker.directory, experiments{selected_experiment}.name);
     
     sequence_directory = fullfile(experiment_directory, sequences{selected_sequence}.name);
     
