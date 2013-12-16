@@ -4,6 +4,7 @@ temporary_index_file = tempname;
 template_file = fullfile(fileparts(mfilename('fullpath')), 'report.html');
 
 ranks = nan(numel(experiments) * 3, numel(trackers));
+scores = nan(numel(experiments) * 2, numel(trackers));
 experiment_names = cellfun(@(x) x.name, experiments,'UniformOutput',false);
 tacker_labels = cellfun(@(x) x.label, trackers, 'UniformOutput', 0);
 
@@ -20,6 +21,9 @@ minimal_difference_acc = 0;
 minimal_difference_fail = 0;
 ar_plot = 0;
 permutation_plot = 0;
+
+permutation_args = {'legend', 0, 'width' 4, 'height', 4};
+ranking_permutation_args = {'flip', 1};
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
@@ -73,14 +77,17 @@ for e = 1:numel(experiments)
 
     report_file = generate_ranking_report(context, trackers(available), experiment, accuracy, robustness, ...
          'labels', labels, 'combineWeight', combine_weight, 'reporttemplate', template_file, ...
-         'arplot', ar_plot, 'permutationplot', permutation_plot);
+         'arplot', ar_plot, 'permutationplot', 0); %permutation_plot);
 
     fprintf(index_fid, '<h2>Experiment %s</h2>\n', experiment.name);
            
     ranks(e * 3 - 2, available) = accuracy.average_ranks;
     ranks(e * 3 - 1, available) = robustness.average_ranks;
     ranks(e * 3, available) = accuracy.average_ranks * combine_weight + robustness.average_ranks * (1-combine_weight);
-       
+    
+    scores(e * 2 - 1, available) = mean(accuracy.mu);
+    scores(e * 2, available) = mean(robustness.mu);
+    
     [~, order] = sort(ranks(e * 3, :), 'ascend');
     print_average_ranks(index_fid, ranks(e * 3, order), tacker_labels(order));
     
@@ -99,7 +106,7 @@ if permutation_plot
 
     fprintf(index_fid, '<h2>Ranking permutations</h2>\n');    
             
-    h = generate_permutation_plot(trackers, ranks(1:3:end, :), experiment_names);
+    h = generate_permutation_plot(trackers, ranks(1:3:end, :), experiment_names, permutation_args{:}, ranking_permutation_args{:});
 
     insert_figure(context, index_fid, h, 'permutation_accuracy', 'Ranking permutations for accuracy rank');
     
@@ -107,7 +114,7 @@ if permutation_plot
         insert_figure(context, 0, h, 'permutation_accuracy', 'Ranking permutations for accuracy rank', 'format', 'data');
     end;    
     
-    h = generate_permutation_plot(trackers, ranks(2:3:end, :), experiment_names);
+    h = generate_permutation_plot(trackers, ranks(2:3:end, :), experiment_names, permutation_args{:}, ranking_permutation_args{:});
 
     insert_figure(context, index_fid, h, 'permutation_robustness', 'Ranking permutations for robustness rank');
             
@@ -115,7 +122,28 @@ if permutation_plot
         insert_figure(context, 0, h, 'permutation_robustness', 'Ranking permutations for robustness rank', 'format', 'data');
     end;      
     
-    h = generate_permutation_plot(trackers, ranks(3:3:end, :), experiment_names); 
+%--   
+  
+    h = generate_permutation_plot(trackers, scores(1:2:end, :), experiment_names, permutation_args{:}, 'scope', [0, 1], 'type', 'Accuracy');
+
+    insert_figure(context, index_fid, h, 'permutation_accuracy_raw', 'Scores permutations for accuracy rank');
+    
+    if export_data
+        insert_figure(context, 0, h, 'permutation_accuracy_raw', 'Scores permutations for accuracy rank', 'format', 'data');
+    end;    
+    
+    h = generate_permutation_plot(trackers, scores(2:2:end, :), experiment_names, permutation_args{:}, 'scope', [0, max(max(scores(2:2:end, :)))+1], 'type', 'Robustness');
+
+    insert_figure(context, index_fid, h, 'permutation_robustness_raw', 'Scores permutations for robustness rank');
+            
+    if export_data
+        insert_figure(context, 0, h, 'permutation_robustness_raw', 'Scores permutations for robustness rank', 'format', 'data');
+    end; 
+
+
+%--
+    
+    h = generate_permutation_plot(trackers, ranks(3:3:end, :), experiment_names, permutation_args{:}, ranking_permutation_args{:}); 
 
     insert_figure(context, index_fid, h, 'permutation_combined', 'Ranking permutations for combined rank');
     

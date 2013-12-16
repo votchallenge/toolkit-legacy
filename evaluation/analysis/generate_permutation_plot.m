@@ -1,10 +1,13 @@
-function hf = generate_permutation_plot(trackers, ranks, criteria, varargin)
+function hf = generate_permutation_plot(trackers, values, criteria, varargin)
 
     plot_title = [];
     normalized = 0;
     width = 9;
     height = max(3, numel(trackers) / 3);
-    
+    scope = [1, numel(trackers)];
+    type = 'Rank';
+    flip = 0;
+    show_legend = 1;
     
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
@@ -15,7 +18,15 @@ function hf = generate_permutation_plot(trackers, ranks, criteria, varargin)
             case 'width'
                 width = varargin{i+1};
             case 'height'
-                height = varargin{i+1};                        
+                height = varargin{i+1};
+            case 'scope'
+                scope = varargin{i+1};
+            case 'type'
+                type = varargin{i+1};
+            case 'flip'
+                flip = varargin{i+1}; 
+            case 'legend'
+                show_legend = varargin{i+1};
             otherwise 
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
@@ -23,7 +34,7 @@ function hf = generate_permutation_plot(trackers, ranks, criteria, varargin)
 
     hf = figure('Visible', 'off');
 
-    [~, I] = sort(ranks, 2, 'ascend');
+    [~, I] = sort(values, 2, 'ascend');
 
     hold on; grid on; box on;
 
@@ -31,7 +42,7 @@ function hf = generate_permutation_plot(trackers, ranks, criteria, varargin)
     
         for t = 1:length(trackers)
 
-            x = ranks(:, t);
+            x = values(:, t);
 
             plot(x, 1:length(criteria), [trackers{t}.style.symbol, '--'], ...
                 'Color', trackers{t}.style.color, 'MarkerSize', 10,  'LineWidth', trackers{t}.style.width);
@@ -58,12 +69,17 @@ function hf = generate_permutation_plot(trackers, ranks, criteria, varargin)
     end;
     
     plot_labels = cellfun(@(tracker) tracker.label, trackers, 'UniformOutput', 0);
-    legend(plot_labels, 'Location', 'NorthEastOutside'); 
-    xlabel('Rank'); 
-
+    if show_legend
+        legend(plot_labels, 'Location', 'NorthEastOutside'); 
+    end;
+    xlabel(type); 
     set(gca,'ytick', 1:numel(criteria),'yticklabel', criteria, 'YDir','Reverse', 'ylim', [0.9, numel(criteria)+0.1]);
-    set(gca,'xtick', 1:length(plot_labels), 'xlim', [0.9, length(plot_labels)+0.1]);
+    set(gca,'xtick', floor(scope(1)):ceil(scope(2)), 'xlim', scope + [-0.1, 0.1]);
 
+    if flip
+        set(gca, 'xdir', 'reverse');
+    end;
+    set(gca, 'LineWidth', 2);
     hold off;
     
     set(hf, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height])

@@ -44,6 +44,9 @@ accuracy_ranks = accuracy.ranks;
 robustness_ranks = robustness.ranks;
 combined_ranks = accuracy.ranks * combine_weight + robustness.ranks * (1-combine_weight);
 
+accuracy_raw = accuracy.mu;
+robustness_raw = robustness.mu;
+
 average_accuracy_ranks = accuracy.average_ranks;
 average_robustness_ranks = robustness.average_ranks;
 
@@ -71,19 +74,27 @@ fprintf(fid, '<h2>Accuracy</h2>\n');
 print_tables(fid, accuracy, t_labels_acc, labels ) ;
 
 if permutation_plot
-    h = generate_permutation_plot(trackers, accuracy_ranks, labels);
+    h = generate_permutation_plot(trackers, accuracy_ranks, labels, 'flip', 1);
     insert_figure(context, fid, h, sprintf('permutation_accuracy_%s', experiment.name), ...
         'Ranking permutations for accuracy rank');
+
+    h = generate_permutation_plot(trackers, accuracy_raw, labels, 'scope', [0, 1], 'type', 'Accuracy');
+    insert_figure(context, fid, h, sprintf('permutation_accuracy_raw_%s', experiment.name), ...
+        'Ranking permutations for raw accuracy');    
 end;
 
 fprintf(fid, '<h2>Robustness</h2>\n');
 
 print_tables(fid, robustness, t_labels_rob, labels );
- 
+
 if permutation_plot
-    h = generate_permutation_plot(trackers, robustness_ranks, labels);
+    h = generate_permutation_plot(trackers, robustness_ranks, labels, 'flip', 1);
     insert_figure(context, fid, h, sprintf('permutation_robustness_%s', experiment.name), ...
         'Ranking permutations for robustness rank');
+
+    h = generate_permutation_plot(trackers, robustness_raw, labels, 'scope', [0, max(robustness_raw(:))+1], 'type', 'Robustness');
+    insert_figure(context, fid, h, sprintf('permutation_robustness_raw_%s', experiment.name), ...
+        'Ranking permutations for raw robustness');
 end;
     
 fprintf(fid, '<h2>Combined ranking (weight = %1.3g)</h2>\n', combine_weight);
@@ -91,7 +102,7 @@ fprintf(fid, '<h2>Combined ranking (weight = %1.3g)</h2>\n', combine_weight);
 print_average_ranks(fid, merged_ranks, t_labels_merg );
 
 if permutation_plot
-    h = generate_permutation_plot(trackers, combined_ranks, labels);
+    h = generate_permutation_plot(trackers, combined_ranks, labels, 'flip', 1);
     insert_figure(context, fid, h, sprintf('permutation_combined_%s', experiment.name), ...
         'Ranking permutations for combined rank');    
 end;
