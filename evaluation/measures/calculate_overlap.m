@@ -1,4 +1,4 @@
-function [overlap] = calculate_overlap(T1, T2)
+function [overlap, only1, only2] = calculate_overlap(T1, T2)
 % CALCULATE_OVERLAP  Calculates per-frame overlap for two bounding-box trajectories.
 %   OVERLAP = CALCULATE_OVERLAP(T1, T2) calculates overlap between trajectories
 %       T1 and T2, where T1 and T2 are matrices of size N1 x 4 and N2 x 4, where
@@ -21,3 +21,17 @@ union = (T1(:, 3) .* T1(:, 4)) + (T2(:, 3) .* T2(:, 4)) - intersection;
 overlap = intersection ./ union;
 
 overlap(any(isnan(T1),2) | any(isnan(T2),2)) = NaN;
+
+if (nargout > 1)
+    A1 = T1(:, 3) .* T1(:, 4);
+    A2 = T2(:, 3) .* T2(:, 4);
+    
+    only1 = (A1 - intersection) ./ union;
+    only1(any(isnan(T1),2) | any(isnan(T2),2)) = NaN;
+    
+    if (nargout > 2)
+        only2 = (A2 - intersection) ./ union;
+        only2(any(isnan(T1),2) | any(isnan(T2),2)) = NaN;
+    end;
+       
+end
