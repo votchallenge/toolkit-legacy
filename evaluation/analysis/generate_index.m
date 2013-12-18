@@ -10,6 +10,8 @@ for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'reporttemplate'
             template_file = varargin{i+1};  
+        case 'reportname'
+            index_file = sprintf('%s%s.html', context.prefix, varargin{i+1});          
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end

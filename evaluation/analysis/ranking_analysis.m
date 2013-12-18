@@ -22,7 +22,7 @@ minimal_difference_fail = 0;
 ar_plot = 0;
 permutation_plot = 0;
 
-permutation_args = {'legend', 0, 'width' 4, 'height', 4};
+permutation_args = {}; %'legend', 1, 'width' 4, 'height', 4};
 ranking_permutation_args = {'flip', 1};
 
 for i = 1:2:length(varargin)
@@ -70,6 +70,12 @@ for e = 1:numel(experiments)
     [accuracy, robustness] = ranking(S_all, F_all, 'alpha', 0.05, ...
         'minimal_difference_acc', minimal_difference_acc,...
         'minimal_difference_fail', minimal_difference_fail) ;
+    
+    if export_data
+        
+        save(fullfile(context.data, sprintf('%s_ranks.mat', experiment.name)), 'accuracy', 'robustness');
+        
+    end;          
     
     print_indent(-1);
 
@@ -121,27 +127,27 @@ if permutation_plot
     if export_data
         insert_figure(context, 0, h, 'permutation_robustness', 'Ranking permutations for robustness rank', 'format', 'data');
     end;      
-    
-%--   
-  
-    h = generate_permutation_plot(trackers, scores(1:2:end, :), experiment_names, permutation_args{:}, 'scope', [0, 1], 'type', 'Accuracy');
-
-    insert_figure(context, index_fid, h, 'permutation_accuracy_raw', 'Scores permutations for accuracy rank');
-    
-    if export_data
-        insert_figure(context, 0, h, 'permutation_accuracy_raw', 'Scores permutations for accuracy rank', 'format', 'data');
-    end;    
-    
-    h = generate_permutation_plot(trackers, scores(2:2:end, :), experiment_names, permutation_args{:}, 'scope', [0, max(max(scores(2:2:end, :)))+1], 'type', 'Robustness');
-
-    insert_figure(context, index_fid, h, 'permutation_robustness_raw', 'Scores permutations for robustness rank');
-            
-    if export_data
-        insert_figure(context, 0, h, 'permutation_robustness_raw', 'Scores permutations for robustness rank', 'format', 'data');
-    end; 
-
-
-%--
+%     
+% %--   
+%   
+%     h = generate_permutation_plot(trackers, scores(1:2:end, :), experiment_names, permutation_args{:}, 'scope', [0, 1], 'type', 'Accuracy');
+% 
+%     insert_figure(context, index_fid, h, 'permutation_accuracy_raw', 'Scores permutations for accuracy rank');
+%     
+%     if export_data
+%         insert_figure(context, 0, h, 'permutation_accuracy_raw', 'Scores permutations for accuracy rank', 'format', 'data');
+%     end;    
+%     
+%     h = generate_permutation_plot(trackers, scores(2:2:end, :), experiment_names, permutation_args{:}, 'scope', [0, max(max(scores(2:2:end, :)))+1], 'type', 'Robustness');
+% 
+%     insert_figure(context, index_fid, h, 'permutation_robustness_raw', 'Scores permutations for robustness rank');
+%             
+%     if export_data
+%         insert_figure(context, 0, h, 'permutation_robustness_raw', 'Scores permutations for robustness rank', 'format', 'data');
+%     end; 
+% 
+% 
+% %--
     
     h = generate_permutation_plot(trackers, ranks(3:3:end, :), experiment_names, permutation_args{:}, ranking_permutation_args{:}); 
 

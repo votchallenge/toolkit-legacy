@@ -17,9 +17,9 @@ for i = 1:2:length(varargin)
         case 'labels'
             labels = varargin{i+1};   
         case 'arplot'
-            ar_plot = varargin{i+1} ;
+            ar_plot = varargin{i+1};
         case 'permutationplot'
-            permutation_plot = varargin{i+1} ;               
+            permutation_plot = varargin{i+1};         
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
