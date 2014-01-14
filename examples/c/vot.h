@@ -128,6 +128,7 @@ VOTRectangle vot_initialize() {
         _vot_sequence_size++;
     }
 
+    fclose(imagesfile);
     free(linebuf);
 
     _vot_result = (VOTRectangle*) malloc(sizeof(VOTRectangle) * _vot_sequence_size);
