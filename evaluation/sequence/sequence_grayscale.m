@@ -1,8 +1,6 @@
 function [grayscale_sequence] = sequence_grayscale(sequence)
 
-global track_properties;
-
-cache_directory = fullfile(track_properties.directory, 'cache', 'grayscale', sequence.name);
+cache_directory = fullfile(get_global_variable('directory'), 'cache', 'grayscale', sequence.name);
 
 mkpath(cache_directory);
 

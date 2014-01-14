@@ -2,7 +2,7 @@ function do_test()
 
 script_directory = fileparts(mfilename('fullpath'));
 include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-     'tracker', 'sequence', 'measures', 'experiment' , 'tests'}, 'UniformOutput', false); 
+    'tracker', 'sequence', 'measures', 'experiment', 'tests'}, 'UniformOutput', false); 
 addpath(include_dirs{:});
 
 initialize_environment;
@@ -11,14 +11,10 @@ stack_configuration = str2func(['stack_', experiment_stack]);
 
 stack_configuration();
 
-global current_sequence;
+current_sequence = get_global_variable('current_sequence', 1);
 
 if ~exist('trajectory', 'var')
 	trajectory = [];
-end;
-
-if ~exist('current_sequence', 'var')
-	current_sequence = 1;
 end;
 
 performance = struct('frames', 0, 'time', 0);
@@ -76,7 +72,7 @@ while 1
     if ~isempty(trajectory)
         print_text('c - Visually compare results with the groundtruth');
     end;
-    if track_properties.debug
+    if get_global_variable('debug', 0)
         print_text('d - Disable debug output');
     else
         print_text('d - Enable debug output');
@@ -129,7 +125,7 @@ while 1
             
         end;   
 	case 'd'
-		track_properties.debug = ~track_properties.debug;
+        set_global_variable('debug', ~get_global_variable('debug', 0));
     case 'e'
         break;
     case 'q'

@@ -1,10 +1,8 @@
 function [trackers] = create_trackers(list_file)
 
-global track_properties;
-
 fid = fopen(list_file, 'r');
 
-results_directory = fullfile(track_properties.directory, 'results');
+results_directory = fullfile(get_global_variable('directory'), 'results');
 
 trackers = cell(0,0);
 

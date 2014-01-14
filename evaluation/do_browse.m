@@ -2,16 +2,7 @@ function do_browse()
 
 script_directory = fileparts(mfilename('fullpath'));
 include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-    'tracker', 'sequence', 'measures', 'experiment' , 'tests'}, 'UniformOutput', false); 
-if exist('strsplit') ~= 2
-	remove_dirs = include_dirs;
-else
-	% if strsplit is available we can filter out missing paths to avoid warnings
-	remove_dirs = include_dirs(ismember(include_dirs, strsplit(path, pathsep)));
-end;
-if ~isempty(remove_dirs) 
-	rmpath(remove_dirs{:});
-end;
+    'tracker', 'sequence', 'measures', 'experiment', 'tests'}, 'UniformOutput', false); 
 addpath(include_dirs{:});
 
 initialize_environment;
@@ -111,7 +102,7 @@ while 1
     
     trajectories = {};
          
-    for i = 1:track_properties.repeat
+    for i = 1:get_global_variable('repeat', 1)
     
         tfile = fullfile(sequence_directory, ...
             sprintf('%s_%03d.txt', sequences{selected_sequence}.name, i));

@@ -8,7 +8,6 @@ function [trajectory, time] = run_tracker(tracker, sequence, start, context)
 %   See also RUN_TRIAL, SYSTEM.
 
 % create temporary directory and generate input data
-global track_properties;
 
 if isempty(tracker.command)
     error('Unable to execute tracker %s. No command given.', tracker.identifier);
@@ -102,7 +101,7 @@ if (n_frames ~= (sequence.length-start) + 1)
     end;
 end;
 
-if track_properties.cleanup
+if get_global_variable('cleanup', 0)
     % clean-up temporary directory
     recursive_rmdir(working_directory);
 end;

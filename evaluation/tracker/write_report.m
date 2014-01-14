@@ -1,8 +1,6 @@
 function [report_file] = write_report(name, tracker, sequences, experiments, scores)
 
-global track_properties;
-
-directory = fullfile(track_properties.directory, 'reports', name);
+directory = fullfile(get_global_variable('directory'), 'reports', name);
 
 mkpath(directory);
 

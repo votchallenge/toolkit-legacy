@@ -1,7 +1,4 @@
 
-global select_experiment;
-global using_trackers;
-
 initialize_defaults;
 
 print_text('Initializing VOT environment ...');
@@ -20,7 +17,7 @@ catch e
     end; 
 end;
 
-mkpath(track_properties.directory);
+mkpath(get_global_variable('directory'));
 
 experiment_stack = get_global_variable('experiment_stack', 'vot2013');
 
@@ -34,8 +31,8 @@ experiments = {};
 
 stack_configuration();
 
-sequences_directory = fullfile(track_properties.directory, 'sequences');
-results_directory = fullfile(track_properties.directory, 'results');
+sequences_directory = fullfile(get_global_variable('directory'), 'sequences');
+results_directory = fullfile(get_global_variable('directory'), 'results');
 
 print_text('Loading sequences ...');
 
@@ -44,6 +41,8 @@ sequences = load_sequences(sequences_directory, get_global_variable('select_sequ
 if isempty(sequences)
 	error('No sequences available. Stopping.');
 end;
+
+using_trackers = get_global_variable('trackers', {});
 
 trackers = cell(length(using_trackers), 1);
 
@@ -62,7 +61,9 @@ for t = 1:length(using_trackers)
     
 end;
 
-if exist('select_experiment', 'var') && ~isempty(select_experiment)
+select_experiment = get_global_variable('select_experiment');
+
+if ~isempty(select_experiment)
 	selected_experiments = unique(select_experiment(select_experiment > 0 & ...
         select_experiment <= length(experiments)));
 else

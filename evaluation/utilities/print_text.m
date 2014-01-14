@@ -1,9 +1,9 @@
 function print_text(text, varargin)
 
-global track_properties;
+indent = get_global_variable('indent', 0);
 
-if track_properties.indent > 0
-    fprintf(repmat(sprintf('  '), 1, track_properties.indent));
+if indent > 0
+    fprintf(repmat(sprintf('  '), 1, indent));
 end;
 
 if ispc

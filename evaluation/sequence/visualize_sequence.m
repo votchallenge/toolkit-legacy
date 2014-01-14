@@ -65,12 +65,13 @@ while 1
     end;
     drawnow;
     try
-        k = waitforbuttonpress;
+	%k = waitforbuttonpress;
+	[x y c] = ginput(1);
     catch 
         break
     end
-    if (k == 1)
-        c = get(hf, 'CurrentCharacter');
+    %if (k == 1)
+        %c = get(hf, 'currentcharacter');
         try
             if c == ' ' || c == 'f' || uint8(c) == 29
                 i = i + 1;
@@ -92,16 +93,16 @@ while 1
                 if i < 1
                     i = 1;
                 end;              
-            elseif c == 'q'
+            elseif c == 'q' || c == -1
                 break;
             else
-                %disp(uint8(c));
+                disp(uint8(c));
             end
         catch e
-            print_text('Error %s', e.message);
+            print_text('Error %s', e);
         end
-        set(hf, 'CurrentCharacter', '?');
-    end;
+        %set(hf, 'currentcharacter', '?');
+    %end;
 
 end;
 

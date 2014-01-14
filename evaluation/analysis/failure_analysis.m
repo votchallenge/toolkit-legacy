@@ -1,6 +1,6 @@
 function [index_file] = failure_analysis(directory, trackers, sequences, experiments, labels, varargin)
 
-global track_properties;
+repeat = get_global_variable('repeat', 1);
 
 temporary_dir = tempdir;
 
@@ -57,7 +57,7 @@ for e = 1:numel(experiments)
 
             result_directory = fullfile(trackers{t}.directory, experiment.name, experiment_sequences{s}.name);
             
-            for j = 1:track_properties.repeat
+            for j = 1:repeat
 
                 result_file = fullfile(result_directory, sprintf('%s_%03d.txt', experiment_sequences{s}.name, j));
                 trajectory = load_trajectory(result_file);

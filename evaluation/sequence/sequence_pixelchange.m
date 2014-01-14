@@ -1,7 +1,5 @@
 function [transformed_sequence] = sequence_pixelchange(sequence, operation, name)
 
-global track_properties;
-
 if ischar(operation)
     operation_name = operation;
     operation = str2func(operation_name);
@@ -13,7 +11,7 @@ if ~isempty(name) && ischar(name)
     operation_name = name;
 end;
 
-cache_directory = fullfile(track_properties.directory, 'cache', ...
+cache_directory = fullfile(get_global_variable('directory'), 'cache', ...
     sprintf('pixelchange_%s', operation_name), sequence.name);
 
 mkpath(cache_directory);

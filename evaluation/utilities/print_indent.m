@@ -1,5 +1,4 @@
 function print_indent(indent)
 
-global track_properties;
+set_global_variable('indent', get_global_variable('indent', 0) + indent);
 
-track_properties.indent = max(0, track_properties.indent + indent);

@@ -1,11 +1,9 @@
 function scores = execution_default(tracker, sequences, directory, varargin)
 
-global track_properties;
-
 arguments.skip_labels = {};
-arguments.skip_initialize = track_properties.skipping;
-arguments.fail_overlap = track_properties.fail;
-arguments.repetitions = track_properties.repeat;
+arguments.skip_initialize = get_global_variable('skipping', 1);
+arguments.fail_overlap = get_global_variable('fail', 0.0);
+arguments.repetitions = get_global_variable('repeat', 1);
 
 args = varargin;
 for j=1:2:length(args)

@@ -1,12 +1,10 @@
 function [estimate] = estimate_completion_time(sequences, varargin)
 
-global track_properties;
-
 failures = 8;
 
 fps = 0.5;
 
-repeats = track_properties.repeat;
+repeats = get_global_variable('repeat', 1);
 
 args = varargin;
 for j=1:2:length(args)

@@ -1,10 +1,8 @@
 function [resized_sequence] = sequence_resize(sequence, ratio)
 
-global track_properties;
-
 ratio = min(10, max(0.1, ratio));
 
-cache_directory = fullfile(track_properties.directory, 'cache', ...
+cache_directory = fullfile(get_global_variable('directory'), 'cache', ...
     sprintf('resize_%.2f', ratio), sequence.name);
 
 mkpath(cache_directory);

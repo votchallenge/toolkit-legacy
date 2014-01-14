@@ -1,6 +1,7 @@
 function [index_file] = ar_analysis(context, trackers, sequences, experiments, varargin)
 
-global track_properties;
+repeat = get_global_variable('repeat', 1);
+burnin = get_global_variable('burnin', 0);
 
 index_file = sprintf('%sarplots.html', context.prefix);
 temporary_index_file = tempname;
@@ -40,8 +41,8 @@ for e = 1:numel(experiments)
 
         print_text('Processing sequence %s ...', experiment_sequences{s}.name);
 
-        accuracy = nan(track_properties.repeat, length(trackers));
-        failures = nan(track_properties.repeat, length(trackers));
+        accuracy = nan(repeat, length(trackers));
+        failures = nan(repeat, length(trackers));
                 
         for t = 1:length(trackers)
 
@@ -49,7 +50,7 @@ for e = 1:numel(experiments)
 
             result_directory = fullfile(trackers{t}.directory, experiment.name, experiment_sequences{s}.name);
             
-            for j = 1:track_properties.repeat
+            for j = 1:repeat
 
                 result_file = fullfile(result_directory, sprintf('%s_%03d.txt', experiment_sequences{s}.name, j));
                 trajectory = load_trajectory(result_file);
@@ -58,7 +59,7 @@ for e = 1:numel(experiments)
                     continue;
                 end;
 
-                accuracy(j, t) = estimate_accuracy(trajectory, experiment_sequences{s}, 'burnin', track_properties.burnin);
+                accuracy(j, t) = estimate_accuracy(trajectory, experiment_sequences{s}, 'burnin', burnin);
 
                 failures(j, t) = estimate_failures(trajectory, experiment_sequences{s});
 

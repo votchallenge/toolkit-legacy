@@ -1,6 +1,12 @@
 
-global track_properties;
+set_global_variable('debug', 0);
+set_global_variable('cache', 1);
+set_global_variable('pack', 1);
+set_global_variable('bundle', []);
+set_global_variable('repeat', 15);
+set_global_variable('cleanup', 1);
+set_global_variable('burnin', 10);
+set_global_variable('skipping', 5);
+set_global_variable('report', 1);
+set_global_variable('fail', 0.0);
 
-track_properties = struct('debug', 0, 'cache', 1, 'indent', 0, 'pack', 1, ...
-     'bundle', 'http://box.vicos.si/vot/vot2013.zip', 'repeat', 15, 'cleanup', 1, ...
-     'burnin', 10, 'skipping', 5, 'report', 1, 'fail', 0.0);

@@ -1,6 +1,7 @@
 function [S_all, nFailures_all, available] = process_results_labels(trackers, sequences, labels, experiment)
 
-global track_properties;
+repeat = get_global_variable('repeat', 1);
+burnin = get_global_variable('burnin', 0);
 
 S_all = cell(length(labels), 1);
 nFailures_all = cell(length(labels), 1);
@@ -31,7 +32,7 @@ for l = 1:length(labels)
         groundtruth = get_region(sequences{s}, 1:sequences{s}.length);
 
         sequence_overlaps = nan(length(trackers), length(filter));
-        sequence_failures = nan(length(trackers), track_properties.repeat);
+        sequence_failures = nan(length(trackers), repeat);
 
         print_text('Processing sequence %s', sequences{s}.name);
 
@@ -45,10 +46,10 @@ for l = 1:length(labels)
             
             directory = fullfile(trackers{t}.directory, experiment, sequences{s}.name);
 
-            accuracy = nan(track_properties.repeat, length(filter));
-            failures = nan(track_properties.repeat, 1);
+            accuracy = nan(repeat, length(filter));
+            failures = nan(repeat, 1);
 
-            for j = 1:track_properties.repeat
+            for j = 1:repeat
 
                 result_file = fullfile(directory, sprintf('%s_%03d.txt', sequences{s}.name, j));
                 trajectory = load_trajectory(result_file);
@@ -62,7 +63,7 @@ for l = 1:length(labels)
                     trajectory(end+1:size(groundtruth, 1), 4) = 0;
                 end;
                 
-                [~, frames] = estimate_accuracy(trajectory(filter, :), groundtruth(filter, :), 'burnin', track_properties.burnin);
+                [~, frames] = estimate_accuracy(trajectory(filter, :), groundtruth(filter, :), 'burnin', burnin);
 
                 accuracy(j, :) = frames;
 

@@ -1,19 +1,21 @@
 function value = get_global_variable(name, default)
 
+global global_variables;
+
 if ~exist('default', 'var')
     default = [];
 end;
 
+if isempty(global_variables);
+    value = default;
+    return;
+end;
+
 try
-    eval(['global ', name]);
-    if exist(name, 'var')
-        eval(['empty = isempty(', name , ');']);
-        if empty
-            value = default;
-        else
-            eval(['value = ', name , ';']);
-        end;
-    end;
+    value = global_variables.(name);
 catch  %#ok<CTCH>
     value = default;
 end;
+
+return;
+

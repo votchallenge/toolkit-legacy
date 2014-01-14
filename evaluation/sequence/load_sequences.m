@@ -1,18 +1,18 @@
 function [sequences] = load_sequences(directory, listfile)
 
-global track_properties;
-
 list_file = fullfile(directory, listfile);
 
 sequences = cell(0);
 
 mkpath(directory);
 
-if ~exist(list_file, 'file') && ~isempty(track_properties.bundle)
-    print_text('Downloading sequence bundle from "%s". This may take a while ...', track_properties.bundle);
+bundle_url = get_global_variable('bundle');
+
+if ~exist(list_file, 'file') && ~isempty(bundle_url)
+    print_text('Downloading sequence bundle from "%s". This may take a while ...', bundle_url);
     bundle = [tempname, '.zip'];
     try
-        urlwrite(track_properties.bundle, bundle);
+        urlwrite(bundle_url, bundle);
         unzip(bundle, directory);
 		delete(bundle);
         list_file = fullfile(directory, 'list.txt');

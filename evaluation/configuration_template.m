@@ -1,16 +1,14 @@
 
-global track_properties;
-
-track_properties.directory = '<TODO: set a working directory for sequences and results>';
+set_global_variable('directory', '<TODO: set a working directory for sequences and results>');
 
 % Enable more verbose output
-% track_properties.debug = 1;
+% set_global_variable('debug', 1);
 
 % Disable result caching
-% track_properties.cache = 0;
+% set_global_variable('cache', 0);
 
 % Disable result packaging
-% track_properties.pack = 0;
+% set_global_variable('pack', 0);
 
 tracker_identifier = '<TODO: set a tracker identifier>';
 

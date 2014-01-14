@@ -1,9 +1,7 @@
 function [tracker] = create_tracker(identifier, result_directory)
 
-global track_properties;
-
 if isempty(result_directory)    
-    result_directory = fullfile(track_properties.directory, 'results', identifier);
+    result_directory = fullfile(get_global_variable('directory'), 'results', identifier);
 end;
 
 mkpath(result_directory);
