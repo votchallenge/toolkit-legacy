@@ -82,6 +82,6 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
     set(gca, 'LineWidth', 2);
     hold off;
     
-    set(hf, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height])
+    set(hf, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
 
     
