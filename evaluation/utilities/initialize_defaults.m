@@ -1,4 +1,5 @@
 
+set_global_variable('directory', pwd());
 set_global_variable('debug', 0);
 set_global_variable('cache', 1);
 set_global_variable('pack', 1);

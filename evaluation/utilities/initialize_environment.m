@@ -69,3 +69,6 @@ if ~isempty(select_experiment)
 else
 	selected_experiments = 1:length(experiments);
 end;
+
+clear t select_experiment using_trackers stack_configuration experiment_stack
+clear sequences_directory results_directory environment_configuration
