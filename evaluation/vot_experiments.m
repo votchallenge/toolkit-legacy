@@ -1,51 +1,14 @@
-function do_experiments()
+function vot_experiments(tracker, sequences, experiments)
 
-script_directory = fileparts(mfilename('fullpath'));
-include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-    'tracker', 'sequence', 'measures', 'experiment', 'tests'}, 'UniformOutput', false); 
-addpath(include_dirs{:});
+summary = cell(length(experiments), 1);
 
-initialize_environment;
-
-summary = cell(length(experiments), 1); %#ok<USENS>
-
-if length(trackers) == 1 %#ok<USENS>
-    selected_tracker = 1;
-else
-
-    print_text('Choose tracker:');
-    print_indent(1);
-
-    for i = 1:length(trackers)
-        print_text('%d - "%s"', i, trackers{i}.identifier);
-    end;
-
-    print_text('e - Exit');
-    print_indent(-1);
-
-    option = input('Selected tracker: ', 's');
-
-    if (option == 'q' || option == 'e')
-        return;
-    end;
-
-    selected_tracker = int32(str2double(option));
-
-    if isempty(selected_tracker) || selected_tracker < 1 || selected_tracker > length(trackers)
-        return;
-    end;
-
-end;
-
-tracker = trackers{selected_tracker};
-
-for e = selected_experiments
+for e = 1:length(experiments)
 
     name = experiments{e}.name;
     execution = experiments{e}.execution;
     converter = experiments{e}.converter;
         
-    if exist(['execution_', execution]) ~= 2
+    if exist(['execution_', execution]) ~= 2 %#ok<EXIST>
         print_debug('Warning: execution function %s not found. Skipping.', execution);
         continue;
     end;

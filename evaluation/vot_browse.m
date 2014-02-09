@@ -1,15 +1,4 @@
-function do_browse()
-
-script_directory = fileparts(mfilename('fullpath'));
-include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-    'tracker', 'sequence', 'measures', 'experiment', 'tests'}, 'UniformOutput', false); 
-addpath(include_dirs{:});
-
-initialize_environment;
-
-stack_configuration = str2func(['stack_', experiment_stack]);
-
-stack_configuration();
+function vot_browse(trackers, sequences, experiments)
 
 selected_tracker = [];
 selected_experiment = [];
@@ -108,7 +97,7 @@ while 1
             sprintf('%s_%03d.txt', sequences{selected_sequence}.name, i));
         
         if exist(tfile, 'file')
-            trajectories{end+1} = csvread(tfile);
+            trajectories{end+1} = csvread(tfile); %#ok<AGROW>
         end;
     
     end;        

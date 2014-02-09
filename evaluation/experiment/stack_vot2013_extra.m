@@ -1,12 +1,11 @@
+function experiments = stack_vot2013_extra()
 
 set_global_variable('bundle', 'http://box.vicos.si/vot/vot2013.zip');
 set_global_variable('repeat', 15);
 set_global_variable('burnin', 10);
 set_global_variable('skipping', 5);
 
-stack_vot2013;
-
-basic_experiments = experiments;
+basic_experiments = stack_vot2013();
 
 loss_black.name = 'loss_black';
 loss_black.converter = @(x) sequence_pixelchange(x, @(I, L, i, len) ...
@@ -27,6 +26,5 @@ reverse.converter = 'sequence_reverse';
 reverse.execution = 'default';
 
 experiments = {loss_black, skipping, resize, reverse}; 
-
 
 experiments = [basic_experiments, experiments];

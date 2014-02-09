@@ -1,4 +1,4 @@
-
+function experiments = stack_vot2013()
 
 set_global_variable('bundle', 'http://box.vicos.si/vot/vot2013.zip');
 set_global_variable('repeat', 15);

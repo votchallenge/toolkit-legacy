@@ -1,4 +1,4 @@
-function [version] = toolkit_information()
+function [version] = vot_information()
 
 version = 1;
 

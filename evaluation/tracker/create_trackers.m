@@ -1,24 +1,25 @@
 function [trackers] = create_trackers(list_file)
 
+identifiers = readfile(list_file, ',');
 
-results_directory = fullfile(get_global_variable('directory'), 'results');
+identifiers = identifiers(:);
 
-fc = readfile(list_file, ',');
+trackers = cell(size(identifiers, 1), 1);
 
-trackers = cell(size(fc, 1), 1);
-
-for i = 1:size(fc, 1)
-    tracker_name = strtrim(fc{i, 1});
+for i = 1:size(identifiers, 1)
+    tracker_identifier = strtrim(identifiers{i});
     
-    if isempty(tracker_name)
+    if isempty(tracker_identifier)
         break;
     end
 
-    trackers{i} = create_tracker(tracker_name, fullfile(results_directory, tracker_name));
-    
-    if size(fc, 2) > 1
-        trackers{i}.label = strtrim(fc{i, 2});
+    if ~valid_identifier(tracker_identifier)
+        print_debug('%s is not a valid tracker identifier. Skipping.', ...
+            tracker_identifier);
+        continue;
     end;
+    
+    trackers{i} = create_tracker(tracker_identifier);
     
 end;
 
