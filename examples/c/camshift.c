@@ -172,7 +172,7 @@ int main( int argc, char** argv)
 
             if( !image->origin )
                 track_box.angle = -track_box.angle;
-            cvEllipseBox( image, track_box, CV_RGB(255,0,0), 3, CV_AA, 0 );
+        
         }
 
         // *****************************************
@@ -180,6 +180,8 @@ int main( int argc, char** argv)
         vot_report(convertbox(track_box));
 
     }
+
+
 
     // *************************************
     // VOT: Call vot_deinitialize at the end
