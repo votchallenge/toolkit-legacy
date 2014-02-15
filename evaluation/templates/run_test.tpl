@@ -5,5 +5,5 @@
 
 tracker = create_tracker('{{tracker}}');
 
-vot_experiments(tracker, sequences, experiments);
+vot_test(tracker, sequences);
 
