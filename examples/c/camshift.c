@@ -165,10 +165,12 @@ int main( int argc, char** argv)
 
             cvCalcBackProject( &hue, backproject, hist );
             cvAnd( backproject, mask, backproject, 0 );
-            cvCamShift( backproject, track_window,
-                        cvTermCriteria( CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 10, 1 ),
-                        &track_comp, &track_box );
-            track_window = track_comp.rect;
+            if (track_window.width > 0 && track_window.height > 0) {
+                cvCamShift( backproject, track_window,
+                            cvTermCriteria( CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 10, 1 ),
+                            &track_comp, &track_box );
+                track_window = track_comp.rect;
+            }
 
             if( !image->origin )
                 track_box.angle = -track_box.angle;
