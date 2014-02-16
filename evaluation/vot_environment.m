@@ -7,6 +7,8 @@ addpath(include_dirs{:});
 
 initialize_defaults;
 
+set_global_variable('indent', 0);
+
 print_text('Initializing VOT environment ...');
 
 global_configuration = get_global_variable('select_configuration', 'configuration');
