@@ -29,14 +29,25 @@ Every time the tracker is run, the toolkit generates a new temporary directory a
 
 Note that each line corresponds to a single frame and only a single bounding box should be outputted by the tracker per each frame. Please not that the tracker is required to produce the bounding box for each frame and it is up to tracker to decide how to predict that frame in case it does not detect any target. The most naive output in such situation, for example, would be setting the bounding box to the size of the entire image with its center corresponding to the center of the image.
 
+Tracker identifier and configuration file
+-----------------------------------------
+
+Each tracker has a unique identifier, i.e. a string that is used to identify that particular tracker within the evaluation system. Because of the simplicity there are certain limitations to the type of characters that can be used in the identifier. Only English alphabet characters (lower-case and upper-case, but preferred lowercase), digits, and dash are allowed.
+
+The properties of each tracker are defined in a configuration script that is named `tracker_<tracker_identifier>.m`. Within this script the important properties of the tracker are set:
+
+* `tracker_command` - The executable command that is used to invoke the tracker program
+* `tracker_label` - An optional string that is used to identify the tracker in visualizations. There are no restrictions to the format of the tracker label, but please try to keep it similar to the tracker identifier. If no value is given, the identifier is used instead.
+* `tracker_linkpath` - An optional array of additional search-paths to be set before executing the tracker.
+
 Binary trackers
 ---------------
 
 For trackers that are compiled into a binary executable form languages, such as C or C++ the integration is simple. The tracker should be able to read and write text files as described in the previous section. Several examples of such trackers are provided with the VOT toolkit with utility functions that can be copied to ones code to ease the adaptation process. 
 
-To register a binary tracker in the environment, simply set the `tracker_command` variable value in the `configuration.m` to the full absolute path to the executable (optionally together with required parameters if the tracker requires some).
+To register a binary tracker in the environment, simply set the `tracker_command` variable value in the `tracker_<tracker_identifier>.m` to the full absolute path to the executable (optionally together with required parameters if the tracker requires some).
 
-**Linking problems**: In some cases the executable requires access to some additional libraries, found in non-standard directories. Matlab overrides the default linking path environmental variable, which can cause linking problems in some cases. For this we have introduced a `tracker_linkpath` variable in the `configuration.m`. This variable should be a cell-array of all directories that should be included in the linking path. An example below adds two custom directories to the library path list in Linux:
+**Linking problems**: In some cases the executable requires access to some additional libraries, found in non-standard directories. Matlab overrides the default linking path environmental variable, which can cause linking problems in some cases. For this we have introduced a `tracker_linkpath` variable. This variable should be a cell-array of all directories that should be included in the linking path. An example below adds two custom directories to the library path list in Linux:
 
     tracker_linkpath = {'/usr/lib64/qt4/', '/usr/lib64/opencv/'};
 
@@ -51,7 +62,7 @@ Matlab-based trackers are a bit more tricky to integrate as the scripts are typi
 
  For an example of integration please check out the Matlab tracker example in the `examples` directory.
 
-When specifying the `tracker_command` variable in the configuration file please note that the wrapper script file is not the one being executed but only a parameter to the Matlab executable. The actual command therefore looks like this:
+When specifying the `tracker_command` variable in the tracker configuration file please note that the wrapper script file is not the one being executed but only a parameter to the Matlab executable. The actual command therefore looks like this:
 
     tracker_command = '<TODO: path to Matlab executable> -nodesktop -nosplash [-wait] -r <TODO: name of the wrapper script>';
 
@@ -77,6 +88,6 @@ While we cannot enforce these guidelines in the current toolkit, the adherence o
 Testing integration
 -------------------
 
-It is not recommended to immediately run the entire evaluation without testing the integration on a simpler task. For this the toolkit provides the `do_test` function that provides an interactive environment for testing your tracker on various sequences.
+It is not recommended to immediately run the entire evaluation without testing the integration on a simpler task. For this the toolkit provides the `vot_test` function that provides an interactive environment for testing your tracker on various sequences.
 
 Using this environment you can verify the correct interpretation of input and output data (at the moment the interactive visualization only works in Matlab) as well as estimate the entire evaluation time based on several runs of the tracker on various sequences (run the tracker on several sequences, then select the option to display required estimate).

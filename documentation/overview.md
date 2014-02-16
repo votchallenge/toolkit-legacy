@@ -24,13 +24,12 @@ Set up the toolkit
 
 A quick way to get the VOT evaluation up and running requires the steps below. The more comprehensive steps are also described in details in the following subsections.
 
- 1. Download the toolkit code and place it to an empty _toolkit directory_.
+ 1. Download the toolkit code and place it to an empty _toolkit directory_. Add at least the root directory of the toolkit to the Matlab/Octave search path.
  2. Compile one of the sample trackers in the `examples` subdirectory of the toolkit (in the case of the Matlab example no compilation is necessary).
- 3. Create a _working directory_. A working directory is a directory where the toolkit stores sequences, results and cached data.
- 4. Configure the toolkit by creating `configuration.m` file in the _toolkit directory_.
- 5. Open Matlab or Octave environment and move to _toolkit directory_.
- 6. Test the toolkit by executing `do_test`.
- 7. Run the evaluation by executing `do_experiments`.
+ 3. Create a _working directory_ by creating a directory, moving to it in Matlab/Octave shell and executing `vot_initialize`. A working directory is a directory where the toolkit stores sequences, results and cached data.
+ 4. Configure the workspace by configuring the generated files in working directory. Configure your tracker by setting the generated tracker configuration file.
+ 5. Test the tracker integration by executing `run_test` script.
+ 6. Run the evaluation by executing `run_experiments`.
 
 Downloading
 -----------
@@ -54,41 +53,13 @@ The code and the documents are organized in the following directory structure:
 * `documentation` - Contains documentation files
 * `evaluation` - Contains the evaluation toolkit
 * `examples` - Contains example source code in various languages
-* `templates` - Contains templates for writing a supplementary description of the tracker
 
 The evaluation source code resides in the `evaluation` directory and is structured into several subdirectories. 
-
-Basic configuration
--------------------
-
-In order to set up the toolkit, you have to copy the `configuration_template.m` to `configuration.m` and edit it to set the required variables.
-
-**Working directory**: The first variable that has to be set is an absolute path to a working directory. It is recommended that the directory is empty before the first use, however, it can be used for multiple trackers later on. For more information regarding the directory structure consult the `internals.md` document.
-
-    track_properties.directory = '<TODO: set a working directory>';
-
-**Tracker**: The evaluated tracker has to be configured as well. This is done by setting an unique tracker name (an abbreviated version, used to determine the tracker at the VOT on-line result repository) as well as the exact executable command (consult the `integration.md` guide for details).
-
-    tracker_identifier = '<TODO: set a tracker name>';
-    
-    tracker_command = '<TODO: set a tracker executable command>';
-
-It is recommended that you test the evaluation with one of the example trackers, contained in the `examples` directory. To configure the ''static'' C tracker, compile `static.c` to executable using a C compiler (on Linux you can use `build.sh` script) and then configure the `tracker_identifier` and `tracker_command` variables appropriately as seen in the example below (using Unix path syntax):
-
-    tracker_identifier = 'c_example';
-    tracker_command = '<toolkit directory>/examples/c/static';
-
-For the Matlab example, the process does not require compilation, however, the command specification is a bit more complex:
-
-    tracker_identifier = 'matlab_example';
-    tracker_command = '<matlab executable> -nodesktop -nosplash -r "addpath(''<toolkit directory>/examples/matlab''); wrapper"';
-
-For more instructions on how to run Matlab trackers (also some specifics for the Windows platform) please check the `integration.md` document.
 
 Perform tracker evaluation
 --------------------------
 
-The entire evaluation is currently performed by executing the `do_experiments` script in Matlab or Octave. This script performs all the experiments, collects and analyzes result data and creates a result package that is ready for submission to the [VOT website](http://votchallenge.net).
+The entire evaluation is currently performed by executing the generated `run_experiments` script in Matlab or Octave. This script performs all the experiments, collects and analyzes result data and creates a result package that is ready for submission to the [VOT website](http://votchallenge.net).
 
 The time required for the evaluation depends on the speed of your tracker. Because of the rigorous testing methodology the entire evaluation can take up to several days. For a more detailed explanation of the testing procedure consult the `internals.md` guide.
 
@@ -105,14 +76,14 @@ Tips and tricks
 ---------------
 
 * _Parallel execution_ - A full evaluation can be extremely time-consuming. Due to simplicity, the toolkit does not support parallel execution, however, it is possible to execute parts of the evaluation in parallel on multiple computers or on a single multi-core computer with a bit of manual work. Two parallelization strategies are described  in the `internals.md` document.
-* _Clearing results_ - By default the toolkit caches already calculated trials, so that the evaluation can be stopped at any time and resumed later with as little lost data as possible. If you, however, wish to clear the already stored data there are two options. The first one is to disable `track_properties.cache` parameter in your `configuration.m`. The second option is to delete the appropriate directory in the results subdirectory of your working directory. This subdirectory has the same name as your tracker, so make sure that you do not delete the wrong one if you are evaluating multiple trackers.
+* _Clearing results_ - By default the toolkit caches already calculated trials, so that the evaluation can be stopped at any time and resumed later with as little lost data as possible. If you, however, wish to clear the already stored data there are two options. The first one is to disable caching parameter (using `set_global_variable('cache', 0)`) in your workspace `configuration.m`. The second option is to delete the appropriate directory in the results subdirectory of your working directory. This subdirectory has the same name as your tracker, so make sure that you do not delete the wrong one if you are evaluating multiple trackers.
 * _Measuring execution time_ - One of the aspects of trackers performance that is being measured in the evaluation is also execution time. Of course this depends on the hardware, however, some conclusions can also be drawn from these estimates. To make them as reliable as possible it is advisable to perform experiments on a single computer or multiple computers with same the hardware specifications. It is also advisable that the computer is not being used extensively during the evaluation. 
 
 Additional configuration
 ------------------------
 
-There are several non-essential parameters available in `configuration.m` file.
+There are several non-essential parameters available that can be set in the `configuration.m` file.
 
-* `track_properties.debug` sets the debug output option (disabled by default). Using this option it is possible to get additional information regarding the progress of the evaluation, however, its usage is mainly indented for development purposes.
-* `track_properties.cache` sets the result caching (enabled by default). By disabling this option all the results are generated every time the evaluation is run instead of preserving results for trials that were already successfully executed.
-* `track_properties.pack` sets the result packaging (enabled by default). If enabled, the results of the evaluation are packed into a ZIP archive at the end of the evaluation. This file is ready to be submitted to the VOT on-line result repository.
+* `debug` sets the debug output option (disabled by default). Using this option it is possible to get additional information regarding the progress of the evaluation, however, its usage is mainly indented for development purposes.
+* `cache` sets the result caching (enabled by default). By disabling this option all the results are generated every time the evaluation is run instead of preserving results for trials that were already successfully executed.
+* `pack` sets the result packaging (enabled by default). If enabled, the results of the evaluation are packed into a ZIP archive at the end of the evaluation. This file is ready to be submitted to the VOT on-line result repository.
