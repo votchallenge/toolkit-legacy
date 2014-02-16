@@ -2,7 +2,7 @@
 
 [sequences, experiments] = vot_environment();
 
-trackers = create_trackers('trackers.txt');
+trackers = create_trackers('{{tracker}}');
 
 vot_browse(trackers, sequences, experiments);
 

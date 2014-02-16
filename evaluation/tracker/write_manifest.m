@@ -16,7 +16,9 @@ environment_version = version();
 
 fid = fopen(manifest, 'w');
 
-fprintf(fid, 'toolkit.version=%d\n', toolkit_information());
+vot_info = vot_information();
+
+fprintf(fid, 'toolkit.version=%d\n', vot_info.version);
 fprintf(fid, 'tracker.identifier=%s\n', tracker.identifier);
 fprintf(fid, 'timestamp=%s\n', datestr(now, 31));
 fprintf(fid, 'platfrom=%s\n', platform_str);

@@ -22,7 +22,7 @@ end;
 
 templates = fullfile(script_directory, 'templates');
 
-version = vot_information();
+info = vot_information();
 
 tracker_identifier = input('Input an unique identifier for your tracker: ', 's');
 
@@ -31,7 +31,7 @@ if ~valid_identifier(tracker_identifier)
 end;
 
 generate_from_template(fullfile(directory, 'configuration.m'), ...
-    fullfile(templates, 'configuration.tpl'), 'version', num2str(version));
+    fullfile(templates, 'configuration.tpl'), 'version', num2str(info.version));
 
 generate_from_template(fullfile(directory, 'run_experiments.m'), ...
     fullfile(templates, 'run_experiments.tpl'), 'tracker', tracker_identifier);
@@ -47,9 +47,6 @@ generate_from_template(fullfile(directory, 'run_analysis.m'), ...
 
 generate_from_template(fullfile(directory, ['tracker_', tracker_identifier, '.m']), ...
     fullfile(templates, 'tracker.tpl'), 'tracker', tracker_identifier);
-
-generate_from_template(fullfile(directory, 'trackers.txt'), ...
-    fullfile(templates, 'trackers.tpl'), 'tracker', tracker_identifier);
 
 % Print further instructions ...
 

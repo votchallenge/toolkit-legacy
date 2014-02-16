@@ -1,4 +1,5 @@
-function [version] = vot_information()
+function [info] = vot_information()
 
-version = 1;
+info = struct('version', 1);
+
 
