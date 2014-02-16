@@ -3,7 +3,7 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
     plot_title = [];
     sensitivity = 30;
     visible = false;    
-    width = 4;
+    width = 6;
     height = 4;
 
     for i = 1:2:length(varargin)

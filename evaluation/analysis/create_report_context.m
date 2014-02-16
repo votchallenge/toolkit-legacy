@@ -1,6 +1,6 @@
-function context = create_report_context(parent)
+function context = create_report_context(name)
 
-context.root = parent;
+context.root = fullfile(get_global_variable('directory'), 'reports', name);
 context.images = fullfile(context.root, 'images');
 context.data = fullfile(context.root, 'data');
 context.prefix = '';
