@@ -1,4 +1,4 @@
-function hf = generate_ar_plot(trackers, accuracy, failures, varargin)
+function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
 
     plot_title = [];
     sensitivity = 30;
@@ -44,7 +44,7 @@ function hf = generate_ar_plot(trackers, accuracy, failures, varargin)
             continue;
         end;
 
-        ar_mean = mean([accuracy(:, t), failures(:, t)], 1);
+        ar_mean = mean([accuracy(:, t), robustness(:, t)], 1);
 
         plot(exp(-ar_mean(2) * sensitivity), ar_mean(1), ...
             trackers{t}.style.symbol, 'Color', trackers{t}.style.color, ...

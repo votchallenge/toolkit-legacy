@@ -42,7 +42,7 @@ for e = 1:numel(experiments)
         print_text('Processing sequence %s ...', experiment_sequences{s}.name);
 
         accuracy = nan(repeat, length(trackers));
-        failures = nan(repeat, length(trackers));
+        robustness = nan(repeat, length(trackers));
                 
         for t = 1:length(trackers)
 
@@ -61,18 +61,18 @@ for e = 1:numel(experiments)
 
                 accuracy(j, t) = estimate_accuracy(trajectory, experiment_sequences{s}, 'burnin', burnin);
 
-                failures(j, t) = estimate_failures(trajectory, experiment_sequences{s});
+                robustness(j, t) = estimate_failures(trajectory, experiment_sequences{s}) ./ experiment_sequences{s}.length;
 
             end;
 
-            failures(isnan(failures(:, t)), t) = mean(failures(~isnan(failures(:, t)), t));
+            robustness(isnan(robustness(:, t)), t) = mean(robustness(~isnan(robustness(:, t)), t));
             accuracy(isnan(accuracy(:, t)), t) = mean(accuracy(~isnan(accuracy(:, t)), t));
             
             print_indent(-1);
 
         end;
 
-        hf = generate_ar_plot(trackers, accuracy, failures);
+        hf = generate_ar_plot(trackers, accuracy, robustness);
         
         insert_figure(context, index_fid, hf, sprintf('arplot_%s_%s.png', ...
             experiment.name, experiment_sequences{s}.name), ...
