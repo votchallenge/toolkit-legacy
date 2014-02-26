@@ -108,7 +108,11 @@ for i = 1 : N_trackers
                             p = 1;
                             h = 0;
                         else
+                        if (is_octave)
+                            [p, h] = wilcoxon_test(S(i,:), S(j,:));
+                        else
                             [p, h, ~] = signrank(dif, [], 'alpha', alpha ) ;
+                        end;
                         end;
                     case 'paired-mean'
                         dif = S(i,:)-S(j,:) ;
@@ -118,7 +122,11 @@ for i = 1 : N_trackers
                             p = 1;
                             h = 0;
                         else
-                            [p, h, ~] = signrank(dif, [], 'alpha', alpha ) ;                            
+                            if (is_octave)
+                                [p, h] = wilcoxon_test(S(i,:), S(j,:));
+                            else
+                                [p, h, ~] = signrank(dif, [], 'alpha', alpha ) ;  
+                            end;
                             m1 = nanmean(S(i,:));
                             m2 = nanmean(S(j,:));
                             if (abs(m1 - m2) <= minimal_difference)
@@ -133,14 +141,22 @@ for i = 1 : N_trackers
                             p = 1;
                             h = 0;
                         else
-                            [p, h, ~] = signrank(dif, [], 'alpha', alpha ) ;
+                            if (is_octave)
+                                [p, h] = wilcoxon_test(S(i,:), S(j,:));
+                            else
+                                [p, h, ~] = signrank(dif, [], 'alpha', alpha ) ;
+                            end;
                             e = sum(abs(dif) <= minimal_difference) / length(dif);
                             if (e > 0.95)
                                 h = 0;
                             end;  
                         end;                        
                     case 'nonpaired'
-                        [p,h] = ranksum(S(i,:),S(j,:), 'alpha', alpha) ;
+                        if (is_octave)
+                            [p,h] = u_test(S(i,:),S(j,:));
+                        else
+                            [p,h] = ranksum(S(i,:),S(j,:), 'alpha', alpha) ;
+                        end;
                     otherwise 
                         error('Unknown type or pairing: %s', pairing) ;
                 end

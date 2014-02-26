@@ -189,3 +189,4 @@ fprintf(fid, '<div class="table">');
 matrix2html(table, fid, 'columnLabels', t_labels);
 
 fprintf(fid, '</div>');
+fflush(fid);
