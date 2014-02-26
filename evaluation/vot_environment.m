@@ -2,7 +2,7 @@ function [sequences, experiments] = vot_environment()
 
 script_directory = fileparts(mfilename('fullpath'));
 include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-    'tracker', 'sequence', 'measures', 'experiment'}, 'UniformOutput', false); 
+    'analysis', 'tracker', 'sequence', 'measures', 'experiment'}, 'UniformOutput', false); 
 addpath(include_dirs{:});
 
 initialize_defaults;
