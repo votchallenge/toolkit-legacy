@@ -6,7 +6,7 @@ function [trajectory, time] = run_trial(tracker, sequence, context, varargin)
 %              Runs the tracker on a sequence. The resulting trajectory is
 %              a composite of all correctly tracked fragments. Where
 %              reinitialization occured, the frame is marked using a
-%              special bounding box (0, 0, -1, -1).
+%              special notation.
 %
 %   See also RUN_TRACKER.
 
