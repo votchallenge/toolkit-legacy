@@ -7,7 +7,8 @@ groundtruth = double(csvread(groundtruth_file));
 mask = '%08d.jpg';
 
 sequence = struct('name', name, 'directory', directory, ...
-        'mask', '%08d.jpg', 'groundtruth', groundtruth, 'length', 0);
+        'mask', '%08d.jpg', 'groundtruth', groundtruth, 'length', 0, ...
+        'file', 'groundtruth.txt');
 
 sequence.images = cell(size(groundtruth, 1), 1);
 
