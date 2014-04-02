@@ -11,11 +11,11 @@ if ~isempty(sequence.labels.names)
     labelsplit = mat2cell(labels, size(labels, 1), ones(1, size(labels, 2)));
 
     for j = 2:nargin
-        if size(varargin{j-1}, 2) ~= 4
+        if ~iscell(varargin{j-1})
             continue;
         end;
         trajectory = varargin{j-1};
-        labelsplit{end+1} = any(isnan(trajectory), 2);
+        labelsplit{end+1} = cellfun(@(x) numel(x) == 1, trajectory, 'UniformOutput', true);
         names{end+1} = sprintf('Trajectory %d', j-1);
     end;
 
@@ -44,14 +44,14 @@ while 1
     hold on;
     draw_region(get_region(sequence, i), [1 0 0], 2);
     for j = 2:nargin
-        if size(varargin{j-1}, 2) ~= 4 || i > size(varargin{j-1}, 1)
+        if ~iscell(varargin{j-1}) || i > numel(varargin{j-1})
             continue;
         end;
-        trajectory = varargin{j-1};
-		if any(isnan(trajectory(i, :)))
+        trajectory = varargin{j-1};    
+		if numel(trajectory{i}) == 1
 			continue;
 		end;
-        draw_region(trajectory(i, :), [0 1 0], 1);
+        draw_region(trajectory{i}, [0 1 0], 1);
     end;
     if ~isempty(sequence.labels.names)
         active = sequence.labels.names(sequence.labels.data(i, :));

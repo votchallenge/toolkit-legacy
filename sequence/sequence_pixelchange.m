@@ -66,7 +66,7 @@ for l = 1:length(labels_cache_names)
         labels_cache_names{l})), labels_cache_data(:, l));
 end;
 
-csvwrite(cache_groundtruth, sequence.groundtruth);
+write_trajectory(cache_groundtruth, sequence.groundtruth);
 
 transformed_sequence = create_sequence(sequence.name, cache_directory);
 

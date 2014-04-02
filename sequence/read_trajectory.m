@@ -1,5 +1,10 @@
 function trajectory = read_trajectory(filename)
 
+if ~exist(filename, 'file')
+    trajectory = [];
+    return;
+end;
+
 fid = fopen(filename);
 lines = textscan(fid, '%s', 'delimiter', '\n');
 fclose(fid);
@@ -21,7 +26,7 @@ for i = 1:length(lines)
             region = parts;
         end;
     elseif mod(length(parts), 2) == 0 && length(parts) > 5
-        region = reshape(region', length(region) / 2, 2); 
+        region = parts; 
     end;
 
     trajectory{i} = region;

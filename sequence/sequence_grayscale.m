@@ -27,7 +27,7 @@ for i = 1:sequence.length
     
 end;
 
-csvwrite(cache_groundtruth, sequence.groundtruth);
+write_trajectory(cache_groundtruth, sequence.groundtruth);
 
 grayscale_sequence = create_sequence(sequence.name, cache_directory);
 

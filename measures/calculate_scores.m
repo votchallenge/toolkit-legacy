@@ -14,7 +14,7 @@ for i = 1:length(sequences)
     for j = 1:repeat
 
         result_file = fullfile(directory, sprintf('%s_%03d.txt', sequences{i}.name, j));
-        trajectory = load_trajectory(result_file);
+        trajectory = read_trajectory(result_file);
 
         if isempty(trajectory)
             continue;

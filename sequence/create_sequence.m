@@ -1,16 +1,14 @@
 function [sequence] = create_sequence(name, directory)
 
-groundtruth_file = fullfile(directory, 'groundtruth.txt');
-
-groundtruth = double(csvread(groundtruth_file));
-
 mask = '%08d.jpg';
 
 sequence = struct('name', name, 'directory', directory, ...
-        'mask', '%08d.jpg', 'groundtruth', groundtruth, 'length', 0, ...
+        'mask', '%08d.jpg', 'length', 0, ...
         'file', 'groundtruth.txt');
 
-sequence.images = cell(size(groundtruth, 1), 1);
+sequence.groundtruth = read_trajectory(fullfile(sequence.directory, sequence.file));
+
+sequence.images = cell(numel(sequence.groundtruth), 1);
 
 sequence.initialize = @(sequence, index, context) get_region(sequence, index);
 
@@ -26,7 +24,7 @@ while true
 	sequence.length = sequence.length + 1;
 end;
 
-sequence.length = min(sequence.length, size(groundtruth, 1));
+sequence.length = min(sequence.length, size(sequence.groundtruth, 1));
 
 if sequence.length < 1
     error('Empty sequence: %s', name);

@@ -1,4 +1,4 @@
-function [time] = repeat_trial(tracker, sequence, directory, varargin)
+function repeat_trial(tracker, sequence, directory, varargin)
 
 repetitions = 15;
 skip_labels = {};
@@ -18,14 +18,12 @@ end
 
 mkpath(directory);
 
-total_time = 0;
-
 time_file = fullfile(directory, sprintf('%s_time.txt', sequence.name));
 
 if get_global_variable('cache', 0) && exist(time_file, 'file')
     times = csvread(time_file);
 else
-    times = zeros(1, repetitions);
+    times = zeros(sequence.length, 1);
 end;
 
 for i = 1:repetitions
@@ -46,21 +44,21 @@ for i = 1:repetitions
     print_text('Repetition %d', i);
 
     context = struct('repetition', i, 'repetitions', repetitions);
-    
-    [trajectory, t] = run_trial(tracker, sequence, context, ...
+        
+    [trajectory, time] = run_trial(tracker, sequence, context, ...
         'skip_labels', skip_labels, 'fail_overlap', fail_overlap, 'skip_initialize', skip_initialize);
-
+    
     print_indent(-1);
 
-    total_time = total_time + t;
-    
-    times(i) = 1 / t;
+    if numel(time) ~= sequence.length   
+        times(:, i) = 1 / mean(time);
+    else
+        times(:, i) = 1 / time;
+    end
     
     if ~isempty(trajectory)
-        csvwrite(result_file, trajectory);
+        write_trajectory(result_file, trajectory);
     end;
 end;
 
 csvwrite(time_file, times);
-
-time = total_time / repetitions;

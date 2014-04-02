@@ -12,8 +12,8 @@ end
 
 if burnin > 0
     
-    mask = trajectory(:, 4) == -1; % determine initialization frames
-    
+    mask = cellfun(@(r) numel(r) == 1 && r == 1, trajectory, 'UniformOutput', true);
+
     if is_octave()
         se = logical([zeros(burnin - 1, 1); ones(burnin, 1)]);
     else
@@ -23,11 +23,13 @@ if burnin > 0
     % ignore the next 'burnin' frames
     mask = imdilate(mask, se);
 
-    trajectory(mask, 4) = 0;
+else    
+    
+    mask = false(size(trajectory, 1), 1);
     
 end;
 
-trajectory(trajectory(:, 4) <= 0, :) = NaN; % do not estimate overlap where the tracker was initialized
+trajectory(mask) = {0};
 
 if isstruct(sequence)
     frames = calculate_overlap(trajectory, get_region(sequence, 1:sequence.length));

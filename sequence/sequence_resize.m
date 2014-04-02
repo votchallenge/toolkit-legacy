@@ -30,10 +30,19 @@ for i = 1:sequence.length
     
 end;
 
-csvwrite(cache_groundtruth, sequence.groundtruth .* ratio);
+function region = rescale_region(region)
+
+    if numel(region) > 3
+        region = region .* ratio;
+    end;
+
+end
+
+write_trajectory(cache_groundtruth, cellfun(@(x) rescale_region(x), sequence.groundtruth));
 
 resized_sequence = create_sequence(sequence.name, cache_directory);
 
 resized_sequence.labels.names = sequence.labels.names;
 resized_sequence.labels.data = sequence.labels.data;
 
+end

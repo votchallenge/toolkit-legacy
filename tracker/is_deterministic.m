@@ -9,8 +9,8 @@ if ~exist(result_file, 'file')
     return;
 end;
 
-baseline = csvread(result_file);
-baseline_valid = ~isnan(baseline(:, 1));
+baseline = read_trajectory(result_file);
+baseline_valid = ~cellfun(@(x) numel(x) == 1, baseline, 'UniformOutput', true);
 
 print_debug('Checking if the tracker is deterministic ...');
 
@@ -23,13 +23,13 @@ for i = 2:repetitions
         break;
     end;
 
-    trial = csvread(result_file);
+    trial = read_trajectory(result_file);
 
     if all(size(baseline) == size(trial))
-        trial_valid = ~isnan(trial(:, 1));
+        trial_valid = ~cellfun(@(x) numel(x) == 1, trial, 'UniformOutput', true);
         if all(baseline_valid == trial_valid)
-            same = baseline(baseline_valid, :) == trial(trial_valid, :);
-            if all(same(:))
+            same = calculate_overlap(baseline(baseline_valid), trial(trial_valid)) > 0.99;
+            if all(same)
                 continue;
             end;
         end;

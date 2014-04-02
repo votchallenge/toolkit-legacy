@@ -26,15 +26,14 @@ for j=1:2:length(args)
     end
 end
 
-
 start = 1;
 
 total_time = 0;
 total_frames = 0;
 
-trajectory = zeros(sequence.length, 4);
+trajectory = cell(sequence.length, 1);
 
-trajectory(:, 1:3) = NaN;
+trajectory(:) = {0};
 
 while start < sequence.length
 
@@ -54,16 +53,16 @@ while start < sequence.length
     failures = find(overlap' <= fail_overlap | ~isfinite(overlap'));
     failures = failures(failures > 1);
 
-    trajectory(start, 4) = -1;
+    trajectory(start) = {1};
         
     if ~isempty(failures)
 
         first_failure = failures(1) + start - 1;
         
-        trajectory(start + 1:min(first_failure, size(Tr, 1) + start - 1), :) = ...
-            Tr(2:min(first_failure - start + 1, size(Tr, 1)), :);
+        trajectory(start + 1:min(first_failure, size(Tr, 1) + start - 1)) = ...
+            Tr(2:min(first_failure - start + 1, size(Tr, 1)));
 
-        trajectory(first_failure, :) = [NaN, NaN, NaN, -2];
+        trajectory(first_failure) = {2};
         start = first_failure + skip_initialize;
                 
         print_debug('INFO: Detected failure at frame %d.', first_failure);
@@ -81,8 +80,8 @@ while start < sequence.length
     else
         
         if size(Tr, 1) > 1
-            trajectory(start + 1:min(sequence.length, size(Tr, 1) + start - 1), :) = ...
-                Tr(2:min(sequence.length - start + 1, size(Tr, 1)), :);
+            trajectory(start + 1:min(sequence.length, size(Tr, 1) + start - 1)) = ...
+                Tr(2:min(sequence.length - start + 1, size(Tr, 1)));
         end;
         
         start = sequence.length;
@@ -93,3 +92,5 @@ while start < sequence.length
 end;
 
 time = total_time / total_frames;
+
+end

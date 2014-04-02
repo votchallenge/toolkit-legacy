@@ -97,7 +97,7 @@ while 1
             sprintf('%s_%03d.txt', sequences{selected_sequence}.name, i));
         
         if exist(tfile, 'file')
-            trajectories{end+1} = csvread(tfile); %#ok<AGROW>
+            trajectories{end+1} = read_trajectory(tfile); %#ok<AGROW>
         end;
     
     end;        
@@ -107,9 +107,7 @@ while 1
         selected_sequence = [];
         continue;
     end;
-    
-    %visualize_analysis(sequences{selected_sequence}, trajectories{:});
-    
+
     visualize_sequence(sequences{selected_sequence}, trajectories{:});
     
     selected_sequence = [];

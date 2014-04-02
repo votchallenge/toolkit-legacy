@@ -77,7 +77,7 @@ end;
 cd(old_directory);
 
 % validate and process results
-trajectory = load_trajectory(output_file);
+trajectory = read_trajectory(output_file);
 
 n_frames = size(trajectory, 1);
 
