@@ -27,4 +27,8 @@ tracker = struct('identifier', identifier, 'command', tracker_command, ...
         'directory', result_directory, 'linkpath', {tracker_linkpath}, ...
         'label', tracker_label);
 
-tracker.run = @run_tracker;
+if exist('tracker_trax', 'var') && tracker_trax
+    tracker.run = @run_trax;
+else
+    tracker.run = @run_tracker;
+end;

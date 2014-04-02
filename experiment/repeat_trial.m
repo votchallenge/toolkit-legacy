@@ -23,7 +23,7 @@ time_file = fullfile(directory, sprintf('%s_time.txt', sequence.name));
 if get_global_variable('cache', 0) && exist(time_file, 'file')
     times = csvread(time_file);
 else
-    times = zeros(sequence.length, 1);
+    times = zeros(sequence.length, repetitions);
 end;
 
 for i = 1:repetitions
@@ -44,9 +44,9 @@ for i = 1:repetitions
     print_text('Repetition %d', i);
 
     context = struct('repetition', i, 'repetitions', repetitions);
-        
-    [trajectory, time] = run_trial(tracker, sequence, context, ...
-        'skip_labels', skip_labels, 'fail_overlap', fail_overlap, 'skip_initialize', skip_initialize);
+            
+    [trajectory, time] = tracker.run(tracker, sequence, context, ...
+            'skip_labels', skip_labels, 'fail_overlap', fail_overlap, 'skip_initialize', skip_initialize);        
     
     print_indent(-1);
 
