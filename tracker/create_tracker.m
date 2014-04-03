@@ -28,9 +28,9 @@ tracker = struct('identifier', identifier, 'command', tracker_command, ...
         'label', tracker_label);
 
 if exist('tracker_trax', 'var') && tracker_trax
-    tracker.run = @run_trax;
+    tracker.run = @trax_wrapper;
     tracker.trax = true;
 else
-    tracker.run = @run_trial;
+    tracker.run = @system_wrapper;
     tracker.trax = false;
 end;

@@ -1,8 +1,8 @@
-function [trajectory, time] = run_trax(tracker, sequence, context, varargin)
-% RUN_TRAX  A wrapper around the external TraX client that handler running
+function [trajectory, time] = trax_wrapper(tracker, sequence, context, varargin)
+% TRAX_WRAPPER  A wrapper around the external TraX client that handler running
 % the tracker.
 %
-%   [TRAJECTORY, TIME] = RUN_TRAX(TRACKER, SEQUENCE, CONTEXT)
+%   [TRAJECTORY, TIME] = TRAX_WRAPPER(TRACKER, SEQUENCE, CONTEXT)
 %              Runs the tracker on a sequence. The resulting trajectory is
 %              a composite of all correctly tracked fragments. Where
 %              reinitialization occured, the frame is marked using a
