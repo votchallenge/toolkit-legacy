@@ -10,7 +10,7 @@ function [trajectory, time] = run_trax(tracker, sequence, context, varargin)
 %
 %   See also RUN_TRIAL.
 
-trax_executable = get_global_variable('trax.client', '');
+trax_executable = get_global_variable('trax_client', '');
 
 if isempty(trax_executable)
     error('TraX support not available');
@@ -20,7 +20,7 @@ skip_labels = {};
 
 skip_initialize = 1;
 
-fail_overlap = 0;
+fail_overlap = -1;
 
 args = varargin;
 for j=1:2:length(args)
@@ -38,7 +38,6 @@ groundtruth_file = fullfile(sequence.directory, sequence.file);
 
 images_file = fullfile(working_directory, 'images.txt');
 
-
 % Generate an initialization region file
 
 initialization_file = fullfile(working_directory, 'initialization.txt');
@@ -47,27 +46,23 @@ initialization = cell(sequence.length, 1);
 
 for index = 1:sequence.length
     
-    if isempty(intersect(get_labels(sequence, index), skip_labels))
-        
+    if ~isempty(intersect(get_labels(sequence, index), skip_labels))
         initialization{index} = 0;
-        
     else
-        
         initialization{index} = sequence.initialize(sequence, index, context);
-        
     end; 
 
 end
 
-write_trajectory(groundtruth_file, initialization);
+write_trajectory(initialization_file, initialization);
 
 output_file = fullfile(working_directory, 'output.txt');
-timing_file = fullfile(working_directory, 'output.txt');
+timing_file = fullfile(working_directory, 'timing.txt');
 
 arguments = '';
 
-if (fail_overlap < 0)
-    arguments = [arguments, sprintf(' -f %.2f', fail_overlap)];
+if (fail_overlap >= 0)
+    arguments = [arguments, sprintf(' -f %.5f', fail_overlap)];
 end;
 
 if (skip_initialize > 0)

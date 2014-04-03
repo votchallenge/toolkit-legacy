@@ -24,7 +24,7 @@ while true
 	sequence.length = sequence.length + 1;
 end;
 
-sequence.length = min(sequence.length, size(sequence.groundtruth, 1));
+sequence.length = min(sequence.length, numel(sequence.groundtruth));
 
 if sequence.length < 1
     error('Empty sequence: %s', name);

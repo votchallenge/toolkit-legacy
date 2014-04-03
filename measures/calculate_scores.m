@@ -31,12 +31,15 @@ for i = 1:length(sequences)
         continue;
     end;
 
-    average_time = mean(times(times > 0));
-    if isempty(average_time)
-        average_time = NaN;
+    average_speed = mean(times(times > 0));
+    average_speed
+    if isnan(average_speed) || average_speed == 0
+        average_speed = NaN;
+    else
+        average_speed = 1000 / average_speed;
     end;
     
-    scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability))), average_time];
+    scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability))), average_speed];
 
 end;
 

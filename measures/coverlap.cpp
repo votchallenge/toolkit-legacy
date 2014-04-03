@@ -37,8 +37,6 @@ Polygon* get_polygon(const mxArray * input) {
         p->y[2] = r[1] + r[3];
         p->y[3] = r[1] + r[3];        
    
-         print_polygon(p);
-        
     }  
     
    

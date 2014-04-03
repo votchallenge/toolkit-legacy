@@ -34,7 +34,7 @@ for i = 1:repetitions
         continue;
     end;
 
-    if i == 4 && is_deterministic(sequence, 3, directory)
+    if i == 4 %&& is_deterministic(sequence, 3, directory)
         print_text('Detected a deterministic tracker, skipping remaining trials.');
         break;
     end;
@@ -51,9 +51,9 @@ for i = 1:repetitions
     print_indent(-1);
 
     if numel(time) ~= sequence.length   
-        times(:, i) = 1 / mean(time);
+        times(:, i) = mean(time);
     else
-        times(:, i) = 1 / time;
+        times(:, i) = time;
     end
     
     if ~isempty(trajectory)

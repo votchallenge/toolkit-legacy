@@ -60,7 +60,7 @@ while 1
         if ~isempty(current_sequence)
 
             print_text('Sequence "%s"', sequences{current_sequence}.name);
-            [trajectory, time] = tracker.run(tracker, sequences{current_sequence}, 1, struct('repetition', 1, 'repetitions', 1));
+            [trajectory, time] = tracker.run(tracker, sequences{current_sequence}, struct('repetition', 1, 'repetitions', 1));
 
             performance.time = performance.time + time * sequences{current_sequence}.length;
 

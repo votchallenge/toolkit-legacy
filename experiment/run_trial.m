@@ -14,7 +14,7 @@ skip_labels = {};
 
 skip_initialize = 1;
 
-fail_overlap = 0;
+fail_overlap = -1; % disable failure detection by default
 
 args = varargin;
 for j=1:2:length(args)
