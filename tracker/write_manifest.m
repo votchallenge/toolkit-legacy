@@ -25,6 +25,6 @@ fprintf(fid, 'platfrom=%s\n', platform_str);
 fprintf(fid, 'platfrom.maxsize=%f\n', platform_maxsize);
 fprintf(fid, 'platfrom.endian=%s\n', platform_endian);
 fprintf(fid, 'environment=%s\n', environment);
-fprintf(fid, 'environment.version=%f\n', environment_version);
+fprintf(fid, 'environment.version=%s\n', environment_version);
 
 fclose(fid);
