@@ -54,18 +54,10 @@ fclose(html_fid);
 
 fclose(latex_fid);
 
-template = fileread(fullfile(fileparts(mfilename('fullpath')), 'template.html'));
+template_file = fileread(get_global_variable('toolkit_path'), 'templates', 'tracker.html'));
 
-report = strrep(template, '{{body}}', fileread(temporary_file));
-
-report = strrep(report, '{{tracker}}', tracker.identifier);
-
-report = strrep(report, '{{timestamp}}', datestr(now, 31));
-
-fid = fopen(report_file, 'w');
-
-fwrite(fid, report);
-
-fclose(fid);
+generate_from_template(report_file, template_file, ...
+    'body', fileread(temporary_file), 'tracker', tracker.identifier, ...
+    'timestamp', datestr(now, 31));
 
 delete(temporary_file);

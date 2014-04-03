@@ -6,7 +6,7 @@ include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
 addpath(include_dirs{:});
 
 initialize_defaults;
-
+set_global_variable('toolkit_path', fileparts(mfilename('fullpath')));
 set_global_variable('indent', 0);
 
 print_text('Initializing VOT environment ...');
