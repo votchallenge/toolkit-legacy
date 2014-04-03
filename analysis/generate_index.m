@@ -2,7 +2,7 @@ function [index_file] = generate_index(context, documents, varargin)
 
 index_file = sprintf('%sindex.html', context.prefix);
 temporary_index_file = tempname;
-template_file = fullfile(fileparts(mfilename('fullpath')), 'report.html');
+template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html');
 
 index_fid = fopen(temporary_index_file, 'w');
 

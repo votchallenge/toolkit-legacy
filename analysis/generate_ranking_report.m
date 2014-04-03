@@ -1,7 +1,7 @@
 function [index_file, ranks] = generate_ranking_report(context, trackers, experiment, accuracy, robustness, varargin)
 
 temporary_index_file = tempname;
-template_file = fullfile(fileparts(mfilename('fullpath')), 'report.html');
+template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html');
 
 labels = [];
 ar_plot = 0;

@@ -6,7 +6,7 @@ temporary_dir = tempdir;
 
 index_file = fullfile(directory, 'failures.html');
 temporary_index_file = fullfile(temporary_dir, 'index.tmp');
-template_file = fullfile(fileparts(mfilename('fullpath')), 'report.html');
+template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html');
 
 tracker_labels = cellfun(@(x) x.identifier, trackers, 'UniformOutput', 0);
 latex_fid = [];

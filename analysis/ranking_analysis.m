@@ -1,7 +1,7 @@
 function [index_file, ranks] = ranking_analysis(context, trackers, sequences, experiments, labels, varargin)
 
 temporary_index_file = tempname;
-template_file = fullfile(fileparts(mfilename('fullpath')), 'report.html');
+template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html');
 
 ranks = nan(numel(experiments) * 3, numel(trackers));
 scores = nan(numel(experiments) * 2, numel(trackers));

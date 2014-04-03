@@ -5,7 +5,7 @@ burnin = get_global_variable('burnin', 0);
 
 index_file = sprintf('%sarplots.html', context.prefix);
 temporary_index_file = tempname;
-template_file = fullfile(fileparts(mfilename('fullpath')), 'report.html');
+template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html');
 
 index_fid = fopen(temporary_index_file, 'w');
 latex_fid = [];
