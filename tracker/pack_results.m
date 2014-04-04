@@ -3,7 +3,7 @@ function [resultfile] = pack_results(tracker, sequences, experiments)
 files = cell(0);
 
 for j = 1:length(experiments)
-    experiment_directory = fullfile(get_global_variable('directory'), experiments{j}.name);
+    experiment_directory = fullfile(tracker.directory, experiments{j}.name);
     if ~exist(experiment_directory, 'dir')
         continue;
     end;
@@ -11,25 +11,29 @@ for j = 1:length(experiments)
     for i = 1:length(sequences)
         sequence_directory = fullfile(experiment_directory, sequences{i}.name);
         if exist(sequence_directory, 'dir')
-            files{end+1} = fullfile(experiments{j}.name, sequences{i}.name); %#ok<AGROW>
+            files{end+1} = fullfile(sequence_directory); %#ok<AGROW>
             print_debug('Adding "%s" ...', sequence_directory);
         end;
     end;
 end;
 
-files{end+1} = relativepath(write_manifest(tracker), tracker.directory);
+files{end+1} = write_manifest(tracker);
 
-old_directory = pwd;
+files{end+1} = benchmark_hardware();
 
-cd(get_global_variable('directory'));
+%cd(get_global_variable('directory'));
 
 filename = sprintf('%s-%s.zip', tracker.identifier, datestr(now, 30));
 
 resultfile = fullfile(get_global_variable('directory'), filename);
 
-try
+resultsdir = fullfile(get_global_variable('directory'), 'results');
 
-    zip(filename, files, tracker.directory);
+files = cellfun(@(f) relativepath(f, resultsdir), files, 'UniformOutput', false);
+
+try    
+    
+    zip(filename, files, resultsdir);
 
 catch e
 
@@ -38,6 +42,6 @@ catch e
 
 end;
 
-cd(old_directory);
+%cd(old_directory);
 
 

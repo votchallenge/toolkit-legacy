@@ -54,7 +54,7 @@ fclose(html_fid);
 
 fclose(latex_fid);
 
-template_file = fileread(get_global_variable('toolkit_path'), 'templates', 'tracker.html'));
+template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'tracker.html');
 
 generate_from_template(report_file, template_file, ...
     'body', fileread(temporary_file), 'tracker', tracker.identifier, ...
