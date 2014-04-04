@@ -1,5 +1,21 @@
 function [sequences, experiments] = vot_environment()
 
+try 
+    
+    % Attempts to load variables from the workspace namespace to save 
+    % some time
+    sequences = evalin('base', 'sequences');
+    experiments = evalin('base', 'experiments');
+    
+    % Are variables correts at a glance ...
+    cached = iscell(sequences) && iscell(experiments);
+    
+catch 
+    
+    cached = false;
+    
+end
+
 script_directory = fileparts(mfilename('fullpath'));
 include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
     'analysis', 'tracker', 'sequence', 'measures', 'experiment'}, 'UniformOutput', false); 
@@ -27,23 +43,36 @@ end;
 
 mkpath(get_global_variable('directory'));
 
-experiment_stack = get_global_variable('stack', 'vot2013');
+if cached
+    print_debug('Skipping loading experiments and sequences');
+else
+    
+    experiment_stack = get_global_variable('stack', 'vot2013');
 
-if exist(['stack_', experiment_stack]) ~= 2 %#ok<EXIST>
-    error('Experiment stack %s not available.', experiment_stack);
+    if exist(['stack_', experiment_stack]) ~= 2 %#ok<EXIST>
+        error('Experiment stack %s not available.', experiment_stack);
+    end;
+
+    stack_configuration = str2func(['stack_', experiment_stack]);
+
+    experiments = stack_configuration();
+
+    sequences_directory = fullfile(get_global_variable('directory'), 'sequences');
+
+    print_text('Loading sequences ...');
+
+    sequences = load_sequences(sequences_directory, ...
+        get_global_variable('sequences', 'list.txt'));
+
+    if isempty(sequences)
+        error('No sequences available. Stopping.');
+    end;
+
 end;
 
-stack_configuration = str2func(['stack_', experiment_stack]);
+tk = get_global_variable('toolkit_path');
 
-experiments = stack_configuration();
+compile_mex('coverlap', {fullfile(tk, 'measures', 'coverlap.cpp'), ...
+    fullfile(tk, 'measures', 'overlap.cpp')});
 
-sequences_directory = fullfile(get_global_variable('directory'), 'sequences');
-
-print_text('Loading sequences ...');
-
-sequences = load_sequences(sequences_directory, ...
-    get_global_variable('sequences', 'list.txt'));
-
-if isempty(sequences)
-	error('No sequences available. Stopping.');
-end;
+compile_mex('benchmark_native', {fullfile(tk, 'measures', 'benchmark_native.cpp')});
