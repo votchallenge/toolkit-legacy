@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <vector>
+#include <fstream>
 
 #include "mex.h"
 #include "region.h"
@@ -76,18 +77,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	}
 
-	FILE* fp = fopen(path, "w");
+	std::ofstream ofs;
+	ofs.open (path, std::ofstream::out | std::ofstream::app);
 
-	if (fp) {
+	if (ofs.is_open()) {
 
     	for (int i = 0; i < regions.size(); i++) {
 
 			Region* region = regions[i];
 
-			region_print(fp, region);
+			char * tmp = region_string(region);
 
-			fputs("\n", fp);
-
+			if (tmp) {
+				ofs << tmp << "\n";
+				free(tmp);
+			}
+			
 			region_release(&region);
 
 		}
@@ -98,7 +103,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		mexErrMsgTxt("Unable to open file for writing.");
 	}
 
-	fclose(fp);
+	ofs.close();
 	free(path);
 }
 

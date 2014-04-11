@@ -2,16 +2,20 @@
 
 #include <stdio.h>
 #include <vector>
+#include <string>
+#include <fstream>
 
 #include "mex.h"
 #include "region.h"
+
+using namespace std;
 
 char* getString(const mxArray *arg) {
 
 	if (mxGetM(arg) != 1)
 		mexErrMsgTxt("Must be a string");
 
-    int l = mxGetN(arg);
+    int l = (int) mxGetN(arg);
 
     char* str = (char *) malloc(sizeof(char) * (l + 1));
     
@@ -27,27 +31,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	char* path = getString(prhs[0]);
 
-	FILE* fp = fopen(path, "r");
+	std::ifstream ifs;
+	ifs.open (path, std::ifstream::in);
 
-	std::vector<Region*> regions;
+	vector<Region*> regions;
 
-	if (fp) {
+	if (ifs.is_open()) {
 
-		size_t line_size = sizeof(char) * 2048;
+		int line_size = sizeof(char) * 2048;
 		char* line_buffer = (char*) malloc(line_size);
-		ssize_t line_length = 0;
 		int line = 0;
 
-    	while (1) {
+    	while (ifs.good()) {
 
 			line++;
 
-		    if ((line_length = getline(&line_buffer, &line_size, fp)) < 1)
-		        break;
+			ifs.getline(line_buffer, line_size);
 
-			if ((line_buffer)[line_length - 1] == '\n') { (line_buffer)[line_length - 1] = '\0'; }
+			if (!ifs.good()) break;
 
-			Region* region;
+			Region* region = NULL;
 
 			if (region_parse(line_buffer, &region)) {
 
@@ -63,7 +66,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 		}
 
-		plhs[0] = mxCreateCellMatrix(regions.size(), 1);
+		plhs[0] = mxCreateCellMatrix((int)regions.size(), 1);
 
 		for (int i = 0; i < regions.size(); i++) {
 
@@ -110,7 +113,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		mexErrMsgTxt("Unable to open file for reading.");
 	}
 
-	fclose(fp);
+	ifs.close();
 	free(path);
 }
+
 
