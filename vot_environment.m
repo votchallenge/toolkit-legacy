@@ -70,9 +70,4 @@ else
 
 end;
 
-tk = get_global_variable('toolkit_path');
-
-compile_mex('coverlap', {fullfile(tk, 'measures', 'coverlap.cpp'), ...
-    fullfile(tk, 'measures', 'overlap.cpp')});
-
-compile_mex('benchmark_native', {fullfile(tk, 'measures', 'benchmark_native.cpp')});
+compile_all_native();
