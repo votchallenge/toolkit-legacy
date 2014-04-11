@@ -1,45 +1,39 @@
 
-// Normal C / C++ includes
-
 #include <stdio.h>
 
-// Including Matlab headers
 #include "mex.h"
+#include "region.h"
 
-#include "overlap.h"
-
-Polygon* get_polygon(const mxArray * input) {
+Region* get_polygon(const mxArray * input) {
     
-    Polygon* p = NULL;
+    Region* p = NULL;
 	double *r = (double*)mxGetPr(input);
     int l = mxGetN(input);
     
     if (l % 2 == 0 && l > 6) {
         
-        p = allocate_polygon(l / 2);
+        p = region_create_polygon(l / 2);
         
-        for (int i = 0; i < p->count; i++) {
-            p->x[i] = r[i*2];
-            p->y[i] = r[i*2+1];
+        for (int i = 0; i < p->data.polygon.count; i++) {
+            p->data.polygon.x[i] = r[i*2];
+            p->data.polygon.y[i] = r[i*2+1];
         }
         
     } else if (l == 4) {
         
-        p = allocate_polygon(4);
+        p = region_create_polygon(4);
         
-        p->x[0] = r[0];
-        p->x[1] = r[0] + r[2];
-        p->x[2] = r[0] + r[2];
-        p->x[3] = r[0];
+        p->data.polygon.x[0] = r[0];
+        p->data.polygon.x[1] = r[0] + r[2];
+        p->data.polygon.x[2] = r[0] + r[2];
+        p->data.polygon.x[3] = r[0];
 
-        p->y[0] = r[1];
-        p->y[1] = r[1];
-        p->y[2] = r[1] + r[3];
-        p->y[3] = r[1] + r[3];        
+        p->data.polygon.y[0] = r[1];
+        p->data.polygon.y[1] = r[1];
+        p->data.polygon.y[2] = r[1] + r[3];
+        p->data.polygon.y[3] = r[1] + r[3];
    
     }  
-    
-   
     
     return p;
     
@@ -48,8 +42,8 @@ Polygon* get_polygon(const mxArray * input) {
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-	Polygon* p1;
-	Polygon* p2;
+	Region* p1;
+	Region* p2;
 
 	if( nrhs != 2 ) mexErrMsgTxt("Four vector arguments required.");
 	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");
@@ -71,8 +65,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
     if (p1 && p2) {
         
-
-        Overlap overlap = compute_overlap(p1, p2);
+        Overlap overlap = region_compute_overlap(p1, p2);
 
         result[0] = overlap.overlap;
         result[1] = overlap.only1;
@@ -86,8 +79,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         
     }
     
-    if (p1) free_polygon(p1);
-    if (p2) free_polygon(p2);
+    if (p1) region_release(&p1);
+    if (p2) region_release(&p2);
 
 }
 
