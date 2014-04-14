@@ -28,6 +28,10 @@ tracker = struct('identifier', identifier, 'command', tracker_command, ...
         'label', tracker_label);
 
 if exist('tracker_trax', 'var') && tracker_trax
+    trax_executable = get_global_variable('trax_client', '');
+    if isempty(trax_executable) && ~isempty(tracker.command)
+        error('TraX support not available');
+    end;
     tracker.run = @trax_wrapper;
     tracker.trax = true;
 else

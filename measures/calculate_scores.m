@@ -14,9 +14,10 @@ for i = 1:length(sequences)
     for j = 1:repeat
 
         result_file = fullfile(directory, sprintf('%s_%03d.txt', sequences{i}.name, j));
-        trajectory = read_trajectory(result_file);
-
-        if isempty(trajectory)
+        
+        try 
+            trajectory = read_trajectory(result_file);
+        catch
             continue;
         end;
 
@@ -32,7 +33,7 @@ for i = 1:length(sequences)
     end;
 
     average_speed = mean(times(times > 0));
-    average_speed
+
     if isnan(average_speed) || average_speed == 0
         average_speed = NaN;
     else

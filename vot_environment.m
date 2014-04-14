@@ -27,6 +27,8 @@ set_global_variable('indent', 0);
 
 print_text('Initializing VOT environment ...');
 
+compile_all_native();
+
 global_configuration = get_global_variable('select_configuration', 'configuration');
 
 try
@@ -70,4 +72,3 @@ else
 
 end;
 
-compile_all_native();

@@ -10,38 +10,17 @@ len = min(size(T1, 1), size(T2, 1));
 T1 = T1(1:len, :);
 T2 = T2(1:len, :);
 
-if (iscell(T1)) 
+if (~iscell(T1)) 
+    T1 = num2cell(T1, 2); 
+end 
+
+if (~iscell(T2)) 
+    T2 = num2cell(T2, 2); 
+end 
+
+results = cell2mat(cellfun(@(r1, r2) coverlap(r1, r2), T1, T2, 'UniformOutput', false));
+
+overlap = results(:, 1);
+only1 = results(:, 2);
+only2 = results(:, 3);
     
-    results = cell2mat(cellfun(@(r1, r2) coverlap(r1, r2), T1, T2, 'UniformOutput', false));
-    
-    overlap = results(:, 1);
-    only1 = results(:, 2);
-    only2 = results(:, 3);
-    
-else
-    hrzInt = min(T1(:, 1) + T1(:, 3), T2(:, 1) + T2(:, 3)) - max(T1(:, 1), T2(:, 1));
-    hrzInt = max(0,hrzInt);
-    vrtInt = min(T1(:, 2) + T1(:, 4), T2(:, 2) + T2(:, 4)) - max(T1(:, 2), T2(:, 2));
-    vrtInt = max(0,vrtInt);
-    intersection = hrzInt .* vrtInt; 
-
-    union = (T1(:, 3) .* T1(:, 4)) + (T2(:, 3) .* T2(:, 4)) - intersection;
-
-    overlap = intersection ./ union;
-
-    overlap(any(isnan(T1),2) | any(isnan(T2),2)) = NaN;
-
-    if (nargout > 1)
-        A1 = T1(:, 3) .* T1(:, 4);
-        A2 = T2(:, 3) .* T2(:, 4);
-
-        only1 = (A1 - intersection) ./ union;
-        only1(any(isnan(T1),2) | any(isnan(T2),2)) = NaN;
-
-        if (nargout > 2)
-            only2 = (A2 - intersection) ./ union;
-            only2(any(isnan(T1),2) | any(isnan(T2),2)) = NaN;
-        end;
-
-    end
-end
