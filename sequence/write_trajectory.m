@@ -1,1 +1,0 @@
-% Writes trajectory to file

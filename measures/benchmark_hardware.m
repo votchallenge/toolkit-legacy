@@ -9,9 +9,6 @@ end;
 
 print_text('Performing hardware performance benchmark');
 
-tk = get_global_variable('toolkit_path');
-compile_mex('benchmark_native', {fullfile(tk, 'measures', 'benchmark_native.cpp')});
-
 print_indent(1);
 
 performance = struct('reading', NaN, ...

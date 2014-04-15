@@ -1,4 +1,6 @@
 
+set_global_variable('workspace_path', fileparts(mfilename('fullpath')));
+
 set_global_variable('version', {{version}});
 
 % Enable more verbose output

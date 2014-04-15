@@ -27,8 +27,6 @@ set_global_variable('indent', 0);
 
 print_text('Initializing VOT environment ...');
 
-compile_all_native();
-
 global_configuration = get_global_variable('select_configuration', 'configuration');
 
 try
@@ -43,7 +41,11 @@ catch e
     end; 
 end;
 
-mkpath(get_global_variable('directory'));
+native_dir = compile_all_native();
+
+if ~isempty(native_dir)
+    addpath(native_dir);
+end;
 
 if cached
     print_debug('Skipping loading experiments and sequences');

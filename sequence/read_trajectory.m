@@ -1,1 +1,0 @@
-% Reads trajectory from file
