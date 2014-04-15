@@ -41,6 +41,7 @@ try
 
 catch e
     
+    cd(old_dir);
     print_text('ERROR: Unable to compile MEX function: "%s".', e.message);
     success = false;
 

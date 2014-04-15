@@ -71,7 +71,7 @@ void convolve2D(double* in, double* out, int dataSizeX, int dataSizeY,  double* 
 
 }
 
-bool maxfilter2D(double* in, double* out, int dataSizeX, int dataSizeY, int kernelSizeX, int kernelSizeY) {
+void maxfilter2D(double* in, double* out, int dataSizeX, int dataSizeY, int kernelSizeX, int kernelSizeY) {
 
     int kCenterX = kernelSizeX >> 1;
     int kCenterY = kernelSizeY >> 1;
@@ -98,7 +98,6 @@ bool maxfilter2D(double* in, double* out, int dataSizeX, int dataSizeY, int kern
         }
     }
 
-
 }
 
 int getSingleInteger(const mxArray *arg) {
@@ -118,7 +117,7 @@ char* getString(const mxArray *arg) {
 	if (mxGetM(arg) != 1)
 		mexErrMsgTxt("Must be an array of chars");
 
-    int l = mxGetN(arg);
+    int l = (int) mxGetN(arg);
 
     char* str = (char *) malloc(sizeof(char) * (l + 1));
     
