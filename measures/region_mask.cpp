@@ -4,6 +4,10 @@
 #include "mex.h"
 #include "region.h"
 
+#define MEX_TEST_DOUBLE(I) (mxGetClassID(prhs[I]) == mxDOUBLE_CLASS)
+#define MEX_TEST_VECTOR(I) (mxGetNumberOfDimensions(prhs[I]) == 2 && mxGetM(prhs[I]) == 1)
+
+
 Region* get_polygon(const mxArray * input) {
     
     Region* p = NULL;
@@ -39,48 +43,39 @@ Region* get_polygon(const mxArray * input) {
     
 }
 
+int getSingleInteger(const mxArray *arg) {
+
+	if (mxGetM(arg) != 1 || mxGetN(arg) != 1)
+		mexErrMsgTxt("Parameter must be a single value");
+
+    if (mxIsInt32(arg))
+        return ((int*)mxGetPr(arg))[0];
+
+    if (mxIsDouble(arg))
+        return (int) ((double*)mxGetPr(arg))[0];
+}
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-	Region* p1;
-	Region* p2;
+	Region* p = NULL;
 
-	if( nrhs != 2 ) mexErrMsgTxt("Four vector arguments required.");
+	if( nrhs != 3 ) mexErrMsgTxt("Two vector and two integer arguments required.");
 	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");
 
-	for (int i = 0; i < 2; i++) {
+	if (!MEX_TEST_VECTOR(0) || !MEX_TEST_DOUBLE(0)) mexErrMsgTxt("First argument must be a vector of type double");
 
-		if (mxGetClassID(prhs[i]) != mxDOUBLE_CLASS)
-			mexErrMsgTxt("All input arguments must be of type double");
-	
-		if ( mxGetNumberOfDimensions(prhs[i]) > 2 || mxGetM(prhs[i]) > 1 ) mexErrMsgTxt("All input arguments must be vectors");
+	int width = getSingleInteger(prhs[1]);
+	int height = getSingleInteger(prhs[2]);
 
-	}
+	p = get_polygon(prhs[0]);
+	float* tmp = p->data.polygon.x; p->data.polygon.x = p->data.polygon.y; p->data.polygon.y = tmp;
 
-	p1 = get_polygon(prhs[0]);
-    p2 = get_polygon(prhs[1]);
-    
-    plhs[0] = mxCreateDoubleMatrix(1, 3, mxREAL);
-    double *result = (double*) mxGetPr(plhs[0]);
+    plhs[0] = mxCreateLogicalMatrix(height, width);
+    char *result = (char*) mxGetData(plhs[0]);
             
-    if (p1 && p2) {
-        
-        Overlap overlap = region_compute_overlap(p1, p2);
-
-        result[0] = overlap.overlap;
-        result[1] = overlap.only1;
-        result[2] = overlap.only2;
-        
-    } else {
-        
-        result[0] = mxGetNaN();
-        result[1] = mxGetNaN();
-        result[2] = mxGetNaN();
-        
-    }
+    region_mask(p, result, height, width);
     
-    if (p1) region_release(&p1);
-    if (p2) region_release(&p2);
+    if (p) region_release(&p);
 
 }
 
