@@ -16,7 +16,7 @@ if ~exist(list_file, 'file') && ~isempty(bundle_url)
         unzip(bundle, directory);
 		delete(bundle);
         list_file = fullfile(directory, 'list.txt');
-    catch e
+    catch
         print_text('Unable to retrieve sequence bundle. Follow the instructions in README.md to install it manually.');
         return;
     end;

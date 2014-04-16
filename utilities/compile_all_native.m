@@ -8,6 +8,10 @@ mkpath(output_path);
 
 trax_path = get_global_variable('trax_source', fullfile(toolkit_path, 'trax'));
 
+if ~get_trax_source(trax_path)
+    error('Unable to compile all native resources.');
+end;
+
 print_text('Compiling MEX files ...');
 
 success = true;
@@ -30,3 +34,36 @@ success = success && compile_mex('benchmark_native', {fullfile(toolkit_path, 'me
 if ~success
     error('Unable to compile all native resources.');
 end;
+
+end
+
+
+function [success] = get_trax_source(trax_path)
+
+trax_url = 'https://github.com/lukacu/trax/archive/master.zip';
+
+trax_header = fullfile(trax_path, 'lib', 'trax.h');
+
+if ~exist(trax_header, 'file')
+    print_text('Downloading TraX source from "%s". Please wait ...', trax_url);
+    bundle = [tempname, '.zip'];
+    try
+        urlwrite(trax_url, bundle);
+        unzip(bundle, fileparts(trax_path));
+		delete(bundle);
+        movefile(fullfile(fileparts(trax_path), 'trax-master'), trax_path);
+        success = true;
+    catch
+        print_text('Unable to retrieve TraX source code.');
+        success = false;
+    end;
+else
+    print_debug('TraX source code already present.');
+    success = true;
+end;
+
+
+
+
+
+end

@@ -6,5 +6,11 @@ if isempty(global_variables);
     global_variables = struct();
 end;
 
-global_variables.(name) = value;
+if nargin == 1
+    if isfield(global_variables, name)
+        global_variables = rmfield(global_variables, name);
+    end;
+else
+    global_variables.(name) = value;
+end;
 
