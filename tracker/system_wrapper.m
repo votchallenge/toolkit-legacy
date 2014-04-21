@@ -39,6 +39,13 @@ while start < sequence.length
 
     [Tr, Tm] = run_once(tracker, sequence, start, context);
 
+    % in case when we only want to know runtime command for testing
+    if isfield(context, 'fake') && context.fake
+        trajectory = Tr;
+        time = Tm;
+        return;
+    end
+    
     if isempty(Tr)
         trajectory = [];
         time = NaN;
@@ -117,6 +124,13 @@ output_file = fullfile(working_directory, 'output.txt');
 library_path = '';
 
 output = [];
+
+% in case when we only want to know runtime command for testing
+if isfield(context, 'fake') && context.fake
+    trajectory = command;
+    time = working_directory;
+    return;
+end
 
 % run the tracker
 old_directory = pwd;

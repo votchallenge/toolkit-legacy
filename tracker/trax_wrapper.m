@@ -69,11 +69,20 @@ if (skip_initialize > 0)
     arguments = [arguments, sprintf(' -r %d', skip_initialize)];
 end;
 
+arguments = [arguments, ' -e "MATLAB_ROOT=', matlabroot, '"'];
+
 command = sprintf('%s %s -I %s -G %s -O %s -S %s -T %s -- %s', trax_executable, ...
     arguments, images_file, groundtruth_file, output_file, ...
     initialization_file, timing_file, tracker.command);
 
 library_path = '';
+
+% in case when we only want to know runtime command for testing
+if isfield(context, 'fake') && context.fake
+    trajectory = command;
+    time = working_directory;
+    return;
+end
 
 % run the tracker
 old_directory = pwd;

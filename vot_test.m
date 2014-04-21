@@ -47,11 +47,11 @@ while 1
         
         if ~isempty(current_sequence)
             
-            directory = prepare_trial_data(sequences{current_sequence}, 1, struct('repetition', 1, 'repetitions', 1));
-            
+            [command, directory] = tracker.run(tracker, sequences{current_sequence}, struct('repetition', 1, 'repetitions', 1, 'fake', true));
+
             print_text('Input data generated in directory "%s"', directory);
             print_text('Open the directory in a terminal and manually execute the tracker command.');
-            print_text('The current command as defined in the environment is: %s', tracker.command);
+            print_text('The current command as defined in the environment is: %s', command);
             print_text('Once the tracker is working as expected, delete the directory.');
         end;
     case 'b'
