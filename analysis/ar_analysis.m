@@ -53,9 +53,10 @@ for e = 1:numel(experiments)
             for j = 1:repeat
 
                 result_file = fullfile(result_directory, sprintf('%s_%03d.txt', experiment_sequences{s}.name, j));
-                trajectory = load_trajectory(result_file);
-
-                if isempty(trajectory)
+                
+                try 
+                    trajectory = read_trajectory(result_file);
+                catch
                     continue;
                 end;
 

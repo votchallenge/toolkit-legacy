@@ -29,7 +29,7 @@ for l = 1:length(labels)
         
         print_indent(1);
 
-        groundtruth = get_region(sequences{s}, 1:sequences{s}.length);
+        groundtruth = sequences{s}.groundtruth;
 
         sequence_overlaps = nan(length(trackers), length(filter));
         sequence_failures = nan(length(trackers), repeat);
@@ -52,22 +52,22 @@ for l = 1:length(labels)
             for j = 1:repeat
 
                 result_file = fullfile(directory, sprintf('%s_%03d.txt', sequences{s}.name, j));
-                trajectory = load_trajectory(result_file);
-
-                if isempty(trajectory)
+                
+                try 
+                    trajectory = read_trajectory(result_file);
+                catch
                     continue;
                 end;
                 
                 if (size(trajectory, 1) < size(groundtruth, 1))
-                    trajectory(end+1:size(groundtruth, 1), :) = NaN;
-                    trajectory(end+1:size(groundtruth, 1), 4) = 0;
+                    trajectory{end+1:length(groundtruth)} = 0;
                 end;
                 
-                [~, frames] = estimate_accuracy(trajectory(filter, :), groundtruth(filter, :), 'burnin', burnin);
+                [~, frames] = estimate_accuracy(trajectory(filter), groundtruth(filter), 'burnin', burnin);
 
                 accuracy(j, :) = frames;
 
-                failures(j) = sum(trajectory(filter, 4) == -2); %estimate_failures(trajectory, sequences{s});
+                failures(j) = estimate_failures(trajectory(filter), sequences{s});
 
             end;
             

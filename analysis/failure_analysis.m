@@ -60,19 +60,20 @@ for e = 1:numel(experiments)
             for j = 1:repeat
 
                 result_file = fullfile(result_directory, sprintf('%s_%03d.txt', experiment_sequences{s}.name, j));
-                trajectory = load_trajectory(result_file);
-
-                if isempty(trajectory)
+                
+                try 
+                    trajectory = read_trajectory(result_file);
+                catch
                     continue;
                 end;
 
                 if length(trajectory) < experiment_sequences{s}.length
-                    trajectory(end+1:experiment_sequences{s}.length, :) = NaN;
+                    trajectory{end+1:experiment_sequences{s}.length} = 0;
                 end;
                 
-                failure_histogram(t, :) = failure_histogram(t, :) + (trajectory(:, 4) == -2)';
-                
-                
+                failure_histogram(t, :) = failure_histogram(t, :) + ...
+                    estimate_failures(trajectory, experiment_sequences{s});
+
             end;
 
             print_indent(-1);
