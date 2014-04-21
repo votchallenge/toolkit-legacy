@@ -41,11 +41,11 @@ catch e
     end; 
 end;
 
-native_dir = compile_all_native();
+native_dir = fullfile(get_global_variable('toolkit_path'), 'mex');
+mkpath(native_dir);
+addpath(native_dir);
 
-if ~isempty(native_dir)
-    addpath(native_dir);
-end;
+compile_all_native(native_dir);
 
 if cached
     print_debug('Skipping loading experiments and sequences');

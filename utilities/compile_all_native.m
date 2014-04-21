@@ -1,10 +1,6 @@
-function output_path = compile_all_native()
+function output_path = compile_all_native(output_path)
 
 toolkit_path = get_global_variable('toolkit_path');
-
-output_path = fullfile(toolkit_path, 'mex');
-
-mkpath(output_path);
 
 trax_path = get_global_variable('trax_source', fullfile(toolkit_path, 'trax'));
 
