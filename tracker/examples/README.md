@@ -1,0 +1,5 @@
+Integration examples (old approach)
+===================================
+
+This folder contains several examples of tracker integration for the old file-based integration approach. It is recommended that you use the new approach, based on the [TraX protocol](https://github.com/lukacu/trax/), however, we also plan to support the old approach for some time.
+At the moment the utilities that are provided with the examples only support storing the trajectory in the old format which can only save axis-aligned rectangles. In theory there is nothing in the toolkit that would prevent addition of more complex region descriptions, however, you will have to write the code yourself (see the part about the new region format in at the [Github wiki](https://github.com/vicoslab/vot-toolkit/wiki).). Using the new format this way has not been tested so far so there may be some glitches, which we will try to fix as soon as somebody reports them.
