@@ -34,6 +34,7 @@ if exist('tracker_trax', 'var') && tracker_trax
     end;
     tracker.run = @trax_wrapper;
     tracker.trax = true;
+    tracker.linkpath{end+1} = fullfile(matlabroot, 'bin', lower(computer));
 else
     tracker.run = @system_wrapper;
     tracker.trax = false;
