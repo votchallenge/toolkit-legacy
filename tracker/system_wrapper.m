@@ -132,6 +132,12 @@ if isfield(context, 'fake') && context.fake
     return;
 end
 
+if ispc
+    library_var = 'PATH';
+else
+    library_var = 'LD_LIBRARY_PATH';
+end;
+
 % run the tracker
 old_directory = pwd;
 try
@@ -147,7 +153,7 @@ try
     else
 
 		% Save library paths
-		library_path = getenv('LD_LIBRARY_PATH');
+		library_path = getenv(library_var);
 
         % Make Matlab use system libraries
         if ~isempty(tracker.linkpath)
@@ -155,9 +161,9 @@ try
             if length(tracker.linkpath) > 1
                 userpath = [sprintf(['%s', pathsep], tracker.linkpath{1:end-1}), userpath];
             end;
-            setenv('LD_LIBRARY_PATH', [userpath, pathsep, getenv('PATH')]);
+            setenv(library_var, [userpath, pathsep, getenv('PATH')]);
         else
-		    setenv('LD_LIBRARY_PATH', getenv('PATH'));
+		    setenv(library_var, getenv('PATH'));
         end;
 
 		if verLessThan('matlab', '7.14.0')
@@ -179,7 +185,7 @@ catch e
 
 	% Reassign old library paths if necessary
 	if ~isempty(library_path)
-		setenv('LD_LIBRARY_PATH', library_path);
+		setenv(library_var, library_path);
 	end;
 
     print_debug('ERROR: Exception thrown "%s".', e.message);
@@ -212,7 +218,7 @@ if (n_frames ~= (sequence.length-start) + 1)
     end;
 end;
 
-if get_global_variable('cleanup', 0)
+if get_global_variable('cleanup', 1)
     % clean-up temporary directory
     recursive_rmdir(working_directory);
 end;

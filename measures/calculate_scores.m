@@ -37,7 +37,7 @@ for i = 1:length(sequences)
     if isnan(average_speed) || average_speed == 0
         average_speed = NaN;
     else
-        average_speed = 1000 / average_speed;
+        average_speed = 1 / average_speed;
     end;
     
     scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability))), average_speed];
