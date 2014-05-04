@@ -18,6 +18,9 @@ success = success && compile_mex('region_overlap', {fullfile(toolkit_path, 'meas
 success = success && compile_mex('region_mask', {fullfile(toolkit_path, 'measures', 'region_mask.cpp'), ...
     fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
 
+success = success && compile_mex('region_convert', {fullfile(toolkit_path, 'measures', 'region_convert.cpp'), ...
+    fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
+
 success = success && compile_mex('read_trajectory', {fullfile(toolkit_path, 'sequence', 'read_trajectory.cpp'), ...
     fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
 
