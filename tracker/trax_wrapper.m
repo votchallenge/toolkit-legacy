@@ -69,11 +69,20 @@ if (skip_initialize > 0)
     arguments = [arguments, sprintf(' -r %d', skip_initialize)];
 end;
 
-arguments = [arguments, ' -e "MATLAB_ROOT=', matlabroot, '"'];
+% mwrapper requires matlab root on Unix
+if ~ispc
+    arguments = [arguments, ' -e "MATLAB_ROOT=', matlabroot, '"'];
+end
 
-command = sprintf('%s %s -I %s -G %s -O %s -S %s -T %s -- %s', trax_executable, ...
+if ispc
+command = sprintf('"%s" %s -I "%s" -G "%s" -O "%s" -S "%s" -T "%s" -- %s', trax_executable, ...
     arguments, images_file, groundtruth_file, output_file, ...
     initialization_file, timing_file, tracker.command);
+else
+command = sprintf('%s %s -I "%s" -G "%s" -O "%s" -S "%s" -T "%s" -- %s', trax_executable, ...
+    arguments, images_file, groundtruth_file, output_file, ...
+    initialization_file, timing_file, tracker.command);    
+end
 
 library_path = '';
 
@@ -84,6 +93,12 @@ if isfield(context, 'fake') && context.fake
     return;
 end
 
+if ispc
+    library_var = 'PATH';
+else
+    library_var = 'LD_LIBRARY_PATH';
+end;
+
 % run the tracker
 old_directory = pwd;
 try
@@ -93,13 +108,11 @@ try
     cd(working_directory);
 
     if is_octave()
-        tic;
         [status, output] = system(command, 1);
-        time = toc;
     else
 
 		% Save library paths
-		library_path = getenv('LD_LIBRARY_PATH');
+		library_path = getenv(library_var);
 
         % Make Matlab use system libraries
         if ~isempty(tracker.linkpath)
@@ -107,19 +120,15 @@ try
             if length(tracker.linkpath) > 1
                 userpath = [sprintf(['%s', pathsep], tracker.linkpath{1:end-1}), userpath];
             end;
-            setenv('LD_LIBRARY_PATH', [userpath, pathsep, getenv('PATH')]);
+            setenv(library_var, [userpath, pathsep, getenv('PATH')]);
         else
-		    setenv('LD_LIBRARY_PATH', getenv('PATH'));
+		    setenv(library_var, getenv('PATH'));
         end;
 
 		if verLessThan('matlab', '7.14.0')
-		    tic;
 		    [status, output] = system(command);
-		    time = toc;
-		else
-		    tic;
+        else
 		    [status, output] = system(command, '');
-		    time = toc;
 		end;
     end;
         
@@ -138,18 +147,23 @@ try
 
     trajectory = read_trajectory(output_file);
     
-    time = csvread(timing_file);
+    time = csvread(timing_file) ./ 1000; % convert to seconds 
     
 catch e
 
 	% Reassign old library paths if necessary
 	if ~isempty(library_path)
-		setenv('LD_LIBRARY_PATH', library_path);
+		setenv(library_var, library_path);
 	end;
 
     print_debug('ERROR: Exception thrown "%s".', e.message);
 end;
 
 cd(old_directory);
+
+if get_global_variable('cleanup', 1)
+    % clean-up temporary directory
+    recursive_rmdir(working_directory);
+end;
 
 end

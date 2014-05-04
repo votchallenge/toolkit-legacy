@@ -62,7 +62,7 @@ while 1
             print_text('Sequence "%s"', sequences{current_sequence}.name);
             [trajectory, time] = tracker.run(tracker, sequences{current_sequence}, struct('repetition', 1, 'repetitions', 1));
 
-            performance.time = performance.time + time * sequences{current_sequence}.length;
+            performance.time = performance.time + mean(time) * sequences{current_sequence}.length;
 
             performance.frames = performance.frames + sequences{current_sequence}.length;
         end;        
@@ -75,8 +75,11 @@ while 1
             
             fps = performance.frames / performance.time;
             
-            estimate = estimate_completion_time(sequences, 'fps', fps);
-            
+            if tracker.trax
+                estimate = estimate_completion_time(sequences, 'fps', fps, 'failures', 0);
+            else
+                estimate = estimate_completion_time(sequences, 'fps', fps);
+            end
             print_text('Based on the current estimate (fps = %.2f), the completion time for %d sequences is %s', fps, length(sequences), format_interval(estimate));
             
         end;   
