@@ -16,6 +16,12 @@ catch
     
 end
 
+configuration_file = fullfile(pwd(), 'configuration.m');
+
+if ~exist(configuration_file, 'file')
+    error('Directory is probably not a VOT workspace. Please run vot_initialize first.');
+end;
+
 script_directory = fileparts(mfilename('fullpath'));
 include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
     'analysis', 'tracker', 'sequence', 'measures', 'experiment'}, 'UniformOutput', false); 
