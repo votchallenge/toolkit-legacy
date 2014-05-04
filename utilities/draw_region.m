@@ -12,12 +12,12 @@ if isnumeric(region)
             plot(x, y, 'Color', color, 'LineWidth', width);
         end;
 
-    elseif size(region, 1) > 2 && size(region, 2) == 2
+    elseif numel(region) >= 6 && mod(numel(region), 2) == 0
 
         x = region(1:2:end);
-        y = region(2:2:end);
-
-        plot(x, y, 'Color', color, 'LineWidth', width);
+        y = region(2:2:end);        
+        
+        plotc(x, y, 'Color', color, 'LineWidth', width);
 	end;
         
 end;
