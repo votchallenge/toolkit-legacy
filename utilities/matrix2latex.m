@@ -48,7 +48,7 @@ function matrix2latex(matrix, filename, varargin)
     format = [];
     textsize = [];
     if (rem(nargin,2) == 1 || nargin < 2)
-        error('matrix2latex: ', 'Incorrect number of arguments to %s.', mfilename);
+        error('Incorrect number of arguments to %s.', mfilename);
     end
 
     okargs = {'rowlabels','columnlabels', 'alignment', 'format', 'size', 'prefix', 'suffix'};
@@ -57,9 +57,9 @@ function matrix2latex(matrix, filename, varargin)
         pval = varargin{j+1};
         k = strmatch(lower(pname), okargs);
         if isempty(k)
-            error('matrix2latex: ', 'Unknown parameter name: %s.', pname);
+            error('Unknown parameter name: %s.', pname);
         elseif length(k)>1
-            error('matrix2latex: ', 'Ambiguous parameter name: %s.', pname);
+            error('Ambiguous parameter name: %s.', pname);
         else
             switch(k)
                 case 1  % rowlabels
@@ -85,7 +85,7 @@ function matrix2latex(matrix, filename, varargin)
                     end
                     if alignment ~= 'l' && alignment ~= 'c' && alignment ~= 'r'
                         alignment = 'l';
-                        warning('matrix2latex: ', 'Unkown alignment. (Set it to \''left\''.)');
+                        warning('Unkown alignment. (Set it to \''left\''.)');
                     end
                 case 4  % format
                     format = lower(pval);
@@ -163,19 +163,19 @@ function matrix2latex(matrix, filename, varargin)
             fprintf(fid, '&');
         end
         for w=1:width-1
-            fprintf(fid, '\\textbf{%s}&', colLabels{w});
+            fprintf(fid, '\\textbf{%s}&', str2latex(colLabels{w}));
         end
-        fprintf(fid, '\\textbf{%s}\\\\\\hline\r\n', colLabels{width});
+        fprintf(fid, '\\textbf{%s}\\\\\\hline\r\n', str2latex(colLabels{width}));
     end
     
     for h=1:height
         if(~isempty(rowLabels))
-            fprintf(fid, '\\textbf{%s}&', rowLabels{h});
+            fprintf(fid, '\\textbf{%s}&', str2latex(rowLabels{h}));
         end
         for w=1:width-1
             fprintf(fid, '%s&', matrix{h, w});
         end
-        fprintf(fid, '%s\\\\\\hline\r\n', matrix{h, width});
+        fprintf(fid, '%s\\\\\\hline\r\n', str2latex(matrix{h, width}));
     end
 
 	if (~isempty(suffix))
