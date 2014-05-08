@@ -1,5 +1,13 @@
 function draw_region(region, color, width)
 
+if nargin < 2
+    color = [1, 0, 0];
+end;
+
+if nargin < 3
+    width = 1;
+end;
+
 if isnumeric(region) 
 	if numel(region) == 4
 
