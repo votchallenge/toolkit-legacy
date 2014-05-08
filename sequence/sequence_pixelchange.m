@@ -21,7 +21,7 @@ cache_groundtruth = fullfile(cache_directory, 'groundtruth.txt');
 sequence_groundtruth = fullfile(sequence.directory, 'groundtruth.txt');
 
 if file_newer_than(cache_groundtruth, sequence_groundtruth)
-    transformed_sequence = create_sequence(sequence.name, cache_directory);
+    transformed_sequence = create_sequence(cache_directory, 'name', sequence.name);
 %     transformed_sequence.labels.names = sequence.labels.names;
 %     transformed_sequence.labels.data = sequence.labels.data;
     return;
@@ -68,7 +68,7 @@ end;
 
 write_trajectory(cache_groundtruth, sequence.groundtruth);
 
-transformed_sequence = create_sequence(sequence.name, cache_directory);
+transformed_sequence = create_sequence(cache_directory, 'name', sequence.name);
 
 % transformed_sequence.labels.names = sequence.labels.names;
 % transformed_sequence.labels.data = sequence.labels.data;

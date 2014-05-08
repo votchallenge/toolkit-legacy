@@ -1,6 +1,25 @@
-function [sequence] = create_sequence(name, directory)
+function [sequence] = create_sequence(directory, varargin)
 
+start = 1;
 mask = '%08d.jpg';
+dummy = false;
+
+[parent, name] = fileparts(directory);
+
+for i = 1:2:length(varargin)
+    switch lower(varargin{i})
+        case 'name'
+            name = varargin{i+1};
+        case 'mask'
+            mask = varargin{i+1};
+        case 'dummy'
+            dummy = varargin{i+1};
+        case 'start'
+            start = varargin{i+1};                
+        otherwise 
+            error(['Unknown switch ', varargin{i},'!']) ;
+    end
+end 
 
 sequence = struct('name', name, 'directory', directory, ...
         'mask', '%08d.jpg', 'length', 0, ...
@@ -13,13 +32,17 @@ sequence.images = cell(numel(sequence.groundtruth), 1);
 sequence.initialize = @(sequence, index, context) get_region(sequence, index);
 
 while true
-    image_name = sprintf(mask, sequence.length + 1);
+    image_name = sprintf(mask, sequence.length + start);
 
     if ~exist(fullfile(sequence.directory, image_name), 'file')
-        break;
+        if dummy && sequence.length > 0
+            sequence.images{sequence.length + 1} = sequence.images{1};          
+        else
+            break;
+        end;
+    else
+        sequence.images{sequence.length + 1} = image_name;
     end;
-
-    sequence.images{sequence.length + 1} = image_name;
 
 	sequence.length = sequence.length + 1;
 end;

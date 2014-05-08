@@ -72,7 +72,7 @@ else
     print_text('Loading sequences ...');
 
     sequences = load_sequences(sequences_directory, ...
-        get_global_variable('sequences', 'list.txt'));
+        'list', get_global_variable('sequences', 'list.txt'));
 
     if isempty(sequences)
         error('No sequences available. Stopping.');

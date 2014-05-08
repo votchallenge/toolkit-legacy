@@ -1,6 +1,20 @@
-function [sequences] = load_sequences(directory, listfile)
+function [sequences] = load_sequences(directory, varargin)
 
-list_file = fullfile(directory, listfile);
+list = 'list.txt';
+dummy = false;
+
+for i = 1:2:length(varargin)
+    switch lower(varargin{i})
+        case 'list'
+            list = varargin{i+1};
+        case 'dummy'
+            dummy = varargin{i+1};            
+        otherwise 
+            error(['Unknown switch ', varargin{i},'!']) ;
+    end
+end 
+
+list_file = fullfile(directory, list);
 
 sequences = cell(0);
 
@@ -36,7 +50,7 @@ while true
         continue;
     end;
 
-    sequences{end+1} = create_sequence(sequence_name, sequence_directory);
+    sequences{end+1} = create_sequence(sequence_directory, 'dummy', dummy);
 
 end;
 
