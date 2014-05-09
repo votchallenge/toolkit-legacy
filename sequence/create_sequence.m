@@ -35,7 +35,7 @@ while true
     image_name = sprintf(mask, sequence.length + start);
 
     if ~exist(fullfile(sequence.directory, image_name), 'file')
-        if dummy && sequence.length > 0
+        if dummy && sequence.length > 0 && sequence.length <= numel(sequence.groundtruth)
             sequence.images{sequence.length + 1} = sequence.images{1};          
         else
             break;
@@ -53,7 +53,12 @@ if sequence.length < 1
     error('Empty sequence: %s', name);
 end;
 
-[height, width, channels] = size(imread(get_image(sequence, 1)));
+imdata = imread(get_image(sequence, 1));
+
+[height, width, channels] = size(imdata);
+
+sequence.grayscale = channels == 1 || isequal(imdata(:, :, 1), ...
+		imdata(:, :, 2), imdata(:, :, 3));
 
 sequence.width = width;
 sequence.height = height;
