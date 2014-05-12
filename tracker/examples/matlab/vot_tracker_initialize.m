@@ -1,9 +1,9 @@
 function [images, region] = vot_tracker_initialize();
 
 % read the images file
-fimages = fopen('images.txt','r'); 
-images = textscan(fimages, '%s');
-fclose(fimages);
+fid = fopen('images.txt','r'); 
+images = textscan(fid, '%s', 'delimiter', '\n');
+fclose(fid);
 images = images{1};
 
 % read the region
