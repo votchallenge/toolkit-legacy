@@ -18,7 +18,7 @@ addpath(tracker_directory);
 % **********************************
 % VOT: Read input data
 % **********************************
-[images, region] = vot_initialize();
+[images, region] = vot_tracker_initialize();
 
 %% Initialize tracker variables
 index_start = 1;
@@ -76,5 +76,5 @@ for t=2:count
 
 end
 
-vot_deinitialize(results);
+vot_tracker_results(results);
 
