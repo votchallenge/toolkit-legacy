@@ -14,17 +14,17 @@ using namespace cv;
 class SampleTracker
 {
 public:
-    inline void init(Mat & img, Rect & bb)
+    inline void init(Mat & img, VOTPolygon poly)
     {
-        p_returnPosition = Rect(img.cols/2 - bb.width/2, img.rows/2 - bb.height/2, bb.width, bb.height);
+        p_returnPosition = poly;
     }
-    inline Rect track(Mat & img)
+    inline VOTPolygon track(Mat img)
     {
         return p_returnPosition;
     }
 
 private:
-    Rect p_returnPosition;
+    VOTPolygon p_returnPosition;
 };
 
 int main(int argc, char* argv[])
@@ -36,19 +36,19 @@ int main(int argc, char* argv[])
     VOT vot_io("region.txt", "images.txt", "output.txt");
     
     //img = firts frame, initPos = initial position in the first frame
-    cv::Rect initPos = vot_io.getInitRectangle();
+    VOTPolygon initPos = vot_io.getInitPolygon();
     vot_io.getNextImage(img);
     
     //output init also bbox
-    vot_io.outputBoundingBox(initPos);
+    vot_io.outputPolygon(initPos);
 
     //tracker initialization
     tracker.init(img, initPos);
 
     //track   
     while (vot_io.getNextImage(img) == 1){
-		cv::Rect bbox= tracker.track(img);
-        vot_io.outputBoundingBox(bbox);
+        VOTPolygon poly= tracker.track(img);
+        vot_io.outputPolygon(poly);
     }
     
     return 0;

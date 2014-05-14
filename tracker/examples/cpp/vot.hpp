@@ -13,25 +13,53 @@
 #include <iostream>
 #include "opencv2/opencv.hpp"
 
+// Bounding box type
+typedef struct {
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+    float x3;
+    float y3;
+    float x4;
+    float y4;
+} VOTPolygon;
+
 class VOT
 {
 public:
     VOT(const std::string & region_file, const std::string & images, const std::string & ouput)
     {
         p_region_stream.open(region_file.c_str());
+        VOTPolygon p;
         if (p_region_stream.is_open()){
-            float x, y, w, h;
             char ch;
-            p_region_stream >> x >> ch >> y >> ch >> w >> ch >> h;
-            p_init_rectangle = cv::Rect(x, y, w, h);
+            p_region_stream >> p.x1 >> ch >> p.y1 >> ch;
+            p_region_stream >> p.x2 >> ch >> p.y2 >> ch;
+            p_region_stream >> p.x3 >> ch >> p.y3 >> ch;
+            p_region_stream >> p.x4 >> ch >> p.y4;
+
         }else{
             std::cerr << "Error loading initial region in file " << region_file << "!" << std::endl;
-            p_init_rectangle = cv::Rect(0, 0, 0, 0);
+            p.x1=0;
+            p.y1=0;
+            p.x2=0;
+            p.y2=0;
+            p.x3=0;
+            p.y3=0;
+            p.x4=0;
+            p.y4=0;
         }
+
+        p_init_polygon = p;
 
         p_images_stream.open(images.c_str());
         if (!p_images_stream.is_open())
             std::cerr << "Error loading image file " << images << "!" << std::endl;
+
+        //read dummy image
+        cv::Mat mat;
+        getNextImage(mat);
 
         p_output_stream.open(ouput.c_str());
         if (!p_output_stream.is_open())
@@ -45,26 +73,32 @@ public:
         p_output_stream.close();
     }
 
-    inline cv::Rect getInitRectangle() const 
-    {   return p_init_rectangle;    }
+    inline VOTPolygon getInitPolygon() const 
+    {   return p_init_polygon;    }
 
-    inline void outputBoundingBox(const cv::Rect & bbox)
-    {   p_output_stream << bbox.x << ", " << bbox.y << ", " << bbox.width << ", " << bbox.height << std::endl;  }
+    inline void outputPolygon(const VOTPolygon & poly)
+    {
+      p_output_stream << poly.x1 << ", " << poly.y1 << ", ";
+      p_output_stream << poly.x2 << ", " << poly.y2 << ", ";
+      p_output_stream << poly.x3 << ", " << poly.y3 << ", ";
+      p_output_stream << poly.x4 << ", " << poly.y4 << std::endl;
+    }
 
     inline int getNextImage(cv::Mat & img)
     {
-		if (p_images_stream.eof() || !p_images_stream.is_open())
+    if (p_images_stream.eof() || !p_images_stream.is_open())
             return -1;
 
-		std::string line;
-		std::getline (p_images_stream, line);
-		img = cv::imread(line, CV_LOAD_IMAGE_COLOR);
-		
-		return 1;
-	}
+    std::string line;
+    std::getline (p_images_stream, line);
+    std::cout << line << std::endl;
+    img = cv::imread(line, CV_LOAD_IMAGE_COLOR);
+
+    return 1;
+  }
 
 private:
-    cv::Rect p_init_rectangle;
+    VOTPolygon p_init_polygon;
     std::ifstream p_region_stream;
     std::ifstream p_images_stream;
     std::ofstream p_output_stream;
