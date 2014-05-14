@@ -3,3 +3,14 @@ mex
 documentation/documentation.*
 documentation/*.wiki
 trax
+cache/
+sequences/
+tracker/examples/c/camshift
+tracker/examples/c/static
+tracker/examples/cpp/static
+configuration.m
+tracker_*.m
+run_analysis.m
+run_browse.m
+run_experiments.m
+run_test.m
