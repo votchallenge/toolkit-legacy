@@ -45,7 +45,7 @@ int main( int argc, char** argv)
     // *****************************************
     // VOT: Call vot_initialize at the beginning
     // *****************************************
-    VOTRectangle selection = vot_initialize();
+    VOTPolygon selection = vot_initialize();
 
     for(f = 1;; f++)
     {

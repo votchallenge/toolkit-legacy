@@ -25,7 +25,7 @@ IplImage *image = 0, *hsv = 0, *hue = 0, *mask = 0, *backproject = 0, *histimg =
 CvHistogram *hist = 0;
 
 int track_object = 0;
-VOTRectangle selection;
+VOTPolygon selection;
 CvRect track_window;
 CvBox2D track_box;
 CvConnectedComp track_comp;
@@ -52,30 +52,23 @@ CvScalar hsv2rgb( float hue ) {
 }
 
 // Convert rotated box to bounding box needed by the VOT toolkit
-VOTRectangle convertbox(CvBox2D box) {
-
-    CvPoint2D32f pt0, pt1, pt2, pt3;
-    VOTRectangle r;
+VOTPolygon convertbox(CvBox2D box) {
 
     double _angle = box.angle*CV_PI/180.0; 
     float a = (float)cos(_angle)*0.5f; 
     float b = (float)sin(_angle)*0.5f; 
-     
-    pt0.x = box.center.x - a*box.size.height - b*box.size.width; 
-    pt0.y = box.center.y + b*box.size.height - a*box.size.width; 
-    pt1.x = box.center.x + a*box.size.height - b*box.size.width; 
-    pt1.y = box.center.y - b*box.size.height - a*box.size.width; 
-    pt2.x = 2 * box.center.x - pt0.x; 
-    pt2.y = 2 * box.center.y - pt0.y; 
-    pt3.x = 2 * box.center.x - pt1.x; 
-    pt3.y = 2 * box.center.y - pt1.y; 
 
-    r.x = cvFloor(MIN(MIN(MIN(pt0.x, pt1.x), pt2.x), pt3.x)); 
-    r.y = cvFloor(MIN(MIN(MIN(pt0.y, pt1.y), pt2.y), pt3.y));
-    r.width = cvCeil(MAX(MAX(MAX(pt0.x, pt1.x), pt2.x), pt3.x)) - r.x - 1; 
-    r.height = cvCeil(MAX(MAX(MAX(pt0.y, pt1.y), pt2.y), pt3.y)) - r.y - 1; 
+    VOTPolygon p;
+    p.x1 = box.center.x - a*box.size.height - b*box.size.width;
+    p.y1 = box.center.y + b*box.size.height - a*box.size.width;
+    p.x2 = box.center.x + a*box.size.height - b*box.size.width;
+    p.y2 = box.center.y - b*box.size.height - a*box.size.width;
+    p.x3 = 2 * box.center.x - p.x1;
+    p.y3 = 2 * box.center.y - p.y1;
+    p.x4 = 2 * box.center.x - p.x2;
+    p.y4 = 2 * box.center.y - p.y2;
 
-    return r;
+    return p;
 }
 
 
@@ -87,6 +80,8 @@ int main( int argc, char** argv)
     // *****************************************
     // VOT: Call vot_initialize at the beginning
     // *****************************************
+
+    //TODO: Convert selection?
     selection = vot_initialize();
 
     track_object = -1;
@@ -138,8 +133,14 @@ int main( int argc, char** argv)
             if( track_object < 0 )
             {
                 float max_val = 0.f;
-                CvRect roi; 
-                roi.x = selection.x; roi.y = selection.y; roi.width = selection.width; roi.height = selection.height;
+                CvRect roi;
+
+
+                //Convert rotated rectangle to axis-aligned rectangle
+                roi.x = cvFloor(MIN(MIN(MIN(selection.x1, selection.x2), selection.x3), selection.x4)); 
+                roi.y = cvFloor(MIN(MIN(MIN(selection.y1, selection.y2), selection.y3), selection.y4));
+                roi.width = cvCeil(MAX(MAX(MAX(selection.x1, selection.x2), selection.x3), selection.x4)) - roi.x - 1; 
+                roi.height = cvCeil(MAX(MAX(MAX(selection.y1, selection.y2), selection.y3), selection.y4)) - roi.y - 1; 
 
                 cvSetImageROI( hue, roi );
                 cvSetImageROI( mask, roi );
@@ -174,7 +175,6 @@ int main( int argc, char** argv)
 
             if( !image->origin )
                 track_box.angle = -track_box.angle;
-        
         }
 
         // *****************************************

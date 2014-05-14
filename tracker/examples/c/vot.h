@@ -41,11 +41,15 @@
 
 // Bounding box type
 typedef struct {
-    float x;
-    float y;
-    float width;
-    float height;
-} VOTRectangle;
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+    float x3;
+    float y3;
+    float x4;
+    float y4;
+} VOTPolygon;
 
 // Internal global variables:
 // Current position in the sequence
@@ -55,14 +59,14 @@ int _vot_sequence_size = 0;
 // List of image file names
 char** _vot_sequence = NULL;
 // List of results
-VOTRectangle* _vot_result = NULL;
+VOTPolygon* _vot_result = NULL;
 
 /**
  * Reads the input data and initializes all structures. Returns the initial 
  * position of the object as specified in the input data. This function should
  * be called at the beginnin of the tracking program.
  */
-VOTRectangle vot_initialize() {
+VOTPolygon vot_initialize() {
 
     int i, j;
     FILE *inputfile = fopen("region.txt", "r");
@@ -82,9 +86,17 @@ VOTRectangle vot_initialize() {
     char* linebuf = (char*) malloc(sizeof(char) * 1024);
     float* pointbuf = (float*) malloc(sizeof(float) * 4);
     ssize_t linelen = 0;
-    VOTRectangle rect; rect.x = 0; rect.y = 0; rect.width = 0; rect.height = 0;
-    
-    for (i = 0; i < 4; i++) {
+    VOTPolygon rect;
+    rect.x1 = 0;
+    rect.y1 = 0;
+    rect.x2 = 0;
+    rect.y2 = 0;
+    rect.x3 = 0;
+    rect.y3 = 0;
+    rect.x4 = 0;
+    rect.y4 = 0;
+
+    for (i = 0; i < 8; i++) {
         if ((linelen = getdelim(&linebuf, &linesiz, ',', inputfile))>0) {
             if ((linebuf)[linelen - 1] == ',') {
                 (linebuf)[linelen - 1] = '\0';
@@ -96,10 +108,14 @@ VOTRectangle vot_initialize() {
 
     }
 
-    rect.x = pointbuf[0];
-    rect.y = pointbuf[1];
-    rect.width = pointbuf[2];
-    rect.height = pointbuf[3];
+    rect.x1 = pointbuf[0];
+    rect.y1 = pointbuf[1];
+    rect.x2 = pointbuf[2];
+    rect.y2 = pointbuf[3];
+    rect.x3 = pointbuf[4];
+    rect.y3 = pointbuf[5];
+    rect.x4 = pointbuf[6];
+    rect.y4 = pointbuf[7];
 
     free(pointbuf);
     fclose(inputfile);
@@ -131,7 +147,7 @@ VOTRectangle vot_initialize() {
     fclose(imagesfile);
     free(linebuf);
 
-    _vot_result = (VOTRectangle*) malloc(sizeof(VOTRectangle) * _vot_sequence_size);
+    _vot_result = (VOTPolygon*) malloc(sizeof(VOTPolygon) * _vot_sequence_size);
 
     return rect;
 }
@@ -153,11 +169,11 @@ const char* vot_frame() {
  * Used to report position of the object. This function also advances the
  * current position.
  */
-void vot_report(const VOTRectangle rect) {
+void vot_report(const VOTPolygon rect) {
 
     if (_vot_sequence_position >= _vot_sequence_size)
         return;
-        
+
     _vot_result[_vot_sequence_position] = rect;
     _vot_sequence_position++;
 }
@@ -173,8 +189,8 @@ void vot_deinitialize() {
     FILE *outputfile = fopen("output.txt", "w");
 
     for (i = 0; i < _vot_sequence_position; i++) {
-        VOTRectangle r = _vot_result[i];
-        fprintf(outputfile, "%f,%f,%f,%f\n", r.x, r.y, r.width, r.height); 
+        VOTPolygon r = _vot_result[i];
+        fprintf(outputfile, "%f,%f,%f,%f,%f,%f,%f,%f\n", r.x1, r.y1, r.x2, r.y2, r.x3, r.y3, r.x4, r.y4); 
     }
 
     fclose(outputfile);
