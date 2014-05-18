@@ -12,7 +12,7 @@ y2 = min(height, round(state.position(2) + state.window / 2));
 region = gray(y1:y2, x1:x2);
 
 if any(size(region) < size(state.template))
-    location = [];
+    location = [state.position - state.size / 2, state.size];
     return;
 end;
 

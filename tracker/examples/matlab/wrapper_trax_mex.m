@@ -4,7 +4,7 @@ function wrapper_trax_mex(tracker)
 % *************************************************************
 % VOT: Always call exit command at the end to terminate Matlab!
 % *************************************************************
-cleanup = onCleanup(@() exit() );
+%cleanup = onCleanup(@() exit() );
 
 % *************************************************************
 % VOT: Set random seed to a different value every time.
@@ -18,7 +18,7 @@ end;
 % **********************************
 % VOT: Initialize TraX protocol
 % **********************************
-traxserver('setup', 'polygon', 'path');
+traxserver('setup', 'rectangle', 'path');
 
 tracker_initialize = str2func(['tracker_', tracker, '_initialize']);
 tracker_update = str2func(['tracker_', tracker, '_update']);
@@ -26,7 +26,7 @@ tracker_update = str2func(['tracker_', tracker, '_update']);
 state = [];
 
 while 1
-   
+
 	% **********************************
 	% VOT: Wait for instructions
 	% **********************************
@@ -38,19 +38,31 @@ while 1
 
 	I = imread(image);
 
-	if ~isempty(region) % New frame
-		if isempty(state) % Not initialized
-			break;
-		end;
+	try
 
-        [state, location] = tracker_update(state, I);
+		if isempty(region) % New frame
+			if isempty(state) % Not initialized
+				break;
+			end;
 
-	else % Initialization
+		    [state, location] = tracker_update(state, I);
 
-		% Initialize the tracker
-		[state, location] = tracker_initialize(I, region);
+		else % Initialization
 
-    end
+			% Initialize the tracker
+			[state, location] = tracker_initialize(I, region);
+
+		end
+
+	catch
+
+		location = [0, 0, 1, 1];
+
+	end
+
+	if isempty(location)
+		location = [0, 0, 1, 1];
+	end;
 
 	% **********************************
 	% VOT: Report status

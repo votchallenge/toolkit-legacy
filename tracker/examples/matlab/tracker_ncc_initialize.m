@@ -6,10 +6,10 @@ gray = double(rgb2gray(I));
 
 % If the provided region is a polygon ...
 if numel(region) > 4
-	x1 = min(region(1:2:end);
-	x2 = max(region(1:2:end);
-	y1 = min(region(2:2:end);
-	y2 = max(region(2:2:end);
+	x1 = min(region(1:2:end));
+	x2 = max(region(1:2:end));
+	y1 = min(region(2:2:end));
+	y2 = max(region(2:2:end));
 
 	region = [x1, y1, x2 - x1, y2 - y1];
 end;
@@ -28,4 +28,3 @@ state = struct('template', template, 'position', position, ...
     
 location = [x1, y1, x2 - x1, y2 - y1];
 
- 
