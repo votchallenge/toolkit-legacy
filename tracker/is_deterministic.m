@@ -28,7 +28,7 @@ for i = 2:repetitions
     if all(size(baseline) == size(trial))
         trial_valid = ~cellfun(@(x) numel(x) == 1, trial, 'UniformOutput', true);
         if all(baseline_valid == trial_valid)
-            same = calculate_overlap(baseline(baseline_valid), trial(trial_valid)) > 0.99;
+            same = calculate_overlap(baseline(baseline_valid), trial(trial_valid)) > 0.999;
             if all(same)
                 continue;
             end;

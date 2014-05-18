@@ -50,6 +50,8 @@ while true
         continue;
     end;
 
+    print_debug('Loading sequence %s', sequence_name);
+    
     sequences{end+1} = create_sequence(sequence_directory, 'dummy', dummy);
 
 end;
