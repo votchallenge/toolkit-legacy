@@ -13,4 +13,4 @@ set_global_variable('version', {{version}});
 % set_global_variable('pack', 0);
 
 % Select experiment stack
-set_global_variable('stack', 'vot2013');
+set_global_variable('stack', 'vot2014');
