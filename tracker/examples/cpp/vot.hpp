@@ -57,10 +57,6 @@ public:
         if (!p_images_stream.is_open())
             std::cerr << "Error loading image file " << images << "!" << std::endl;
 
-        //read dummy image
-        cv::Mat mat;
-        getNextImage(mat);
-
         p_output_stream.open(ouput.c_str());
         if (!p_output_stream.is_open())
             std::cerr << "Error opening output file " << ouput << "!" << std::endl;
