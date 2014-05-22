@@ -16,6 +16,10 @@ for i = 1:2:length(varargin)
             samples = varargin{i+1};
         case 'scale'
             scale = varargin{i+1};
+        case 'width'
+            scale = varargin{i+1} / sequence.width;
+        case 'height'
+            scale = varargin{i+1} / sequence.height;
         case 'groundtruthcolor'
             groundtruth_color = varargin{i+1};
         case 'trajectorycolor'
@@ -41,14 +45,14 @@ indices = round(linspace(1, sequence.length, samples));
 
 map = [];
 
-animation = zeros(sequence.height * scale, sequence.width * scale, 1, numel(indices));
+animation = zeros(ceil(sequence.height * scale), ceil(sequence.width * scale), 1, numel(indices));
 
 for i = 1:length(indices)
 
     image = double(imread(get_image(sequence, indices(i)))) / 255;
 
     image = imresize(image, scale);
-    
+
     image_red = image(:, :, 1);
     image_green = image(:, :, 2);
     image_blue = image(:, :, 3);
