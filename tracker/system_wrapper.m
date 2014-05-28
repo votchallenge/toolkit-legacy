@@ -127,7 +127,7 @@ output = [];
 
 % in case when we only want to know runtime command for testing
 if isfield(context, 'fake') && context.fake
-    trajectory = command;
+    trajectory = tracker.command;
     time = working_directory;
     return;
 end
