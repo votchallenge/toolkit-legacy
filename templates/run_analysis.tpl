@@ -6,6 +6,8 @@
 
 trackers = create_trackers('{{tracker}}'); % TODO: add more trackers here
 
+% If you are performing analysis on a dataset that does not have per-frame
+% labels, use "labels = [];" here!
 labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
 
@@ -13,7 +15,7 @@ context = create_report_context('report_{{tracker}}'); % TODO: name of the repor
 
 % Perform ranking analysis
 ranking_index = ranking_analysis(context, trackers, sequences, ...
-        experiments, labels, 'permutationplot', 1, 'arplot', 1);
+        experiments, 'labels', labels, 'permutationplot', 1, 'arplot', 1);
 
 % Perform standard A-R plot analysis
 ar_index = ar_analysis(context, trackers, sequences, experiments);

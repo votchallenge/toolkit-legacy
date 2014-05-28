@@ -1,7 +1,13 @@
-function [index_file, ranks] = ranking_analysis(context, trackers, sequences, experiments, labels, varargin)
+function [index_file, ranks] = ranking_analysis(context, trackers, sequences, experiments, varargin)
+
+if length(trackers) < 2
+	error('At least two trackers required for ranking analysis');
+end
 
 temporary_index_file = tempname;
 template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html');
+
+labels = {};
 
 ranks = nan(numel(experiments) * 3, numel(trackers));
 scores = nan(numel(experiments) * 2, numel(trackers));
@@ -39,6 +45,8 @@ for i = 1:2:length(varargin)
             minimal_difference_fail = varargin{i+1} ;
         case 'arplot'
             ar_plot = varargin{i+1} ;
+        case 'labels'
+            labels = varargin{i+1} ;
         case 'permutationplot'
             permutation_plot = varargin{i+1} ;
         case 'exportdata'
@@ -58,9 +66,22 @@ for e = 1:numel(experiments)
 
     print_text('Loading data ...');
 
-    [S_all, F_all, available] = ...
-        process_results_labels(trackers, convert_sequences(sequences, experiment.converter), ...
-        labels, experiment.name);
+	if isempty(labels)
+
+		[S_all, F_all, available] = ...
+		    process_results_sequences(trackers, convert_sequences(sequences, experiment.converter), experiment.name);
+
+		series_labels = cellfun(@(x) x.name, sequences, 'UniformOutput', 0);
+
+	else
+
+		[S_all, F_all, available] = ...
+		    process_results_labels(trackers, convert_sequences(sequences, experiment.converter), ...
+		    labels, experiment.name);
+
+		series_labels = labels;
+
+	end
 
     S_all = cellfun(@(x) x(available, :), S_all, 'UniformOutput', 0);
     F_all = cellfun(@(x) x(available, :), F_all, 'UniformOutput', 0);
@@ -82,7 +103,7 @@ for e = 1:numel(experiments)
     print_text('Writing report ...');
 
     report_file = generate_ranking_report(context, trackers(available), experiment, accuracy, robustness, ...
-         'labels', labels, 'combineWeight', combine_weight, 'reporttemplate', template_file, ...
+         'SeriesLabels', series_labels, 'combineWeight', combine_weight, 'reporttemplate', template_file, ...
          'arplot', ar_plot, 'permutationplot', 0); %permutation_plot);
 
     fprintf(index_fid, '<h2>Experiment %s</h2>\n', experiment.name);
