@@ -23,7 +23,7 @@ end;
 tracker_initialize = str2func(['tracker_', tracker, '_initialize']);
 tracker_update = str2func(['tracker_', tracker, '_update']);
 
-I = imread(sequence{1});
+I = imread(images{1});
 
 results = cell(length(images), 1);
 

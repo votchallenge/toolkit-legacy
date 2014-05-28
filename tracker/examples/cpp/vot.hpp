@@ -11,7 +11,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 // Bounding box type
 typedef struct {
@@ -74,10 +74,10 @@ public:
 
     inline void outputPolygon(const VOTPolygon & poly)
     {
-      p_output_stream << poly.x1 << ", " << poly.y1 << ", ";
-      p_output_stream << poly.x2 << ", " << poly.y2 << ", ";
-      p_output_stream << poly.x3 << ", " << poly.y3 << ", ";
-      p_output_stream << poly.x4 << ", " << poly.y4 << std::endl;
+      p_output_stream << poly.x1 << "," << poly.y1 << ",";
+      p_output_stream << poly.x2 << "," << poly.y2 << ",";
+      p_output_stream << poly.x3 << "," << poly.y3 << ",";
+      p_output_stream << poly.x4 << "," << poly.y4 << std::endl;
     }
 
     inline int getNextImage(cv::Mat & img)
@@ -87,9 +87,9 @@ public:
 
     std::string line;
     std::getline (p_images_stream, line);
-    std::cout << line << std::endl;
+	if (line.empty() && p_images_stream.eof()) return -1;
     img = cv::imread(line, CV_LOAD_IMAGE_COLOR);
-
+ 
     return 1;
   }
 
