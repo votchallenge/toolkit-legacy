@@ -122,7 +122,7 @@ int main( int argc, char** argv)
             cv::Rect rect;
             float x, y, width, height;
             trax_region_get_rectangle(reg, &x, &y, &width, &height);
-            rect.x = x; rect.y = y; rect.width = width; rect.height = height;
+            rect.x = round(x); rect.y = round(y); rect.width = round(x + width) - rect.x; rect.height = round(y + height) - rect.y;
 
             cv::Mat image = cv::imread(trax_image_get_path(img));
 
@@ -177,6 +177,8 @@ int main( int argc, char** argv)
     int left = round(MIN(p.x1, MIN(p.x2, MIN(p.x3, p.x4))));
     int bottom = round(MAX(p.y1, MAX(p.y2, MAX(p.y3, p.y4))));
     int right = round(MAX(p.x1, MAX(p.x2, MAX(p.x3, p.x4))));
+
+//printf("R:%d %d %d %d \n", left, top, right, bottom);
 
     vot_io.getNextImage(img);
     
