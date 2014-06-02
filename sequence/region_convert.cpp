@@ -38,7 +38,7 @@ Region* array_to_region(const mxArray * input) {
    
     } if (l == 1) {
         
-        p = region_create_special(r[0]);
+        p = region_create_special((int)r[0]);
         
     } 
     
@@ -74,7 +74,7 @@ mxArray* region_to_array(const Region* region) {
 	case SPECIAL: {
 		val = mxCreateDoubleMatrix(1, 1, mxREAL);
 		double *p = (double*) mxGetPr(val);
-		p[0] = region->data.special;
+		p[0] = (double) region->data.special;
 		break;
 	}
 	}
@@ -100,22 +100,24 @@ string get_string(const mxArray *arg) {
     return str;
 }
 
-int get_region_code(string str) {
+bool get_region_code(string str, RegionType& type) {
     
     if (str == "rectangle") {
-        return RECTANGLE;
+        type = RECTANGLE;
+		return true;
     }
     
     if (str == "polygon") {
-        return POLYGON;
+        type = POLYGON;
+		return true;
     } 
 
-  	return -1;
+  	return false;
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-	int format;
+	RegionType format;
 	Region* p;
 	Region* c;
 
@@ -127,9 +129,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	if ( mxGetNumberOfDimensions(prhs[0]) > 2 || mxGetM(prhs[0]) > 1 ) mexErrMsgTxt("First input argument must be a vector");
 
-	format = get_region_code(get_string(prhs[1]));
-
-	if (format < 0)
+	if (!get_region_code(get_string(prhs[1]), format))
 		mexErrMsgTxt("Not a valid format");
 
 	p = array_to_region(prhs[0]);
