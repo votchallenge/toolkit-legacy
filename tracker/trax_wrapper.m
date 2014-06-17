@@ -108,7 +108,9 @@ try
     cd(working_directory);
 
     if is_octave()
+        tic;
         [status, output] = system(command, 1);
+        time = toc;
     else
 
 		% Save library paths
@@ -126,9 +128,13 @@ try
         end;
 
 		if verLessThan('matlab', '7.14.0')
+		    tic;
 		    [status, output] = system(command);
+		    time = toc;
         else
+		    tic;
 		    [status, output] = system(command, '');
+		    time = toc;
 		end;
     end;
         
@@ -147,8 +153,9 @@ try
 
     trajectory = read_trajectory(output_file);
     
-    time = csvread(timing_file) ./ 1000; % convert to seconds 
-    
+    %time = csvread(timing_file) ./ 1000; % convert to seconds 
+	time = time / sequence.length;    
+
 catch e
 
 	% Reassign old library paths if necessary

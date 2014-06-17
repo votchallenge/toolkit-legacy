@@ -58,7 +58,7 @@ for l = 1:length(labels)
                 catch
                     continue;
                 end;
-                
+
                 if (size(trajectory, 1) < size(groundtruth, 1))
                     trajectory{end+1:length(groundtruth)} = 0;
                 end;
