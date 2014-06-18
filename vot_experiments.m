@@ -43,8 +43,11 @@ if get_global_variable('report', 0)
 
     print_indent(-1);
     
-    print_text('Report document written to "%s"', reportfile);
-    
+	if isempty(reportfile)
+	    print_text('Unable to automatically pack results. Please do it manually.');
+	else
+	    print_text('Report document written to "%s"', reportfile);
+    end;
 end;
 
 if get_global_variable('pack', 0)

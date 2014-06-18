@@ -37,7 +37,7 @@ try
 
 catch e
 
-    print_debug('Warning: problem with creating a result package: %s', e.message);
+    print_debug('Warning: error during creation of a result package: %s', e.message);
     resultfile = [];
 
 end;
