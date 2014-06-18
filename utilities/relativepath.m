@@ -40,9 +40,14 @@ if  isempty(tgt_path)  ||   ~isequal(tgt_path(end),filesep)
    tgt_path = [tgt_path filesep];
 end
 
-% Convert to all lowercase:
-[act_path] = fileparts( lower(act_path) );
-[tgt_path] = fileparts( lower(tgt_path) );
+if isunix()
+	[act_path] = fileparts(act_path);
+	[tgt_path] = fileparts(tgt_path);
+else
+	% Convert to all lowercase:
+	[act_path] = fileparts(lower(act_path));
+	[tgt_path] = fileparts(lower(tgt_path));
+end;
 
 % Create a cell-array containing the directory levels:
 act_path_cell = pathparts(act_path);
