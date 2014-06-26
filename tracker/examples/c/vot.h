@@ -84,7 +84,7 @@ VOTPolygon vot_initialize() {
 
     size_t linesiz = sizeof(char) * 1024;
     char* linebuf = (char*) malloc(sizeof(char) * 1024);
-    float* pointbuf = (float*) malloc(sizeof(float) * 4);
+    float* pointbuf = (float*) malloc(sizeof(float) * 8);
     ssize_t linelen = 0;
     VOTPolygon rect;
     rect.x1 = 0;
