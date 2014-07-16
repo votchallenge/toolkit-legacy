@@ -1,5 +1,7 @@
 function [scores] = calculate_scores(tracker, sequences, result_directory)
 
+performance = readstruct(benchmark_hardware());
+
 scores = nan(length(sequences), 3);
 repeat = get_global_variable('repeat', 1);
 burnin = get_global_variable('burnin', 0);
@@ -32,6 +34,8 @@ for i = 1:length(sequences)
         continue;
     end;
 
+    times = normalize_speed(times, reliability, tracker, sequences{i}, performance);
+    
     average_speed = mean(times(times > 0));
 
     if isnan(average_speed) || average_speed == 0
