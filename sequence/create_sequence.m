@@ -77,6 +77,7 @@ for file = dir(fullfile(directory, '*.label'))'
     end;
 
     if size(data, 1) ~= sequence.length || size(data, 2) ~= 1
+        print_debug('Label file does not have correct size');
         continue;
     end;
 
@@ -86,4 +87,29 @@ for file = dir(fullfile(directory, '*.label'))'
 end;
 
 sequence.labels.data = labeldata;
+
+sequence.values.names = {};
+valuesdata = false(sequence.length, 0);
+
+for file = dir(fullfile(directory, '*.value'))'
+
+    try
+        data = csvread(fullfile(directory, file.name));
+    catch e
+        e.message
+        continue
+    end;
+
+    if size(data, 1) ~= sequence.length || size(data, 2) ~= 1
+        print_debug('Value file does not have correct size');
+        continue;
+    end;
+
+    sequence.values.names{end+1} = file.name(1:end-6);
+    valuesdata = cat(2, valuesdata, data);
+
+end;
+
+sequence.values.data = valuesdata;
+
 
