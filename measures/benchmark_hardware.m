@@ -74,6 +74,39 @@ end;
 
 performance.nonlinear_native = toc / repetitions;
 
+if ~is_octave()
+	print_debug('Performing Matlab startup time benchmark');
+
+	if isunix
+		matlab_executable = [fullfile(matlabroot, 'bin', 'matlab'), ' -nodesktop -nosplash -r quit'];
+	else
+		matlab_executable = [fullfile(matlabroot, 'bin', 'matlab.exe'), ' -nodesktop -nosplash -wait -minimize -r quit'];
+	end
+
+	try
+
+		repetitions = 3;
+
+		tic;
+
+		for i = 1:repetitions
+
+			if verLessThan('matlab', '7.14.0')
+				[status, output] = system(matlab_executable);
+			else
+				[status, output] = system(matlab_executable, '');
+			end;
+
+		end;
+
+		performance.matlab_startup = toc / repetitions;
+
+	catch e
+
+		print_debug('ERROR: Exception thrown "%s".', e.message);
+	end;
+end
+
 writestruct(filename, performance);
 
 print_indent(-1);
