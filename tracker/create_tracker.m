@@ -13,21 +13,20 @@ if exist(['tracker_' , identifier]) ~= 2 %#ok<EXIST>
 end;
 
 tracker_label = [];
+tracker_interpreter = [];
+tracker_linkpath = {};
+tracker_trax = true;
 
 tracker_configuration = str2func(['tracker_' , identifier]);
 tracker_configuration();
 
-if isempty(tracker_label)
-    tracker_label = identifier;
-end;
-    
 tracker_label = strtrim(tracker_label);
 
 tracker = struct('identifier', identifier, 'command', tracker_command, ...
         'directory', result_directory, 'linkpath', {tracker_linkpath}, ...
-        'label', tracker_label);
+        'label', tracker_label, 'interpreter', tracker_interpreter);
 
-if exist('tracker_trax', 'var') && tracker_trax
+if tracker_trax
     trax_executable = get_global_variable('trax_client', '');
     if isempty(trax_executable) && ~isempty(tracker.command)
         error('TraX support not available');
