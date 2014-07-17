@@ -25,7 +25,7 @@ end;
 average_frames = total_frames / length(sequences);
 
 lens = linspace(0, 1, failures + 1);
-reruns = sum(lens(2:end));
+reruns = sum(lens);
 
 estimate = (average_frames * reruns * repeats) * length(sequences) / fps;
 

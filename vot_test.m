@@ -72,7 +72,7 @@ while 1
         end;
     case 't'
         if performance.frames > 0
-            
+
             fps = performance.frames / performance.time;
             
             if tracker.trax
@@ -80,6 +80,7 @@ while 1
             else
                 estimate = estimate_completion_time(sequences, 'fps', fps);
             end
+
             print_text('Based on the current estimate (fps = %.2f), the completion time for %d sequences is %s', fps, length(sequences), format_interval(estimate));
             
         end;   
