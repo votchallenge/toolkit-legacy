@@ -21,15 +21,15 @@ end
 
 function [key, value] = parse_line(line)
 
-	tokens = strsplit(line, '=');
+    delimiter = find(line == '=', 1);
 
-	if numel(tokens) < 2
+	if isnan(delimiter)
 		key = []; value = [];
 		return;
 	end;
-
-	key = tokens{1};
-	value = [tokens{2:end}];
+        
+	key = line(1:delimiter-1);
+	value = line(delimiter+1:end);
 
 	[numvalue, status] = str2num(value); %#ok<ST2NM>
 
