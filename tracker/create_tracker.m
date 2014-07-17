@@ -25,7 +25,7 @@ tracker_label = strtrim(tracker_label);
 tracker = struct('identifier', identifier, 'command', tracker_command, ...
         'directory', result_directory, 'linkpath', {tracker_linkpath}, ...
         'label', tracker_label, 'interpreter', tracker_interpreter);
-
+    
 if tracker_trax
     trax_executable = get_global_variable('trax_client', '');
     if isempty(trax_executable) && ~isempty(tracker.command)
@@ -35,6 +35,12 @@ if tracker_trax
     tracker.trax = true;
     tracker.linkpath{end+1} = fullfile(matlabroot, 'bin', lower(computer('arch')));
 else
-    tracker.run = @system_wrapper;
+    tracker.run = @system_wrapper; %#ok<UNRCH>
     tracker.trax = false;
+end;
+
+performance_filename = fullfile(tracker.directory, 'performance.txt');
+
+if exist(performance_filename, 'file')
+    tracker.performance = readstruct(benchmark_hardware(tracker));
 end;

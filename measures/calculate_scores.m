@@ -1,6 +1,6 @@
 function [scores] = calculate_scores(tracker, sequences, result_directory)
 
-performance = readstruct(benchmark_hardware());
+performance = readstruct(benchmark_hardware(tracker));
 
 scores = nan(length(sequences), 3);
 repeat = get_global_variable('repeat', 1);

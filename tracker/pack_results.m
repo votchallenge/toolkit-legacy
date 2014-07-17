@@ -19,7 +19,7 @@ end;
 
 files{end+1} = write_manifest(tracker);
 
-files{end+1} = benchmark_hardware();
+files{end+1} = benchmark_hardware(tracker);
 
 %cd(get_global_variable('directory'));
 

@@ -1,6 +1,6 @@
-function [filename] = benchmark_hardware()
+function [filename] = benchmark_hardware(tracker)
 
-filename = fullfile(get_global_variable('directory'), 'results', 'performance.txt');
+filename = fullfile(tracker.directory, 'performance.txt');
 
 if exist(filename, 'file')
     print_debug('Skipping hardware performance benchmark');
