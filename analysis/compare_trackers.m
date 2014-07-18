@@ -4,7 +4,8 @@ function [ha, hr] = compare_trackers(A1, R1, A2, R2, alpha, practical)
     
     % Statistical test
     dif = A1 - A2;
-    dif = dif(~isnan(dif)) ;
+	valid = ~isnan(dif);
+    dif = dif(valid) ;
     if (length(dif) < 5)
         print_text('Warning: less than 5 samples when comparing tracker %s and %s', tracker1.identifier, tracker2.identifier);
         ha = 0;
@@ -15,16 +16,11 @@ function [ha, hr] = compare_trackers(A1, R1, A2, R2, alpha, practical)
         else
             [~, ha, ~] = signrank(dif, [], 'alpha', alpha ) ;
         end;
-%        e = sum(abs(dif) <= minimal_difference) / length(dif);
-%        if (e > 0.95)
-%            ha = 0;
-%        end;  
     end;               
-    
+  
     % Practical difference of accuracy
     if ~isempty(practical)
-
-        if mean(dif ./ practical) < 1
+        if mean(abs(dif)' ./ practical(valid)) < 1
             ha = 0;
         end;
         

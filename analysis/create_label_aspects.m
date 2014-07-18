@@ -93,7 +93,7 @@ function practical = practical_for_label(sequences, label)
         p = get_frame_value(sequences{s}, 'practical', filter);
 
         if ~isempty(p)
-            practical = [practical, p];
+            practical = [practical; p];
         end;
         
     end;

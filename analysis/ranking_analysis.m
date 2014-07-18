@@ -12,7 +12,7 @@ labels = {};
 ranks = nan(numel(experiments) * 3, numel(trackers));
 scores = nan(numel(experiments) * 2, numel(trackers));
 experiment_names = cellfun(@(x) x.name, experiments,'UniformOutput',false);
-tacker_labels = cellfun(@(x) x.label, trackers, 'UniformOutput', 0);
+tracker_labels = cellfun(@(x) x.label, trackers, 'UniformOutput', 0);
 
 index_fid = fopen(temporary_index_file, 'w');
 
@@ -62,13 +62,15 @@ for e = 1:numel(experiments)
 
     print_indent(1);
 
+	experiment_sequences = convert_sequences(sequences, experiment.converter);
+
     if isempty(labels)
 
-        aspects = create_sequence_aspects(experiment, trackers, sequences);
+        aspects = create_sequence_aspects(experiment, trackers, experiment_sequences);
         
     else
         
-        aspects = create_label_aspects(experiment, trackers, sequences, labels);
+        aspects = create_label_aspects(experiment, trackers, experiment_sequences, labels);
 
     end;
     
@@ -76,7 +78,7 @@ for e = 1:numel(experiments)
     
     print_text('Processing ...');
 
-    [accuracy, robustness, available] = trackers_ranking(experiment, trackers, sequences, aspects, 'usepractical', usepractical);
+    [accuracy, robustness, available] = trackers_ranking(experiment, trackers, experiment_sequences, aspects, 'usepractical', usepractical);
     
     if export_data
         
@@ -102,7 +104,7 @@ for e = 1:numel(experiments)
     scores(e * 2, available) = mean(robustness.mu);
     
     [~, order] = sort(ranks(e * 3, :), 'ascend');
-    print_average_ranks(index_fid, ranks(e * 3, order), tacker_labels(order));
+    print_average_ranks(index_fid, ranks(e * 3, order), tracker_labels(order));
     
     fprintf(index_fid, '<a href="%s" class="more">More information</a>\n', report_file);
 
@@ -113,7 +115,7 @@ ranks(isnan(ranks)) = size(ranks, 2);
 fprintf(index_fid, '<h2>Averaged</h2>\n');
 mean_ranks = mean(ranks(3:3:end, :), 1);
 [~, order] = sort(mean_ranks,'ascend')  ;
-print_average_ranks(index_fid, mean_ranks(order), tacker_labels(order));
+print_average_ranks(index_fid, mean_ranks(order), tracker_labels(order));
 
 if permutation_plot
 
@@ -211,13 +213,13 @@ delete(temporary_index_file);
 
 end
 
-function print_average_ranks(fid, ranks, tacker_labels )
+function print_average_ranks(fid, ranks, tracker_labels )
 
     table = cellfun(@(x) sprintf('%1.3g', x), num2cell(ranks), 'UniformOutput', 0);
 
     fprintf(fid, '<div class="table">');
     
-    matrix2html(table, fid, 'columnLabels', tacker_labels);
+    matrix2html(table, fid, 'columnLabels', tracker_labels);
 
     fprintf(fid, '</div>');
     

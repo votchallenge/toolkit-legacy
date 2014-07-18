@@ -8,7 +8,7 @@ for i = 1:2:length(varargin)
         case 'alpha'
             alpha = varargin{i+1} ;
         case 'usepractical'
-            practical = varargin{i+1} ;            
+            usepractical = varargin{i+1} ;            
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -27,10 +27,12 @@ robustness.mu = zeros(N_aspects, N_trackers) ;
 robustness.std = zeros(N_aspects, N_trackers) ;
 robustness.ranks = zeros(N_aspects, N_trackers) ;
 
-
-
 for a = 1:length(aspects)
     
+	print_indent(1);
+
+	print_text('Processing aspect %s ...', aspects{a}.name);
+
     % rank trackers and calculate statistical significance of differences
     [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = ...
         trackers_ranking_aspect(experiment, trackers, sequences, aspects{a}, 'alpha', alpha, 'usepractical', usepractical);
@@ -48,6 +50,8 @@ for a = 1:length(aspects)
     robustness.std(a, :) = average_robustness.std ;        
     robustness.ranks(a, :) = adapted_robustness_ranks ;
     
+	print_indent(-1);
+
 end
 
 accuracy.average_ranks = mean(accuracy.ranks,1) ;
@@ -58,10 +62,12 @@ end
 function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = trackers_ranking_aspect(experiment, trackers, sequences, aspect, varargin)
 
     alpha = 0.05 ;
-    usepractical = true;
-    
-    cache_directory = fullfile(get_global_variable('directory'), 'cache', 'ranking', experiment.name, aspect.name);    
-    mkpath(cache_directory);
+    usepractical = false;
+
+    cache_directory_scores = fullfile(get_global_variable('directory'), 'cache', 'ar', experiment.name, aspect.name);    
+    cache_directory_ranking = fullfile(get_global_variable('directory'), 'cache', 'ranking', experiment.name, aspect.name);    
+    mkpath(cache_directory_scores);
+	mkpath(cache_directory_ranking);
 
     for i = 1:2:length(varargin)
         switch varargin{i}
@@ -94,9 +100,13 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
         practical = [];
     end
 
+	print_indent(1);
+
     for t1 = 1:length(trackers)
 
-        cache_file = fullfile(cache_directory, sprintf('%s.txt', trackers{t1}.identifier));
+		print_text('Processing tracker %s ...', trackers{t1}.identifier);
+
+        cache_file = fullfile(cache_directory_scores, sprintf('%s.txt', trackers{t1}.identifier));
         
         if ~exist(cache_file, 'file')
         
@@ -137,7 +147,7 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
         
         for t2 = t1+1:length(trackers)
         
-            cache_file = fullfile(cache_directory, sprintf('%s-%s.txt', trackers{t1}.identifier, trackers{t2}.identifier));
+            cache_file = fullfile(cache_directory_ranking, sprintf('%s-%s.txt', trackers{t1}.identifier, trackers{t2}.identifier));
         
             if ~exist(cache_file, 'file')
 
@@ -178,6 +188,8 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
             HR(t1, t2) = hr; HR(t2, t1) = HR(t1, t2);               
         end;
     end;
+
+	print_indent(-1);
 
     [~, order_by_accuracy] = sort(average_accuracy.mu, 'descend');
     [~, accuracy_ranks] = sort(order_by_accuracy, 'ascend') ;
