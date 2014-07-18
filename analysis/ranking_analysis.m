@@ -64,11 +64,11 @@ for e = 1:numel(experiments)
 
     if isempty(labels)
 
-        aspects = create_sequence_aspects(experiment, tracker, sequences);
+        aspects = create_sequence_aspects(experiment, trackers, sequences);
         
     else
         
-        aspects = create_label_aspects(experiment, tracker, sequences, labels);
+        aspects = create_label_aspects(experiment, trackers, sequences, labels);
 
     end;
     

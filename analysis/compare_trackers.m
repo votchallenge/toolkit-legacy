@@ -15,10 +15,10 @@ function [ha, hr] = compare_trackers(A1, R1, A2, R2, alpha, practical)
         else
             [~, ha, ~] = signrank(dif, [], 'alpha', alpha ) ;
         end;
-        e = sum(abs(dif) <= minimal_difference) / length(dif);
-        if (e > 0.95)
-            ha = 0;
-        end;  
+%        e = sum(abs(dif) <= minimal_difference) / length(dif);
+%        if (e > 0.95)
+%            ha = 0;
+%        end;  
     end;               
     
     % Practical difference of accuracy
