@@ -34,9 +34,13 @@ for i = 1:length(sequences)
         continue;
     end;
 
-    times = normalize_speed(times, reliability, tracker, sequences{i}, performance);
-    
-    average_speed = mean(times(times > 0));
+    average_speed = mean(times(:, any(times > 0, 1)), 1)';
+   
+    reliability = reliability(~isnan(reliability));
+ 
+    average_speed = normalize_speed(average_speed, reliability, tracker, sequences{i}, performance);
+
+    average_speed = mean(average_speed);    
 
     if isnan(average_speed) || average_speed == 0
         average_speed = NaN;
