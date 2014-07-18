@@ -29,6 +29,8 @@ permutation_plot = 0;
 permutation_args = {}; %'legend', 1, 'width' 4, 'height', 4};
 ranking_permutation_args = {'flip', 1};
 
+usepractical = false;
+
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'combineweight'
@@ -45,6 +47,8 @@ for i = 1:2:length(varargin)
             permutation_plot = varargin{i+1} ;
         case 'exportdata'
             export_data = varargin{i+1} ;              
+        case 'usepractical'
+            usepractical = varargin{i+1} ;  
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -72,7 +76,7 @@ for e = 1:numel(experiments)
     
     print_text('Processing ...');
 
-    [accuracy, robustness, available] = trackers_ranking(experiment, trackers, sequences, aspects);
+    [accuracy, robustness, available] = trackers_ranking(experiment, trackers, sequences, aspects, 'usepractical', usepractical);
     
     if export_data
         

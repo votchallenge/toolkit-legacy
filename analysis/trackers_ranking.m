@@ -1,11 +1,14 @@
 function [accuracy, robustness, available] = trackers_ranking(experiment, trackers, sequences, aspects, varargin)
 
 alpha = 0.05 ;
+usepractical = false;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'alpha'
-            alpha = varargin{i+1} ;           
+            alpha = varargin{i+1} ;
+        case 'usepractical'
+            practical = varargin{i+1} ;            
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -30,7 +33,7 @@ for a = 1:length(aspects)
     
     % rank trackers and calculate statistical significance of differences
     [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = ...
-        trackers_ranking_aspect(experiment, trackers, sequences, aspects{a}, 'alpha', alpha);
+        trackers_ranking_aspect(experiment, trackers, sequences, aspects{a}, 'alpha', alpha, 'usepractical', usepractical);
     
     % get adapted ranks
     adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA) ;
