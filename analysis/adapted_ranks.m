@@ -1,7 +1,7 @@
-function Ra = adapted_ranks(R, H)
+function a_ranks = adapted_ranks(ranks, different)
 
-Ra = zeros(1, length(R)) ;
-for i_tracker=1:length(R)
-    id_equivalent = find(H(i_tracker,:)==0) ;
-    Ra(i_tracker) = mean(R(id_equivalent)) ; %#ok<FNDSB>
+a_ranks = zeros(1, length(ranks)) ;
+
+for tracker = 1:length(ranks)
+    a_ranks(tracker) = mean(ranks(find(different(tracker,:) == 0))) ; %#ok<FNDSB>
 end 

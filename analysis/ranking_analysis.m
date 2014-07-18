@@ -23,8 +23,6 @@ export_data = 0;
 
 report_filename = sprintf('%sranking.html', context.prefix);
 
-minimal_difference_acc = 0;
-minimal_difference_fail = 0;
 ar_plot = 0;
 permutation_plot = 0;
 
@@ -39,10 +37,6 @@ for i = 1:2:length(varargin)
             latex_fid = varargin{i+1};
         case 'reporttemplate'
             template_file = varargin{i+1}; 
-        case 'minimaldifferenceaccuracy'
-            minimal_difference_acc = varargin{i+1} ;
-        case 'minimaldifferencefailure'
-            minimal_difference_fail = varargin{i+1} ;
         case 'arplot'
             ar_plot = varargin{i+1} ;
         case 'labels'
@@ -64,33 +58,21 @@ for e = 1:numel(experiments)
 
     print_indent(1);
 
-    print_text('Loading data ...');
+    if isempty(labels)
 
-	if isempty(labels)
+        aspects = create_sequence_aspects(experiment, tracker, sequences);
+        
+    else
+        
+        aspects = create_label_aspects(experiment, tracker, sequences, labels);
 
-		[S_all, F_all, available] = ...
-		    process_results_sequences(trackers, convert_sequences(sequences, experiment.converter), experiment.name);
-
-		series_labels = cellfun(@(x) x.name, sequences, 'UniformOutput', 0);
-
-	else
-
-		[S_all, F_all, available] = ...
-		    process_results_labels(trackers, convert_sequences(sequences, experiment.converter), ...
-		    labels, experiment.name);
-
-		series_labels = labels;
-
-	end
-
-    S_all = cellfun(@(x) x(available, :), S_all, 'UniformOutput', 0);
-    F_all = cellfun(@(x) x(available, :), F_all, 'UniformOutput', 0);
+    end;
+    
+    aspects_labels = cellfun(@(x) x.title, aspects, 'UniformOutput', 0);
     
     print_text('Processing ...');
 
-    [accuracy, robustness] = ranking(S_all, F_all, 'alpha', 0.05, ...
-        'minimal_difference_acc', minimal_difference_acc,...
-        'minimal_difference_fail', minimal_difference_fail) ;
+    [accuracy, robustness, available] = trackers_ranking(experiment, trackers, sequences, aspects);
     
     if export_data
         
@@ -103,7 +85,7 @@ for e = 1:numel(experiments)
     print_text('Writing report ...');
 
     report_file = generate_ranking_report(context, trackers(available), experiment, accuracy, robustness, ...
-         'SeriesLabels', series_labels, 'combineWeight', combine_weight, 'reporttemplate', template_file, ...
+         'SeriesLabels', aspects_labels, 'combineWeight', combine_weight, 'reporttemplate', template_file, ...
          'arplot', ar_plot, 'permutationplot', 0); %permutation_plot);
 
     fprintf(index_fid, '<h2>Experiment %s</h2>\n', experiment.name);
@@ -148,7 +130,7 @@ if permutation_plot
     if export_data
         insert_figure(context, 0, h, 'permutation_robustness', 'Ranking permutations for robustness rank', 'format', 'data');
     end;      
-%     
+
 % %--   
 %   
 %     h = generate_permutation_plot(trackers, scores(1:2:end, :), experiment_names, permutation_args{:}, 'scope', [0, 1], 'type', 'Accuracy');
@@ -166,7 +148,6 @@ if permutation_plot
 %     if export_data
 %         insert_figure(context, 0, h, 'permutation_robustness_raw', 'Scores permutations for robustness rank', 'format', 'data');
 %     end; 
-% 
 % 
 % %--
     
@@ -224,6 +205,8 @@ generate_from_template(fullfile(context.root, index_file), template_file, ...
 
 delete(temporary_index_file);
 
+end
+
 function print_average_ranks(fid, ranks, tacker_labels )
 
     table = cellfun(@(x) sprintf('%1.3g', x), num2cell(ranks), 'UniformOutput', 0);
@@ -233,4 +216,5 @@ function print_average_ranks(fid, ranks, tacker_labels )
     matrix2html(table, fid, 'columnLabels', tacker_labels);
 
     fprintf(fid, '</div>');
-
+    
+end
