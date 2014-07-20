@@ -10,6 +10,7 @@ function [ha, hr] = compare_trackers(A1, R1, A2, R2, alpha, practical)
         print_text('Warning: less than 5 samples when comparing tracker %s and %s', tracker1.identifier, tracker2.identifier);
         ha = 0;
     else
+		%dif(abs(dif)' < practical(valid)) = 0;
         if (is_octave)
             pa = wilcoxon_test(A1, A2);
             ha = (pa <= alpha);
@@ -20,7 +21,7 @@ function [ha, hr] = compare_trackers(A1, R1, A2, R2, alpha, practical)
   
     % Practical difference of accuracy
     if ~isempty(practical)
-        if mean(abs(dif)' ./ practical(valid)) < 1
+        if abs(mean(dif' ./ practical(valid))) < 1
             ha = 0;
         end;
         

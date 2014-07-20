@@ -79,6 +79,14 @@ for e = 1:numel(experiments)
     print_text('Processing ...');
 
     [accuracy, robustness, available] = trackers_ranking(experiment, trackers, experiment_sequences, aspects, 'usepractical', usepractical);
+
+	accuracy.average_ranks = accuracy.average_ranks(:, available);
+	accuracy.mu = accuracy.mu(:, available);
+	accuracy.std = accuracy.std(:, available);
+
+	robustness.average_ranks = robustness.average_ranks(:, available);
+	robustness.mu = robustness.mu(:, available);
+	robustness.std = robustness.std(:, available);
     
     if export_data
         
@@ -90,8 +98,8 @@ for e = 1:numel(experiments)
 
     print_text('Writing report ...');
 
-    report_file = generate_ranking_report(context, trackers(available), experiment, accuracy, robustness, ...
-         'SeriesLabels', aspects_labels, 'combineWeight', combine_weight, 'reporttemplate', template_file, ...
+    report_file = generate_ranking_report(context, trackers(available), experiment, aspects, accuracy, robustness, ...
+         'combineWeight', combine_weight, 'reporttemplate', template_file, ...
          'arplot', ar_plot, 'permutationplot', 0); %permutation_plot);
 
     fprintf(index_fid, '<h2>Experiment %s</h2>\n', experiment.name);
@@ -196,7 +204,7 @@ if ~isempty(latex_fid)
         celldata{indices(3), i} = sprintf('\\third{%.2f}', celldata{indices(3), i});
     end;
     
-    matrix2latex(celldata, latex_fid, 'columnLabels', column_labels, 'rowLabels', strrep(tacker_labels(order), '_', '\_'), 'format', '%.2f', ...
+    matrix2latex(celldata, latex_fid, 'columnLabels', column_labels, 'rowLabels', strrep(tracker_labels(order), '_', '\_'), 'format', '%.2f', ...
             'prefix', prefix);
 
     fprintf(latex_fid, '\\end{table}\n');

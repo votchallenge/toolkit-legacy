@@ -80,7 +80,7 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
     tracker_labels = cellfun(@(x) x.label, trackers, 'UniformOutput', 0);
 
     if show_legend
-        legend(tracker_labels(available), 'Location', 'NorthWestOutside'); 
+        legend(tracker_labels(available), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
     end;
     
     xlabel(sprintf('Reliability (S = %d)', sensitivity));

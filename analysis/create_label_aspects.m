@@ -3,16 +3,28 @@ function aspects = create_label_aspects(experiment, tracker, sequences, labels) 
     aspects = cellfun(@(label) struct('name', sprintf('label_%s', label), ...
         'title', label, ...
         'aggregate', @(experiment, tracker, sequences) ...
-        aggregate_for_label(experiment, tracker, sequences, label), ...
-        'practical', @(sequences) practical_for_label(sequences, label)), ...
+        aggregate_for_label(experiment, tracker, sequences, label, true), ...
+        'practical', @(sequences) practical_for_label(sequences, label), 'length', @(sequences) count_for_label(sequences, label)), ...
         labels, 'UniformOutput', false);
 
 end
 
-function [A, R] = aggregate_for_label(experiment, tracker, sequences, label)
+function [A, R] = aggregate_for_label(experiment, tracker, sequences, label, cache)
 
     A = [];
     R = [];
+
+    cache_directory = fullfile(get_global_variable('directory'), 'cache', 'labels', experiment.name, label);    
+    mkpath(cache_directory);
+
+	cache_file = fullfile(cache_directory, sprintf('%s.mat', tracker.identifier));
+        
+    if exist(cache_file, 'file') && cache
+		load(cache_file);
+		if ~isempty(A) && ~isempty(R)
+			return;
+		end;
+	end;
 
     repeat = get_global_variable('repeat', 1);
     burnin = get_global_variable('burnin', 0);    
@@ -26,7 +38,7 @@ function [A, R] = aggregate_for_label(experiment, tracker, sequences, label)
 
         filter = query_label(sequences{s}, label);
 
-        if isempty(filter)
+        if isempty(filter) | ~any(filter)
             continue;
         end;
         
@@ -73,6 +85,30 @@ function [A, R] = aggregate_for_label(experiment, tracker, sequences, label)
         if ~isempty(sequence_failures)
             R = [R, sequence_failures];
         end;
+
+    end
+
+    if cache
+		save(cache_file, 'A', 'R');
+	end;
+end
+
+function [count] = count_for_label(sequences, label)
+
+    A = [];
+    R = [];
+
+	count = 0;
+
+    for s = 1:length(sequences)
+
+        filter = query_label(sequences{s}, label);
+
+        if isempty(filter)
+            continue;
+        end;
+        
+		count = count + sum(filter);
 
     end
 end

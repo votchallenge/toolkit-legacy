@@ -4,7 +4,7 @@ function aspects = create_sequence_aspects(experiment, tracker, sequences) %#ok<
         'title', sequence.name, ...
         'aggregate', @(experiment, tracker, sequences) ...
         aggregate_for_sequence(experiment, tracker, sequence), ...
-        'practical', @(sequences) get_frame_value(sequence, 'practical')), ...
+        'practical', @(sequences) get_frame_value(sequence, 'practical'), 'length', @(sequences) sequence.length), ...
         sequences, 'UniformOutput', false);        
 
 end
@@ -14,14 +14,17 @@ function [A, R] = aggregate_for_sequence(experiment, tracker, sequence)
     A = [];
     R = [];
 
-    if ~exist(fullfile(tracker.directory, experiment), 'dir')
+    repeat = get_global_variable('repeat', 1);
+    burnin = get_global_variable('burnin', 0);    
+
+    if ~exist(fullfile(tracker.directory, experiment.name), 'dir')
         print_debug('Warning: Results not available %s', tracker.identifier);
         return;
     end;
 
     groundtruth = sequence.groundtruth;
 
-    directory = fullfile(tracker.directory, experiment, sequence.name);
+    directory = fullfile(tracker.directory, experiment.name, sequence.name);
 
     accuracy = nan(repeat, sequence.length);
     failures = nan(repeat, 1);
