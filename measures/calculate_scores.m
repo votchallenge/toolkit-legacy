@@ -34,9 +34,9 @@ for i = 1:length(sequences)
         continue;
     end;
 
-    average_speed = mean(times(:, any(times > 0, 1)), 1)';
-   
-    reliability = reliability(~isnan(reliability));
+    valid = any(times > 0, 1) & ~isnan(reliability)';
+    average_speed = mean(times(:, valid), 1)';   
+    reliability = reliability(valid);
  
     average_speed = normalize_speed(average_speed, reliability, tracker, sequences{i}, performance);
 
