@@ -10,12 +10,18 @@ template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'repo
 index_fid = fopen(temporary_index_file, 'w');
 latex_fid = [];
 
+labels = {};
+
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'latexfile'
             latex_fid = varargin{i+1};
         case 'reporttemplate'
-            template_file = varargin{i+1};  
+            template_file = varargin{i+1};
+        case 'labels'
+            labels = varargin{i+1} ;
+        case 'index'
+            index_file = varargin{i+1} ;
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -35,49 +41,49 @@ for e = 1:numel(experiments)
     
     experiment_sequences = convert_sequences(sequences, experiment.converter);
     
-    for s = 1:length(experiment_sequences)
+	if isempty(labels)
+
+		aspects = create_sequence_aspects(experiment, trackers, experiment_sequences);
+		
+	else
+		
+		aspects = create_label_aspects(experiment, trackers, experiment_sequences, labels);
+
+	end;
+
+    aspects_labels = cellfun(@(x) x.title, aspects, 'UniformOutput', 0);
+
+    for s = 1:length(aspects)
 
         print_indent(1);
 
-        print_text('Processing sequence %s ...', experiment_sequences{s}.name);
+        print_text('Processing aspect %s ...', aspects{s}.name);
 
-        accuracy = nan(repeat, length(trackers));
-        robustness = nan(repeat, length(trackers));
+        accuracy = nan(1, length(trackers));
+        robustness = nan(1, length(trackers));
                 
         for t = 1:length(trackers)
 
             print_indent(1);
 
-            result_directory = fullfile(trackers{t}.directory, experiment.name, experiment_sequences{s}.name);
-            
-            for j = 1:repeat
+	        [A, R] = aspects{s}.aggregate(experiment, trackers{t}, experiment_sequences);
 
-                result_file = fullfile(result_directory, sprintf('%s_%03d.txt', experiment_sequences{s}.name, j));
-                
-                try 
-                    trajectory = read_trajectory(result_file);
-                catch
-                    continue;
-                end;
+	        valid_frames = ~isnan(A) ;
 
-                accuracy(j, t) = estimate_accuracy(trajectory, experiment_sequences{s}, 'burnin', burnin);
+	        accuracy(t) = mean(A(valid_frames));
+	        robustness(t) = mean(R);
 
-                robustness(j, t) = estimate_failures(trajectory, experiment_sequences{s}) ./ experiment_sequences{s}.length;
-
-            end;
-
-            robustness(isnan(robustness(:, t)), t) = mean(robustness(~isnan(robustness(:, t)), t));
-            accuracy(isnan(accuracy(:, t)), t) = mean(accuracy(~isnan(accuracy(:, t)), t));
-            
             print_indent(-1);
 
         end;
 
+		robustness = robustness ./ aspects{s}.length(experiment_sequences);
+
         hf = generate_ar_plot(trackers, accuracy, robustness);
         
-        insert_figure(context, index_fid, hf, sprintf('arplot_%s_%s.png', ...
-            experiment.name, experiment_sequences{s}.name), ...
-            sprintf('Sequence %s', experiment_sequences{s}.name));
+        insert_figure(context, index_fid, hf, sprintf('arplot_%s_%s', ...
+            experiment.name, aspects{s}.name), ...
+            sprintf('Aspect %s', aspects{s}.name));
     
         print_indent(-1);
 

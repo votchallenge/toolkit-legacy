@@ -1,9 +1,8 @@
-function [index_file, ranks] = generate_ranking_report(context, trackers, experiment, accuracy, robustness, varargin)
+function [index_file, ranks] = generate_ranking_report(context, trackers, experiment, aspects, accuracy, robustness, varargin)
 
 temporary_index_file = tempname;
 template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html');
 
-series_labels = [];
 ar_plot = 0;
 permutation_plot = 0;
 combine_weight = 0.5 ;
@@ -13,9 +12,7 @@ for i = 1:2:length(varargin)
         case 'reporttemplate'
             template_file = varargin{i+1};         
         case 'combineweight'
-            combine_weight = varargin{i+1};    
-        case 'serieslabels'
-            series_labels = varargin{i+1};   
+            combine_weight = varargin{i+1};      
         case 'arplot'
             ar_plot = varargin{i+1};
         case 'permutationplot'
@@ -29,9 +26,7 @@ fid = fopen(temporary_index_file, 'w');
 
 tracker_labels = cellfun(@(x) x.label, trackers, 'UniformOutput', 0);
 
-if isempty(series_labels)
-    series_labels = cellfun(@(x) sprintf('Series %d', x), {1:size(accuracy, 1)}, 'UniformOutput', 0);
-end;
+aspect_labels = cellfun(@(x) x.title, aspects, 'UniformOutput', 0);
 
 t_labels_acc = tracker_labels;
 t_labels_rob = tracker_labels;
@@ -71,28 +66,28 @@ merged_ranks = merged_ranks(order_by_ranks_merg);
 
 fprintf(fid, '<h2>Accuracy</h2>\n');
 
-print_tables(fid, accuracy, t_labels_acc, series_labels ) ;
+print_tables(fid, accuracy, t_labels_acc, aspect_labels ) ;
 
 if permutation_plot
-    h = generate_permutation_plot(trackers, accuracy_ranks, series_labels, 'flip', 1);
+    h = generate_permutation_plot(trackers, accuracy_ranks, aspect_labels, 'flip', 1);
     insert_figure(context, fid, h, sprintf('permutation_accuracy_%s', experiment.name), ...
         'Ranking permutations for accuracy rank');
 
-    h = generate_permutation_plot(trackers, accuracy_raw, series_labels, 'scope', [0, 1], 'type', 'Accuracy');
+    h = generate_permutation_plot(trackers, accuracy_raw, aspect_labels, 'scope', [0, 1], 'type', 'Accuracy');
     insert_figure(context, fid, h, sprintf('permutation_accuracy_raw_%s', experiment.name), ...
         'Ranking permutations for raw accuracy');    
 end;
 
 fprintf(fid, '<h2>Robustness</h2>\n');
 
-print_tables(fid, robustness, t_labels_rob, series_labels );
+print_tables(fid, robustness, t_labels_rob, aspect_labels );
 
 if permutation_plot
-    h = generate_permutation_plot(trackers, robustness_ranks, series_labels, 'flip', 1);
+    h = generate_permutation_plot(trackers, robustness_ranks, aspect_labels, 'flip', 1);
     insert_figure(context, fid, h, sprintf('permutation_robustness_%s', experiment.name), ...
         'Ranking permutations for robustness rank');
 
-    h = generate_permutation_plot(trackers, robustness_raw, series_labels, 'scope', [0, max(robustness_raw(:))+1], 'type', 'Robustness');
+    h = generate_permutation_plot(trackers, robustness_raw, aspect_labels, 'scope', [0, max(robustness_raw(:))+1], 'type', 'Robustness');
     insert_figure(context, fid, h, sprintf('permutation_robustness_raw_%s', experiment.name), ...
         'Ranking permutations for raw robustness');
 end;
@@ -102,20 +97,22 @@ fprintf(fid, '<h2>Combined ranking (weight = %1.3g)</h2>\n', combine_weight);
 print_average_ranks(fid, merged_ranks, t_labels_merg );
 
 if permutation_plot
-    h = generate_permutation_plot(trackers, combined_ranks, series_labels, 'flip', 1);
+    h = generate_permutation_plot(trackers, combined_ranks, aspect_labels, 'flip', 1);
     insert_figure(context, fid, h, sprintf('permutation_combined_%s', experiment.name), ...
         'Ranking permutations for combined rank');    
 end;
 
 if ar_plot
 
-%     for l = 1:length(labels)
-%         label = labels{l};
-%         h = generate_ranking_plot(trackers(available), accuracy.ranks(l, :), robustness.ranks(l, :), ...
-%             sprintf('Experiment %s, label %s', experiment.name, label), length(trackers));
-% 
-%         export_figure(h, fullfile(context.images, sprintf('ranking_%s_%s', experiment.name, label)), 'png');
-%     end;
+    for a = 1:length(aspects)
+        aspect = aspects{a};
+        h = generate_ranking_plot(trackers, accuracy_ranks(a, :), robustness_ranks(a, :), ...
+            sprintf('Experiment %s, %s', experiment.name, aspect.title), length(trackers));
+
+	    insert_figure(context, fid, h, sprintf('ranking_%s_%s', experiment.name, aspect.name), ...
+	        sprintf('Experiment %s, %s', experiment.name, aspect.title));    
+	
+    end;
 
     h = generate_ranking_plot(trackers, average_accuracy_ranks, average_robustness_ranks, ...
         sprintf('Experiment %s', experiment.name), length(trackers));

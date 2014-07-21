@@ -58,7 +58,7 @@ for i = 1:repetitions
     
     if ~isempty(trajectory)
         write_trajectory(result_file, trajectory);
+		csvwrite(time_file, times);
     end;
 end;
 
-csvwrite(time_file, times);

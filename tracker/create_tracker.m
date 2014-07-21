@@ -12,7 +12,7 @@ if exist(['tracker_' , identifier]) ~= 2 %#ok<EXIST>
     %error('Configuration for tracker %s does not exist.', identifier);
 end;
 
-tracker_label = [];
+tracker_label = identifier;
 tracker_interpreter = [];
 tracker_linkpath = {};
 tracker_trax = true;

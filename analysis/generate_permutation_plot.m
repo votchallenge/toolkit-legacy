@@ -64,13 +64,13 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
         end;
 
         if ~isempty(plot_title)
-            title([plot_title, '(normalized)'],'interpreter','none');
+            title([plot_title, '(normalized)'],'interpreter', 'none');
         end;
     end;
     
     plot_labels = cellfun(@(tracker) tracker.label, trackers, 'UniformOutput', 0);
     if show_legend
-        legend(plot_labels, 'Location', 'NorthEastOutside'); 
+        legend(plot_labels, 'Location', 'NorthEastOutside', 'interpreter', 'none'); 
     end;
     xlabel(type); 
     set(gca,'ytick', 1:numel(criteria),'yticklabel', criteria, 'YDir','Reverse', 'ylim', [0.9, numel(criteria)+0.1]);

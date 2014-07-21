@@ -37,9 +37,8 @@ for i = 1:size(identifiers, 1)
     end
 
     if ~valid_identifier(tracker_identifier)
-        print_debug('%s is not a valid tracker identifier. Skipping.', ...
+        print_debug('Warning: %s is not a valid tracker identifier.', ...
             tracker_identifier);
-        continue;
     end;
 
     trackers{i} = create_tracker(tracker_identifier);

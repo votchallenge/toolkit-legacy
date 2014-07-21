@@ -3,7 +3,7 @@ function hf = generate_ranking_plot(trackers, accuracy, robustness, plot_title, 
     hf = figure('Visible', 'off');
 
     hold on; box on; grid on;
-    title(plot_title,'interpreter','none');
+    title(plot_title, 'interpreter','none');
 
     available = true(length(trackers), 1);
 
@@ -19,7 +19,7 @@ function hf = generate_ranking_plot(trackers, accuracy, robustness, plot_title, 
 
     end;
     plot_labels = cellfun(@(tracker) tracker.label, trackers, 'UniformOutput', 0);
-    legend(plot_labels(available), 'Location', 'NorthWestOutside'); 
+    legend(plot_labels(available), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
     xlabel('Robustness rank'); set(gca,'XDir','Reverse');
     ylabel('Accuracy rank'); set(gca,'YDir','Reverse');
     xlim([1, plot_limit]); 

@@ -12,7 +12,7 @@ labels = {};
 ranks = nan(numel(experiments) * 3, numel(trackers));
 scores = nan(numel(experiments) * 2, numel(trackers));
 experiment_names = cellfun(@(x) x.name, experiments,'UniformOutput',false);
-tacker_labels = cellfun(@(x) x.label, trackers, 'UniformOutput', 0);
+tracker_labels = cellfun(@(x) x.label, trackers, 'UniformOutput', 0);
 
 index_fid = fopen(temporary_index_file, 'w');
 
@@ -62,13 +62,15 @@ for e = 1:numel(experiments)
 
     print_indent(1);
 
+	experiment_sequences = convert_sequences(sequences, experiment.converter);
+
     if isempty(labels)
 
-        aspects = create_sequence_aspects(experiment, tracker, sequences);
+        aspects = create_sequence_aspects(experiment, trackers, experiment_sequences);
         
     else
         
-        aspects = create_label_aspects(experiment, tracker, sequences, labels);
+        aspects = create_label_aspects(experiment, trackers, experiment_sequences, labels);
 
     end;
     
@@ -76,7 +78,15 @@ for e = 1:numel(experiments)
     
     print_text('Processing ...');
 
-    [accuracy, robustness, available] = trackers_ranking(experiment, trackers, sequences, aspects, 'usepractical', usepractical);
+    [accuracy, robustness, available] = trackers_ranking(experiment, trackers, experiment_sequences, aspects, 'usepractical', usepractical);
+
+	accuracy.average_ranks = accuracy.average_ranks(:, available);
+	accuracy.mu = accuracy.mu(:, available);
+	accuracy.std = accuracy.std(:, available);
+
+	robustness.average_ranks = robustness.average_ranks(:, available);
+	robustness.mu = robustness.mu(:, available);
+	robustness.std = robustness.std(:, available);
     
     if export_data
         
@@ -88,8 +98,8 @@ for e = 1:numel(experiments)
 
     print_text('Writing report ...');
 
-    report_file = generate_ranking_report(context, trackers(available), experiment, accuracy, robustness, ...
-         'SeriesLabels', aspects_labels, 'combineWeight', combine_weight, 'reporttemplate', template_file, ...
+    report_file = generate_ranking_report(context, trackers(available), experiment, aspects, accuracy, robustness, ...
+         'combineWeight', combine_weight, 'reporttemplate', template_file, ...
          'arplot', ar_plot, 'permutationplot', 0); %permutation_plot);
 
     fprintf(index_fid, '<h2>Experiment %s</h2>\n', experiment.name);
@@ -102,7 +112,7 @@ for e = 1:numel(experiments)
     scores(e * 2, available) = mean(robustness.mu);
     
     [~, order] = sort(ranks(e * 3, :), 'ascend');
-    print_average_ranks(index_fid, ranks(e * 3, order), tacker_labels(order));
+    print_average_ranks(index_fid, ranks(e * 3, order), tracker_labels(order));
     
     fprintf(index_fid, '<a href="%s" class="more">More information</a>\n', report_file);
 
@@ -113,7 +123,7 @@ ranks(isnan(ranks)) = size(ranks, 2);
 fprintf(index_fid, '<h2>Averaged</h2>\n');
 mean_ranks = mean(ranks(3:3:end, :), 1);
 [~, order] = sort(mean_ranks,'ascend')  ;
-print_average_ranks(index_fid, mean_ranks(order), tacker_labels(order));
+print_average_ranks(index_fid, mean_ranks(order), tracker_labels(order));
 
 if permutation_plot
 
@@ -194,7 +204,7 @@ if ~isempty(latex_fid)
         celldata{indices(3), i} = sprintf('\\third{%.2f}', celldata{indices(3), i});
     end;
     
-    matrix2latex(celldata, latex_fid, 'columnLabels', column_labels, 'rowLabels', strrep(tacker_labels(order), '_', '\_'), 'format', '%.2f', ...
+    matrix2latex(celldata, latex_fid, 'columnLabels', column_labels, 'rowLabels', strrep(tracker_labels(order), '_', '\_'), 'format', '%.2f', ...
             'prefix', prefix);
 
     fprintf(latex_fid, '\\end{table}\n');
@@ -211,13 +221,13 @@ delete(temporary_index_file);
 
 end
 
-function print_average_ranks(fid, ranks, tacker_labels )
+function print_average_ranks(fid, ranks, tracker_labels )
 
     table = cellfun(@(x) sprintf('%1.3g', x), num2cell(ranks), 'UniformOutput', 0);
 
     fprintf(fid, '<div class="table">');
     
-    matrix2html(table, fid, 'columnLabels', tacker_labels);
+    matrix2html(table, fid, 'columnLabels', tracker_labels);
 
     fprintf(fid, '</div>');
     

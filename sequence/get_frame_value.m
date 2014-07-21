@@ -9,11 +9,11 @@ end;
 
 if nargin == 2
     
-    region = sequence.values.data(value_index, :);
+    value = sequence.values.data(:, value_index);
     
 else
 
-	region = sequence.values.data(value_index, index);
+	value = sequence.values.data(index, value_index);
 
 end;
 
