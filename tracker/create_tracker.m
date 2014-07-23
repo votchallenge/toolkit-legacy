@@ -12,6 +12,7 @@ if exist(['tracker_' , identifier]) ~= 2 %#ok<EXIST>
     %error('Configuration for tracker %s does not exist.', identifier);
 end;
 
+tracker_metadata = struct([]);
 tracker_label = identifier;
 tracker_interpreter = [];
 tracker_linkpath = {};
@@ -43,4 +44,8 @@ performance_filename = fullfile(tracker.directory, 'performance.txt');
 
 if exist(performance_filename, 'file')
     tracker.performance = readstruct(benchmark_hardware(tracker));
+end;
+
+if isstruct(tracker_metadata)
+    tracker.metadata = tracker_metadata;
 end;
