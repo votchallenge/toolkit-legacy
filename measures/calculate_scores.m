@@ -1,6 +1,8 @@
 function [scores] = calculate_scores(tracker, sequences, result_directory)
 
-performance = readstruct(benchmark_hardware(tracker));
+if ~isfield(tracker, 'performance')
+    tracker.performance = readstruct(benchmark_hardware(tracker));
+end;
 
 scores = nan(length(sequences), 3);
 repeat = get_global_variable('repeat', 1);
@@ -12,6 +14,7 @@ for i = 1:length(sequences)
 
     accuracy = nan(repeat, 1);
     reliability = nan(repeat, 1);
+	failures = cell(repeat, 1);
 
     for j = 1:repeat
 
@@ -24,7 +27,7 @@ for i = 1:length(sequences)
         end;
 
         accuracy(j) = estimate_accuracy(trajectory, sequences{i}, 'burnin', burnin);
-        reliability(j) = estimate_failures(trajectory, sequences{i});
+        [reliability(j), failures{j}] = estimate_failures(trajectory, sequences{i});
 
     end;
 
@@ -38,7 +41,7 @@ for i = 1:length(sequences)
     average_speed = mean(times(:, valid), 1)';   
     reliability = reliability(valid);
  
-    average_speed = normalize_speed(average_speed, reliability, tracker, sequences{i}, performance);
+    average_speed = normalize_speed(average_speed, failures(valid), tracker, sequences{i});
 
     average_speed = mean(average_speed);    
 
@@ -51,5 +54,3 @@ for i = 1:length(sequences)
     scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability))), average_speed];
 
 end;
-
-
