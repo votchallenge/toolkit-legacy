@@ -45,7 +45,7 @@ function matrix2latex(matrix, filename, varargin)
     alignment = 'l';
 	prefix = [];
 	suffix = [];
-    format = [];
+    format = '%.2f';
     textsize = [];
     if (rem(nargin,2) == 1 || nargin < 2)
         error('Incorrect number of arguments to %s.', mfilename);
@@ -73,19 +73,16 @@ function matrix2latex(matrix, filename, varargin)
                         colLabels = cellstr(num2str(colLabels(:)));
                     end
                 case 3  % alignment
-                    alignment = lower(pval);
-                    if alignment == 'right'
-                        alignment = 'r';
-                    end
-                    if alignment == 'left'
-                        alignment = 'l';
-                    end
-                    if alignment == 'center'
-                        alignment = 'c';
-                    end
-                    if alignment ~= 'l' && alignment ~= 'c' && alignment ~= 'r'
-                        alignment = 'l';
-                        warning('Unkown alignment. (Set it to \''left\''.)');
+                    switch lower(pval);
+                        case 'right'
+                            alignment = 'r';
+                        case 'left'
+                            alignment = 'l';
+                        case 'center'
+                            alignment = 'c';
+                        otherwise
+                            alignment = 'l';
+                            warning('Unkown alignment. (Set it to \''left\''.)');
                     end
                 case 4  % format
                     format = lower(pval);
@@ -114,29 +111,22 @@ function matrix2latex(matrix, filename, varargin)
         matrix = num2cell(matrix);
         for h=1:height
             for w=1:width
-                if(~isempty(format))
-                    matrix{h, w} = num2str(matrix{h, w}, format);
-                else
-                    matrix{h, w} = num2str(matrix{h, w});
-                end
+            	matrix{h, w} = num2str(matrix{h, w}, format);
             end
         end
         
-    else
-        if iscell(matrix)
-            for h=1:height
-                for w=1:width
-                    if isnumeric(matrix{h, w})
-                        if(~isempty(format))
-                            matrix{h, w} = num2str(matrix{h, w}, format);
-                        else
-                            matrix{h, w} = num2str(matrix{h, w});
-                        end
-                    end;
-                end
+    elseif iscell(matrix)
+        for h=1:height
+            for w=1:width
+                if isnumeric(matrix{h, w})
+                    matrix{h, w} = num2str(matrix{h, w}, format);
+                elseif isstruct(matrix{h, w})
+                    matrix{h, w} = struct2latexstr(matrix{h, w}, format);
+                end;
             end
-        end;
-    end
+        end
+    end;
+
     
     if(~isempty(textsize))
         fprintf(fid, '\\begin{%s}', textsize);
@@ -192,3 +182,23 @@ function matrix2latex(matrix, filename, varargin)
     if (close_file)
         fclose(fid);
     end;
+end
+
+function str = struct2latexstr(s, format)
+
+    if ~isfield(s, 'text')
+        str = '';
+        return;
+    end;
+
+    if isnumeric(s.text)
+        str = num2str(s.text, format);
+    else
+        str = s.text;
+    end;
+    
+    if isfield(s, 'class')
+        str = sprintf('\\%s{%s}', s.class, str);
+    end
+
+end
