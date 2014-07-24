@@ -14,7 +14,7 @@ if strcmpi(tracker.interpreter, 'matlab')
     if isfield(performance, 'matlab_startup')
         startup = performance.matlab_startup;
     else
-        model = get_global_variable('performance.matlab_startup_model', []);
+        model = get_global_variable('matlab_startup_model', []);
 		if ~isempty(model)
 			startup = model(1) * performance.reading + model(2);
 		end;
