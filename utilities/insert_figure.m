@@ -21,6 +21,13 @@ switch lower(format)
         fprintf(fid, ...
             '<p class="plot"><img src="%s/%s%s.png" alt="%s" /><span class="caption">%s</span></p>\n', ...
             context.imagesurl, context.prefix, id, title, title);
+    case 'latex'
+        export_figure(hf, fullfile(context.images, [context.prefix, id]), 'eps', 'cache', cache);
+        
+        fprintf(fid, ...
+            '\\begin{figure}\\centering\\includegraphics{%s/%s%s.eps}\\caption{%s}\\end{figure}\n', ...
+            context.imagesurl, context.prefix, id, title);        
+        
     case 'data'
         
         file = export_figure(hf, fullfile(context.data, [context.prefix, id]), 'fig', 'cache', cache);
