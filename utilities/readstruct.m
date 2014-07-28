@@ -11,6 +11,8 @@ s = struct();
 for i = 1:numel(lines)
 	[key, value] = parse_line(lines{i});
 
+	key = strrep(strrep(strrep(key, '.', '_'), ' ', '_'), '-', '_');
+
 	if ~isempty(key)
 		s.(key) = value;
 	end
