@@ -4,7 +4,7 @@ if ~isfield(tracker, 'performance')
     tracker.performance = readstruct(benchmark_hardware(tracker));
 end;
 
-scores = nan(length(sequences), 3);
+scores = nan(length(sequences), 4);
 repeat = get_global_variable('repeat', 1);
 burnin = get_global_variable('burnin', 0);
 
@@ -41,16 +41,19 @@ for i = 1:length(sequences)
     average_speed = mean(times(:, valid), 1)';   
     reliability = reliability(valid);
  
-    average_speed = normalize_speed(average_speed, failures(valid), tracker, sequences{i});
+    [normalized_speed, actual_speed] = normalize_speed(average_speed, failures(valid), tracker, sequences{i});
 
-    average_speed = mean(average_speed);    
+    normalized_speed = mean(normalized_speed);
+    actual_speed = mean(actual_speed);
 
-    if isnan(average_speed) || average_speed == 0
-        average_speed = NaN;
+    if isnan(normalized_speed) || normalized_speed == 0
+        normalized_speed = NaN;
+        actual_speed = NaN;
     else
-        average_speed = 1 / average_speed;
+        normalized_speed = 1 / normalized_speed;
+        actual_speed = 1 / actual_speed;
     end;
     
-    scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability))), average_speed];
+    scores(i, :) = [mean(accuracy(~isnan(accuracy))), mean(reliability(~isnan(reliability))), normalized_speed, actual_speed];
 
 end;

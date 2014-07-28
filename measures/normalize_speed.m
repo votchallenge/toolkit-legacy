@@ -1,4 +1,4 @@
-function [nspeed] = normalize_speed(speed, failures, tracker, sequence)
+function [normalized_speed, actual_speed] = normalize_speed(speed, failures, tracker, sequence)
 
 if ~isfield(tracker, 'performance')
     error('Tracker %s has no performance profile, unable to normalize speed.', tracker.identifier);
@@ -33,4 +33,5 @@ else
 	startup_time = startup * (1 + failure_count);
 end;
 
-nspeed = (((speed .* full_length) - startup_time) ./ actual_length) / factor;
+actual_speed = (((speed .* full_length) - startup_time) ./ actual_length);
+normalized_speed = actual_speed / factor;
