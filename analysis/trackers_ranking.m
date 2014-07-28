@@ -41,24 +41,25 @@ for a = 1:length(aspects)
     adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA) ;
     adapted_robustness_ranks = adapted_ranks(robustness_ranks, HR) ;   
     
+    % mask out results that are not available
 	adapted_accuracy_ranks(~available) = nan;
 	adapted_robustness_ranks(~available) = nan;
 
     % write results to output structures
-    accuracy.mu(a, :) = average_accuracy.mu ;
-    accuracy.std(a, :) = average_accuracy.std ;
-    accuracy.ranks(a, :) = adapted_accuracy_ranks ;
-  
-    robustness.mu(a, :) = average_robustness.mu ;
-    robustness.std(a, :) = average_robustness.std ;        
-    robustness.ranks(a, :) = adapted_robustness_ranks ;
+    accuracy.mu(a, :) = average_accuracy.mu;
+    accuracy.std(a, :) = average_accuracy.std;
+    accuracy.ranks(a, :) = adapted_accuracy_ranks;
+    robustness.mu(a, :) = average_robustness.mu;
+    robustness.std(a, :) = average_robustness.std;        
+    robustness.ranks(a, :) = adapted_robustness_ranks;
     
 	print_indent(-1);
 
 end
 
-accuracy.average_ranks = mean(accuracy.ranks,1) ;
-robustness.average_ranks = mean(robustness.ranks,1) ;
+% TODO: remove average ranks, this can be computed later
+accuracy.average_ranks = mean(accuracy.ranks, 1) ;
+robustness.average_ranks = mean(robustness.ranks, 1) ;
 
 end
 

@@ -24,7 +24,7 @@ end;
 
 script_directory = fileparts(mfilename('fullpath'));
 include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-    'analysis', 'tracker', 'sequence', 'measures', 'experiment'}, 'UniformOutput', false); 
+    'analysis', 'tracker', 'sequence', 'measures', 'experiment' ,'report'}, 'UniformOutput', false); 
 addpath(include_dirs{:});
 
 initialize_defaults;
