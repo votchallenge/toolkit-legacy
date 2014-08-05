@@ -1,11 +1,14 @@
 function [styled_trackers] = set_trackers_visual_identity(trackers, varargin)
 
 groups = [];
+offset = 0;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'groups'
-            groups = varargin{i+1};          
+            groups = varargin{i+1}; 
+        case 'offset'
+            offset = varargin{i+1};
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -26,7 +29,17 @@ else
     colors = repmat(hsv(7), ceil(length(trackers) / 7), 1);
 end
 
-symbol = repmat({'o', 'x', '*', 'v', 'd', '+', '<', 'p', '>'}, 1, ceil(length(trackers) / 9));
+symbols = {'o', 'x', '*', 'v', 'd', '+', '<', 'p', '>'};
+
+if offset ~= 0
+   offset_symbols = mod(offset, length(symbols));
+   symbols = {symbols{offset_symbols+1:end}, symbols{1:offset_symbols}};
+   
+   offset_colors = mod(offset, length(colors));
+   colors = cat(1, colors(offset_colors+1:end, :), colors(1:offset_colors, :));
+end
+
+symbol = repmat(symbols, 1, ceil(length(trackers) / 9));
 width = mod(1:length(trackers), 5) / 5 + 1.5;
 
 styled_trackers = cell(length(trackers), 1);

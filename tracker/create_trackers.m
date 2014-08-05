@@ -45,5 +45,3 @@ for i = 1:size(identifiers, 1)
     trackers{i} = create_tracker(tracker_identifier);
 
 end;
-
-trackers = set_trackers_visual_identity(trackers);
