@@ -12,7 +12,7 @@ end
 
 if burnin > 0
     
-    stack = get_global_variable('stack', 'vot2013');
+    stack = get_global_variable('stack', 'vot2014');
     
     if strcmp('vot2013', stack)    
         mask = cellfun(@(r) numel(r) == 1 || r(4) == -1, trajectory, 'UniformOutput', true);    
