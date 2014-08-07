@@ -129,8 +129,6 @@ for e = 1:numel(experiments)
     print_indent(-1);
 
     print_text('Writing report ...');
-
-    keyboard;
     
     if isempty(additional_trackers) 
         report_file = generate_ranking_report(context, trackers(available), experiment, aspects, accuracy, robustness, ...
