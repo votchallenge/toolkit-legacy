@@ -12,7 +12,13 @@ end
 
 if burnin > 0
     
-    mask = cellfun(@(r) numel(r) == 1 && r == 1, trajectory, 'UniformOutput', true);
+    stack = get_global_variable('stack', 'vot2013');
+    
+    if strcmp('vot2013', stack)    
+        mask = cellfun(@(r) numel(r) == 1 || r(4) == -1, trajectory, 'UniformOutput', true);    
+    else
+        mask = cellfun(@(r) numel(r) == 1 && r == 1, trajectory, 'UniformOutput', true);
+    end
 
     if is_octave()
         se = logical([zeros(burnin - 1, 1); ones(burnin, 1)]);
