@@ -32,11 +32,11 @@ for a = 1:length(aspects)
 	print_indent(1);
 
 	print_text('Processing aspect %s ...', aspects{a}.name);
-
+    
     % rank trackers and calculate statistical significance of differences
     [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = ...
         trackers_ranking_aspect(experiment, trackers, sequences, aspects{a}, 'alpha', alpha, 'usepractical', usepractical);
-    
+        
     % get adapted ranks
     adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA) ;
     adapted_robustness_ranks = adapted_ranks(robustness_ranks, HR) ;   

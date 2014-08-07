@@ -30,6 +30,7 @@ permutation_args = {}; %'legend', 1, 'width' 4, 'height', 4};
 ranking_permutation_args = {'flip', 1};
 
 usepractical = false;
+additional_trackers = {};
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
@@ -49,10 +50,21 @@ for i = 1:2:length(varargin)
             export_data = varargin{i+1} ;              
         case 'usepractical'
             usepractical = varargin{i+1} ;  
+        case 'additionaltrackers'
+            additional_trackers = varargin{i+1};
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
 end 
+
+if ~isempty(additional_trackers)
+    ranks = nan(numel(experiments) * 3, numel(trackers) + numel(additional_trackers));
+    scores = nan(numel(experiments) * 2, numel(trackers) + numel(additional_trackers));
+    
+    a_tracker_labels = ...
+        cellfun(@(x) sprintf('<span style="color: red">%s</span>', x.label), additional_trackers, 'UniformOutput', 0);
+    tracker_labels = cat(1, tracker_labels, a_tracker_labels);
+end
 
 for e = 1:numel(experiments)
 
@@ -73,18 +85,40 @@ for e = 1:numel(experiments)
         aspects = create_label_aspects(experiment, trackers, experiment_sequences, labels);
 
     end;
-    
+        
     print_text('Processing ...');
 
     [accuracy, robustness, available] = trackers_ranking(experiment, trackers, experiment_sequences, aspects, 'usepractical', usepractical);
 
 	accuracy.average_ranks = accuracy.average_ranks(:, available);
+    accuracy.ranks = accuracy.ranks(:, available);
 	accuracy.mu = accuracy.mu(:, available);
 	accuracy.std = accuracy.std(:, available);
 
 	robustness.average_ranks = robustness.average_ranks(:, available);
+    robustness.ranks = robustness.ranks(:, available);
 	robustness.mu = robustness.mu(:, available);
 	robustness.std = robustness.std(:, available);
+    
+    if ~isempty(additional_trackers)        
+        %%% Additional trackers
+        % Additional trackers will be ploted with regular trackers, but
+        % ranks are computed only for regular trackers, otherwise
+        % additional trackers would have changed the ranking.
+        
+        print_text('Starting additional tracker analysis ...');
+        print_indent(1);
+        
+        % Get data for each frame in each sequence
+        if isempty(labels)
+            additional_aspects = create_sequence_aspects(experiment, additional_trackers, experiment_sequences); 
+        else
+            additional_aspects = create_label_aspects(experiment, additional_trackers, experiment_sequences, labels);
+        end            
+        
+        [additional_accuracy, additional_robustness, additional_available] = ...
+            compare_additional_trackers(experiment, additional_trackers, additional_aspects, available, accuracy, robustness, experiment_sequences);
+    end
     
     if export_data
         
@@ -96,11 +130,38 @@ for e = 1:numel(experiments)
 
     print_text('Writing report ...');
 
-    report_file = generate_ranking_report(context, trackers(available), experiment, aspects, accuracy, robustness, ...
-         'combineWeight', combine_weight, 'reporttemplate', template_file, ...
-         'arplot', ar_plot, 'permutationplot', 0); %permutation_plot);
+    keyboard;
+    
+    if isempty(additional_trackers) 
+        report_file = generate_ranking_report(context, trackers(available), experiment, aspects, accuracy, robustness, ...
+             'combineWeight', combine_weight, 'reporttemplate', template_file, ...
+             'arplot', ar_plot, 'permutationplot', 0); %permutation_plot);
+    else
+        additional_packed = {additional_trackers(additional_available), additional_accuracy, additional_robustness};
+        
+        report_file = generate_ranking_report(context, trackers(available), experiment, aspects, accuracy, robustness, ...
+             'combineWeight', combine_weight, 'reporttemplate', template_file, ...
+             'arplot', ar_plot, 'permutationplot', 0, ... %permutation_plot
+             'additionaltrackers', additional_packed);
+    end     
 
     fprintf(index_fid, '<h2>Experiment %s</h2>\n', experiment.name);
+    
+    if ~isempty(additional_trackers)
+       accuracy.average_ranks = cat(2, accuracy.average_ranks, additional_accuracy.average_ranks);
+       robustness.average_ranks = cat(2, robustness.average_ranks, additional_robustness.average_ranks);
+       
+       accuracy.mu = cat(2, accuracy.mu, additional_accuracy.mu);
+       robustness.mu = cat(2, robustness.mu, additional_robustness.mu);
+       
+       accuracy.std = cat(2, accuracy.std, additional_accuracy.std);
+       robustness.std = cat(2, robustness.std, additional_robustness.std);
+       
+       accuracy.ranks = cat(2, accuracy.ranks, additional_accuracy.ranks);
+       robustness.ranks = cat(2, robustness.ranks, additional_robustness.ranks);
+       
+       available = cat(1, available, additional_available);
+    end
            
     ranks(e * 3 - 2, available) = accuracy.average_ranks;
     ranks(e * 3 - 1, available) = robustness.average_ranks;
@@ -127,7 +188,8 @@ if permutation_plot
 
     fprintf(index_fid, '<h2>Ranking permutations</h2>\n');    
             
-    h = generate_permutation_plot(trackers, ranks(1:3:end, :), experiment_names, permutation_args{:}, ranking_permutation_args{:});
+    h = generate_permutation_plot(trackers, ranks(1:3:end, :), experiment_names, ...
+        permutation_args{:}, ranking_permutation_args{:}, 'additionaltrackers', additional_trackers);
 
     insert_figure(context, index_fid, h, 'permutation_accuracy', 'Ranking permutations for accuracy rank');
     
@@ -135,7 +197,8 @@ if permutation_plot
         insert_figure(context, 0, h, 'permutation_accuracy', 'Ranking permutations for accuracy rank', 'format', 'data');
     end;    
     
-    h = generate_permutation_plot(trackers, ranks(2:3:end, :), experiment_names, permutation_args{:}, ranking_permutation_args{:});
+    h = generate_permutation_plot(trackers, ranks(2:3:end, :), ...
+        experiment_names, permutation_args{:}, ranking_permutation_args{:}, 'additionaltrackers', additional_trackers);
 
     insert_figure(context, index_fid, h, 'permutation_robustness', 'Ranking permutations for robustness rank');
             
@@ -163,7 +226,8 @@ if permutation_plot
 % 
 % %--
     
-    h = generate_permutation_plot(trackers, ranks(3:3:end, :), experiment_names, permutation_args{:}, ranking_permutation_args{:}); 
+    h = generate_permutation_plot(trackers, ranks(3:3:end, :), experiment_names, ...
+        permutation_args{:}, ranking_permutation_args{:}, 'additionaltrackers', additional_trackers); 
 
     insert_figure(context, index_fid, h, 'permutation_combined', 'Ranking permutations for combined rank');
     
