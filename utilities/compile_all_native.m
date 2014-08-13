@@ -1,4 +1,4 @@
-function output_path = compile_all_native(output_path)
+function compile_all_native(output_path)
 
 toolkit_path = get_global_variable('toolkit_path');
 
@@ -45,17 +45,20 @@ trax_header = fullfile(trax_path, 'lib', 'trax.h');
 
 if ~exist(trax_header, 'file')
     print_text('Downloading TraX source from "%s". Please wait ...', trax_url);
+    working_directory = tempname;
+    mkdir(working_directory);
     bundle = [tempname, '.zip'];
     try
         urlwrite(trax_url, bundle);
-        unzip(bundle, fileparts(trax_path));
+        unzip(bundle, working_directory);
 		delete(bundle);
-        movefile(fullfile(fileparts(trax_path), 'trax-master'), trax_path);
+        movefile(fullfile(working_directory, 'trax-master'), trax_path);
         success = true;
     catch
         print_text('Unable to retrieve TraX source code.');
         success = false;
     end;
+    recursive_rmdir(working_directory);
 else
     print_debug('TraX source code already present.');
     success = true;
