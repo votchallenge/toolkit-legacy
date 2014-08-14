@@ -1,11 +1,14 @@
 function hf = generate_ranking_plot(trackers, accuracy, robustness, plot_title, plot_limit, varargin)
 
 additional_data = {};
+display_numbers = 0;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})        
         case 'additionaltrackers'
-            additional_data = varargin{i+1};                        
+            additional_data = varargin{i+1};  
+        case 'displaynumbers'
+            display_numbers = varargin{i+1}; 
         otherwise
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -18,8 +21,9 @@ end
 
     available = true(length(trackers), 1);
 
+    
+    % Plot regular trackers
     for t = 1:length(trackers)
-
         if isnan(accuracy(t))
             available(t) = 0;
             continue;
@@ -30,6 +34,8 @@ end
     end;
     plot_labels = cellfun(@(tracker) tracker.label, trackers, 'UniformOutput', 0);
     
+    
+    % Plot additional trackers
     if ~isempty(additional_data)
         a_trackers = additional_data{1};
         a_accuracy = additional_data{2};
@@ -50,6 +56,39 @@ end
         plot_labels = cat(1, plot_labels, a_plot_labels);
         available = cat(1, available, a_available);
     end    
+    
+    % Label trackers with numbers
+    if display_numbers
+        for t = 1:length(trackers)    
+            if isnan(accuracy(t))                
+                continue;
+            end;
+            text(robustness(t) - 0.75, accuracy(t),...
+                ['\bf' num2str(t)], ...
+                'VerticalAlignment','bottom',...
+                'HorizontalAlignment','center',...
+                'FontSize',7);
+
+            plot_labels{t} = sprintf('%d - %s', t, trackers{t}.label);
+        end
+        
+        if ~isempty(additional_data)
+            for t = 1:length(a_trackers)    
+                if isnan(a_accuracy(t))                
+                    continue;
+                end;
+                tracker_number = t + sum(available) - sum(a_available);
+                text(a_robustness(t) - 0.75, a_accuracy(t),...
+                    ['\bf' num2str(tracker_number)], ...
+                    'VerticalAlignment','bottom',...
+                    'HorizontalAlignment','center',...
+                    'FontSize',7);
+
+                plot_labels{tracker_number} = sprintf('%d - %s', tracker_number, a_trackers{t}.label);
+            end
+        end
+    end
+    
     hLegend = legend(plot_labels(available), 'Location', 'NorthWestOutside', 'interpreter', 'none', 'FontSize', 9); 
     
     if ~isempty(additional_data)
