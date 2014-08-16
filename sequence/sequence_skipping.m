@@ -11,7 +11,7 @@ mask = mod(indices, skip + keep);
 indices = indices(mask > 0 & mask < (keep + 1));
 
 skipped_sequence.groundtruth = sequence.groundtruth(indices, :);
-
+skipped_sequence.indices = sequence.indices(indices, :);
 skipped_sequence.labels.names = sequence.labels.names;
 skipped_sequence.labels.data = sequence.labels.data(indices, :);
 

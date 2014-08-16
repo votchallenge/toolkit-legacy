@@ -47,6 +47,8 @@ while true
 	sequence.length = sequence.length + 1;
 end;
 
+sequence.indices = 1:sequence.length;
+
 sequence.length = min(sequence.length, numel(sequence.groundtruth));
 
 if sequence.length < 1
