@@ -2,11 +2,10 @@ function [accuracy, frames] = estimate_accuracy(trajectory, sequence, varargin)
 
 burnin = 0;
 
-args = varargin;
-for j=1:2:length(args)
+for j=1:2:length(varargin)
     switch varargin{j}
-        case 'burnin', burnin = max(0, args{j+1});
-        otherwise, error(['unrecognized argument ' args{j}]);
+        case 'burnin', burnin = max(0, varargin{j+1});
+        otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
 

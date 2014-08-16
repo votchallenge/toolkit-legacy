@@ -49,7 +49,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");
 
 	for (int i = 0; i < 2; i++) {
-
+        // TODO: accept integer for special frames
 		if (mxGetClassID(prhs[i]) != mxDOUBLE_CLASS)
 			mexErrMsgTxt("All input arguments must be of type double");
 	
