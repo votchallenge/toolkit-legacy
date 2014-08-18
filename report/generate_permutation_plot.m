@@ -5,7 +5,7 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
     width = 9;
     height = max(3, numel(trackers) / 3);
     scope = [1, numel(trackers)];
-    scope_edited = false;
+    scope_custom = false;
     type = 'Rank';
     flip = 0;
     show_legend = 1;
@@ -23,7 +23,7 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
                 height = varargin{i+1};
             case 'scope'
                 scope = varargin{i+1};                
-                scope_edited = true;
+                scope_custom = true;
             case 'type'
                 type = varargin{i+1};
             case 'flip'
@@ -37,7 +37,7 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
         end
     end 
 
-    if ~isempty(additional_trackers) && ~scope_edited
+    if ~isempty(additional_trackers) && ~scope_custom
         scope = [1, numel(trackers) + numel(additional_trackers)];
     end
     
