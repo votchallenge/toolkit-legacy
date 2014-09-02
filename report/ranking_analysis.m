@@ -50,8 +50,11 @@ for i = 1:2:length(varargin)
             export_data = varargin{i+1} ;              
         case 'usepractical'
             usepractical = varargin{i+1} ;  
-        case 'additionaltrackers'
+        case 'additionaltrackers'            
             additional_trackers = varargin{i+1};
+            merged = set_trackers_visual_identity(cat(1, trackers, additional_trackers));
+            trackers = merged(1:length(trackers));
+            additional_trackers = merged(end-length(additional_trackers)+1:end);
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
