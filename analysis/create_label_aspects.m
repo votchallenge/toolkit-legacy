@@ -38,7 +38,7 @@ function [A, R] = aggregate_for_label(experiment, tracker, sequences, label, cac
 
         filter = query_label(sequences{s}, label);
 
-        if isempty(filter) | ~any(filter)
+        if isempty(filter) || ~any(filter)
             continue;
         end;
         
@@ -89,14 +89,11 @@ function [A, R] = aggregate_for_label(experiment, tracker, sequences, label, cac
     end
 
     if cache
-		save(cache_file, 'A', 'R');
-	end;
+        save(cache_file, 'A', 'R');
+    end;
 end
 
 function [count] = count_for_label(sequences, label)
-
-    A = [];
-    R = [];
 
 	count = 0;
 
@@ -108,7 +105,7 @@ function [count] = count_for_label(sequences, label)
             continue;
         end;
         
-		count = count + sum(filter);
+		count = count + numel(filter);
 
     end
 end
@@ -129,7 +126,7 @@ function practical = practical_for_label(sequences, label)
         p = get_frame_value(sequences{s}, 'practical', filter);
 
         if ~isempty(p)
-            practical = [practical; p];
+            practical = [practical; p]; %#ok<AGROW>
         end;
         
     end;

@@ -1,14 +1,12 @@
 function [index_file] = ar_analysis(context, trackers, sequences, experiments, varargin)
 
-repeat = get_global_variable('repeat', 1);
-burnin = get_global_variable('burnin', 0);
-
 index_file = sprintf('%sarplots.html', context.prefix);
 temporary_index_file = tempname;
 template_file = fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html');
 
 index_fid = fopen(temporary_index_file, 'w');
 latex_fid = [];
+sensitivity = 30;
 
 labels = {};
 
@@ -22,6 +20,8 @@ for i = 1:2:length(varargin)
             labels = varargin{i+1} ;
         case 'index'
             index_file = varargin{i+1} ;
+        case 'sensitivity'
+            sensitivity = varargin{i+1} ;            
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -51,17 +51,17 @@ for e = 1:numel(experiments)
 
 	end;
 
-    aspects_labels = cellfun(@(x) x.title, aspects, 'UniformOutput', 0);
+    accuracy = nan(numel(aspects), numel(trackers));
+    robustness = nan(numel(aspects), numel(trackers));
 
+    repeat = get_global_variable('repeat', 1);
+    
     for s = 1:length(aspects)
 
         print_indent(1);
 
         print_text('Processing aspect %s ...', aspects{s}.name);
-
-        accuracy = nan(1, length(trackers));
-        robustness = nan(1, length(trackers));
-                
+   
         for t = 1:length(trackers)
 
             print_indent(1);
@@ -70,16 +70,19 @@ for e = 1:numel(experiments)
 
 	        valid_frames = ~isnan(A) ;
 
-	        accuracy(t) = mean(A(valid_frames));
-	        robustness(t) = mean(R);
+	        accuracy(s, t) = mean(A(valid_frames));
+            
+            R = sum(reshape(R, repeat, length(R) / repeat), 2);
+            
+	        robustness(s, t) = mean(R);
 
             print_indent(-1);
 
         end;
 
-		robustness = robustness ./ aspects{s}.length(experiment_sequences);
+		robustness(s, :) = robustness(s, :) ./ aspects{s}.length(experiment_sequences);
 
-        hf = generate_ar_plot(trackers, accuracy, robustness);
+        hf = generate_ar_plot(trackers, accuracy(s, :), robustness(s, :), 'sensitivity', sensitivity);
         
         insert_figure(context, index_fid, hf, sprintf('arplot_%s_%s', ...
             experiment.name, aspects{s}.name), ...
@@ -89,6 +92,11 @@ for e = 1:numel(experiments)
 
     end;
 
+    hf = generate_ar_plot(trackers, mean(accuracy), mean(robustness), 'sensitivity', sensitivity);
+
+    insert_figure(context, index_fid, hf, sprintf('arplot_%s', ...
+        experiment.name), ...
+        sprintf('Experiment %s', experiment.name));
 
     print_indent(-1);
 

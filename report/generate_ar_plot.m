@@ -83,7 +83,7 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
         legend(tracker_labels(available), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
     end;
     
-    xlabel(sprintf('Reliability (S = %d)', sensitivity));
+    xlabel(sprintf('Reliability (S = %.2f)', sensitivity));
     ylabel('Accuracy');
     xlim([0, 1]); 
     ylim([0, 1]);
