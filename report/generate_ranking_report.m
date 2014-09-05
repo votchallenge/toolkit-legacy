@@ -7,6 +7,10 @@ ar_plot = 0;
 permutation_plot = 0;
 combine_weight = 0.5 ;
 
+additional_trackers = {};
+additional_accuracy = {};
+additional_robustness = {};
+
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'reporttemplate'
@@ -16,7 +20,11 @@ for i = 1:2:length(varargin)
         case 'arplot'
             ar_plot = varargin{i+1};
         case 'permutationplot'
-            permutation_plot = varargin{i+1};         
+            permutation_plot = varargin{i+1};  
+        case 'additionaltrackers'
+            additional_trackers = varargin{i+1}{1};  
+            additional_accuracy = varargin{i+1}{2};
+            additional_robustness = varargin{i+1}{3};
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -44,6 +52,26 @@ robustness_raw = robustness.mu;
 
 average_accuracy_ranks = accuracy.average_ranks;
 average_robustness_ranks = robustness.average_ranks;
+
+if ~isempty(additional_trackers)
+    a_tracker_labels = cellfun(@(x) sprintf('<span style="color: red">%s</span>',x.label), additional_trackers, 'UniformOutput', 0);
+    
+    t_labels_acc = cat(1, tracker_labels, a_tracker_labels);
+    t_labels_rob = cat(1, tracker_labels, a_tracker_labels);
+    t_labels_merg = cat(1, tracker_labels, a_tracker_labels);
+    
+    accuracy.mu = cat(2, accuracy.mu, additional_accuracy.mu);
+    accuracy.std = cat(2, accuracy.std, additional_accuracy.std);
+    accuracy.ranks = cat(2, accuracy.ranks, additional_accuracy.ranks);
+    accuracy.average_ranks = cat(2, accuracy.average_ranks, additional_accuracy.average_ranks);
+    
+    robustness.mu = cat(2, robustness.mu, additional_robustness.mu);
+    robustness.std = cat(2, robustness.std, additional_robustness.std); 
+    robustness.ranks = cat(2, robustness.ranks, additional_robustness.ranks);
+    robustness.average_ranks = cat(2, robustness.average_ranks, additional_robustness.average_ranks);
+    
+    merged_ranks = accuracy.average_ranks * combine_weight + robustness.average_ranks * (1 - combine_weight);
+end
 
 % sort accuracy and robustness by their average ranks
 [~, order_by_ranks_acc]  =  sort(accuracy.average_ranks,'ascend')  ;
@@ -118,7 +146,16 @@ if ar_plot
         sprintf('Experiment %s', experiment.name), length(trackers));
 
     insert_figure(context, fid, h, sprintf('ranking_%s', experiment.name), ...
-        sprintf('Ranking AR-plot for %s', experiment.name));        
+        sprintf('Ranking AR-plot for %s', experiment.name)); 
+    
+    if ~isempty(additional_trackers)    
+        h = generate_ranking_plot(trackers, average_accuracy_ranks, average_robustness_ranks, ...
+            sprintf('Experiment %s', experiment.name), length(trackers), ...
+            'additionaltrackers', {additional_trackers, additional_accuracy.average_ranks, additional_robustness.average_ranks});
+        
+        insert_figure(context, fid, h, sprintf('additional_ranking_%s', experiment.name), ...
+            sprintf('Ranking AR-plot with additional trackers for %s', experiment.name));
+    end
 
 end;
 

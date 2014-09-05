@@ -24,4 +24,3 @@ documents = {ranking_index, 'Tracker ranking', 'The official ranking analysis'; 
     ar_index, 'A-R plots', 'Results visualized as A-R plots'};
 
 generate_index(context, documents);
-
