@@ -1,4 +1,4 @@
-function [accuracy, robustness, available] = trackers_ranking(experiment, trackers, sequences, aspects, varargin)
+function [accuracy, robustness, available] = trackers_ranking(experiment, trackers, sequences, selectors, varargin)
 
 alpha = 0.05 ;
 usepractical = false;
@@ -15,27 +15,27 @@ for i = 1:2:length(varargin)
 end
 
 N_trackers = length(trackers) ;
-N_aspects = length(aspects) ;
+N_selectors = length(selectors) ;
 
 % initialize accuracy outputs
-accuracy.mu = zeros(N_aspects, N_trackers) ;
-accuracy.std = zeros(N_aspects, N_trackers) ;
-accuracy.ranks = zeros(N_aspects, N_trackers) ;
+accuracy.mu = zeros(N_selectors, N_trackers) ;
+accuracy.std = zeros(N_selectors, N_trackers) ;
+accuracy.ranks = zeros(N_selectors, N_trackers) ;
 
 % initialize robustness outputs
-robustness.mu = zeros(N_aspects, N_trackers) ;
-robustness.std = zeros(N_aspects, N_trackers) ;
-robustness.ranks = zeros(N_aspects, N_trackers) ;
+robustness.mu = zeros(N_selectors, N_trackers) ;
+robustness.std = zeros(N_selectors, N_trackers) ;
+robustness.ranks = zeros(N_selectors, N_trackers) ;
 
-for a = 1:length(aspects)
+for a = 1:length(selectors)
     
 	print_indent(1);
 
-	print_text('Processing aspect %s ...', aspects{a}.name);
+	print_text('Processing selector %s ...', selectors{a}.name);
 
     % rank trackers and calculate statistical significance of differences
     [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = ...
-        trackers_ranking_aspect(experiment, trackers, sequences, aspects{a}, 'alpha', alpha, 'usepractical', usepractical);
+        trackers_ranking_selector(experiment, trackers, sequences, selectors{a}, 'alpha', alpha, 'usepractical', usepractical);
     
     % get adapted ranks
     adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA) ;
@@ -63,7 +63,7 @@ robustness.average_ranks = mean(robustness.ranks, 1) ;
 
 end
 
-function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = trackers_ranking_aspect(experiment, trackers, sequences, aspect, varargin)
+function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = trackers_ranking_selector(experiment, trackers, sequences, selector, varargin)
 
     alpha = 0.05 ;
     usepractical = false;
@@ -94,7 +94,7 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
     available = true(length(trackers), 1);
     
     if usepractical        
-        practical = aspect.practical(sequences);
+        practical = selector.practical(sequences);
     else
         practical = [];
     end
@@ -106,7 +106,7 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
 		print_text('Processing tracker %s ...', trackers{t1}.identifier);
 
             if isempty(cacheA{t1})
-                [A1, R1] = aspect.aggregate(experiment, trackers{t1}, sequences);
+                [A1, R1] = selector.aggregate(experiment, trackers{t1}, sequences);
                 cacheA{t1} = A1; cacheR{t1} = R1;
             else
                 A1 = cacheA{t1}; R1 = cacheR{t1};
@@ -131,14 +131,14 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
         for t2 = t1+1:length(trackers)
         
             if isempty(cacheA{t1})
-                [A1, R1] = aspect.aggregate(experiment, trackers{t1}, sequences);
+                [A1, R1] = selector.aggregate(experiment, trackers{t1}, sequences);
                 cacheA{t1} = A1; cacheR{t1} = R1;
             else
                 A1 = cacheA{t1}; R1 = cacheR{t1};
             end;
 
             if isempty(cacheA{t2})
-                [A2, R2] = aspect.aggregate(experiment, trackers{t2}, sequences);
+                [A2, R2] = selector.aggregate(experiment, trackers{t2}, sequences);
                 cacheA{t2} = A2; cacheR{t2} = R2;
             else
                 A2 = cacheA{t2}; R2 = cacheR{t2};

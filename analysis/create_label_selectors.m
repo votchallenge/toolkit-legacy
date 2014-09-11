@@ -1,6 +1,6 @@
-function aspects = create_label_aspects(experiment, tracker, sequences, labels) %#ok<INUSL>
+function selectors = create_label_selectors(experiment, tracker, sequences, labels) %#ok<INUSL>
 
-    aspects = cellfun(@(label) struct('name', sprintf('label_%s', label), ...
+    selectors = cellfun(@(label) struct('name', sprintf('label_%s', label), ...
         'title', label, ...
         'aggregate', @(experiment, tracker, sequences) ...
         aggregate_for_label(experiment, tracker, sequences, label, true), ...
@@ -9,10 +9,10 @@ function aspects = create_label_aspects(experiment, tracker, sequences, labels) 
 
 end
 
-function [A, R] = aggregate_for_label(experiment, tracker, sequences, label, cache)
+function [average_overlap, average_failures] = aggregate_for_label(experiment, tracker, sequences, label, cache)
 
-    A = [];
-    R = [];
+    average_overlap = [];
+    average_failures = [];
 
     cache_directory = fullfile(get_global_variable('directory'), 'cache', 'labels', experiment.name, label);    
     mkpath(cache_directory);
@@ -21,7 +21,7 @@ function [A, R] = aggregate_for_label(experiment, tracker, sequences, label, cac
         
     if exist(cache_file, 'file') && cache
 		load(cache_file);
-		if ~isempty(A) && ~isempty(R)
+		if ~isempty(average_overlap) && ~isempty(average_failures)
 			return;
 		end;
 	end;
@@ -79,17 +79,17 @@ function [A, R] = aggregate_for_label(experiment, tracker, sequences, label, cac
         sequence_failures = failures';
 
         if ~isempty(sequence_overlaps)
-            A = [A, sequence_overlaps];
+            average_overlap = [average_overlap, sequence_overlaps];
         end;
         
         if ~isempty(sequence_failures)
-            R = [R, sequence_failures];
+            average_failures = [average_failures, sequence_failures];
         end;
 
     end
 
     if cache
-        save(cache_file, 'A', 'R');
+        save(cache_file, 'average_overlap', 'average_failures');
     end;
 end
 

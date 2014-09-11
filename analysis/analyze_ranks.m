@@ -14,14 +14,14 @@ for i = 1:2:length(varargin)
     end
 end 
 
-aspect_count = length(sequences);
+selector_count = length(sequences);
 
 if ~isempty(labels)
-    aspect_count = length(labels);
+    selector_count = length(labels);
 end;
 
-ranks = nan(numel(experiments), aspect_count, numel(trackers), 2);
-scores = nan(numel(experiments), aspect_count, numel(trackers), 2);
+ranks = nan(numel(experiments), selector_count, numel(trackers), 2);
+scores = nan(numel(experiments), selector_count, numel(trackers), 2);
 
 for e = 1:numel(experiments)
 
@@ -35,15 +35,15 @@ for e = 1:numel(experiments)
 
     if isempty(labels)
 
-        aspects = create_sequence_aspects(experiment, trackers, experiment_sequences);
+        selectors = create_sequence_selectors(experiment, trackers, experiment_sequences);
         
     else
         
-        aspects = create_label_aspects(experiment, trackers, experiment_sequences, labels);
+        selectors = create_label_selectors(experiment, trackers, experiment_sequences, labels);
 
     end;
     
-    [accuracy, robustness, available] = trackers_ranking(experiment, trackers, experiment_sequences, aspects, 'usepractical', usepractical);
+    [accuracy, robustness, available] = trackers_ranking(experiment, trackers, experiment_sequences, selectors, 'usepractical', usepractical);
 
 	accuracy.average_ranks = accuracy.average_ranks(:, available);
 	accuracy.mu = accuracy.mu(:, available);

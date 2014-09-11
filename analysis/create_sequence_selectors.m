@@ -1,6 +1,6 @@
-function aspects = create_sequence_aspects(experiment, tracker, sequences) %#ok<INUSL>
+function selectors = create_sequence_selectors(experiment, tracker, sequences) %#ok<INUSL>
 
-    aspects = cellfun(@(sequence) struct('name', sprintf('sequence_%s', sequence.name), ...
+    selectors = cellfun(@(sequence) struct('name', sprintf('sequence_%s', sequence.name), ...
         'title', sequence.name, ...
         'aggregate', @(experiment, tracker, sequences) ...
         aggregate_for_sequence(experiment, tracker, sequence), ...
@@ -9,10 +9,10 @@ function aspects = create_sequence_aspects(experiment, tracker, sequences) %#ok<
 
 end
 
-function [A, R] = aggregate_for_sequence(experiment, tracker, sequence)
+function [average_overlap, average_failures] = aggregate_for_sequence(experiment, tracker, sequence)
 
-    A = [];
-    R = [];
+    average_overlap = [];
+    average_failures = [];
 
     repeat = get_global_variable('repeat', 1);
     burnin = get_global_variable('burnin', 0);    
@@ -59,11 +59,11 @@ function [A, R] = aggregate_for_sequence(experiment, tracker, sequence)
     sequence_failures = failures;
 
     if ~isempty(sequence_overlaps)
-        A = [A sequence_overlaps];
+        average_overlap = [average_overlap sequence_overlaps];
     end;
 
     if ~isempty(sequence_failures)
-        R = [R sequence_failures];
+        average_failures = [average_failures sequence_failures];
     end;
 
 end
