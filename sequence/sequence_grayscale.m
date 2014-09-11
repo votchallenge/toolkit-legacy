@@ -12,6 +12,7 @@ if file_newer_than(cache_groundtruth, sequence_groundtruth)
     grayscale_sequence = create_sequence(cache_directory, 'name', sequence.name);
     grayscale_sequence.labels.names = sequence.labels.names;
     grayscale_sequence.labels.data = sequence.labels.data;
+    grayscale_sequence.properties = sequence.properties;
     return;
 end;
 

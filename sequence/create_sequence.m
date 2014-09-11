@@ -114,4 +114,13 @@ end;
 
 sequence.values.data = valuesdata;
 
+properties_filename = fullfile(sequence.directory, 'properties.txt');
+
+if exist(properties_filename, 'file')
+    sequence.properties = readstruct(properties_filename);
+else
+    sequence.properties = struct();
+end;
+
+
 
