@@ -1,7 +1,8 @@
-function [speeds, normalized] = analyze_speed(experiments, trackers, sequences, varargin)
+function [speeds, normalized, original] = analyze_speed(experiments, trackers, sequences, varargin)
 
 speeds = nan(length(experiments), length(trackers), length(sequences));
 normalized = false(length(experiments), length(trackers), length(sequences));
+original = nan(length(experiments), length(trackers), length(sequences));
 
 repeat = get_global_variable('repeat', 1);
 
@@ -57,7 +58,9 @@ for e = 1:numel(experiments)
             valid = any(times > 0, 1) & ~isnan(reliability)';
             average_speed = mean(times(:, valid), 1)';   
             reliability = reliability(valid);
-
+            
+                
+            average_original = mean(average_speed);
             if isfield(trackers{t}, 'performance')           
                 average_speed = mean(normalize_speed(average_speed, failures(valid), trackers{t}, experiment_sequences{s}));
                 normalized(e, t, s) = true;
@@ -68,8 +71,10 @@ for e = 1:numel(experiments)
 
             if isnan(average_speed) || average_speed == 0
                 speeds(e, t, s) = NaN;
+                original(e, t, s) = NaN;
             else
                 speeds(e, t, s) = 1 / average_speed;
+                original(e, t, s) = 1 / average_original;
             end;
 
         end;
