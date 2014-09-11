@@ -10,4 +10,6 @@ set_global_variable('burnin', 10);
 set_global_variable('skipping', 5);
 set_global_variable('report', 1);
 set_global_variable('fail', 0.0);
+set_global_variable('matlab_startup_model', [923.5042, -4.2525]);
+set_global_variable('report_template', fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html'));
 
