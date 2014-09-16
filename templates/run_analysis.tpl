@@ -8,8 +8,8 @@ trackers = create_trackers('{{tracker}}'); % TODO: add more trackers here
 
 % If you are performing analysis on a dataset that does not have per-frame
 % labels, use "labels = [];" here!
-labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
-    'motion', 'empty'};
+labels = {'camera_motion', 'illum_change', 'occlusion', 'size_change', ...
+    'motion_change', 'empty'};
 
 context = create_report_context('report_{{tracker}}'); % TODO: name of the report
 
