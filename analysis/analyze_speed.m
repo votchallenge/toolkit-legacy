@@ -1,7 +1,6 @@
-function [speeds, normalized, original] = analyze_speed(experiments, trackers, sequences, varargin)
+function [normalized, original] = analyze_speed(experiments, trackers, sequences, varargin)
 
-speeds = nan(length(experiments), length(trackers), length(sequences));
-normalized = false(length(experiments), length(trackers), length(sequences));
+normalized = nan(length(experiments), length(trackers), length(sequences));
 original = nan(length(experiments), length(trackers), length(sequences));
 
 repeat = get_global_variable('repeat', 1);
@@ -57,26 +56,27 @@ for e = 1:numel(experiments)
 
             valid = any(times > 0, 1) & ~isnan(reliability)';
             average_speed = mean(times(:, valid), 1)';   
-            reliability = reliability(valid);
-            
-                
             average_original = mean(average_speed);
+            
             if isfield(trackers{t}, 'performance')           
-                average_speed = mean(normalize_speed(average_speed, failures(valid), trackers{t}, experiment_sequences{s}));
-                normalized(e, t, s) = true;
+                average_normalized = mean(normalize_speed(average_speed, failures(valid), trackers{t}, experiment_sequences{s}));
             else
-				average_speed = mean(average_speed);
+				average_normalized = NaN;
                 print_debug('Warning: No performance profile for tracker %s.', trackers{t}.identifier);
             end;
 
-            if isnan(average_speed) || average_speed == 0
-                speeds(e, t, s) = NaN;
-                original(e, t, s) = NaN;
+            if isnan(average_normalized) || average_normalized == 0
+                normalized(e, t, s) = NaN;
             else
-                speeds(e, t, s) = 1 / average_speed;
-                original(e, t, s) = 1 / average_original;
+                normalized(e, t, s) = 1 / average_normalized;
             end;
 
+            if isnan(average_original) || average_original == 0
+                original(e, t, s) = NaN;
+            else
+                original(e, t, s) = 1 / average_original;
+            end;            
+            
         end;
 
     end;

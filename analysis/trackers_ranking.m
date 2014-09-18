@@ -1,7 +1,8 @@
-function [accuracy, robustness, available] = trackers_ranking(experiment, trackers, sequences, selectors, varargin)
+function [accuracy, robustness] = trackers_ranking(experiment, trackers, sequences, selectors, varargin)
 
 alpha = 0.05 ;
 usepractical = false;
+average = 'mean';
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
@@ -9,6 +10,8 @@ for i = 1:2:length(varargin)
             alpha = varargin{i+1} ;
         case 'usepractical'
             usepractical = varargin{i+1} ;            
+        case 'average'
+            average = varargin{i+1} ;              
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -46,21 +49,54 @@ for a = 1:length(selectors)
 	adapted_robustness_ranks(~available) = nan;
 
     % write results to output structures
-    accuracy.mu(a, :) = average_accuracy.mu;
-    accuracy.std(a, :) = average_accuracy.std;
+    accuracy.value(a, :) = average_accuracy.mu;
+    accuracy.error(a, :) = average_accuracy.std;
     accuracy.ranks(a, :) = adapted_accuracy_ranks;
-    robustness.mu(a, :) = average_robustness.mu;
-    robustness.std(a, :) = average_robustness.std;        
+    
+    robustness.value(a, :) = average_robustness.mu;
+    robustness.error(a, :) = average_robustness.std;        
     robustness.ranks(a, :) = adapted_robustness_ranks;
+    robustness.length = selectors{a}.length(sequences);
     
 	print_indent(-1);
 
 end
 
-% TODO: remove average ranks, this can be computed later
-accuracy.average_ranks = mean(accuracy.ranks, 1) ;
-robustness.average_ranks = mean(robustness.ranks, 1) ;
+switch average
+    
+    case 'mean'
 
+        accuracy.average_ranks = mean(accuracy.ranks, 1) ;
+        robustness.average_ranks = mean(robustness.ranks, 1) ;
+
+        accuracy.average_value = mean(accuracy.value, 1) ;
+        robustness.average_value = mean(robustness.value, 1) ;        
+                
+    case 'gather'
+        
+        gather_selector = create_label_selectors(experiment, sequences, {'all'});
+        
+        [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = ...
+            trackers_ranking_selector(experiment, trackers, sequences, gather_selector{1}, 'alpha', alpha, 'usepractical', usepractical);
+
+        % get adapted ranks
+        adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA) ;
+        adapted_robustness_ranks = adapted_ranks(robustness_ranks, HR) ;   
+
+        % mask out results that are not available
+        adapted_accuracy_ranks(~available) = nan;
+        adapted_robustness_ranks(~available) = nan;
+
+        % write results to output structures
+        accuracy.average_value = average_accuracy.value;
+        accuracy.average_error = average_accuracy.error;
+        accuracy.average_ranks = adapted_accuracy_ranks;
+        robustness.average_value = average_robustness.value;
+        robustness.average_error = average_robustness.error; 
+        robustness.average_ranks = adapted_robustness_ranks;
+    
+end
+    
 end
 
 function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = trackers_ranking_selector(experiment, trackers, sequences, selector, varargin)

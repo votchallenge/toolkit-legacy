@@ -22,40 +22,30 @@ function matrix2html(matrix, filename, varargin)
 
     rowLabels = [];
     colLabels = [];
-    format = [];
+    format = '%.2f';
     css_class = [];
     if (rem(nargin,2) == 1 || nargin < 2)
         error('Incorrect number of arguments to %s.', mfilename);
     end
 
-    okargs = {'rowlabels','columnlabels', 'format', 'class'};
-    for j=1:2:(nargin-2)
-        pname = varargin{j};
-        pval = varargin{j+1};
-        k = strmatch(lower(pname), okargs);
-        if isempty(k)
-            error('Unknown parameter name: %s.', pname);
-        elseif length(k)>1
-            error('Ambiguous parameter name: %s.', pname);
-        else
-            switch(k)
-                case 1  % rowlabels
-                    rowLabels = pval;
-                    if isnumeric(rowLabels)
-                        rowLabels = cellstr(num2str(rowLabels(:)));
-                    end
-                case 2  % column labels
-                    colLabels = pval;
-                    if isnumeric(colLabels)
-                        colLabels = cellstr(num2str(colLabels(:)));
-                    end
-                case 3  % format
-                    format = lower(pval);
-                case 4  % format
-                    css_class = pval;
-            end
+    for i = 1:2:length(varargin)
+        switch lower(varargin{i}) 
+            case 'rowlabels'
+                rowLabels = varargin{i+1};
+            case 'columnlabels'
+                colLabels = varargin{i+1};    
+            case 'format'
+                format = lower(varargin{i+1});
+            case 'class'
+                css_class = varargin{i+1};                
+            otherwise 
+                error(['Unknown switch ', varargin{i}, '!']) ;
         end
-    end
+    end     
+
+    rowLabels = matrix2cells(rowLabels, 'th', format);
+    colLabels = matrix2cells(colLabels, 'th', format);
+    matrix = matrix2cells(matrix, 'td', format);                
 
     if (ischar(filename))
         fid = fopen(filename, 'w');
@@ -65,52 +55,154 @@ function matrix2html(matrix, filename, varargin)
         close_file = 0;
     end;
     
-    width = size(matrix, 2);
-    height = size(matrix, 1);
+    if ~isempty(colLabels) && ~isempty(rowLabels)
 
-    if isnumeric(matrix)
-        matrix = num2cell(matrix);
-        for h=1:height
-            for w=1:width
-                if(~isempty(format))
-                    matrix{h, w} = num2str(matrix{h, w}, format);
-                else
-                    matrix{h, w} = num2str(matrix{h, w});
-                end
-            end
-        end
-    end
-    
+        stub = cell(size(colLabels, 1), size(rowLabels, 2));        
+        stub{1, 1} = sprintf('<th colspan="%d" rowspan="%d">&nbsp;</th>', ...
+                size(rowLabels, 2), size(colLabels, 1));
+        
+        matrix = cat(2, cat(1, stub, rowLabels), cat(1, colLabels, matrix));
+
+    elseif ~isempty(colLabels)
+
+        matrix = cat(1, colLabels, matrix);
+
+    elseif ~isempty(rowLabels)
+
+        matrix = cat(2, rowLabels, matrix);
+
+    end;
+
+
     if(~isempty(css_class))
         fprintf(fid, '<table class="%s">\n', css_class);
     else
         fprintf(fid, '<table>\n');
     end
     
-    if(~isempty(colLabels))
-        fprintf(fid, '<tr>');
-        if(~isempty(rowLabels))
-            fprintf(fid, '<th>&nbsp;</th>');
-        end
-        for w=1:width
-            fprintf(fid, '<th>%s</th>', colLabels{w});
-        end
-        fprintf(fid, '</tr>\r\n');
-    end
+    skip = cellfun(@(x) isempty(x), matrix, 'UniformOutput', true);
     
-    for h=1:height
+    for i = 1 : size(matrix, 1)
         fprintf(fid, '<tr>');
-        if(~isempty(rowLabels))
-            fprintf(fid, '<th>%s</th>', rowLabels{h});
-        end
-        for w=1:width
-            fprintf(fid, '<td>%s</td>', matrix{h, w});
-        end
-        fprintf(fid, '</tr>\r\n');
-    end
+
+        cellfun(@(x) fprintf(fid, x), matrix(i, ~skip(i, :)), 'UniformOutput', true);
+
+        fprintf(fid, '</tr>');
+    end;
 
     fprintf(fid, '</table>\r\n');
     
     if (close_file)
         fclose(fid);
     end;
+
+end
+
+function [cells] = matrix2cells(matrix, element, format)
+
+    if isnumeric(matrix)
+        cells =  cellfun(@(x) num2str(x, format), ...
+            num2cell(matrix), 'UniformOutput', false);
+        rowspan = ones(size(cells));
+        colspan = ones(size(cells));
+    else
+        [cells, rowspan, colspan] = cellfun(@(x) cell2cell(x, format), ...
+            matrix, 'UniformOutput', false);
+        rowspan = cell2mat(rowspan);
+        colspan = cell2mat(colspan);
+    end    
+
+    width = size(matrix, 2);
+    height = size(matrix, 1);
+
+    for h=1:height
+        for w=1:width
+            if rowspan(h, w) == 0 || colspan(h, w) == 0
+                cells{h, w} = '';
+            elseif rowspan(h, w) == 1 && colspan(h, w) == 1
+                cells{h, w} = sprintf('<%s>%s</%s>', element, cells{h, w}, element);
+            elseif rowspan(h, w) == 1
+                cells{h, w} = sprintf('<%s colspan="%d">%s</%s>', ...
+                    element, colspan(h, w), cells{h, w}, element);
+            elseif colspan(h, w) == 1
+                cells{h, w} = sprintf('<%s rowspan="%d">%s</%s>', ...
+                    element, rowspan(h, w), cells{h, w}, element);
+            else
+                cells{h, w} = sprintf('<%s colspan="%d" rowspan="%d">%s</%s>', ...
+                    element, colspan(h, w), rowspan(h, w), cells{h, w}, element);
+            end;
+        end
+    end
+
+%     max_width = max(sum(colspan));
+%     max_height = max(sum(rowspan));
+%     
+%     if max_width < width
+%         cells = cells(:, 1:max_width);
+%     end
+%     
+%     if max_height < height
+%         cells = cells(:, 1:max_height);
+%     end
+    
+end
+
+function [str, rowspan, colspan] = cell2cell(s, format)
+
+    rowspan = 1;
+    colspan = 1;
+
+    if isnumeric(s)
+        str = num2str(s, format);
+        return;
+    elseif ~isstruct(s)
+        str = s;
+        return;
+    end;
+
+    if ~isfield(s, 'text')
+        rowspan = 0;
+        colspan = 0;
+        str = [];
+        return;
+    end;
+
+    if isfield(s, 'format')
+        format = s.format;
+    end;
+
+    if isfield(s, 'columns')
+        colspan = s.columns;
+    end
+    
+    if isfield(s, 'rows')
+        rowspan = s.rows;
+    end
+
+    if isnumeric(s.text)
+        str = num2str(s.text, format);
+    else
+        str = s.text;
+    end;
+
+    element = 'span';
+    attributes = '';
+    
+    if isfield(s, 'class')
+        attributes = [attributes, ' class="', s.class, '" '];
+    end
+
+    if isfield(s, 'tooltip')
+        attributes = [attributes, ' title="', s.tooltip, '" '];
+    end
+
+    if isfield(s, 'url')
+        element = 'a';
+        attributes = [attributes, ' href="', s.url, '" '];
+    end    
+    
+    if ~isempty(attributes)
+       str = sprintf('<%s %s>%s</%s>', element, attributes, str, element);     
+    end
+    
+end

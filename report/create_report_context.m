@@ -1,11 +1,37 @@
-function context = create_report_context(name)
+function context = create_report_context(name, varargin)
+
+title = name;
+latex = false;
+raw = false;
+cache = false;
+
+for i = 1:2:length(varargin)
+    switch lower(varargin{i}) 
+        case 'title'
+            title = varargin{i+1};
+        case 'latex'
+            latex = varargin{i+1};
+        case 'raw'
+            raw = varargin{i+1};
+        case 'cache'
+            cache = varargin{i+1};
+        otherwise 
+            error(['Unknown switch ', varargin{i}, '!']) ;
+    end
+end 
+
 
 context.root = fullfile(get_global_variable('directory'), 'reports', name);
 context.images = fullfile(context.root, 'images');
-context.data = fullfile(context.root, 'data');
+context.raw = fullfile(context.root, 'raw');
+context.exportlatex = latex;
+context.exportraw = raw;
 context.prefix = '';
 context.imagesurl = 'images';
+context.rawurl = 'raw';
+context.cache = cache;
+context.title = title;
 
 mkpath(context.root);
 mkpath(context.images);
-mkpath(context.data);
+mkpath(context.raw);

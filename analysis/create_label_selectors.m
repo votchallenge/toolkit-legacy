@@ -1,4 +1,4 @@
-function selectors = create_label_selectors(experiment, tracker, sequences, labels) %#ok<INUSL>
+function selectors = create_label_selectors(experiment, sequences, labels) %#ok<INUSL>
 
     selectors = cellfun(@(label) struct('name', sprintf('label_%s', label), ...
         'title', label, ...
@@ -19,8 +19,15 @@ function [average_overlap, average_failures] = aggregate_for_label(experiment, t
 
 	cache_file = fullfile(cache_directory, sprintf('%s.mat', tracker.identifier));
         
-    if exist(cache_file, 'file') && cache
+	if exist(cache_file, 'file') && cache
+        A = []; R = [];
 		load(cache_file);
+		if ~isempty(A) && ~isempty(R)
+            average_overlap = A;
+            average_failures = R;
+			return;
+		end;
+
 		if ~isempty(average_overlap) && ~isempty(average_failures)
 			return;
 		end;

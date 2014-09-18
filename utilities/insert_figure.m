@@ -1,44 +1,40 @@
-function insert_figure(context, fid, hf, id, title, varargin)
+function insert_figure(context, fid, handle, id, title)
 
-format = 'html';
-cache = true;
+    fprintf(fid, '<div class="plot">\n');
 
-for i = 1:2:length(varargin)
-    switch lower(varargin{i})
-        case 'format'
-            format = varargin{i+1};
-        case 'cache'
-            cache = varargin{i+1};
-        otherwise 
-            error(['Unknown switch ', varargin{i},'!']) ;
-    end
-end 
+    export_figure(handle, fullfile(context.images, [context.prefix, id]), 'png', 'cache', context.cache);
 
-switch lower(format)
-    case 'html'
-        export_figure(hf, fullfile(context.images, [context.prefix, id]), 'png', 'cache', cache);
+    fprintf(fid, ...
+        '<img src="%s/%s%s.png" alt="%s" /><span class="caption">%s</span>\n', ...
+        context.imagesurl, context.prefix, id, title, title);
 
-        fprintf(fid, ...
-            '<p class="plot"><img src="%s/%s%s.png" alt="%s" /><span class="caption">%s</span></p>\n', ...
-            context.imagesurl, context.prefix, id, title, title);
-    case 'latex'
-        export_figure(hf, fullfile(context.images, [context.prefix, id]), 'eps', 'cache', cache);
-        
-        fprintf(fid, ...
-            '\\begin{figure}\\centering\\includegraphics{%s/%s%s.eps}\\caption{%s}\\end{figure}\n', ...
-            context.imagesurl, context.prefix, id, title);        
-        
-    case 'data'
-        
-        file = export_figure(hf, fullfile(context.data, [context.prefix, id]), 'fig', 'cache', cache);
-        
-        % Hack : try to fix potential figure invisibility
-        try
-            f=load(file,'-mat');
-            n=fieldnames(f);
-            f.(n{1}).properties.Visible='on';
-            save(file,'-struct','f'); 
-        catch e
-            print_debug('Warning: unable to fix figure visibility: %s', e.message);
-        end;
-end;
+    if context.exportlatex
+
+            export_figure(handle, fullfile(context.images, [context.prefix, id]), 'eps', 'cache', context.cache);
+            
+            fprintf(fid, '<a href="%s/%s%s.eps" class="export eps">EPS</a>', ...
+                context.imagesurl, context.prefix, id);
+
+    end;
+
+
+    if context.exportraw
+            
+            file = export_figure(handle, fullfile(context.data, [context.prefix, id]), 'fig', 'cache', context.cache);
+            
+            % Hack : try to fix potential figure invisibility
+            try
+                f = load(file, '-mat');
+                n = fieldnames(f);
+                f.(n{1}).properties.Visible = 'on';
+                save(file, '-struct', 'f'); 
+            catch e
+                print_debug('Warning: unable to fix figure visibility: %s', e.message);
+            end;
+
+            fprintf(fid, '<a href="%s/%s%s.fig" class="export eps">FIG</a>', ...
+                context.imagesurl, context.prefix, id);
+    end;
+
+    fprintf(fid, '</div>\n');
+
