@@ -50,6 +50,10 @@ for e = 1:numel(experiments)
 
             times = csvread(times_file);
 
+			if size(times, 1) == 1
+				times = repmat(times, experiment_sequences{s}.length, 1);
+			end
+
 			if size(times, 2) < repeat
 				times = cat(2, times, zeros(experiment_sequences{s}.length, repeat - size(times, 2)));
 			end;
