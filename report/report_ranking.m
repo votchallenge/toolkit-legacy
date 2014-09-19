@@ -61,9 +61,13 @@ table_data(:, 2:2:end) = [averaged_ranks(:, :, 2)', overall_ranks(:, 2)];
 
 table_data = highlight_best_rows(num2cell(table_data), repmat({'ascending'}, 1, numel(experiments) * 2 + 2));
 
+print_text('Writing ranking table ...');
+
 document.table(table_data, 'columnLabels', column_labels, 'rowLabels', tracker_labels);
 
 for e = 1:length(experiments)
+
+	print_text('Writing ranking details for experiment %s ...', experiments{e}.name);
 
     document.section('Experiment %s', experiments{e}.name);
     

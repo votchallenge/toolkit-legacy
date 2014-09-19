@@ -17,16 +17,17 @@ for i = 1:2:length(varargin)
     end
 end 
 
+
 document = create_document(context, 'challenge', 'title', 'VOT competition report');
 
 print_text('Generating competition report'); print_indent(1);
 
 print_text('Speed report ...'); print_indent(1);
 
-%[normalized, original] = analyze_speed(experiments, trackers, sequences);
+[normalized, original] = analyze_speed(experiments, trackers, sequences);
 
-%averaged_normalized = squeeze(mean(mean(normalized, 3), 1));
-%averaged_original = squeeze(mean(mean(original, 3), 1));
+averaged_normalized = squeeze(mean(mean(normalized, 3), 1));
+averaged_original = squeeze(mean(mean(original, 3), 1));
 
 % TODO: write detailed report (implementation and raw speed)
 
@@ -48,7 +49,7 @@ column_labels = cell(2, 2 * numel(experiments) + 4);
 
 ranking_labels = {'Acc. Rank', 'Rob. Rank'};
 column_labels(1, :) = repmat({struct()}, 1, size(column_labels, 2));
-column_labels(1, 1:3:end-4) = cellfun(@(x) struct('text', x.name, 'columns', 2), experiments,'UniformOutput',false);
+column_labels(1, 1:3:end-3) = cellfun(@(x) struct('text', x.name, 'columns', 2), experiments,'UniformOutput',false);
 column_labels{1, end-3} = struct('text', '', 'columns', 4);
 column_labels(2, :) = [ranking_labels(repmat(1:length(ranking_labels), 1, numel(experiments) + 1)), {'Rank', 'Speed'}];
 
@@ -58,13 +59,11 @@ experiments_ranking_data(2:2:end) = ranks(:, :, 2);
 experiments_ranking_data = num2cell(experiments_ranking_data);
 
 overall_ranking_data = num2cell(cat(2, combined_ranks, overall_ranks)');
-averaged_normalized = zeros(1, 10);
 speed_data = num2cell(averaged_normalized);
 
 tabledata = cat(1, experiments_ranking_data, overall_ranking_data, speed_data)';
 
 ordering = [repmat({'ascending'}, 1, numel(experiments) * 2 + 3), 'descending'];
-
 tabledata = highlight_best_rows(tabledata, ordering);
 
 document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
