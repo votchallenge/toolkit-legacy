@@ -8,6 +8,16 @@ addpath(include_dirs{:});
 
 initialize_defaults;
 
+stacks = {};
+
+files = dir(fullfile(script_directory, 'experiment'));
+
+for i = 1:length(files)
+    if ~files(i).isdir && strncmp(files(i).name, 'stack_', 6)
+        stacks{end+1} = files(i).name(7:end-2);
+    end;
+end
+
 directory = pwd();
 
 % Check if the directory is already a valid VOT workspace ...
@@ -30,23 +40,42 @@ if ~valid_identifier(tracker_identifier)
     error('Not a valid tracker identifier!');
 end;
 
+print_text('Select one of the available experiment stacks:');
+
+for i = 1:length(stacks)
+    print_text(' %d - %s', i, stacks{i});
+end;
+
+option = input('Selection: ', 's');
+option = int32(str2double(option));
+
+if isempty(option) || option < 1 || option > length(stacks)
+    error('Not a valid stack!');
+end;
+
+selected_stack = stacks{option};
+
+variables = {'version', num2str(info.version), ...
+    'tracker', tracker_identifier, 'stack', selected_stack};
+
+
 generate_from_template(fullfile(directory, 'configuration.m'), ...
-    fullfile(templates, 'configuration.tpl'), 'version', num2str(info.version));
+    fullfile(templates, 'configuration.tpl'), variables{:});
 
 generate_from_template(fullfile(directory, 'run_experiments.m'), ...
-    fullfile(templates, 'run_experiments.tpl'), 'tracker', tracker_identifier);
+    fullfile(templates, 'run_experiments.tpl'), variables{:});
 
 generate_from_template(fullfile(directory, 'run_test.m'), ...
-    fullfile(templates, 'run_test.tpl'), 'tracker', tracker_identifier);
+    fullfile(templates, 'run_test.tpl'), variables{:});
 
 generate_from_template(fullfile(directory, 'run_browse.m'), ...
-    fullfile(templates, 'run_browse.tpl'), 'tracker', tracker_identifier);
+    fullfile(templates, 'run_browse.tpl'), variables{:});
 
 generate_from_template(fullfile(directory, 'run_analysis.m'), ...
-    fullfile(templates, 'run_analysis.tpl'), 'tracker', tracker_identifier);
+    fullfile(templates, 'run_analysis.tpl'), variables{:});
 
 generate_from_template(fullfile(directory, ['tracker_', tracker_identifier, '.m']), ...
-    fullfile(templates, 'tracker.tpl'), 'tracker', tracker_identifier);
+    fullfile(templates, 'tracker.tpl'), variables{:});
 
 % Print further instructions ...
 

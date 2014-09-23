@@ -4,9 +4,11 @@
 
 [sequences, experiments] = vot_environment();
 
-trackers = create_trackers('{{tracker}}'); % TODO: add more trackers here
+error('Analysis not configured!'); % Remove this line after proper configuration
 
-context = create_report_context('report_{{tracker}}'); % TODO: name of the report
+trackers = create_trackers('{{tracker}}', 'TODO'); % TODO: add more trackers here
+
+context = create_report_context('report_{{stack}}_{{tracker}}');
 
 report_challenge(context, experiments, trackers, sequences);
 
