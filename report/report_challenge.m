@@ -24,10 +24,13 @@ print_text('Generating competition report'); print_indent(1);
 
 print_text('Speed report ...'); print_indent(1);
 
-[normalized, original] = analyze_speed(experiments, trackers, sequences);
+[normalized, original] = analyze_speed(experiments, trackers(1:5), sequences);
 
 averaged_normalized = squeeze(mean(mean(normalized, 3), 1));
 averaged_original = squeeze(mean(mean(original, 3), 1));
+normalized
+averaged_normalized
+return;
 
 % TODO: write detailed report (implementation and raw speed)
 
@@ -49,7 +52,7 @@ column_labels = cell(2, 2 * numel(experiments) + 4);
 
 ranking_labels = {'Acc. Rank', 'Rob. Rank'};
 column_labels(1, :) = repmat({struct()}, 1, size(column_labels, 2));
-column_labels(1, 1:3:end-3) = cellfun(@(x) struct('text', x.name, 'columns', 2), experiments,'UniformOutput',false);
+column_labels(1, 1:2:end-4) = cellfun(@(x) struct('text', x.name, 'columns', 2), experiments,'UniformOutput',false);
 column_labels{1, end-3} = struct('text', '', 'columns', 4);
 column_labels(2, :) = [ranking_labels(repmat(1:length(ranking_labels), 1, numel(experiments) + 1)), {'Rank', 'Speed'}];
 
