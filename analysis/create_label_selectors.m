@@ -90,10 +90,12 @@ function [average_overlap, average_failures] = aggregate_for_label(experiment, t
         end;
         
         if ~isempty(sequence_failures)
-            average_failures = [average_failures, sequence_failures];
+            average_failures = [average_failures; sequence_failures];
         end;
 
     end
+
+	average_failures = sum(average_failures);
 
     if cache
         save(cache_file, 'average_overlap', 'average_failures');

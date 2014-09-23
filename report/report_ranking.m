@@ -5,7 +5,7 @@ usepractical = false;
 permutationplot = false;
 arplot = true;
 average = 'mean';
-sensitivity = 200;
+sensitivity = 30;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
