@@ -24,13 +24,10 @@ print_text('Generating competition report'); print_indent(1);
 
 print_text('Speed report ...'); print_indent(1);
 
-[normalized, original] = analyze_speed(experiments, trackers(1:5), sequences);
+[normalized, original] = analyze_speed(experiments, trackers, sequences);
 
 averaged_normalized = squeeze(mean(mean(normalized, 3), 1));
 averaged_original = squeeze(mean(mean(original, 3), 1));
-normalized
-averaged_normalized
-return;
 
 % TODO: write detailed report (implementation and raw speed)
 
