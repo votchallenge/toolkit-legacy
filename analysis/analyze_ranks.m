@@ -3,7 +3,8 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
     usepractical = false;
     uselabels = true;
     average = 'mean';
-
+    alpha = 0.05;
+    
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
             case 'uselabels'
@@ -11,7 +12,9 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
             case 'usepractical'
                 usepractical = varargin{i+1} ;  
             case 'average'
-                average = varargin{i+1} ;              
+                average = varargin{i+1};
+            case 'alpha'
+                alpha = varargin{i+1};                
             otherwise 
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
@@ -35,7 +38,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
     end;
 
     [accuracy, robustness] = trackers_ranking(experiment, trackers, ...
-        experiment_sequences, selectors, 'usepractical', usepractical, 'average', average);
+        experiment_sequences, selectors, alpha, usepractical, average);
 
     result = struct('accuracy', accuracy, 'robustness', robustness);
 
@@ -43,24 +46,8 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
 end
 
-function [accuracy, robustness] = trackers_ranking(experiment, trackers, sequences, selectors, varargin)
-
-    alpha = 0.05 ;
-    usepractical = false;
-    average = 'mean';
-
-    for i = 1:2:length(varargin)
-        switch lower(varargin{i})
-            case 'alpha'
-                alpha = varargin{i+1} ;
-            case 'usepractical'
-                usepractical = varargin{i+1} ;            
-            case 'average'
-                average = varargin{i+1} ;              
-            otherwise 
-                error(['Unknown switch ', varargin{i},'!']) ;
-        end
-    end
+function [accuracy, robustness] = trackers_ranking(experiment, trackers, ...
+    sequences, selectors, alpha, usepractical, average)
 
     N_trackers = length(trackers) ;
     N_selectors = length(selectors) ;
@@ -83,7 +70,7 @@ function [accuracy, robustness] = trackers_ranking(experiment, trackers, sequenc
 
         % rank trackers and calculate statistical significance of differences
         [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = ...
-            trackers_ranking_selector(experiment, trackers, sequences, selectors{a}, 'alpha', alpha, 'usepractical', usepractical);
+            trackers_ranking_selector(experiment, trackers, sequences, selectors{a}, alpha, usepractical);
         
         % get adapted ranks
         adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA) ;
@@ -144,21 +131,8 @@ function [accuracy, robustness] = trackers_ranking(experiment, trackers, sequenc
     
 end
 
-function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = trackers_ranking_selector(experiment, trackers, sequences, selector, varargin)
-
-    alpha = 0.05 ;
-    usepractical = false;
-
-    for i = 1:2:length(varargin)
-        switch varargin{i}
-            case 'alpha'
-                alpha = varargin{i+1} ;               
-            case 'usepractical'
-                usepractical = varargin{i+1} ;                 
-            otherwise 
-                error(['Unknown switch ', varargin{i},'!']) ;
-        end
-    end 
+function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] ...
+    = trackers_ranking_selector(experiment, trackers, sequences, selector, alpha, usepractical)
 
     cacheA = cell(length(trackers), 1);
     cacheR = cell(length(trackers), 1);
@@ -230,8 +204,17 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
                 continue; 
             end
 
-            [ha, hr] = compare_trackers(O1, F1, O2, F2, alpha, practical);
+            % If alpha is 0 then we disable the equivalence testing
+            if alpha <= 0
+            
+                ha = false; hr = false;
+                
+            else
+                
+                [ha, hr] = compare_trackers(O1, F1, O2, F2, alpha, practical);
 
+            end;
+                
             HA(t1, t2) = ha; HA(t2, t1) = HA(t1, t2);
             HR(t1, t2) = hr; HR(t2, t1) = HR(t1, t2);               
         end;
