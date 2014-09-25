@@ -6,6 +6,7 @@ permutationplot = false;
 arplot = true;
 average = 'mean';
 sensitivity = 30;
+alpha = 0.05;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
@@ -18,7 +19,9 @@ for i = 1:2:length(varargin)
         case 'arplot'
             arplot = varargin{i+1};
         case 'average'
-            average = varargin{i+1};            
+            average = varargin{i+1};
+        case 'alpha'
+            alpha = varargin{i+1}; 
         otherwise 
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
@@ -34,7 +37,7 @@ for e = 1:length(experiments)
 
     [result] = analyze_ranks(experiments{e}, trackers, ...
         sequences, 'uselabels', uselabels, 'usepractical', usepractical, ...
-        'average', average);
+        'average', average, 'alpha', alpha);
     results{e} = result;
   
     averaged_ranks(e, :, 1) = result.accuracy.average_ranks;
