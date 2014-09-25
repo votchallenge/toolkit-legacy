@@ -207,7 +207,7 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
             % If alpha is 0 then we disable the equivalence testing
             if alpha <= 0
             
-                ha = false; hr = false;
+                ha = true; hr = true;
                 
             else
                 
