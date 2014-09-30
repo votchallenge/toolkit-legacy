@@ -25,8 +25,12 @@ switch lower(format)
     case 'fig'
         saveas(handle, filename, 'fig');
     case 'eps'
-        set(gca, 'FontSize', 12, 'FontWeight', 'bold', 'linewidth', 2);
+        fontSize = get(gca, 'FontSize');
+        fontWeight = get(gca, 'FontWeight');
+        lineWidth = get(gca, 'LineWidth');
+        set(gca, 'FontSize', 10, 'FontWeight', 'bold', 'LineWidth', 2);
         print( handle, '-depsc', [filename, '.eps']);
+        set(gca, 'FontSize', fontSize, 'FontWeight', fontWeight, 'LineWidth', lineWidth);
     case 'png'
         print( handle, '-dpng', '-r130', [filename, '.png']);
     otherwise
