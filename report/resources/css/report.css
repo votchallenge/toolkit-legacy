@@ -1,0 +1,11 @@
+
+div.grid_small {  display: inline-block; width: 200px; }
+div.grid_medium {  display: inline-block; width: 400px; }
+div.grid_large {  display: inline-block; width: 600px; }
+
+p.plot { text-align: center; }
+div.imagegrid .plot {width: 45%; display: inline-block; }
+div.imagegrid .plot img {width: 100%;}
+
+.plot { border: 1px #eeeeee solid; padding: 10px; margin-bottom: 20px; }
+.plot .caption { text-align: center; font-size: 110%; display: block; }

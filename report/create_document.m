@@ -46,6 +46,7 @@ document.link = @(url, text, varargin) insert_link(document, url, sprintf(text, 
 
 document.figure = @(handle, id, title) insert_figure(context, document.fid, handle, id, title);
 
+document.include('css', 'report.css');
 
 end
 
@@ -53,30 +54,38 @@ function write_report_document(document)
 
     fclose(document.fid);
 
-    metadata = struct();
+    metadata = struct('resources', struct());
 
-    load(document.temporary_metadata);
+    if exist(document.temporary_metadata, 'file')
+        load(document.temporary_metadata);
+    end;
 
     resources = struct2cell(metadata.resources);
-    tokens = cell(numel(resources), 1);
+    head_tokens = cell(numel(resources), 1);
     
     for i = 1:numel(resources)
         url = sprintf('%s/%s/%s', 'resources', resources{i}.type, resources{i}.name);
 
         switch resources{i}.type
             case 'js'
-                tokens{i} = sprintf('<script type="text/javascript" src="%s"></script>\n', url);
+                head_tokens{i} = sprintf('<script type="text/javascript" src="%s"></script>\n', url);
             case 'css'
-                tokens{i} = sprintf('<link rel="stylesheet" type="text/css" href="%s"/>\n', url);
+                head_tokens{i} = sprintf('<link rel="stylesheet" type="text/css" href="%s"/>\n', url);
             otherwise
-                tokens{i} = '';   
+                head_tokens{i} = '';   
         end;
 
     end;
 
+    if isempty(head_tokens)
+        head = '';
+    else
+        head = strjoin(head_tokens, '');
+    end;
+    
     generate_from_template(document.target_file, document.template_file, ...
         'body', fileread(document.temporary_file), 'title', document.title, ...
-        'timestamp', datestr(now, 31), 'head', strjoin(tokens, ''));
+        'timestamp', datestr(now, 31), 'head', head);
     
     delete(document.temporary_file);
     delete(document.temporary_metadata);
