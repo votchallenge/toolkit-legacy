@@ -10,5 +10,7 @@ trackers = create_trackers('{{tracker}}', 'TODO'); % TODO: add more trackers her
 
 context = create_report_context('report_{{stack}}_{{tracker}}');
 
-report_challenge(context, experiments, trackers, sequences);
+report_article(context, experiments, trackers, sequences, 'highlight', '{{tracker}}'); % This report is more suitable for results included in a paper
+
+% report_challenge(context, experiments, trackers, sequences); % Use this report for official challenge report
 
