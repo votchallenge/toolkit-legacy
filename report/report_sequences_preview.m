@@ -20,17 +20,20 @@ for s = 1:length(sequences)
 
     print_text('Processing sequence %s ...', sequences{s}.name);
 
-    fprintf(index_fid, '<div class="grid_small">\n');
+    document.raw('<div class="timeline">\n');
+    
+    figure_id = sprintf('sequence_preview_%s', sequences{s}.name);
     
     document.figure(@() generate_sequence_strip(sequences{s}, {}, 'samples', frames, 'window', Inf), ...
-        sequences{s}.name, sprintf('Sequence %s', sequences{s}.name));
+        figure_id, sprintf('Sequence %s', sequences{s}.name));
 
-    fprintf(index_fid, '</div>\n');
+    document.raw('</div>\n');
     
     print_indent(-1);
 
 end;
 
+document.write();
 
 
 
