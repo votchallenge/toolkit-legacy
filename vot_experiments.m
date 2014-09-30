@@ -32,40 +32,4 @@ for e = 1:length(experiments)
 
 end;
 
-if get_global_variable('report', 0)
-
-    print_text('Generating report ...');
-    
-    print_indent(1);
-    
-    reportfile = write_report(sprintf('%s_%s', datestr(now, 30), ...
-        tracker.identifier), tracker, sequences, experiments, summary);
-
-    print_indent(-1);
-    
-	if isempty(reportfile)
-	    print_text('Unable to automatically pack results. Please do it manually.');
-	else
-	    print_text('Report document written to "%s"', reportfile);
-    end;
-end;
-
-if get_global_variable('pack', 0)
-
-    print_text('Packing results ...');
-
-    print_indent(1);
-
-    resultfile = pack_results(tracker, sequences, experiments);
-
-    print_indent(-1);
-
-    print_text('Result pack stored to "%s"', resultfile);
-
-else
-
-    print_debug('Omitting result packaging.');
-
-end;
-
 print_text('Done.');
