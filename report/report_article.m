@@ -1,9 +1,9 @@
 function [document] = report_article(context, experiments, trackers, sequences, varargin)
 
-arplot = true;
-permutationplot = true;
+arplot = false;
+permutationplot = false;
 ratio = 0.5;
-highlight = [];
+spotlight = [];
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
@@ -13,8 +13,8 @@ for i = 1:2:length(varargin)
             permutationplot = varargin{i+1};
         case 'combineweight'
             ratio = varargin{i+1};
-        case 'highlight'
-            highlight = varargin{i+1};
+        case 'spotlight'
+            spotlight = varargin{i+1};
         otherwise 
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
@@ -54,11 +54,30 @@ overall_ranking_data = num2cell(cat(2, combined_ranks, overall_ranks)');
 
 tabledata = cat(1, experiments_ranking_data, overall_ranking_data)';
 
-ordering = [repmat({'ascending'}, 1, numel(experiments) * 2 + 3)];
+ordering = repmat({'ascending'}, 1, numel(experiments) * 2 + 3);
 tabledata = highlight_best_rows(tabledata, ordering);
+
+document.chapter('Ranking');
 
 document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
 
 document.link(ranking_document.url, 'Detailed ranking results');
 
+if ~isempty(spotlight)
+
+    highlight_index = find_tracker(trackers, spotlight);
+    
+    if ~isempty(highlight_index)
+    
+        document.chapter('Hightlights for tracker %s');
+
+        [spotlight_document, highlights] = report_ranking_spotlight(context, trackers, sequences, experiments, spotlight,  'uselabels', false, 'usepractical', true);
+
+        document.link(spotlight_document.url, 'Detailed spotlight results');
+
+        % TODO: hightlight for tracker
+    end;
+
+end;
+    
 document.write();
