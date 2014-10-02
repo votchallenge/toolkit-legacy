@@ -2,8 +2,9 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
     usepractical = false;
     uselabels = true;
-    average = 'mean';
+    average = 'weighted_mean';
     alpha = 0.05;
+    cache = fullfile(get_global_variable('directory'), 'cache');
     
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
@@ -13,8 +14,10 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
                 usepractical = varargin{i+1} ;  
             case 'average'
                 average = varargin{i+1};
-            case 'alpha'
+            case 'alpha'                
                 alpha = varargin{i+1};                
+            case 'cache'
+                cache = varargin{i+1};                   
             otherwise 
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
@@ -37,16 +40,35 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
     end;
 
-    [accuracy, robustness] = trackers_ranking(experiment, trackers, ...
-        experiment_sequences, selectors, alpha, usepractical, average);
+    sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, selectors, 'UniformOutput', false)), '-'), 'Char', 'hex');
+    trackers_hash = md5hash(strjoin(sort(cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
+    parameters_hash = md5hash(sprintf('%f-%s-%d-%d', alpha, average, uselabels, usepractical));
+    
+    mkpath(fullfile(cache, 'ranking'));
+    
+    cache_file = fullfile(cache, 'ranking', sprintf('%s_%s_%s_%s.mat', experiment.name, trackers_hash, sequences_hash, parameters_hash));
 
-    result = struct('accuracy', accuracy, 'robustness', robustness);
+    result = [];
+	if exist(cache_file, 'file')         
+		load(cache_file);       
+	end;    
+    
+    if isempty(result)
+        [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers, ...
+            experiment_sequences, selectors, alpha, usepractical, average);
 
+        result = struct('accuracy', accuracy, 'robustness', robustness, 'lengths', lengths);
+
+        save(cache_file, 'result');
+    else
+        print_text('Loading ranking results from cache.');
+    end; 
+        
     print_indent(-1);
 
 end
 
-function [accuracy, robustness] = trackers_ranking(experiment, trackers, ...
+function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers, ...
     sequences, selectors, alpha, usepractical, average)
 
     N_trackers = length(trackers) ;
@@ -61,7 +83,9 @@ function [accuracy, robustness] = trackers_ranking(experiment, trackers, ...
     robustness.mu = zeros(N_selectors, N_trackers) ;
     robustness.std = zeros(N_selectors, N_trackers) ;
     robustness.ranks = zeros(N_selectors, N_trackers) ;
-
+    
+    lengths = zeros(N_selectors, 1);
+    
     for a = 1:length(selectors)
         
 	    print_indent(1);
@@ -88,21 +112,33 @@ function [accuracy, robustness] = trackers_ranking(experiment, trackers, ...
         robustness.value(a, :) = average_robustness.mu;
         robustness.error(a, :) = average_robustness.std;        
         robustness.ranks(a, :) = adapted_robustness_ranks;
-        robustness.length = selectors{a}.length(sequences);
+        
+        lengths(a) = selectors{a}.length(sequences);
         
 	    print_indent(-1);
 
     end
 
+    robustness.labels = cellfun(@(x) x.name, selectors, 'UniformOutput', false);
+    accuracy.labels = robustness.labels;
+    
     switch average
+
+        case 'weighted_mean'
+
+            accuracy.average_ranks = mean(accuracy.ranks, 1);
+            robustness.average_ranks = mean(robustness.ranks, 1);
+
+            accuracy.average_value = sum(accuracy.value .* repmat(lengths, 1, length(trackers)), 1) ./ length(lengths);
+            robustness.average_value = sum(robustness.value .* repmat(lengths, 1, length(trackers)), 1) ./ length(lengths);           
         
         case 'mean'
 
-            accuracy.average_ranks = mean(accuracy.ranks, 1) ;
-            robustness.average_ranks = mean(robustness.ranks, 1) ;
+            accuracy.average_ranks = mean(accuracy.ranks, 1);
+            robustness.average_ranks = mean(robustness.ranks, 1);
 
-            accuracy.average_value = mean(accuracy.value, 1) ;
-            robustness.average_value = mean(robustness.value, 1) ;        
+            accuracy.average_value = mean(accuracy.value, 1);
+            robustness.average_value = mean(robustness.value, 1);        
                     
         case 'gather'
             

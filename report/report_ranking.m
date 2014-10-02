@@ -4,7 +4,7 @@ uselabels = false;
 usepractical = false;
 permutationplot = false;
 arplot = true;
-average = 'mean';
+average = 'weighted_mean';
 sensitivity = 30;
 alpha = 0.05;
 
@@ -37,13 +37,13 @@ for e = 1:length(experiments)
 
     [result] = analyze_ranks(experiments{e}, trackers, ...
         sequences, 'uselabels', uselabels, 'usepractical', usepractical, ...
-        'average', average, 'alpha', alpha);
+        'average', average, 'alpha', alpha, 'cache', context.cachedir);
     results{e} = result;
   
     averaged_ranks(e, :, 1) = result.accuracy.average_ranks;
     averaged_ranks(e, :, 2) = result.robustness.average_ranks;    
     averaged_scores(e, :, 1) = result.accuracy.average_value;
-    averaged_scores(e, :, 2) = result.robustness.average_value ./ result.robustness.length;
+    averaged_scores(e, :, 2) = result.robustness.average_value ./ mean(result.lengths);
 end;
 
 overall_ranks = squeeze(mean(averaged_ranks, 1)); % Averaged per-label and per-experiment
@@ -161,7 +161,7 @@ for e = 1:length(experiments)
             plot_id = sprintf('arplot_%s_%s', experiments{e}.name, selector_labels{l});
 
             hf = generate_ar_plot(trackers, results{e}.accuracy.value(l, :), ...
-                results{e}.robustness.value(l, :) ./ results{e}.robustness.length, ...
+                results{e}.robustness.value(l, :) ./ results{e}.lengths(l), ...
                 'title', plot_title, 'sensitivity', sensitivity);
 
             document.figure(hf, plot_id, plot_title);

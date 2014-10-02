@@ -9,3 +9,11 @@ div.imagegrid .plot img {width: 100%;}
 
 .plot { border: 1px #eeeeee solid; padding: 10px; margin-bottom: 20px; }
 .plot .caption { text-align: center; font-size: 110%; display: block; }
+
+td span.first { font-weight: bold; color: red; }
+td span.second { font-weight: bold; color: blue; }
+td span.third { color: green; }
+
+td span.good {  color: green; }
+td span.average { color: gray; }
+td span.bad { color: red; }

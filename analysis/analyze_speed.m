@@ -1,5 +1,33 @@
 function [normalized, original] = analyze_speed(experiments, trackers, sequences, varargin)
 
+cache = fullfile(get_global_variable('directory'), 'cache');
+
+for i = 1:2:length(varargin)
+    switch lower(varargin{i})          
+        case 'cache'
+            cache = varargin{i+1};                   
+        otherwise 
+            error(['Unknown switch ', varargin{i},'!']) ;
+    end
+end 
+
+experiments_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, experiments, 'UniformOutput', false)), '-'), 'Char', 'hex');
+sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, selectors, 'UniformOutput', false)), '-'), 'Char', 'hex');
+trackers_hash = md5hash(strjoin(sort(cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
+mkpath(fullfile(cache, 'speed'));
+
+cache_file = fullfile(cache, 'speed', sprintf('%s_%s_%s.mat', experiments_hash, trackers_hash, sequences_hash));
+
+if exist(cache_file, 'file') 
+        normalized = [];
+        original = [];
+        load(cache_file);
+        if ~isempty(normalized) && ~isempty(origin)   
+            print_text('Loading speed results from cache.');
+            return;
+        end;
+end;
+    
 normalized = nan(length(experiments), length(trackers), length(sequences));
 original = nan(length(experiments), length(trackers), length(sequences));
 
@@ -88,3 +116,5 @@ for e = 1:numel(experiments)
 	print_indent(-1);
 
 end;
+
+save(cache_file, 'normalized', 'original');

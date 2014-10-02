@@ -29,9 +29,12 @@ context.exportraw = raw;
 context.prefix = '';
 context.imagesurl = 'images';
 context.rawurl = 'raw';
-context.cache = cache;
 context.title = title;
+context.cache = cache;
 
 mkpath(context.root);
 mkpath(context.images);
 mkpath(context.raw);
+
+context.cachedir = fullfile(context.root, 'cache');
+mkpath(context.cachedir);
