@@ -30,6 +30,9 @@ success = success && compile_mex('write_trajectory', {fullfile(toolkit_path, 'se
 success = success && compile_mex('benchmark_native', {fullfile(toolkit_path, 'measures', 'benchmark_native.cpp')}, ...
     {}, output_path);
 
+success = success && compile_mex('md5hash', {fullfile(toolkit_path, 'utilities', 'md5hash.cpp')}, ...
+    {}, output_path);
+
 if ~success
     error('Unable to compile all native resources.');
 end;
