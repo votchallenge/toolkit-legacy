@@ -12,7 +12,7 @@ for i = 1:2:length(varargin)
 end 
 
 if isempty(version)
-    tokens = strsplit(identifier, ':');
+    tokens = regexp(identifier,':','split');
     if numel(tokens) > 2
         error('Error: %s is not a valid tracker identifier.', identifier);
     elseif numel(tokens) == 2
