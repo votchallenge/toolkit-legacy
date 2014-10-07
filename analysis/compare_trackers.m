@@ -7,7 +7,7 @@ function [ha, hr] = compare_trackers(A1, R1, A2, R2, alpha, practical)
 	valid = ~isnan(dif);
     dif = dif(valid) ;
     if (length(dif) < 5)
-        print_text('Warning: less than 5 samples when comparing tracker %s and %s', tracker1.identifier, tracker2.identifier);
+        print_text('Warning: less than 5 samples when comparing trackers.');
         ha = 0;
     else
 		%dif(abs(dif)' < practical(valid)) = 0;

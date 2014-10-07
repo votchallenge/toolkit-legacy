@@ -1,7 +1,8 @@
-function valid = valid_identifier(identifier)
+function [valid, conditional] = valid_identifier(identifier)
 
 if ~ischar(identifier)
-    valid = 0;
+    valid = false;
+	conditional = false;
     return;
 end;
 
@@ -10,3 +11,4 @@ numeric = (identifier >= '0' & identifier <= '9');
 symbol = identifier == '_';
 
 valid = all(alpha | numeric | symbol);
+conditional = all(alpha | numeric | symbol | identifier == '-');

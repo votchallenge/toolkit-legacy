@@ -12,14 +12,9 @@ for j = 1:nargin
 
     else
         
-        % if the argument is not a file name, test if it is
-        % a valid tracker identifier and use that
-        if valid_identifier(varargin{j})
-            identifiers = [identifiers; varargin(j)]; %#ok<AGROW>
-        else
-            continue;
-        end;
-        
+        % if the argument is not a file name ...
+        identifiers = [identifiers; varargin(j)]; %#ok<AGROW>
+
     end;
     
 end;
