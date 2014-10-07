@@ -36,11 +36,6 @@ for i = 1:size(identifiers, 1)
         break;
     end
 
-    if ~valid_identifier(tracker_identifier)
-        print_debug('Warning: %s is not a valid tracker identifier.', ...
-            tracker_identifier);
-    end;
-
     trackers{i} = create_tracker(tracker_identifier);
 
 end;
