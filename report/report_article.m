@@ -64,11 +64,12 @@ document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', 
 document.link(ranking_document.url, 'Detailed ranking results');
 
 if ~isempty(spotlight)
+    print_text('WARNING: The spotlight feature is not complete and does not work as planned.');
 
     highlight_index = find_tracker(trackers, spotlight);
     
     if ~isempty(highlight_index)
-    
+
         document.chapter('Hightlights for tracker %s');
 
         [spotlight_document, highlights] = report_ranking_spotlight(context, trackers, sequences, experiments, spotlight,  'uselabels', false, 'usepractical', true);
