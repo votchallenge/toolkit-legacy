@@ -1,6 +1,6 @@
 function [document] = report_article(context, experiments, trackers, sequences, varargin)
 
-arplot = false;
+arplot = true;
 permutationplot = false;
 ratio = 0.5;
 spotlight = [];

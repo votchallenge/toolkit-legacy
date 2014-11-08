@@ -12,7 +12,7 @@ for i = 1:2:length(varargin)
 end 
 
 experiments_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, experiments, 'UniformOutput', false)), '-'), 'Char', 'hex');
-sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, selectors, 'UniformOutput', false)), '-'), 'Char', 'hex');
+sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
 trackers_hash = md5hash(strjoin(sort(cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
 mkpath(fullfile(cache, 'speed'));
 
