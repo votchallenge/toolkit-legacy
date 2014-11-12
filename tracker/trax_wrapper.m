@@ -69,6 +69,13 @@ if (skip_initialize > 0)
     arguments = [arguments, sprintf(' -r %d', skip_initialize)];
 end;
 
+if ~isempty(tracker.trax_parameters) && iscell(tracker.trax_parameters)
+    for i = 1:size(tracker.trax_parameters, 1)
+        arguments = [arguments, sprintf(' -p "%s=%s"', ...
+            tracker.trax_parameters{i, 1}, num2str(tracker.trax_parameters{i, 2}))]; %#ok<AGROW>
+    end
+end
+
 % mwrapper requires matlab root on Unix
 if ~ispc
     arguments = [arguments, ' -e "MATLAB_ROOT=', matlabroot, '"'];

@@ -62,6 +62,7 @@ else
 	tracker_interpreter = [];
 	tracker_linkpath = {};
 	tracker_trax = true;
+    tracker_trax_parameters = {};
 
 	tracker_configuration = str2func(['tracker_' , family_identifier]);
 	tracker_configuration();
@@ -84,6 +85,7 @@ else
 		end;
 		tracker.run = @trax_wrapper;
 		tracker.trax = true;
+        tracker.trax_parameters = tracker_trax_parameters;
 		tracker.linkpath{end+1} = fullfile(matlabroot, 'bin', lower(computer('arch')));
 	else
 		tracker.run = @system_wrapper; %#ok<UNRCH>
