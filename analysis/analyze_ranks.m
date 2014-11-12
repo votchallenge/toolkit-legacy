@@ -129,8 +129,8 @@ function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers
             accuracy.average_ranks = mean(accuracy.ranks, 1);
             robustness.average_ranks = mean(robustness.ranks, 1);
 
-            accuracy.average_value = sum(accuracy.value .* repmat(lengths, 1, length(trackers)), 1) ./ length(lengths);
-            robustness.average_value = sum(robustness.value .* repmat(lengths, 1, length(trackers)), 1) ./ length(lengths);           
+            accuracy.average_value = sum(accuracy.value .* repmat(lengths, 1, length(trackers)), 1) ./ sum(lengths);
+            robustness.average_value = sum(robustness.value .* repmat(lengths, 1, length(trackers)), 1) ./ sum(lengths);
         
         case 'mean'
 

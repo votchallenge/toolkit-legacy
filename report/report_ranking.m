@@ -52,7 +52,7 @@ tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.
 
 column_labels = cell(2, 2 * numel(experiments) + 2);
 
-ranking_labels = {'Acc. Rank', 'Rob. Rank'};
+ranking_labels = {'Accuracy', 'Robustness'};
 column_labels(1, 1:2:end-2) = cellfun(@(x) struct('text', x.name, 'columns', 2), experiments,'UniformOutput',false);
 column_labels{1, end-1} = struct('text', 'Averaged', 'columns', 2);
 column_labels(1, 2:2:end) = repmat({struct()}, 1, numel(experiments) + 1);
@@ -73,8 +73,6 @@ for e = 1:length(experiments)
 	print_text('Writing ranking details for experiment %s ...', experiments{e}.name);
 
     document.section('Experiment %s', experiments{e}.name);
-    
-    % TODO: detailed tables of per-selector rankings and raw scores 
 
     if arplot
     
@@ -108,7 +106,7 @@ for e = 1:length(experiments)
         selector_labels = cellfun(@(x) x.name, sequences, 'UniformOutput', 0);
     end
 
-    print_experiment_table(document, results{e}, tracker_labels, selector_labels );
+    print_experiment_tables(document, results{e}, tracker_labels, selector_labels );
 
     document.subsection('Detailed plots');
 
@@ -179,25 +177,39 @@ document.write();
 end
 
 % --------------------------------------------------------------------- %
-function print_experiment_table(document, results, tracker_labels, selector_labels)
+function print_experiment_tables(document, results, tracker_labels, selector_labels)
 
-column_labels = cell(2, 4 * numel(selector_labels));
+    column_labels = cell(2, 2 * numel(selector_labels));
 
-ranking_labels = {'Acc. Rank', 'Rob. Rank', 'Overlap', 'Failures'};
-column_labels(1, :) = repmat({struct()}, 1, numel(selector_labels) * 4);
-column_labels(1, 1:4:end) = cellfun(@(x) struct('text', x, 'columns', 4), selector_labels,'UniformOutput', false);
-column_labels(2, :) = ranking_labels(repmat(1:length(ranking_labels), 1, numel(selector_labels)));
+    score_labels = {'Accuracy', 'Robustness'};
+    column_labels(1, :) = repmat({struct()}, 1, numel(selector_labels) * 2);
+    column_labels(1, 1:2:end) = cellfun(@(x) struct('text', x, 'columns', 2), selector_labels,'UniformOutput', false);
+    column_labels(2, :) = score_labels(repmat(1:length(score_labels), 1, numel(selector_labels)));
 
-table_data = zeros(numel(tracker_labels), 4 * numel(selector_labels));
-table_data(:, 1:4:end) = results.accuracy.ranks';
-table_data(:, 2:4:end) = results.robustness.ranks';
-table_data(:, 3:4:end) = results.accuracy.value';
-table_data(:, 4:4:end) = results.robustness.value';
+    table_data = zeros(numel(tracker_labels), 2 * numel(selector_labels));
+    table_data(:, 1:2:end) = results.accuracy.ranks';
+    table_data(:, 2:2:end) = results.robustness.ranks';
 
-table_data = highlight_best_rows(num2cell(table_data), ...
-    repmat({'ascending', 'ascending', 'descending', 'ascending'}, 1, numel(selector_labels)));
+    table_data = highlight_best_rows(num2cell(table_data), ...
+        repmat({'ascending', 'ascending'}, 1, numel(selector_labels)));
 
-document.table(table_data, 'columnLabels', column_labels, 'rowLabels', tracker_labels);
+    document.table(table_data, 'columnLabels', column_labels, 'rowLabels', tracker_labels, 'title', 'Ranks');
+
+    column_labels = cell(2, 2 * numel(selector_labels));
+
+    score_labels = {'Overlap', 'Failures'};
+    column_labels(1, :) = repmat({struct()}, 1, numel(selector_labels) * 2);
+    column_labels(1, 1:2:end) = cellfun(@(x) struct('text', x, 'columns', 2), selector_labels,'UniformOutput', false);
+    column_labels(2, :) = score_labels(repmat(1:length(score_labels), 1, numel(selector_labels)));
+
+    table_data = zeros(numel(tracker_labels), 2 * numel(selector_labels));
+    table_data(:, 1:2:end) = results.accuracy.value';
+    table_data(:, 2:2:end) = results.robustness.value';
+
+    table_data = highlight_best_rows(num2cell(table_data), ...
+        repmat({'descending', 'ascending'}, 1, numel(selector_labels)));
+
+    document.table(table_data, 'columnLabels', column_labels, 'rowLabels', tracker_labels, 'title', 'Raw scores');
 
 end
 
