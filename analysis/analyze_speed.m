@@ -22,7 +22,7 @@ if exist(cache_file, 'file')
         normalized = [];
         original = [];
         load(cache_file);
-        if ~isempty(normalized) && ~isempty(origin)   
+        if ~isempty(normalized) && ~isempty(original)   
             print_text('Loading speed results from cache.');
             return;
         end;

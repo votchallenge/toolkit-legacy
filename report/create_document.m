@@ -198,7 +198,7 @@ function insert_figure(context, fid, handle, id, title)
 
     if context.exportraw
             
-            file = export_figure(handle, fullfile(context.data, [context.prefix, id]), 'fig', 'cache', context.cache);
+            file = export_figure(handle, fullfile(context.raw, [context.prefix, id]), 'fig', 'cache', context.cache);
             
             % Hack : try to fix potential figure invisibility
             try
