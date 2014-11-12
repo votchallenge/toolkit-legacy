@@ -24,6 +24,7 @@ function matrix2html(matrix, filename, varargin)
     colLabels = [];
     format = '%.2f';
     css_class = [];
+    title = [];
     if (rem(nargin,2) == 1 || nargin < 2)
         error('Incorrect number of arguments to %s.', mfilename);
     end
@@ -37,7 +38,9 @@ function matrix2html(matrix, filename, varargin)
             case 'format'
                 format = lower(varargin{i+1});
             case 'class'
-                css_class = varargin{i+1};                
+                css_class = varargin{i+1};
+            case 'title'
+                title = varargin{i+1};    
             otherwise 
                 error(['Unknown switch ', varargin{i}, '!']) ;
         end
@@ -74,6 +77,10 @@ function matrix2html(matrix, filename, varargin)
     end;
 
 
+    if(~isempty(title))
+        fprintf(fid, '<div class="title">%s</div>\n', title);
+    end
+    
     if(~isempty(css_class))
         fprintf(fid, '<table class="%s">\n', css_class);
     else
