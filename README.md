@@ -5,14 +5,22 @@ This repository contains the official evaluation kit for the [Visual Object Trac
 
 For more detailed informations consult the documentation available at [Github wiki](https://github.com/vicoslab/vot-toolkit/wiki). You can also subscribe to the VOT [mailing list](https://service.ait.ac.at/mailman/listinfo/votchallenge) to receive news about challenges and important software updates.
 
-Click [here](https://github.com/vicoslab/vot-toolkit/archive/master.zip) to download the latest version of the evaluation kit. 
+Click [here](https://github.com/vicoslab/vot-toolkit/archive/master.zip) to download the latest official version of the evaluation kit. 
 
-Authors
--------
+Developers
+----------
 
-* Luka Čehovin
+* Luka Čehovin (lead developer)
 * Georg Nebehay
 * Tomáš Vojíř
+
+Contributors
+------------
+
+* Heng Cherkeng
+* Stefan Duffner
+* Mario Maresca
+* Klaus Haag
 
 License
 -------
