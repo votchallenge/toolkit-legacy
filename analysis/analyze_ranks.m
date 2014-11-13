@@ -40,8 +40,8 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
     end;
 
-    sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, selectors, 'UniformOutput', false)), '-'), 'Char', 'hex');
-    trackers_hash = md5hash(strjoin(sort(cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
+    sequences_hash = md5hash(strjoin((cellfun(@(x) x.name, selectors, 'UniformOutput', false)), '-'), 'Char', 'hex');
+    trackers_hash = md5hash(strjoin((cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
     parameters_hash = md5hash(sprintf('%f-%s-%d-%d', alpha, average, uselabels, usepractical));
     
     mkpath(fullfile(cache, 'ranking'));
