@@ -3,10 +3,12 @@ function [document, averaged_ranks] = report_ranking(context, trackers, sequence
 uselabels = false;
 usepractical = false;
 permutationplot = false;
-arplot = true;
+arplot = false; %true;
 average = 'weighted_mean';
 sensitivity = 30;
 alpha = 0.05;
+table_format = 'joined'; % joined, rankscores, fragmented
+table_orientation = 'trackers'; % trackers, selectors, trackerscores, selectorscores
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
@@ -22,6 +24,10 @@ for i = 1:2:length(varargin)
             average = varargin{i+1};
         case 'alpha'
             alpha = varargin{i+1}; 
+        case 'tableformat'
+            table_format = varargin{i+1};
+        case 'tableorientation'
+            table_orientation = varargin{i+1}; 
         otherwise 
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
@@ -106,8 +112,28 @@ for e = 1:length(experiments)
         selector_labels = cellfun(@(x) x.name, sequences, 'UniformOutput', 0);
     end
 
-    print_experiment_tables(document, results{e}, tracker_labels, selector_labels );
-
+    score_labels = {'Acc. Rank', 'Rob. Rank', 'Overlap', 'Failures'};
+    score_sorting = {'ascending', 'ascending', 'descending', 'ascending'};
+    scores = cat(3, results{e}.accuracy.ranks', results{e}.robustness.ranks', results{e}.accuracy.value', results{e}.robustness.value');
+                
+    switch table_format
+        case 'joined'
+            print_scores_table(document, scores, score_sorting, score_labels, tracker_labels, selector_labels, table_orientation, 'Ranks and raw scores');
+        case 'rankscores'
+            print_scores_table(document, scores(:, :, 1:2), score_sorting(1:2), score_labels(1:2), tracker_labels, selector_labels, table_orientation, 'Ranks');
+            print_scores_table(document, scores(:, :, 3:4), score_sorting(3:4), score_labels(3:4), tracker_labels, selector_labels, table_orientation, 'Raw scores');
+        case 'fragmented'
+            for t = 1:numel(score_labels)
+                print_scores_table(document, scores(:, :, t), score_sorting(t), score_labels(t), tracker_labels, selector_labels, table_orientation, score_labels{t});
+            end;
+    end
+    
+%     if table_flip
+%         print_experiment_tables_selectors(document, results{e}, tracker_labels, selector_labels );
+%     else
+%         print_experiment_tables_trackers(document, results{e}, tracker_labels, selector_labels );
+%     end
+    
     document.subsection('Detailed plots');
 
     if permutationplot
@@ -177,39 +203,94 @@ document.write();
 end
 
 % --------------------------------------------------------------------- %
-function print_experiment_tables(document, results, tracker_labels, selector_labels)
 
-    column_labels = cell(2, 2 * numel(selector_labels));
+function print_scores_table(document, scores, score_sorting, score_labels, tracker_labels, selector_labels, orientation, title)
 
-    score_labels = {'Accuracy', 'Robustness'};
-    column_labels(1, :) = repmat({struct()}, 1, numel(selector_labels) * 2);
-    column_labels(1, 1:2:end) = cellfun(@(x) struct('text', x, 'columns', 2), selector_labels,'UniformOutput', false);
-    column_labels(2, :) = score_labels(repmat(1:length(score_labels), 1, numel(selector_labels)));
+    % Scores - selectors x trackers x scores
 
-    table_data = zeros(numel(tracker_labels), 2 * numel(selector_labels));
-    table_data(:, 1:2:end) = results.accuracy.ranks';
-    table_data(:, 2:2:end) = results.robustness.ranks';
+    score_count = numel(score_labels);
+    selector_count = numel(selector_labels);
+    tracker_count = numel(tracker_labels);
+    
+    switch orientation
+        case 'trackers'
+            row_labels = tracker_labels;
+            column_labels = selector_labels;
+            row_scores = false;
+            sort_columns = false;
+        case 'selectors'
+            row_labels = selector_labels;
+            column_labels = tracker_labels;
+            row_scores = false;
+            sort_columns = true;
+        case 'trackerscores'
+            row_labels = tracker_labels;
+            column_labels = selector_labels;
+            row_scores = true;
+            sort_columns = true;
+        case 'selectorscores'
+            row_labels = selector_labels;
+            column_labels = tracker_labels;
+            row_scores = true;
+            sort_columns = false;
+        otherwise
+            error('Unknown format %s', orientation);
+    end
 
-    table_data = highlight_best_rows(num2cell(table_data), ...
-        repmat({'ascending', 'ascending'}, 1, numel(selector_labels)));
+    column_labels = column_labels(:)';
+    row_labels = row_labels(:);
+    
+    row_count = numel(row_labels);
+    column_count = numel(column_labels);
+    
+    if sort_columns
+        table_data = cell(tracker_count * score_count, selector_count);
+        
+        for s = 1:score_count
+            score_table_data = highlight_best_rows(num2cell(scores(:, :, s)), ...
+                repmat(score_sorting(s), 1, numel(selector_labels)));
+            table_data(s:score_count:end, :) = score_table_data;
+        end
+        
+        if ~row_scores
+            table_data = table_data';
+        end
+    else
+        table_data = cell(tracker_count, selector_count * score_count);
+        
+        for s = 1:score_count
+            score_table_data = highlight_best_rows(num2cell(scores(:, :, s)), ...
+                repmat(score_sorting(s), 1, numel(selector_labels)));
+            table_data(:, s:score_count:end) = score_table_data;
+        end
+        
+        if row_scores
+            table_data = table_data';
+        end
+    end
+    
+    if row_scores
+        
+        if score_count > 1
+            row_labels_exp = cell(score_count * row_count, 2);
+            row_labels_exp(:, 1) = repmat({struct()}, 1, row_count * score_count);
+            row_labels_exp(1:score_count:end, 1) = cellfun(@(x) struct('text', x, 'rows', score_count), row_labels, 'UniformOutput', false);
+            row_labels_exp(:, 2) = score_labels(repmat(1:score_count, 1, row_count));
+            row_labels = row_labels_exp;
+        end
+        
+    else
+        
+        if score_count > 1
+            column_labels_exp = cell(2, score_count * column_count);
+            column_labels_exp(1, :) = repmat({struct()}, 1, column_count * score_count);
+            column_labels_exp(1, 1:score_count:end) = cellfun(@(x) struct('text', x, 'columns', score_count), column_labels, 'UniformOutput', false);
+            column_labels_exp(2, :) = score_labels(repmat(1:score_count, 1, column_count));
+            column_labels = column_labels_exp;
+        end
+        
+    end;
 
-    document.table(table_data, 'columnLabels', column_labels, 'rowLabels', tracker_labels, 'title', 'Ranks');
-
-    column_labels = cell(2, 2 * numel(selector_labels));
-
-    score_labels = {'Overlap', 'Failures'};
-    column_labels(1, :) = repmat({struct()}, 1, numel(selector_labels) * 2);
-    column_labels(1, 1:2:end) = cellfun(@(x) struct('text', x, 'columns', 2), selector_labels,'UniformOutput', false);
-    column_labels(2, :) = score_labels(repmat(1:length(score_labels), 1, numel(selector_labels)));
-
-    table_data = zeros(numel(tracker_labels), 2 * numel(selector_labels));
-    table_data(:, 1:2:end) = results.accuracy.value';
-    table_data(:, 2:2:end) = results.robustness.value';
-
-    table_data = highlight_best_rows(num2cell(table_data), ...
-        repmat({'descending', 'ascending'}, 1, numel(selector_labels)));
-
-    document.table(table_data, 'columnLabels', column_labels, 'rowLabels', tracker_labels, 'title', 'Raw scores');
+    document.table(table_data, 'columnLabels', column_labels, 'rowLabels', row_labels, 'title', title);
 
 end
-

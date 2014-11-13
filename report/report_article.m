@@ -28,7 +28,9 @@ print_text('Generating article report'); print_indent(1);
 print_text('Ranking report ...'); print_indent(1);
 
 [ranking_document, ranks] = report_ranking(context, trackers, sequences, experiments, ...
-    'uselabels', false, 'usepractical', true, 'arplot', arplot, 'permutationplot', permutationplot);
+    'uselabels', false, 'usepractical', true, 'tableformat', 'fragmented', ...
+    'tableorientation', 'selectors', ...
+    'arplot', arplot, 'permutationplot', permutationplot);
 
 combined_ranks = squeeze(mean(ranks, 1));
 
