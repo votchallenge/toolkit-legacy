@@ -127,7 +127,7 @@ for e = 1:length(experiments)
         [results{e}.robustness.value', result.robustness.average_value']);
     
     table_selector_labels = selector_labels;
-    table_selector_labels{end+1} = struct('text', 'Average', 'class',  'average');
+    table_selector_labels{end+1} = create_table_cell('Average', 'class',  'average'); %#ok<AGROW>
     
     switch table_format
         case 'joined'
@@ -300,7 +300,7 @@ function print_scores_table(document, scores, score_sorting, score_labels, track
         if score_count > 1
             row_labels_exp = cell(score_count * row_count, 2);
             row_labels_exp(:, 1) = repmat({struct()}, 1, row_count * score_count);
-            row_labels_exp(1:score_count:end, 1) = cellfun(@(x) struct('text', x, 'rows', score_count), row_labels, 'UniformOutput', false);
+            row_labels_exp(1:score_count:end, 1) = cellfun(@(x) create_table_cell(x, 'rows', score_count), row_labels, 'UniformOutput', false);
             row_labels_exp(:, 2) = score_labels(repmat(1:score_count, 1, row_count));
             row_labels = row_labels_exp;
         end
@@ -310,7 +310,7 @@ function print_scores_table(document, scores, score_sorting, score_labels, track
         if score_count > 1
             column_labels_exp = cell(2, score_count * column_count);
             column_labels_exp(1, :) = repmat({struct()}, 1, column_count * score_count);
-            column_labels_exp(1, 1:score_count:end) = cellfun(@(x) struct('text', x, 'columns', score_count), column_labels, 'UniformOutput', false);
+            column_labels_exp(1, 1:score_count:end) = cellfun(@(x) create_table_cell(x, 'columns', score_count), column_labels, 'UniformOutput', false);
             column_labels_exp(2, :) = score_labels(repmat(1:score_count, 1, column_count));
             column_labels = column_labels_exp;
         end
