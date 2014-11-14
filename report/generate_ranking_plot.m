@@ -3,8 +3,8 @@ function hf = generate_ranking_plot(trackers, accuracy, robustness, varargin)
     plot_title = [];
     visible = false; 
     plot_limit = numel(trackers);
-    width = 6;
-    height = 4;
+    width = [];
+    height = [];
 
     hf = [];
 
@@ -40,6 +40,14 @@ function hf = generate_ranking_plot(trackers, accuracy, robustness, varargin)
     else
         figure(hf);
     end;
+
+    if isempty(width)
+        width = iff(show_legend, 6, 4);
+    end
+
+    if isempty(height)
+        height = 4;
+    end
 
     hold on; box on; grid on;
     title(plot_title, 'interpreter','none');

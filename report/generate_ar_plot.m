@@ -3,8 +3,8 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
     plot_title = [];
     sensitivity = 30;
     visible = false;    
-    width = 6;
-    height = 4;
+    width = [];
+    height = [];
 
     hf = [];
     
@@ -35,6 +35,14 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
         end
     end 
 
+    if isempty(width)
+        width = iff(show_legend, 6, 4);
+    end
+
+    if isempty(height)
+        height = 4;
+    end
+
     if isempty(hf)
         if ~visible
             hf = figure('Visible', 'off');
@@ -45,8 +53,7 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
         figure(hf);
     end;
 
-    hold on;
-    grid on;
+    hold on; box on; grid on;
     
     if ~isempty(plot_title)
         title(plot_title, 'interpreter', 'none'); 
