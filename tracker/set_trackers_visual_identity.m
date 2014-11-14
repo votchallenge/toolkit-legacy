@@ -5,7 +5,7 @@ groups = [];
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'groups'
-            groups = varargin{i+1};          
+            groups = varargin{i+1};
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -36,6 +36,8 @@ for i = 1:length(trackers)
     styled_trackers{i}.style.color = colors(i, :);
     styled_trackers{i}.style.symbol = symbol{i};
     styled_trackers{i}.style.width = width(i);
+    styled_trackers{i}.style.font_color = [0, 0, 0];
+    styled_trackers{i}.style.font_bold = false;
     if isfield(trackers{i}, 'label')
         styled_trackers{i}.label = trackers{i}.label;
     else
