@@ -20,7 +20,7 @@ for j = 1:nargin
 end;
 
 % remove the duplicate identifiers
-identifiers = unique(identifiers);
+identifiers = unique(identifiers, 'stable');
 
 trackers = cell(size(identifiers, 1), 1);
 
