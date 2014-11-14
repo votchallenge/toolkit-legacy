@@ -121,17 +121,23 @@ for e = 1:length(experiments)
 
     score_labels = {'Acc. Rank', 'Rob. Rank', 'Overlap', 'Failures'};
     score_sorting = {'ascending', 'ascending', 'descending', 'ascending'};
-    scores = cat(3, results{e}.accuracy.ranks', results{e}.robustness.ranks', results{e}.accuracy.value', results{e}.robustness.value');
-                
+    scores = cat(3, [results{e}.accuracy.ranks', result.accuracy.average_ranks'], ...
+        [results{e}.robustness.ranks', result.robustness.average_ranks'], ...
+        [results{e}.accuracy.value', result.accuracy.average_value'], ...
+        [results{e}.robustness.value', result.robustness.average_value']);
+    
+    table_selector_labels = selector_labels;
+    table_selector_labels{end+1} = struct('text', 'Average', 'class',  'average');
+    
     switch table_format
         case 'joined'
-            print_scores_table(document, scores, score_sorting, score_labels, tracker_labels, selector_labels, table_orientation, 'Ranks and raw scores');
+            print_scores_table(document, scores, score_sorting, score_labels, tracker_labels, table_selector_labels, table_orientation, 'Ranks and raw scores');
         case 'rankscores'
-            print_scores_table(document, scores(:, :, 1:2), score_sorting(1:2), score_labels(1:2), tracker_labels, selector_labels, table_orientation, 'Ranks');
-            print_scores_table(document, scores(:, :, 3:4), score_sorting(3:4), score_labels(3:4), tracker_labels, selector_labels, table_orientation, 'Raw scores');
+            print_scores_table(document, scores(:, :, 1:2), score_sorting(1:2), score_labels(1:2), tracker_labels, table_selector_labels, table_orientation, 'Ranks');
+            print_scores_table(document, scores(:, :, 3:4), score_sorting(3:4), score_labels(3:4), tracker_labels, table_selector_labels, table_orientation, 'Raw scores');
         case 'fragmented'
             for t = 1:numel(score_labels)
-                print_scores_table(document, scores(:, :, t), score_sorting(t), score_labels(t), tracker_labels, selector_labels, table_orientation, score_labels{t});
+                print_scores_table(document, scores(:, :, t), score_sorting(t), score_labels(t), tracker_labels, table_selector_labels, table_orientation, score_labels{t});
             end;
     end
     
