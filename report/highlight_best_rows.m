@@ -4,31 +4,32 @@ if size(tabledata, 2) ~= numel(columns)
     error('Number of columns does not match the sorting instructuions.');
 end;
 
+labels = {'first', 'second', 'third'};
+
 for i = 1:numel(columns)
-    
+
+    values = cell2mat(tabledata(:, i));
+    usable = find(~isnan(values));
+
     switch columns{i}
         case 'descending'
-			values = cell2mat(tabledata(:, i));
-			usable = find(~isnan(values));
-            [~, indices] = sort(values(usable), 'descend');
-            indices = usable(indices);
-            
-			if ~isempty(indices)
-		        tabledata{indices(1), i} = struct('text', tabledata{indices(1), i}, 'class', 'first');
-		        tabledata{indices(2), i} = struct('text', tabledata{indices(2), i}, 'class', 'second');
-		        tabledata{indices(3), i} = struct('text', tabledata{indices(3), i}, 'class', 'third');
-            end;
+
+            levels = sort(unique(values(usable)), 'descend');
 
         case 'ascending'
-			values = cell2mat(tabledata(:, i));
-			usable = find(~isnan(values));
-            [~, indices] = sort(values(usable), 'ascend');
-            indices = usable(indices);
+            levels = sort(unique(values(usable)), 'ascend');
 
-			if ~isempty(indices)
-		        tabledata{indices(1), i} = struct('text', tabledata{indices(1), i}, 'class', 'first');
-		        tabledata{indices(2), i} = struct('text', tabledata{indices(2), i}, 'class', 'second');
-		        tabledata{indices(3), i} = struct('text', tabledata{indices(3), i}, 'class', 'third');
-			end;
+        otherwise
+            levels = [];
     end;
+    
+    if isempty(levels)
+        continue;
+    end;
+    
+    for j = 1:min(numel(labels), numel(levels))
+        tabledata(values == levels(j), i) = cellfun(...
+            @(x) struct('text', x, 'class', labels{j}), tabledata(values == levels(j), i), 'UniformOutput', false);
+        
+    end
 end;
