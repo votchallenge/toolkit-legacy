@@ -112,8 +112,9 @@ function [cells] = matrix2cells(matrix, element, format)
             num2cell(matrix), 'UniformOutput', false);
         rowspan = ones(size(cells));
         colspan = ones(size(cells));
+        attributes = repmat({''}, size(cells, 1), size(cells, 2));
     else
-        [cells, rowspan, colspan] = cellfun(@(x) cell2cell(x, format), ...
+        [cells, rowspan, colspan, attributes] = cellfun(@(x) cell2cell(x, format), ...
             matrix, 'UniformOutput', false);
         rowspan = cell2mat(rowspan);
         colspan = cell2mat(colspan);
@@ -127,16 +128,17 @@ function [cells] = matrix2cells(matrix, element, format)
             if rowspan(h, w) == 0 || colspan(h, w) == 0
                 cells{h, w} = '';
             elseif rowspan(h, w) == 1 && colspan(h, w) == 1
-                cells{h, w} = sprintf('<%s>%s</%s>', element, cells{h, w}, element);
+                cells{h, w} = sprintf('<%s %s>%s</%s>', element, ...
+                    attributes{h, w}, cells{h, w}, element);
             elseif rowspan(h, w) == 1
-                cells{h, w} = sprintf('<%s colspan="%d">%s</%s>', ...
-                    element, colspan(h, w), cells{h, w}, element);
+                cells{h, w} = sprintf('<%s colspan="%d" %s>%s</%s>', ...
+                    element, colspan(h, w), attributes{h, w}, cells{h, w}, element);
             elseif colspan(h, w) == 1
-                cells{h, w} = sprintf('<%s rowspan="%d">%s</%s>', ...
-                    element, rowspan(h, w), cells{h, w}, element);
+                cells{h, w} = sprintf('<%s rowspan="%d" %s>%s</%s>', ...
+                    element, rowspan(h, w), attributes{h, w}, cells{h, w}, element);
             else
-                cells{h, w} = sprintf('<%s colspan="%d" rowspan="%d">%s</%s>', ...
-                    element, colspan(h, w), rowspan(h, w), cells{h, w}, element);
+                cells{h, w} = sprintf('<%s colspan="%d" rowspan="%d" %s>%s</%s>', ...
+                    element, colspan(h, w), rowspan(h, w), attributes{h, w}, cells{h, w}, element);
             end;
         end
     end
@@ -154,11 +156,13 @@ function [cells] = matrix2cells(matrix, element, format)
     
 end
 
-function [str, rowspan, colspan] = cell2cell(s, format)
+function [str, rowspan, colspan, cell_attributes] = cell2cell(s, format)
 
     rowspan = 1;
     colspan = 1;
 
+    cell_attributes = '';
+    
     if isnumeric(s)
         str = num2str(s, format);
         return;
@@ -196,7 +200,7 @@ function [str, rowspan, colspan] = cell2cell(s, format)
     attributes = '';
     
     if isfield(s, 'class')
-        attributes = [attributes, ' class="', s.class, '" '];
+        cell_attributes = [cell_attributes, ' class="', s.class, '" '];
     end
 
     if isfield(s, 'tooltip')

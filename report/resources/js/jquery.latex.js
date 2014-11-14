@@ -1,5 +1,15 @@
 LaTeX = new Object();
 
+LaTeX.augment = function(text, classes) {
+
+    for (var cl in classes) {
+        text = '\\' + classes[cl] + '{' + text + '}';
+
+    }
+
+    return text;
+} 
+
 LaTeX.escape = function(s) {
 
 	return s.replace("\\", "\\textbackslash").replace("~", "\\textasciitilde").replace("&", "\\&").replace("_", "\\_");
@@ -24,11 +34,13 @@ $(function () {
                 cell = $(cell);
                 var colspan = parseInt(cell.attr('colspan'));
                 var rowspan = parseInt(cell.attr('rowspan'));
-
                 if (!colspan) colspan = 1;
                 if (!rowspan) rowspan = 1;
 
-                rowData.push({'header' : cell.is('th'), 'text' : cell.text(), 'rows' : rowspan, 'columns': colspan});
+                var classes = cell.attr('class');
+                if (classes) classes = classes.split(' '); else classes = [];
+
+                rowData.push({'header' : cell.is('th'), 'text' : cell.text(), 'rows' : rowspan, 'columns': colspan, 'classes': classes});
                 columns += colspan;
 
             });
@@ -48,7 +60,7 @@ $(function () {
 
             $.each(rowData, function(i, cell) {
 
-                var rendered = LaTeX.escape(cell.text);
+                var rendered = LaTeX.augment(LaTeX.escape(cell.text), cell.classes);
 
                 if (cell.header) {
                     rendered = '\\textbf{' + rendered + '}';
