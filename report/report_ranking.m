@@ -3,6 +3,7 @@ function [document, averaged_ranks] = report_ranking(context, trackers, sequence
 uselabels = false;
 usepractical = false;
 permutationplot = false;
+hidelegend = false;
 arplot = false; %true;
 average = 'weighted_mean';
 sensitivity = 30;
@@ -28,6 +29,8 @@ for i = 1:2:length(varargin)
             table_format = varargin{i+1};
         case 'tableorientation'
             table_orientation = varargin{i+1}; 
+        case 'hidelegend'
+            hidelegend = varargin{i+1}; 
         otherwise 
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
@@ -89,18 +92,22 @@ for e = 1:length(experiments)
 
         hf = generate_ranking_plot(trackers, squeeze(averaged_ranks(e, :, 1)), ...
             squeeze(averaged_ranks(e, :, 2)), ...
-            'title', plot_title, 'limit', numel(trackers));
+            'title', plot_title, 'limit', numel(trackers), 'legend', ~hidelegend);
 
         document.figure(hf, plot_id, plot_title);
+
+        close(hf);
 
         plot_title = sprintf('AR plot for experiment %s', experiments{e}.name);
         plot_id = sprintf('arplot_%s', experiments{e}.name);
 
         hf = generate_ar_plot(trackers, squeeze(averaged_scores(e, :, 1)), ...
             squeeze(averaged_scores(e, :, 2)), ...
-            'title', plot_title, 'sensitivity', sensitivity);
+            'title', plot_title, 'sensitivity', sensitivity, 'legend', ~hidelegend);
 
         document.figure(hf, plot_id, plot_title);
+
+        close(hf);
 
         document.raw('</div>\n');
 
@@ -128,38 +135,47 @@ for e = 1:length(experiments)
             end;
     end
     
-%     if table_flip
-%         print_experiment_tables_selectors(document, results{e}, tracker_labels, selector_labels );
-%     else
-%         print_experiment_tables_trackers(document, results{e}, tracker_labels, selector_labels );
-%     end
-    
     document.subsection('Detailed plots');
 
     if permutationplot
               
         document.raw('<div class="imagegrid">\n');        
         
-        h = generate_permutation_plot(trackers, results{e}.accuracy.ranks, selector_labels, 'flip', 1);
+        h = generate_permutation_plot(trackers, results{e}.accuracy.ranks, selector_labels, ...
+            'flip', 1, 'legend', ~hidelegend);
         document.figure(h, sprintf('permutation_accuracy_%s', experiments{e}.name), ...
             'Ranking permutations for accuracy rank');
 
-        h = generate_permutation_plot(trackers, results{e}.accuracy.value, selector_labels, 'scope', [0, 1], 'type', 'Average overlap');
+        close(h);
+
+        h = generate_permutation_plot(trackers, results{e}.accuracy.value, selector_labels, ...
+            'scope', [0, 1], 'type', 'Average overlap', 'legend', ~hidelegend);
         document.figure(h, sprintf('permutation_overlap_%s', experiments{e}.name), ...
             'Permutations for average overlap');    
+
+        close(h);
 
         document.raw('</div>\n');
         document.raw('<div class="imagegrid">\n');        
         
-        h = generate_permutation_plot(trackers, results{e}.robustness.ranks, selector_labels, 'flip', 1);
+        h = generate_permutation_plot(trackers, results{e}.robustness.ranks, selector_labels, ...
+            'flip', 1, 'legend', ~hidelegend);
         document.figure(h, sprintf('permutation_robustness_%s', experiments{e}.name), ...
             'Ranking permutations for robustness rank');
 
-        h = generate_permutation_plot(trackers, results{e}.robustness.value, selector_labels, ...
-            'scope', [0, max(results{e}.robustness.value(:))+1], 'type', 'Failures');
+        close(h);
+
+        robustness = results{e}.robustness.value(:, :) ./ repmat(results{e}.lengths(:), 1, numel(tracker_labels));
+        
+        h = generate_permutation_plot(trackers, robustness, selector_labels, ...
+            'scope', [0, max(robustness(:))+eps], 'type', ...
+            'Failures', 'legend', ~hidelegend);
+
         document.figure(h, sprintf('permutation_failures_%s', experiments{e}.name), ...
             'Permutations for failures');
-        
+
+        close(h);
+            
         document.raw('</div>\n');        
     end;
 
@@ -176,9 +192,11 @@ for e = 1:length(experiments)
 
             hf = generate_ranking_plot(trackers, results{e}.accuracy.ranks(l, :)', ...
                 results{e}.robustness.ranks(l, :)', ...
-                'title', plot_title, 'limit', numel(trackers));
+                'title', plot_title, 'limit', numel(trackers), 'legend', ~hidelegend);
 
             document.figure(hf, plot_id, plot_title);   
+
+            close(hf);
 
             plot_title = sprintf('AR plot for label %s in experiment %s', ...
                 selector_labels{l}, experiments{e}.name);
@@ -186,9 +204,11 @@ for e = 1:length(experiments)
 
             hf = generate_ar_plot(trackers, results{e}.accuracy.value(l, :), ...
                 results{e}.robustness.value(l, :) ./ results{e}.lengths(l), ...
-                'title', plot_title, 'sensitivity', sensitivity);
+                'title', plot_title, 'sensitivity', sensitivity, 'legend', ~hidelegend);
 
             document.figure(hf, plot_id, plot_title);
+
+            close(hf);
 
             document.raw('</div>\n');
 
