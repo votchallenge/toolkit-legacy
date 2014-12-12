@@ -194,7 +194,11 @@ end;
 cd(old_directory);
 
 % validate and process results
-trajectory = read_trajectory(output_file);
+if exist(output_file, 'file')
+    trajectory = read_trajectory(output_file);
+else
+    trajectory = {};
+end;
 
 n_frames = size(trajectory, 1);
 
