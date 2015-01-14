@@ -3,6 +3,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
     usepractical = false;
     uselabels = true;
     average = 'weighted_mean';
+	adaptation = 'mean';
     alpha = 0.05;
     cache = fullfile(get_global_variable('directory'), 'cache');
     
@@ -18,6 +19,8 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
                 alpha = varargin{i+1};                
             case 'cache'
                 cache = varargin{i+1};                   
+            case 'adaptation'
+                adaptation = varargin{i+1};  
             otherwise 
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
@@ -40,9 +43,10 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
     end;
 
+
     sequences_hash = md5hash(strjoin((cellfun(@(x) x.name, selectors, 'UniformOutput', false)), '-'), 'Char', 'hex');
     trackers_hash = md5hash(strjoin((cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
-    parameters_hash = md5hash(sprintf('%f-%s-%d-%d', alpha, average, uselabels, usepractical));
+    parameters_hash = md5hash(sprintf('%f-%s-%d-%d-%s', alpha, average, uselabels, usepractical, adaptation));
     
     mkpath(fullfile(cache, 'ranking'));
     
@@ -55,7 +59,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
     
     if isempty(result)
         [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers, ...
-            experiment_sequences, selectors, alpha, usepractical, average);
+            experiment_sequences, selectors, alpha, usepractical, average, adaptation);
 
         result = struct('accuracy', accuracy, 'robustness', robustness); %, 'lengths', lengths);
 
@@ -69,7 +73,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 end
 
 function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers, ...
-    sequences, selectors, alpha, usepractical, average)
+    sequences, selectors, alpha, usepractical, average, adaptation)
 
     N_trackers = length(trackers) ;
     N_selectors = length(selectors) ;
@@ -97,8 +101,8 @@ function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers
             trackers_ranking_selector(experiment, trackers, sequences, selectors{a}, alpha, usepractical);
         
         % get adapted ranks
-        adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA) ;
-        adapted_robustness_ranks = adapted_ranks(robustness_ranks, HR) ;   
+        adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA, adaptation);
+        adapted_robustness_ranks = adapted_ranks(robustness_ranks, HR, adaptation);
         
         % mask out results that are not available
 	    adapted_accuracy_ranks(~available) = nan;

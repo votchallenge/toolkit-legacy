@@ -1,6 +1,4 @@
-function a_ranks = adapted_ranks(ranks, different)
-
-mode = 'reranked';
+function a_ranks = adapted_ranks(ranks, different, mode)
 
 a_ranks = zeros(1, length(ranks)) ;
 
@@ -32,5 +30,5 @@ switch mode
 
         [~, ~, reranked] = unique(a_ranks);
         a_ranks = reranked; 
-        
+
 end;
