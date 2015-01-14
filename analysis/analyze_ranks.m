@@ -57,7 +57,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
         [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers, ...
             experiment_sequences, selectors, alpha, usepractical, average);
 
-        result = struct('accuracy', accuracy, 'robustness', robustness, 'lengths', lengths);
+        result = struct('accuracy', accuracy, 'robustness', robustness); %, 'lengths', lengths);
 
         save(cache_file, 'result');
     else
@@ -196,29 +196,28 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
 
 		print_text('Processing tracker %s ...', trackers{t1}.identifier);
 
-            if isempty(cacheA{t1})
-                [O1, F1] = selector.aggregate(experiment, trackers{t1}, sequences);
-                cacheA{t1} = O1; cacheR{t1} = F1;
-            else
-                O1 = cacheA{t1}; F1 = cacheR{t1};
-            end;
+        if isempty(cacheA{t1})
+            [O1, F1] = selector.aggregate(experiment, trackers{t1}, sequences);
+            cacheA{t1} = O1; cacheR{t1} = F1;
+        else
+            O1 = cacheA{t1}; F1 = cacheR{t1};
+        end;
 
-            if isempty(O1)
-                available(t1) = false;
-				HA(t1, :) = true; HA(:, t1) = true;
-				HR(t1, :) = true; HR(:, t1) = true;
-                continue; 
-            end
-            
-            valid_frames = ~isnan(O1) ;
-
-            average_accuracy.mu(t1) = mean(O1(valid_frames));
-            average_accuracy.std(t1) = std(O1(valid_frames));
-
-            average_robustness.mu(t1) = mean(F1);
-            average_robustness.std(t1) = std(F1);
-
+        if isempty(O1)
+            available(t1) = false;
+			HA(t1, :) = true; HA(:, t1) = true;
+			HR(t1, :) = true; HR(:, t1) = true;
+            continue; 
+        end
         
+        valid_frames = ~isnan(O1) ;
+
+        average_accuracy.mu(t1) = mean(O1(valid_frames));
+        average_accuracy.std(t1) = std(O1(valid_frames));
+
+        average_robustness.mu(t1) = mean(F1(:));
+        average_robustness.std(t1) = std(F1(:));
+
         for t2 = t1+1:length(trackers)
         
             if isempty(cacheA{t1})

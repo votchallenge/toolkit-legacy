@@ -1,9 +1,11 @@
 function selectors = create_label_selectors(experiment, sequences, labels) %#ok<INUSL>
 
+    sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
+
     selectors = cellfun(@(label) struct('name', sprintf('label_%s', label), ...
         'title', label, ...
         'aggregate', @(experiment, tracker, sequences) ...
-        aggregate_for_label(experiment, tracker, sequences, label, true), ...
+        aggregate_for_label(experiment, tracker, sequences, label, sequences_hash), ...
         'practical', @(sequences) practical_for_label(sequences, label), 'length', @(sequences) count_for_label(sequences, label)), ...
         labels, 'UniformOutput', false);
 
@@ -14,24 +16,27 @@ function [average_overlap, average_failures] = aggregate_for_label(experiment, t
     average_overlap = [];
     average_failures = [];
 
-    cache_directory = fullfile(get_global_variable('directory'), 'cache', 'labels', experiment.name, label);    
-    mkpath(cache_directory);
+    if ~isempty(cache)
+        cache_directory = fullfile(get_global_variable('directory'), 'cache', 'labels', experiment.name, label, cache);    
+        mkpath(cache_directory);
 
-	cache_file = fullfile(cache_directory, sprintf('%s.mat', tracker.identifier));
-        
-	if exist(cache_file, 'file') && cache
-        A = []; R = [];
-		load(cache_file);
-		if ~isempty(A) && ~isempty(R)
-            average_overlap = A;
-            average_failures = R;
-			return;
-		end;
+	    cache_file = fullfile(cache_directory, sprintf('%s.mat', tracker.identifier));
+            
+	    if exist(cache_file, 'file') && ~isempty(cache)
+            A = []; R = [];
+		    load(cache_file);
+		    if ~isempty(A) && ~isempty(R)
+                average_overlap = A;
+                average_failures = R;
+			    return;
+		    end;
 
-		if ~isempty(average_overlap) && ~isempty(average_failures)
-			return;
-		end;
-	end;
+		    if ~isempty(average_overlap) && ~isempty(average_failures)
+			    return;
+		    end;
+	    end;
+    end;
+
 
     repeat = get_global_variable('repeat', 1);
     burnin = get_global_variable('burnin', 0);    
@@ -83,7 +88,7 @@ function [average_overlap, average_failures] = aggregate_for_label(experiment, t
 
         failures(isnan(failures)) = mean(failures(~isnan(failures)));
 
-        sequence_failures = failures';
+        sequence_failures = failures' ./ numel(filter);
 
         if ~isempty(sequence_overlaps)
             average_overlap = [average_overlap, sequence_overlaps];
@@ -95,9 +100,9 @@ function [average_overlap, average_failures] = aggregate_for_label(experiment, t
 
     end
 
-	average_failures = sum(average_failures);
+	%average_failures = sum(average_failures);
 
-    if cache
+    if ~isempty(cache)
         save(cache_file, 'average_overlap', 'average_failures');
     end;
 end

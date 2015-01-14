@@ -56,7 +56,7 @@ function [average_overlap, average_failures] = aggregate_for_sequence(experiment
 
     failures(isnan(failures)) = mean(failures(~isnan(failures)));
 
-    sequence_failures = failures;
+    sequence_failures = failures ./ sequence.length;
 
     if ~isempty(sequence_overlaps)
         average_overlap = [average_overlap sequence_overlaps];

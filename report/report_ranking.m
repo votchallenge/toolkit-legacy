@@ -52,7 +52,7 @@ for e = 1:length(experiments)
     averaged_ranks(e, :, 1) = result.accuracy.average_ranks;
     averaged_ranks(e, :, 2) = result.robustness.average_ranks;    
     averaged_scores(e, :, 1) = result.accuracy.average_value;
-    averaged_scores(e, :, 2) = result.robustness.average_value ./ mean(result.lengths);
+    averaged_scores(e, :, 2) = result.robustness.average_value;
 end;
 
 overall_ranks = squeeze(mean(averaged_ranks, 1)); % Averaged per-label and per-experiment
@@ -124,7 +124,7 @@ for e = 1:length(experiments)
     scores = cat(3, [results{e}.accuracy.ranks', result.accuracy.average_ranks'], ...
         [results{e}.robustness.ranks', result.robustness.average_ranks'], ...
         [results{e}.accuracy.value', result.accuracy.average_value'], ...
-        [results{e}.robustness.value', result.robustness.average_value']);
+        [results{e}.robustness.value', result.robustness.average_value'] * 100);
     
     table_selector_labels = selector_labels;
     table_selector_labels{end+1} = create_table_cell('Average', 'class',  'average'); %#ok<AGROW>
@@ -171,7 +171,7 @@ for e = 1:length(experiments)
 
         close(h);
 
-        robustness = results{e}.robustness.value(:, :) ./ repmat(results{e}.lengths(:), 1, numel(tracker_labels));
+        robustness = results{e}.robustness.value(:, :);
         
         h = generate_permutation_plot(trackers, robustness, selector_labels, ...
             'scope', [0, max(robustness(:))+eps], 'type', ...
@@ -209,7 +209,7 @@ for e = 1:length(experiments)
             plot_id = sprintf('arplot_%s_%s', experiments{e}.name, selector_labels{l});
 
             hf = generate_ar_plot(trackers, results{e}.accuracy.value(l, :), ...
-                results{e}.robustness.value(l, :) ./ results{e}.lengths(l), ...
+                results{e}.robustness.value(l, :), ...
                 'title', plot_title, 'sensitivity', sensitivity, 'legend', ~hidelegend);
 
             document.figure(hf, plot_id, plot_title);
