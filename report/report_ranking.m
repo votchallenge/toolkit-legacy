@@ -46,7 +46,7 @@ for e = 1:length(experiments)
 
     [result] = analyze_ranks(experiments{e}, trackers, ...
         sequences, 'uselabels', uselabels, 'usepractical', usepractical, ...
-        'average', average, 'alpha', alpha, 'cache', context.cachedir, 'adaptation', 'mean');
+        'average', average, 'alpha', alpha, 'cache', context.cachedir, 'adaptation', 'best');
     results{e} = result;
   
     averaged_ranks(e, :, 1) = result.accuracy.average_ranks;
