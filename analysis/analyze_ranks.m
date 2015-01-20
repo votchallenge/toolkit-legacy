@@ -58,7 +58,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 	end;    
     
     if isempty(result)
-        [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers, ...
+        [accuracy, robustness] = trackers_ranking(experiment, trackers, ...
             experiment_sequences, selectors, alpha, usepractical, average, adaptation);
 
         result = struct('accuracy', accuracy, 'robustness', robustness); %, 'lengths', lengths);
@@ -72,7 +72,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
 end
 
-function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers, ...
+function [accuracy, robustness] = trackers_ranking(experiment, trackers, ...
     sequences, selectors, alpha, usepractical, average, adaptation)
 
     N_trackers = length(trackers) ;
@@ -265,7 +265,7 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
     end;
 
 	print_indent(-1);
-save(sprintf('cache_%s.mat', selector.name), 'cacheA', 'cacheR');
+
     [~, order_by_accuracy] = sort(average_accuracy.mu(available), 'descend');
 	accuracy_ranks = ones(size(available)) * length(available);
     [~, accuracy_ranks(available)] = sort(order_by_accuracy, 'ascend') ;
