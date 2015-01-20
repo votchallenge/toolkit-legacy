@@ -2,7 +2,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
     usepractical = false;
     uselabels = true;
-    average = 'weighted_mean';
+    average = 'gather';
 	adaptation = 'mean';
     alpha = 0.05;
     cache = fullfile(get_global_variable('directory'), 'cache');
@@ -220,7 +220,7 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
         average_accuracy.std(t1) = std(O1(valid_frames));
 
         average_robustness.mu(t1) = mean(F1(:));
-        average_robustness.std(t1) = std(F1(:));
+        average_robustness.std(t1) = std(F1(:)); % TODO: how to do this?
 
         for t2 = t1+1:length(trackers)
         
@@ -253,14 +253,14 @@ function [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks
                 [ha, hr] = compare_trackers(O1, F1, O2, F2, alpha, practical);
 
             end;
-                
+            
             HA(t1, t2) = ha; HA(t2, t1) = HA(t1, t2);
             HR(t1, t2) = hr; HR(t2, t1) = HR(t1, t2);               
         end;
     end;
 
 	print_indent(-1);
-
+save(sprintf('cache_%s.mat', selector.name), 'cacheA', 'cacheR');
     [~, order_by_accuracy] = sort(average_accuracy.mu(available), 'descend');
 	accuracy_ranks = ones(size(available)) * length(available);
     [~, accuracy_ranks(available)] = sort(order_by_accuracy, 'ascend') ;

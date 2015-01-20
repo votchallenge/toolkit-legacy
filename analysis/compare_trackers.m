@@ -28,22 +28,21 @@ function [ha, hr] = compare_trackers(A1, R1, A2, R2, alpha, practical)
     end;
     
     % Testing robustness significance
-%    R1 = R1(:);
-%    R2 = R2(:);
-%    if (is_octave)
-%        pr = u_test(R1, R2);
-%        hr = (pr <= alpha);
-%    else
-%        [~, hr] = ranksum(R1, R2, 'alpha', alpha) ;
-%    end;
+   R1 = R1(:);
+   R2 = R2(:);
+   if (is_octave)
+       pr = u_test(R1, R2);
+       hr = (pr <= alpha);
+   else
+       [~, hr] = ranksum(R1, R2, 'alpha', alpha) ;
+   end;
 
-    R1 = mean(R1, 2);
-    R2 = mean(R2, 2);
-    if (is_octave)
-        pr = wilcoxon_test(R1, R2);
-        hr = (pr <= alpha);
-    else
-%        [~, hr] = ranksum(R1, R2, 'alpha', alpha) ;
-        [~, hr, ~] = signrank(R1 - R2, [], 'alpha', alpha ) ;
-    end;      
-
+%     R1 = mean(R1, 2);
+%     R2 = mean(R2, 2);
+%     if (is_octave)
+%         pr = wilcoxon_test(R1, R2);
+%         hr = (pr <= alpha);
+%     else
+%         [~, hr, ~] = signrank(R1 - R2, [], 'alpha', alpha ) ;
+%     end;      
+% 
