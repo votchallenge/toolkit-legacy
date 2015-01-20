@@ -146,27 +146,32 @@ function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers
                     
         case 'gather'
             
+			print_text('Processing gathered frames ...');
+			print_indent(1);
+
             gather_selector = create_label_selectors(experiment, sequences, {'all'});
             
             [average_accuracy, average_robustness, accuracy_ranks, robustness_ranks, HA, HR, available] = ...
-                trackers_ranking_selector(experiment, trackers, sequences, gather_selector{1}, 'alpha', alpha, 'usepractical', usepractical);
+                trackers_ranking_selector(experiment, trackers, sequences, gather_selector{1}, alpha, usepractical);
 
             % get adapted ranks
-            adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA) ;
-            adapted_robustness_ranks = adapted_ranks(robustness_ranks, HR) ;   
+            adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA, adaptation);
+            adapted_robustness_ranks = adapted_ranks(robustness_ranks, HR, adaptation);
 
             % mask out results that are not available
             adapted_accuracy_ranks(~available) = nan;
             adapted_robustness_ranks(~available) = nan;
 
             % write results to output structures
-            accuracy.average_value = average_accuracy.value;
-            accuracy.average_error = average_accuracy.error;
+            accuracy.average_value = average_accuracy.mu';
+            accuracy.average_error = average_accuracy.std';
             accuracy.average_ranks = adapted_accuracy_ranks;
-            robustness.average_value = average_robustness.value;
-            robustness.average_error = average_robustness.error; 
+            robustness.average_value = average_robustness.mu';
+            robustness.average_error = average_robustness.std'; 
             robustness.average_ranks = adapted_robustness_ranks;
         
+			print_indent(-1);
+
     end
     
 end
