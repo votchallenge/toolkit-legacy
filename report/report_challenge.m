@@ -1,11 +1,17 @@
 function [document] = report_challenge(context, experiments, trackers, sequences, varargin)
 
 arplot = true;
-permutationplot = true;
+permutationplot = false;
+speed = true;
+failures = true;
 ratio = 0.5;
 
 for i = 1:2:length(varargin)
-    switch lower(varargin{i}) 
+    switch lower(varargin{i})
+        case 'speed'
+            speed = varargin{i+1};
+        case 'failures'
+            failures = varargin{i+1}; 
         case 'arplot'
             arplot = varargin{i+1};
         case 'permutationplot'
@@ -33,10 +39,10 @@ averaged_original = squeeze(mean(mean(original, 3), 1));
 
 print_indent(-1);
 
-print_text('Ranking report ...'); print_indent(1);
-
 [ranking_document, ranks] = report_ranking(context, trackers, sequences, experiments, ...
     'uselabels', true, 'usepractical', true, 'arplot', arplot, 'permutationplot', permutationplot);
+
+print_indent(-1);
 
 combined_ranks = squeeze(mean(ranks, 1));
 
@@ -69,5 +75,21 @@ tabledata = highlight_best_rows(tabledata, ordering);
 document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
 
 document.link(ranking_document.url, 'Detailed ranking results');
+
+document.section('Other analysis');
+
+if failures
+
+    print_text('Failures report ...'); print_indent(1);
+
+    failures_document = report_failures(context, trackers, sequences, experiments);
+
+    print_indent(-1);
+
+    document.link(failures_document.url, 'Failure analysis');
+
+end;
+
+% TODO: speed analysis report
 
 document.write();

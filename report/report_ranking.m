@@ -148,7 +148,7 @@ for e = 1:length(experiments)
 
     if permutationplot
               
-        document.raw('<div class="imagegrid">\n');        
+        document.raw('<div class="imagegrid">\n');
         
         h = generate_permutation_plot(trackers, results{e}.accuracy.ranks, selector_labels, ...
             'flip', 1, 'legend', ~hidelegend);
@@ -185,7 +185,7 @@ for e = 1:length(experiments)
 
         close(h);
             
-        document.raw('</div>\n');        
+        document.raw('</div>\n');
     end;
 
     if arplot
