@@ -8,7 +8,7 @@ arplot = false; %true;
 average = 'gather';
 sensitivity = 30;
 alpha = 0.05;
-table_format = 'joined'; % joined, rankscores, fragmented
+table_format = 'accrob'; % joined, rankscores, accrob, fragmented
 table_orientation = 'trackers'; % trackers, selectors, trackerscores, selectorscores
 
 for i = 1:2:length(varargin)
@@ -135,6 +135,9 @@ for e = 1:length(experiments)
         case 'rankscores'
             print_scores_table(document, scores(:, :, 1:2), score_sorting(1:2), score_labels(1:2), tracker_labels, table_selector_labels, table_orientation, 'Ranks');
             print_scores_table(document, scores(:, :, 3:4), score_sorting(3:4), score_labels(3:4), tracker_labels, table_selector_labels, table_orientation, 'Raw scores');
+        case 'accrob'
+            print_scores_table(document, scores(:, :, [1,3]), score_sorting([1,3]), score_labels([1,3]), tracker_labels, table_selector_labels, table_orientation, 'Accuracy');
+            print_scores_table(document, scores(:, :, [2,4]), score_sorting([2,4]), score_labels([2,4]), tracker_labels, table_selector_labels, table_orientation, 'Robustness');
         case 'fragmented'
             for t = 1:numel(score_labels)
                 print_scores_table(document, scores(:, :, t), score_sorting(t), score_labels(t), tracker_labels, table_selector_labels, table_orientation, score_labels{t});
