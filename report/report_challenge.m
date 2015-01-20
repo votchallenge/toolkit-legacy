@@ -5,6 +5,7 @@ permutationplot = false;
 speed = true;
 failures = true;
 ratio = 0.5;
+master_legend = true;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
@@ -18,15 +19,33 @@ for i = 1:2:length(varargin)
             permutationplot = varargin{i+1};
         case 'combineweight'
             ratio = varargin{i+1};
+        case 'masterlegend'
+            master_legend = varargin{i+1};            
         otherwise 
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
 end 
 
-
 document = create_document(context, 'challenge', 'title', 'VOT competition report');
 
 print_text('Generating competition report'); print_indent(1);
+
+if master_legend
+
+    document.chapter('Trackers legend');
+
+    % Using heuristic to generate tracker legend, 8 per row seems ok for
+    % paper
+    rows = ceil(numel(trackers) / 8);
+    columns = ceil(numel(trackers) / rows);
+
+    lh = generate_trackers_legend(trackers, 'visible', false, 'columns', columns, 'rows', rows);
+
+    document.figure(lh, 'tracker_legend', 'Tracker legend');
+
+    close(lh);
+
+end;
 
 print_text('Speed report ...'); print_indent(1);
 
@@ -40,7 +59,8 @@ averaged_original = squeeze(mean(mean(original, 3), 1));
 print_indent(-1);
 
 [ranking_document, ranks] = report_ranking(context, trackers, sequences, experiments, ...
-    'uselabels', true, 'usepractical', true, 'arplot', arplot, 'permutationplot', permutationplot);
+    'uselabels', true, 'usepractical', true, 'arplot', arplot, 'permutationplot', permutationplot, ...
+    'hidelegend', master_legend);
 
 print_indent(-1);
 
