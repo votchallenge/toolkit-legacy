@@ -2,7 +2,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
     usepractical = false;
     uselabels = true;
-    average = 'gather';
+    average = 'weighted_mean';
 	adaptation = 'mean';
     alpha = 0.05;
     cache = fullfile(get_global_variable('directory'), 'cache');
