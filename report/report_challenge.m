@@ -4,6 +4,7 @@ arplot = true;
 permutationplot = false;
 speed = true;
 failures = true;
+difficulty = true;
 ratio = 0.5;
 master_legend = true;
 
@@ -13,6 +14,8 @@ for i = 1:2:length(varargin)
             speed = varargin{i+1};
         case 'failures'
             failures = varargin{i+1}; 
+        case 'difficulty'
+            difficulty = varargin{i+1};             
         case 'arplot'
             arplot = varargin{i+1};
         case 'permutationplot'
@@ -113,6 +116,18 @@ if failures
     print_indent(-1);
 
     document.link(failures_document.url, 'Failure analysis');
+
+end;
+
+if difficulty
+
+    print_text('Difficulty report ...'); print_indent(1);
+
+    difficulty_document = report_difficulty(context, trackers, sequences, experiments, 'uselabels', true, 'usepractical', true);
+
+    print_indent(-1);
+
+    document.link(difficulty_document.url, 'Difficulty analysis');
 
 end;
 
