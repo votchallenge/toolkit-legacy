@@ -47,12 +47,18 @@ if master_legend
 
 end;
 
-print_text('Speed report ...'); print_indent(1);
+if speed
 
-[normalized, original] = analyze_speed(experiments, trackers, sequences, 'cache', context.cachedir);
+    print_text('Speed report ...'); print_indent(1);
 
-averaged_normalized = squeeze(mean(mean(normalized, 3), 1));
-averaged_original = squeeze(mean(mean(original, 3), 1));
+    [normalized, original] = analyze_speed(experiments, trackers, sequences, 'cache', context.cachedir);
+
+    averaged_normalized = squeeze(mean(mean(normalized, 3), 1));
+    averaged_original = squeeze(mean(mean(original, 3), 1));
+
+else
+    averaged_normalized = nan(1, numel(trackers));
+end
 
 % TODO: write detailed report (implementation and raw speed)
 
