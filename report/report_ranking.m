@@ -1,11 +1,11 @@
 function [document, averaged_ranks] = report_ranking(context, trackers, sequences, experiments, varargin)
 
-uselabels = false;
-usepractical = false;
-permutationplot = false;
-hidelegend = false;
-arplot = false;
-average = 'weighted_mean';
+uselabels = get_global_variable('report_labels', true);
+usepractical = get_global_variable('report_ranking_practical', true);
+permutationplot = get_global_variable('report_ranking_permutationplot', false);
+hidelegend = get_global_variable('report_legend_hide', false);
+arplot = get_global_variable('report_ranking_arplot', true);
+average = get_global_variable('report_ranking_average', 'weighted_mean');
 sensitivity = 30;
 alpha = 0.05;
 table_format = 'accrob'; % joined, rankscores, accrob, fragmented
