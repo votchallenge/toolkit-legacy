@@ -4,8 +4,8 @@ uselabels = false;
 usepractical = false;
 permutationplot = false;
 hidelegend = false;
-arplot = false; %true;
-average = 'gather';
+arplot = false;
+average = 'weighted_mean';
 sensitivity = 30;
 alpha = 0.05;
 table_format = 'accrob'; % joined, rankscores, accrob, fragmented
@@ -16,7 +16,7 @@ for i = 1:2:length(varargin)
         case 'usepractical'
             usepractical = varargin{i+1};
         case 'uselabels'
-            uselabels = varargin{i+1};            
+            uselabels = varargin{i+1};
         case 'permutationplot'
             permutationplot = varargin{i+1};
         case 'arplot'
@@ -28,9 +28,9 @@ for i = 1:2:length(varargin)
         case 'tableformat'
             table_format = varargin{i+1};
         case 'tableorientation'
-            table_orientation = varargin{i+1}; 
+            table_orientation = varargin{i+1};
         case 'hidelegend'
-            hidelegend = varargin{i+1}; 
+            hidelegend = varargin{i+1};
         otherwise 
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
@@ -40,7 +40,6 @@ document = create_document(context, 'ranking', 'title', 'AR ranking');
 
 results = cell(length(experiments), 1);
 averaged_ranks = nan(length(experiments), length(trackers), 2);
-averaged_scores = nan(length(experiments), length(trackers), 2);
 
 for e = 1:length(experiments)
 
@@ -51,8 +50,6 @@ for e = 1:length(experiments)
   
     averaged_ranks(e, :, 1) = result.accuracy.average_ranks;
     averaged_ranks(e, :, 2) = result.robustness.average_ranks;    
-    averaged_scores(e, :, 1) = result.accuracy.average_value;
-    averaged_scores(e, :, 2) = result.robustness.average_value;
 end;
 
 overall_ranks = squeeze(mean(averaged_ranks, 1)); % Averaged per-label and per-experiment
@@ -101,8 +98,8 @@ for e = 1:length(experiments)
         plot_title = sprintf('AR plot for experiment %s', experiments{e}.name);
         plot_id = sprintf('arplot_%s', experiments{e}.name);
 
-        hf = generate_ar_plot(trackers, squeeze(averaged_scores(e, :, 1)), ...
-            squeeze(averaged_scores(e, :, 2)), ...
+        hf = generate_ar_plot(trackers, results{e}.accuracy.average_value, ...
+            results{e}.robustness.average_normalized, ...
             'title', plot_title, 'sensitivity', sensitivity, 'legend', ~hidelegend);
 
         document.figure(hf, plot_id, plot_title);
@@ -119,12 +116,12 @@ for e = 1:length(experiments)
         selector_labels = cellfun(@(x) x.name, sequences, 'UniformOutput', 0);
     end
 
-    score_labels = {'Acc. Rank', 'Rob. Rank', 'Overlap', 'Failures'};
+    score_labels = {'A-Rank', 'R-Rank', 'Overlap', 'Failures'};
     score_sorting = {'ascending', 'ascending', 'descending', 'ascending'};
     scores = cat(3, [results{e}.accuracy.ranks', results{e}.accuracy.average_ranks'], ...
         [results{e}.robustness.ranks', results{e}.robustness.average_ranks'], ...
         [results{e}.accuracy.value', results{e}.accuracy.average_value'], ...
-        [results{e}.robustness.value', results{e}.robustness.average_value'] * 100);
+        [results{e}.robustness.value', results{e}.robustness.average_value']);
     
     table_selector_labels = selector_labels;
     table_selector_labels{end+1} = create_table_cell('Average', 'class', 'average'); %#ok<AGROW>
@@ -212,7 +209,7 @@ for e = 1:length(experiments)
             plot_id = sprintf('arplot_%s_%s', experiments{e}.name, selector_labels{l});
 
             hf = generate_ar_plot(trackers, results{e}.accuracy.value(l, :), ...
-                results{e}.robustness.value(l, :), ...
+                results{e}.robustness.normalized(l, :), ...
                 'title', plot_title, 'sensitivity', sensitivity, 'legend', ~hidelegend);
 
             document.figure(hf, plot_id, plot_title);

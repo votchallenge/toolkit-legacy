@@ -1,18 +1,18 @@
 function selectors = create_sequence_selectors(experiment, sequences) %#ok<INUSL>
 
-    selectors = cellfun(@(sequence) struct('name', sprintf('sequence_%s', sequence.name), ...
+    selectors = cellfun(@(sequence, i) struct('name', sprintf('sequence_%s', sequence.name), ...
         'title', sequence.name, ...
         'aggregate', @(experiment, tracker, sequences) ...
         aggregate_for_sequence(experiment, tracker, sequence), ...
-        'practical', @(sequences) get_frame_value(sequence, 'practical'), 'length', @(sequences) sequence.length), ...
-        sequences, 'UniformOutput', false);        
+        'practical', @(sequences) get_frame_value(sequence, 'practical'), 'length', @(sequences) count_frames(sequences, i)), ...
+        sequences, mat2cell(1:length(sequences)), 'UniformOutput', false);        
 
 end
 
-function [average_overlap, average_failures] = aggregate_for_sequence(experiment, tracker, sequence)
+function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(experiment, tracker, sequence)
 
-    average_overlap = [];
-    average_failures = [];
+    aggregated_overlap = [];
+    aggregated_failures = [];
 
     repeat = get_global_variable('repeat', 1);
     burnin = get_global_variable('burnin', 0);    
@@ -56,15 +56,25 @@ function [average_overlap, average_failures] = aggregate_for_sequence(experiment
 
     failures(isnan(failures)) = mean(failures(~isnan(failures)));
 
-    sequence_failures = failures ./ sequence.length;
-
+    sequence_failures = failures;
+    
     if ~isempty(sequence_overlaps)
-        average_overlap = [average_overlap sequence_overlaps];
+        aggregated_overlap = [aggregated_overlap sequence_overlaps];
     end;
 
     if ~isempty(sequence_failures)
-        average_failures = [average_failures sequence_failures];
+        aggregated_failures = [aggregated_failures sequence_failures];
     end;
+    
+end
+
+function [count, partial] = count_frames(sequences, i)
+
+	count = sequences{i}.length;
+
+    partial = zeros(1, length(sequences));
+    
+    partial(i) = count;
 
 end
 
