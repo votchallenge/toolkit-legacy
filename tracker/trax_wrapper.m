@@ -17,22 +17,22 @@ if isempty(trax_executable)
 end;
 
 skip_labels = {};
-
 skip_initialize = 1;
-
 fail_overlap = -1;
+working_directory = tempname;
 
 args = varargin;
 for j=1:2:length(args)
-    switch varargin{j}
+    switch lower(varargin{j})
         case 'skip_labels', skip_labels = args{j+1};
         case 'skip_initialize', skip_initialize = max(1, args{j+1}); 
         case 'fail_overlap', fail_overlap = args{j+1};
+        case 'directory', working_directory = args{j+1};
         otherwise, error(['unrecognized argument ' args{j}]);
     end
 end
 
-working_directory = prepare_trial_data(sequence, 1, context);
+prepare_trial_data(working_directory, sequence, 1, context);
 
 groundtruth_file = fullfile(sequence.directory, sequence.file);
 

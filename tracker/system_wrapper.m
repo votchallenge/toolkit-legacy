@@ -16,12 +16,15 @@ skip_initialize = 1;
 
 fail_overlap = -1; % disable failure detection by default
 
+working_directory = tempname;
+
 args = varargin;
 for j=1:2:length(args)
-    switch varargin{j}
+    switch lower(varargin{j})
         case 'skip_labels', skip_labels = args{j+1};
         case 'skip_initialize', skip_initialize = max(1, args{j+1}); 
-        case 'fail_overlap', fail_overlap = args{j+1};            
+        case 'fail_overlap', fail_overlap = args{j+1};
+        case 'directory', working_directory = args{j+1};
         otherwise, error(['unrecognized argument ' args{j}]);
     end
 end
@@ -37,7 +40,7 @@ trajectory(:) = {0};
 
 while start < sequence.length
 
-    [Tr, Tm] = run_once(tracker, sequence, start, context);
+    [Tr, Tm] = run_once(working_directory, tracker, sequence, start, context);
 
     % in case when we only want to know runtime command for testing
     if isfield(context, 'fake') && context.fake
@@ -102,7 +105,7 @@ time = total_time / total_frames;
 
 end
 
-function [trajectory, time] = run_once(tracker, sequence, start, context)
+function [trajectory, time] = run_once(working_directory, tracker, sequence, start, context)
 % RUN_TRACKER  Generates input data for the tracker, runs the tracker and
 % validates results.
 %
@@ -117,7 +120,7 @@ if isempty(tracker.command)
     error('Unable to execute tracker %s. No command given.', tracker.identifier);
 end;
 
-working_directory = prepare_trial_data(sequence, start, context);
+prepare_trial_data(working_directory, sequence, start, context);
 
 output_file = fullfile(working_directory, 'output.txt');
 
