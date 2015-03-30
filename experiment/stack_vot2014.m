@@ -10,6 +10,9 @@ baseline.converter = [];
 baseline.execution = 'default';
 baseline.labels = {'camera_motion', 'illum_change', 'occlusion', 'size_change', ...
     'motion_change', 'empty'};
+baseline.parameters.repeat = 15;
+baseline.parameters.burnin = 10;
+baseline.parameters.skipping = 5;
 
 region_noise.name = 'region_noise';
 region_noise.converter = @(sequence) sequence_transform_initialization(...
@@ -17,6 +20,9 @@ region_noise.converter = @(sequence) sequence_transform_initialization(...
 region_noise.execution = 'default';
 region_noise.labels = {'camera_motion', 'illum_change', 'occlusion', 'size_change', ...
     'motion_change', 'empty'};
+region_noise.parameters.repeat = 15;
+region_noise.parameters.burnin = 10;
+region_noise.parameters.skipping = 5;
 
 experiments = {baseline, region_noise};
 
