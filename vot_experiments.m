@@ -1,35 +1,65 @@
-function vot_experiments(tracker, sequences, experiments)
+function vot_experiments(trackers, sequences, experiments, varargin)
 
-summary = cell(length(experiments), 1);
+mode = 'execute';
 
-for e = 1:length(experiments)
+args = varargin;
+for j=1:2:length(args)
+    switch lower(varargin{j})
+        case 'mode', mode = args{j+1};         
+        otherwise, error(['unrecognized argument ' args{j}]);
+    end
+end
 
-    name = experiments{e}.name;
-    execution = experiments{e}.execution;
-    converter = experiments{e}.converter;
-        
-    if exist(['execution_', execution]) ~= 2 %#ok<EXIST>
-        print_debug('Warning: execution function %s not found. Skipping.', execution);
-        continue;
-    end;
+switch lower(mode)
+    case 'execute' 
+        iterator = @execute_iterator;
+    otherwise, error(['unrecognized mode ' mode]);
+end
 
-    execution_function = str2func(['execution_', execution]);
-
-    print_text('Running Experiment "%s" ...', name);
-
-    print_indent(1);
-
-    experiment_directory = fullfile(tracker.directory, experiments{e}.name);
-
-    arguments = {};
-    if isfield(experiments{e}, 'parameters')
-        arguments = struct2opt(experiments{e}.parameters);
-    end;
-    
-    summary{e} = execution_function(tracker, convert_sequences(sequences, converter), experiment_directory, arguments{:});
-
-    print_indent(-1);
-
-end;
+iterate(experiments, trackers, sequences, 'iterator', iterator);
 
 print_text('Done.');
+
+end
+
+function context = execute_iterator(event, context)
+
+    switch (event.type)
+        case 'experiment_enter'
+            
+            print_debug('Experiment %s', event.experiment.name);
+
+            print_indent(1);       
+        case 'experiment_exit'
+
+            print_indent(-1);
+
+        case 'tracker_enter'
+            
+            print_debug('Tracker %s', event.tracker.identifier);
+
+            print_indent(1);  
+            
+        case 'tracker_exit'
+
+            print_indent(-1);
+            
+        case 'sequence_enter'
+            
+            print_debug('Sequence %s', event.sequence.name);
+
+            arguments = {};
+            if isfield(event.experiment, 'parameters')
+                arguments = struct2opt(event.experiment.parameters);
+            end;
+            
+            sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
+                event.sequence.name);
+            
+            repeat_trial(event.tracker, event.sequence, sequence_directory, arguments{:});
+            
+    end;
+
+end
+
+
