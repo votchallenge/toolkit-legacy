@@ -1,45 +1,36 @@
 function selectors = create_label_selectors(experiment, sequences, labels) %#ok<INUSL>
 
-    sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
-
     selectors = cellfun(@(label) struct('name', sprintf('label_%s', label), ...
         'title', label, ...
         'aggregate', @(experiment, tracker, sequences) ...
-        aggregate_for_label(experiment, tracker, sequences, label, sequences_hash), ...
+        aggregate_for_label(experiment, tracker, sequences, label), ...
         'practical', @(sequences) practical_for_label(sequences, label), 'length', @(sequences) count_for_label(sequences, label)), ...
         labels, 'UniformOutput', false);
 
 end
 
-function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experiment, tracker, sequences, label, cache)
+function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experiment, tracker, sequences, label)
 
     aggregated_overlap = [];
     aggregated_failures = [];
 
-    if ~isempty(cache)
-        cache_directory = fullfile(get_global_variable('directory'), 'cache', 'labels', experiment.name, label, cache);    
-        mkpath(cache_directory);
+    result_hash = calculate_results_fingerprint(tracker, experiment, sequences);
 
-	    cache_file = fullfile(cache_directory, sprintf('%s.mat', tracker.identifier));
-            
-	    if exist(cache_file, 'file') && ~isempty(cache)
-            A = []; R = [];
-		    load(cache_file);
-		    if ~isempty(A) && ~isempty(R)
-                aggregated_overlap = A;
-                aggregated_failures = R;
-			    return;
-		    end;
+    cache_directory = fullfile(get_global_variable('directory'), 'cache', 'selectors', tracker.identifier, experiment.name);
+    mkpath(cache_directory);
 
-		    if ~isempty(aggregated_overlap) && ~isempty(aggregated_failures)
-			    return;
-		    end;
-	    end;
+    cache_file = fullfile(cache_directory, sprintf('label-%s-%s.mat', label, result_hash));
+
+    if exist(cache_file, 'file')
+        load(cache_file);
+
+        if ~isempty(aggregated_overlap) && ~isempty(aggregated_failures)
+            return;
+        end;
     end;
 
-
-    repeat = get_global_variable('repeat', 1);
-    burnin = get_global_variable('burnin', 0);    
+    repeat = experiment.parameters.repeat;
+    burnin = experiment.parameters.burnin;
 
     if ~exist(fullfile(tracker.directory, experiment.name), 'dir')
         print_debug('Warning: Results not available %s', tracker.identifier);
@@ -102,9 +93,8 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
 
 	%average_failures = sum(average_failures);
 
-    if ~isempty(cache)
-        save(cache_file, 'aggregated_overlap', 'aggregated_failures');
-    end;
+    save(cache_file, 'aggregated_overlap', 'aggregated_failures');
+
 end
 
 function [count, partial] = count_for_label(sequences, label)
