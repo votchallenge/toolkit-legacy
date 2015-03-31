@@ -6,7 +6,7 @@ for j = 1:nargin
 
     if exist(varargin{j}, 'file')
 
-        ids = readfile(varargin{j}, ',');
+        ids = readfile(varargin{j}, 'Delimiter', ',');
 
         identifiers = [identifiers; ids(:)]; %#ok<AGROW>
 
