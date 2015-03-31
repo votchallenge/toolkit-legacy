@@ -94,11 +94,17 @@ experiments_ranking_data(2:2:end) = ranks(:, :, 2);
 experiments_ranking_data = num2cell(experiments_ranking_data);
 
 overall_ranking_data = num2cell(cat(2, combined_ranks, overall_ranks)');
-speed_data = num2cell(averaged_normalized);
 
-tabledata = cat(1, experiments_ranking_data, overall_ranking_data, speed_data)';
+if speed
+    speed_data = num2cell(averaged_normalized);
+    tabledata = cat(1, experiments_ranking_data, overall_ranking_data, speed_data)';
+    ordering = [repmat({'ascending'}, 1, numel(experiments) * 2 + 3), 'descending'];
+else
+    tabledata = cat(1, experiments_ranking_data, overall_ranking_data)';
+    ordering = repmat({'ascending'}, 1, numel(experiments) * 2 + 3);
+    column_labels = column_labels(: ,1:end-1);
+end
 
-ordering = [repmat({'ascending'}, 1, numel(experiments) * 2 + 3), 'descending'];
 tabledata = highlight_best_rows(tabledata, ordering);
 
 document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
