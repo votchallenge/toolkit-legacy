@@ -34,11 +34,11 @@ for e = 1:length(experiments)
         selector_labels = cellfun(@(x) x.name, sequences, 'UniformOutput', 0);
     end
 
-    median_accuracy = median(result.accuracy.value, 2);
-    median_robustness = median(result.robustness.normalized, 2);
+    median_accuracy = nanmedian(result.accuracy.value, 2);
+    median_robustness = nanmedian(result.robustness.normalized, 2);
     
-    median_diff_accuracy = median(bsxfun(@minus, result.accuracy.value, mean(result.accuracy.value, 1)), 2);
-    median_diff_robustness = median(bsxfun(@minus, result.robustness.normalized, mean(result.robustness.normalized, 1)), 2);
+    median_diff_accuracy = nanmedian(bsxfun(@minus, result.accuracy.value, mean(result.accuracy.value, 1)), 2);
+    median_diff_robustness = nanmedian(bsxfun(@minus, result.robustness.normalized, mean(result.robustness.normalized, 1)), 2);
     
     table_data = [median_accuracy, median_robustness * 100, median_diff_accuracy, median_diff_robustness * 100];
     
@@ -56,7 +56,7 @@ for e = 1:length(experiments)
     for i = 1:numel(selector_labels)
         if median_diff_accuracy(i) > 0
             rectangle('Position',[i-0.3, 0.5, 0.6, median_diff_accuracy(i)], 'FaceColor', 'green');
-        else
+        elseif median_diff_accuracy(i) < 0
             rectangle('Position',[i-0.3, 0.5+median_diff_accuracy(i), 0.6, -median_diff_accuracy(i)], 'FaceColor', 'red');
         end;
         
@@ -74,7 +74,7 @@ for e = 1:length(experiments)
     for i = 1:numel(selector_labels)
         if median_diff_robustness(i) > 0
             rectangle('Position',[i-0.3, origin, 0.6, median_diff_robustness(i)], 'FaceColor', 'red');
-        else
+        elseif median_diff_robustness(i) < 0
             rectangle('Position',[i-0.3, origin+median_diff_robustness(i), 0.6, -median_diff_robustness(i)], 'FaceColor', 'green');
         end;
         

@@ -1,11 +1,14 @@
 function [tracker] = create_tracker(identifier, varargin)
 
 version = [];
+makedirectory = true;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'version'
             version = varargin{i+1};            
+        case 'makedirectory'
+            makedirectory = varargin{i+1};  
         otherwise 
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -28,7 +31,9 @@ end;
 
 result_directory = fullfile(get_global_variable('directory'), 'results', identifier);
 
-mkpath(result_directory);
+if makedirectory
+    mkpath(result_directory);
+end;
 
 [identifier_valid, identifier_conditional] = valid_identifier(family_identifier);
 configuration_found = exist(['tracker_' , family_identifier]) ~= 2; %#ok<EXIST>

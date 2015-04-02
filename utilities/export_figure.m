@@ -25,14 +25,25 @@ switch lower(format)
     case 'fig'
         saveas(handle, filename, 'fig');
     case 'eps'
-        fontSize = get(gca, 'FontSize');
-        fontWeight = get(gca, 'FontWeight');
-        lineWidth = get(gca, 'LineWidth');
-        set(gca, 'FontSize', 10, 'FontWeight', 'bold', 'LineWidth', 2);
+        allca = num2cell(findall(handle, 'type', 'axes'));
+        allbackup = cellfun(@update_axis, allca, 'UniformOutput', false);
         print( handle, '-depsc', [filename, '.eps']);
-        set(gca, 'FontSize', fontSize, 'FontWeight', fontWeight, 'LineWidth', lineWidth);
+        cellfun(@restore_axis, allca, allbackup, 'UniformOutput', false);
     case 'png'
         print( handle, '-dpng', '-r130', [filename, '.png']);
     otherwise
         error('Unknown format');
 end;
+
+end
+
+function [backup] = update_axis(ha)
+    backup.fontSize = get(ha, 'FontSize');
+    backup.fontWeight = get(ha, 'FontWeight');
+    backup.lineWidth = get(ha, 'LineWidth');
+    set(ha, 'FontSize', 10, 'FontWeight', 'bold', 'LineWidth', 2);
+end
+ 
+function [backup] = restore_axis(ha, backup)
+    set(ha, 'FontSize', backup.fontSize, 'FontWeight', backup.fontWeight, 'LineWidth', backup.lineWidth);
+end
