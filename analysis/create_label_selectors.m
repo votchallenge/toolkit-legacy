@@ -63,7 +63,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
             end;
 
             if (size(trajectory, 1) < size(groundtruth, 1))
-                trajectory{end+1:length(groundtruth)} = 0;
+                trajectory(end+1:length(groundtruth)) = {0};
             end;
 
             [~, frames] = estimate_accuracy(trajectory(filter), groundtruth(filter), 'burnin', burnin);
