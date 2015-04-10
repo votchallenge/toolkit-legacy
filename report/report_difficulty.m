@@ -65,7 +65,7 @@ for e = 1:length(experiments)
     hold off;
     set(gca, 'YLim', [0, 1], 'XLim', [0.5, numel(selector_labels) + 0.5], 'XTick', 1:numel(selector_labels), 'XTickLabel', selector_labels);
     
-    document.figure(hf, sprintf('difficulty_%s_accuracy_scatter.png', experiments{e}.name), ...
+    document.figure(hf, sprintf('difficulty_%s_accuracy_scatter', experiments{e}.name), ...
         sprintf('Accuracy scatter'));
 
     hf = figure('Visible', 'off');
@@ -83,7 +83,7 @@ for e = 1:length(experiments)
     hold off;
     set(gca, 'YLim', [0, max(result.robustness.normalized(:))], 'XLim', [0.5, numel(selector_labels) + 0.5], 'XTick', 1:numel(selector_labels), 'XTickLabel', selector_labels);
     
-    document.figure(hf, sprintf('difficulty_%s_robustness_scatter.png', experiments{e}.name), ...
+    document.figure(hf, sprintf('difficulty_%s_robustness_scatter', experiments{e}.name), ...
         sprintf('Robustness scatter'));    
     
     document.raw('</div>\n');

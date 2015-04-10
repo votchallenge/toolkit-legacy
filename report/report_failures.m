@@ -31,7 +31,7 @@ for e = 1:numel(experiments)
         imagesc(histograms{s});
         set(gca,'ytick',(1:numel(trackers)),'yticklabel', tracker_labels);
         
-        document.figure(hf, sprintf('failures_%s_%s_individual.png', experiment.name, experiment_sequences{s}.name), ...
+        document.figure(hf, sprintf('failures_%s_%s_individual', experiment.name, experiment_sequences{s}.name), ...
             sprintf('Sequence %s, individual trackers', experiment_sequences{s}.name));
         
         hf = figure('Visible', 'off');
@@ -48,7 +48,7 @@ for e = 1:numel(experiments)
         set(gca, 'XLim', [1, experiment_sequences{s}.length]);
         hold off;
 
-        document.figure(hf, sprintf('failures_%s_%s_combined.png', experiment.name, experiment_sequences{s}.name), ...
+        document.figure(hf, sprintf('failures_%s_%s_combined', experiment.name, experiment_sequences{s}.name), ...
             sprintf('Sequence %s, combined failures with properties', experiment_sequences{s}.name));
         
         document.raw('</div>\n');

@@ -172,7 +172,7 @@ for e = 1:length(experiments)
 
         close(h);
 
-        robustness = results{e}.robustness.normalized(:, :) .* sensitivity;
+        robustness = results{e}.robustness.normalized .* sensitivity;
         
         h = generate_permutation_plot(trackers, robustness, selector_labels, ...
             'scope', [0, max(robustness(:))+eps], 'type', ...

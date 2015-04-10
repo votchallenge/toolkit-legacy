@@ -54,9 +54,21 @@ function hf = generate_trackers_legend(trackers, varargin)
         plot(X(t), Y(t), trackers{t}.style.symbol, 'Color', ...
             trackers{t}.style.color, 'MarkerSize', 10,  'LineWidth', trackers{t}.style.width);
 
-        args = {'Interpreter', 'none', 'Color', trackers{t}.style.font_color};
+        if isfield(trackers{t}.style, 'font_color')
+            font_color = trackers{t}.style.font_color;
+        else
+            font_color = [0, 0, 0];
+        end;
         
-        if trackers{t}.style.font_bold
+        if isfield(trackers{t}.style, 'font_bold')
+            font_bold = trackers{t}.style.font_bold;
+        else
+            font_bold = false;
+        end;
+        
+        args = {'Interpreter', 'none', 'Color', font_color};
+        
+        if font_bold
            args(end+1:end+2) = {'FontWeight', 'bold'};
         end
 
