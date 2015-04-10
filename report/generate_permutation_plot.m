@@ -74,7 +74,7 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
     end;
     xlabel(type); 
     set(gca,'ytick', 1:numel(criteria),'yticklabel', criteria, 'YDir','Reverse', 'ylim', [0.9, numel(criteria)+0.1]);
-    set(gca,'xtick', floor(scope(1)):ceil(scope(2)), 'xlim', scope + [-0.1, 0.1]);
+    set(gca,'xtick', floor(scope(1)):ceil(scope(2)), 'xlim', scope + [-1, 1] * (diff(scope) / 100));
 
     if flip
         set(gca, 'xdir', 'reverse');

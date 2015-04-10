@@ -6,6 +6,7 @@ permutationplot = get_global_variable('report_ranking_permutationplot', false);
 hidelegend = get_global_variable('report_legend_hide', false);
 arplot = get_global_variable('report_ranking_arplot', true);
 average = get_global_variable('report_ranking_average', 'weighted_mean');
+adaptation = get_global_variable('report_ranking_adaptation', 'mean');
 sensitivity = 30;
 alpha = 0.05;
 table_format = 'accrob'; % joined, rankscores, accrob, fragmented
@@ -45,7 +46,7 @@ for e = 1:length(experiments)
 
     [result] = analyze_ranks(experiments{e}, trackers, ...
         sequences, 'uselabels', uselabels, 'usepractical', usepractical, ...
-        'average', average, 'alpha', alpha, 'cache', context.cachedir, 'adaptation', 'mean');
+        'average', average, 'alpha', alpha, 'cache', context.cachedir, 'adaptation', adaptation);
     results{e} = result;
   
     averaged_ranks(e, :, 1) = result.accuracy.average_ranks;
@@ -171,7 +172,7 @@ for e = 1:length(experiments)
 
         close(h);
 
-        robustness = results{e}.robustness.value(:, :);
+        robustness = results{e}.robustness.normalized(:, :) .* sensitivity;
         
         h = generate_permutation_plot(trackers, robustness, selector_labels, ...
             'scope', [0, max(robustness(:))+eps], 'type', ...
