@@ -8,11 +8,11 @@ fail_overlap = 0;
 args = varargin;
 for j=1:2:length(args)
     switch varargin{j}
-        case 'repetitions', repetitions = args{j+1};
+        case 'repeat', repetitions = args{j+1};
         case 'skip_labels', skip_labels = args{j+1};
         case 'skip_initialize', skip_initialize = args{j+1};            
         case 'fail_overlap', fail_overlap = args{j+1};            
-        otherwise, error(['unrecognized argument ' args{j}]);
+        %otherwise, error(['unrecognized argument ' args{j}]);
     end
 end
 
