@@ -213,7 +213,8 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
     end
 
 	print_indent(1);
-
+    [~, lengths] = selector.length(sequences);
+    
     for t1 = 1:length(trackers)
 
 		print_text('Processing tracker %s ...', trackers{t1}.identifier);
@@ -235,11 +236,8 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
         valid_frames = ~isnan(O1) ;
 
         average_accuracy(t1) = mean(O1(valid_frames));
-        average_failures(t1) = mean(F1(:));
-        
-        [~, lengths] = selector.length(sequences);        
-        normalized = mean(bsxfun(@times, F1, 1 ./ lengths(lengths > 0)'));        
-        average_failurerate(t1) = mean(normalized(:));
+        average_failures(t1) = mean(sum(F1, 2));     
+        average_failurerate(t1) = mean(sum(F1, 2) ./ sum(lengths));
         
         for t2 = t1+1:length(trackers)
         
