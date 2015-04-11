@@ -27,7 +27,7 @@ function context = execute_iterator(event, context)
     switch (event.type)
         case 'experiment_enter'
             
-            print_debug('Experiment %s', event.experiment.name);
+            print_text('Experiment %s', event.experiment.name);
 
             print_indent(1);       
         case 'experiment_exit'
@@ -36,7 +36,7 @@ function context = execute_iterator(event, context)
 
         case 'tracker_enter'
             
-            print_debug('Tracker %s', event.tracker.identifier);
+            print_text('Tracker %s', event.tracker.identifier);
 
             print_indent(1);  
             
@@ -46,7 +46,7 @@ function context = execute_iterator(event, context)
             
         case 'sequence_enter'
             
-            print_debug('Sequence %s', event.sequence.name);
+            print_text('Sequence %s', event.sequence.name);
 
             arguments = {};
             if isfield(event.experiment, 'parameters')
