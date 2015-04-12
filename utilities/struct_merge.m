@@ -1,10 +1,8 @@
 function merged = struct_merge(from, to)
-% nest_struct_merge merges a from structure (array) to a to structure (array) in a recursive manner when values contain structures (arrays).
+% struct_merge merges a from structure (array) to a to structure (array) in a recursive 
+% manner when values contain structures (arrays).
 %
-%   file name: nest_struct_merge.m
-%   created: 07/10/2014
-%   modified: 07/10/2014
-%   copyright @2014 Dongxi Zheng (author)
+%   copyright @2014 Dongxi Zheng (author), modified by Luka Cehovin
 %
 %   description:
 %   This function merges a from structure (array) to a to structure (array)
@@ -48,7 +46,7 @@ function to = struct2struct(from, to)
 % structure array.
 
     % get the size of from structure's fields
-    from_fields = fields(from);
+    from_fields = fieldnames(from);
     n_fields = length(from_fields);
     
     % for each field in the from structure
@@ -117,7 +115,7 @@ function to = struct2sa(from, to)
     to = reshape(to, 1, to_count);
     
     % get the sizes of the from structure array and its fields
-    from_fields = fields(from);
+    from_fields = fieldnames(from);
     n_fields = length(from_fields);
     
     % for each field of the from structure, append the value to the end of
@@ -150,7 +148,7 @@ function to = sa2sa(from, to)
     to = reshape(to, 1, to_count);
     
     % get the sizes of the from structure array and its fields
-    from_fields = fields(from);
+    from_fields = fieldnames(from);
     n_fields = length(from_fields);
     from_count = numel(from);
     
