@@ -66,19 +66,10 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
     end;
 
     frames = num2cell(accuracy, 1);
-    sequence_overlaps = cellfun(@(frame) mean(frame(~isnan(frame))), frames);
+    aggregated_overlap = cellfun(@(frame) mean(frame(~isnan(frame))), frames);
 
     failures(isnan(failures)) = mean(failures(~isnan(failures)));
-
-    sequence_failures = failures;
-    
-    if ~isempty(sequence_overlaps)
-        aggregated_overlap = [aggregated_overlap sequence_overlaps];
-    end;
-
-    if ~isempty(sequence_failures)
-        aggregated_failures = [aggregated_failures sequence_failures];
-    end;
+    aggregated_failures = failures';
     
     save(cache_file, 'aggregated_overlap', 'aggregated_failures');
     
@@ -93,4 +84,5 @@ function [count, partial] = count_frames(sequences, i)
     partial(i) = count;
 
 end
+
 

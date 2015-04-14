@@ -236,8 +236,8 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
         valid_frames = ~isnan(O1) ;
 
         average_accuracy(t1) = mean(O1(valid_frames));
-        average_failures(t1) = mean(sum(F1, 2));     
-        average_failurerate(t1) = mean(sum(F1, 2) ./ sum(lengths));
+        average_failures(t1) = mean(sum(F1, 1));     
+        average_failurerate(t1) = mean(sum(F1, 1) ./ sum(lengths));
         
         for t2 = t1+1:length(trackers)
         
@@ -279,4 +279,5 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
 	print_indent(-1);  
 
 end
+
 
