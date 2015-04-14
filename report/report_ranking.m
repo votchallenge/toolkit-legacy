@@ -7,7 +7,7 @@ hidelegend = get_global_variable('report_legend_hide', false);
 arplot = get_global_variable('report_ranking_arplot', true);
 average = get_global_variable('report_ranking_average', 'weighted_mean');
 adaptation = get_global_variable('report_ranking_adaptation', 'mean');
-sensitivity = 30;
+sensitivity = get_global_variable('report_ranking_sensitivity', 30);
 alpha = 0.05;
 table_format = 'accrob'; % joined, rankscores, accrob, fragmented
 table_orientation = 'trackers'; % trackers, selectors, trackerscores, selectorscores
@@ -61,7 +61,7 @@ column_labels = cell(2, 2 * numel(experiments) + 2);
 
 ranking_labels = {'Accuracy', 'Robustness'};
 column_labels(1, 1:2:end-2) = cellfun(@(x) struct('text', x.name, 'columns', 2), experiments,'UniformOutput',false);
-column_labels{1, end-1} = struct('text', 'Averaged', 'columns', 2);
+column_labels{1, end-1} = struct('text', 'Overall', 'columns', 2);
 column_labels(1, 2:2:end) = repmat({struct()}, 1, numel(experiments) + 1);
 column_labels(2, :) = ranking_labels(repmat(1:length(ranking_labels), 1, numel(experiments) + 1));
 
@@ -125,7 +125,7 @@ for e = 1:length(experiments)
         [results{e}.robustness.value', results{e}.robustness.average_value']);
     
     table_selector_labels = selector_labels;
-    table_selector_labels{end+1} = create_table_cell('Average', 'class', 'average'); %#ok<AGROW>
+    table_selector_labels{end+1} = create_table_cell('Overall', 'class', 'average'); %#ok<AGROW>
     
     switch table_format
         case 'joined'
@@ -156,9 +156,9 @@ for e = 1:length(experiments)
         close(h);
 
         h = generate_permutation_plot(trackers, results{e}.accuracy.value, selector_labels, ...
-            'scope', [0, 1], 'type', 'Average overlap', 'legend', ~hidelegend);
+            'scope', [0, 1], 'type', 'Overall overlap', 'legend', ~hidelegend);
         document.figure(h, sprintf('permutation_overlap_%s', experiments{e}.name), ...
-            'Permutations for average overlap');    
+            'Permutations for overall overlap');    
 
         close(h);
 
