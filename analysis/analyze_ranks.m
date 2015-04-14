@@ -152,15 +152,15 @@ function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers
             robustness.average_value = mean(robustness.value, 1);
             robustness.average_normalized = mean(robustness.normalized, 1);      
                     
-        case 'gather'
+        case 'pool'
             
-			print_text('Processing gathered frames ...');
+			print_text('Processing pooled frames ...');
 			print_indent(1);
 
-            gather_selector = create_label_selectors(experiment, sequences, {'all'});
+            pool_selector = create_label_selectors(experiment, sequences, {'all'});
             
             [average_overlap, average_failures, average_failurerate, HA, HR, available] = ...
-                trackers_raw_scores_selector(experiment, trackers, sequences, gather_selector{1}, alpha, usepractical);
+                trackers_raw_scores_selector(experiment, trackers, sequences, pool_selector{1}, alpha, usepractical);
 
             [~, order_by_accuracy] = sort(average_overlap(available), 'descend');
             accuracy_ranks = ones(size(available)) * length(available);
@@ -187,6 +187,10 @@ function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers
         
 			print_indent(-1);
 
+        otherwise
+            
+            error('Unknown averaging technique "%s"!', average);
+            
     end
     
 end
@@ -235,8 +239,20 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
         
         valid_frames = ~isnan(O1) ;
 
+        % O1 ... stacked per-frame overlaps (already averaged over
+        % repeats).
+        %
+        % F1 ... fragments (rows) x repeats (columns) of raw failure count.
+        
+        % Average accuracy is average over valid frames (non NaN).
         average_accuracy(t1) = mean(O1(valid_frames));
+        
+        % Average failures are sum of failures in fragments averaged over
+        % repetitions
         average_failures(t1) = mean(sum(F1, 1));     
+        
+        % Average failure rate is sum of failures in fragments divided by
+        % total length of selector, averaged over repetitions
         average_failurerate(t1) = mean(sum(F1, 1) ./ sum(lengths));
         
         for t2 = t1+1:length(trackers)
