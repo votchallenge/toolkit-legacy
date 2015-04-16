@@ -16,7 +16,7 @@ baseline.parameters.skipping = 5;
 
 region_noise.name = 'region_noise';
 region_noise.converter = @(sequence) sequence_transform_initialization(...
-    sequence, @noisy_transform);
+    sequence, @noisy_transform, 'rectangle');
 region_noise.execution = 'default';
 region_noise.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};

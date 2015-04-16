@@ -1,8 +1,13 @@
-function noisy_sequence = sequence_transform_initialization(sequence, transform)
+function noisy_sequence = sequence_transform_initialization(sequence, transform, format)
+
+if nargin < 3
+    format = [];
+end;
 
 noisy_sequence = sequence;
 noisy_sequence.initialize = @transform_initialization;
 noisy_sequence.initialize_transform = transform;
+noisy_sequence.initialize_format = format;
 
 end
 
@@ -35,5 +40,8 @@ function [region] = transform_initialization(sequence, index, context)
 
     end;
     
+    if ~isempty(sequence.initialize_format)
+        region = region_convert(region, sequence.initialize_format);
+    end;
     
 end
