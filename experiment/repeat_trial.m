@@ -1,20 +1,8 @@
-function repeat_trial(tracker, sequence, directory, varargin)
+function repeat_trial(tracker, sequence, directory, context)
 
-repetitions = 15;
-skip_labels = {};
-skip_initialize = 0;
-fail_overlap = 0;
+defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
 
-args = varargin;
-for j=1:2:length(args)
-    switch varargin{j}
-        case 'repeat', repetitions = args{j+1};
-        case 'skip_labels', skip_labels = args{j+1};
-        case 'skip_initialize', skip_initialize = args{j+1};            
-        case 'fail_overlap', fail_overlap = args{j+1};            
-        %otherwise, error(['unrecognized argument ' args{j}]);
-    end
-end
+context = struct_merge(context, defaults);
 
 mkpath(directory);
 
@@ -23,10 +11,10 @@ time_file = fullfile(directory, sprintf('%s_time.txt', sequence.name));
 if get_global_variable('cache', 0) && exist(time_file, 'file')
     times = csvread(time_file);
 else
-    times = zeros(sequence.length, repetitions);
+    times = zeros(sequence.length, context.repetitions);
 end;
 
-for i = 1:repetitions
+for i = 1:context.repetitions
 
     result_file = fullfile(directory, sprintf('%s_%03d.txt', sequence.name, i));
 
@@ -43,10 +31,9 @@ for i = 1:repetitions
 
     print_text('Repetition %d', i);
 
-    context = struct('repetition', i, 'repetitions', repetitions);
+    context.repetition = i;
             
-    [trajectory, time] = tracker.run(tracker, sequence, context, ...
-            'skip_labels', skip_labels, 'fail_overlap', fail_overlap, 'skip_initialize', skip_initialize);        
+    [trajectory, time] = tracker.run(tracker, sequence, context);        
     
     print_indent(-1);
 

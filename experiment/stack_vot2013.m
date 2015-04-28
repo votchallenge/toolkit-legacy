@@ -1,18 +1,16 @@
 function experiments = stack_vot2013()
 
 set_global_variable('bundle', 'http://box.vicos.si/vot/vot2013.zip');
-set_global_variable('repeat', 15);
-set_global_variable('burnin', 10);
-set_global_variable('skipping', 5);
 
 baseline.name = 'baseline';
 baseline.converter = [];
 baseline.execution = 'default';
 baseline.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
-baseline.parameters.repeat = 15;
+baseline.parameters.repetitions = 15;
 baseline.parameters.burnin = 10;
-baseline.parameters.skipping = 5;
+baseline.parameters.skip_initialize = 5;
+baseline.parameters.failure_overlap = 0;
 
 region_noise.name = 'region_noise';
 region_noise.converter = @(sequence) sequence_transform_initialization(...
@@ -20,18 +18,20 @@ region_noise.converter = @(sequence) sequence_transform_initialization(...
 region_noise.execution = 'default';
 region_noise.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
-region_noise.parameters.repeat = 15;
+region_noise.parameters.repetitions = 15;
 region_noise.parameters.burnin = 10;
-region_noise.parameters.skipping = 5;
+region_noise.parameters.skip_initialize = 5;
+region_noise.parameters.failure_overlap = 0;
 
 grayscale.name = 'grayscale';
 grayscale.converter = 'sequence_grayscale';
 grayscale.execution = 'default';
 grayscale.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
-grayscale.parameters.repeat = 15;
+grayscale.parameters.repetitions = 15;
 grayscale.parameters.burnin = 10;
-grayscale.parameters.skipping = 5;
+grayscale.parameters.skip_initialize = 5;
+grayscale.parameters.failure_overlap = 0;
 
 experiments = {baseline, region_noise, grayscale};
 

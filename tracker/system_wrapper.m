@@ -1,4 +1,4 @@
-function [trajectory, time] = system_wrapper(tracker, sequence, context, varargin)
+function [trajectory, time] = system_wrapper(tracker, sequence, context)
 % SYSTEM_WRAPPER  A wrapper around external system command that handles 
 % reinicialization when the tracker fails.
 %
@@ -10,24 +10,9 @@ function [trajectory, time] = system_wrapper(tracker, sequence, context, varargi
 %
 %   See also RUN_TRACKER.
 
-skip_labels = {};
+defaults = struct('directory', tempname, 'skip_labels', {{}}, 'skip_initialize', 1, 'failure_overlap',  -1);
 
-skip_initialize = 1;
-
-fail_overlap = -1; % disable failure detection by default
-
-working_directory = tempname;
-
-args = varargin;
-for j=1:2:length(args)
-    switch lower(varargin{j})
-        case 'skip_labels', skip_labels = args{j+1};
-        case 'skip_initialize', skip_initialize = max(1, args{j+1}); 
-        case 'fail_overlap', fail_overlap = args{j+1};
-        case 'directory', working_directory = args{j+1};
-        otherwise, error(['unrecognized argument ' args{j}]);
-    end
-end
+context = struct_merge(context, defaults);
 
 start = 1;
 
@@ -40,7 +25,7 @@ trajectory(:) = {0};
 
 while start < sequence.length
 
-    [Tr, Tm] = run_once(working_directory, tracker, sequence, start, context);
+    [Tr, Tm] = run_once(context.directory, tracker, sequence, start, context);
 
     % in case when we only want to know runtime command for testing
     if isfield(context, 'fake') && context.fake
@@ -60,7 +45,7 @@ while start < sequence.length
 
     overlap = calculate_overlap(Tr, get_region(sequence, start:sequence.length));
 
-    failures = find(overlap' <= fail_overlap | ~isfinite(overlap'));
+    failures = find(overlap' <= context.failure_overlap | ~isfinite(overlap'));
     failures = failures(failures > 1);
 
     trajectory(start) = {1};
@@ -73,13 +58,13 @@ while start < sequence.length
             Tr(2:min(first_failure - start + 1, size(Tr, 1)));
 
         trajectory(first_failure) = {2};
-        start = first_failure + skip_initialize;
+        start = first_failure + context.skip_initialize;
                 
         print_debug('INFO: Detected failure at frame %d.', first_failure);
         
-        if ~isempty(skip_labels)
+        if ~isempty(context.skip_labels)
             for i = start:sequence.length
-                if isempty(intersect(get_labels(sequence, i), skip_labels))
+                if isempty(intersect(get_labels(sequence, i), context.skip_labels))
                     start = i;
                     break;
                 end;                

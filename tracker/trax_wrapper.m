@@ -1,4 +1,4 @@
-function [trajectory, time] = trax_wrapper(tracker, sequence, context, varargin)
+function [trajectory, time] = trax_wrapper(tracker, sequence, context)
 % TRAX_WRAPPER  A wrapper around the external TraX client that handler running
 % the tracker.
 %
@@ -16,37 +16,25 @@ if isempty(trax_executable)
     error('TraX support not available');
 end;
 
-skip_labels = {};
-skip_initialize = 1;
-fail_overlap = -1;
-working_directory = tempname;
+defaults = struct('directory', tempname, 'skip_labels', {{}}, 'skip_initialize', 1, 'failure_overlap',  -1);
 
-args = varargin;
-for j=1:2:length(args)
-    switch lower(varargin{j})
-        case 'skip_labels', skip_labels = args{j+1};
-        case 'skip_initialize', skip_initialize = max(1, args{j+1}); 
-        case 'fail_overlap', fail_overlap = args{j+1};
-        case 'directory', working_directory = args{j+1};
-        otherwise, error(['unrecognized argument ' args{j}]);
-    end
-end
+context = struct_merge(context, defaults);
 
-prepare_trial_data(working_directory, sequence, 1, context);
+prepare_trial_data(context.directory, sequence, 1, context);
 
 groundtruth_file = fullfile(sequence.directory, sequence.file);
 
-images_file = fullfile(working_directory, 'images.txt');
+images_file = fullfile(context.directory, 'images.txt');
 
 % Generate an initialization region file
 
-initialization_file = fullfile(working_directory, 'initialization.txt');
+initialization_file = fullfile(context.directory, 'initialization.txt');
 
 initialization = cell(sequence.length, 1);
 
 for index = 1:sequence.length
     
-    if ~isempty(intersect(get_labels(sequence, index), skip_labels))
+    if ~isempty(intersect(get_labels(sequence, index), context.skip_labels))
         initialization{index} = 0;
     else
         initialization{index} = sequence.initialize(sequence, index, context);
@@ -56,17 +44,17 @@ end
 
 write_trajectory(initialization_file, initialization);
 
-output_file = fullfile(working_directory, 'output.txt');
-timing_file = fullfile(working_directory, 'timing.txt');
+output_file = fullfile(context.directory, 'output.txt');
+timing_file = fullfile(context.directory, 'timing.txt');
 
 arguments = '';
 
-if (fail_overlap >= 0)
-    arguments = [arguments, sprintf(' -f %.5f', fail_overlap)];
+if (context.failure_overlap >= 0)
+    arguments = [arguments, sprintf(' -f %.5f', context.failure_overlap)];
 end;
 
-if (skip_initialize > 0)
-    arguments = [arguments, sprintf(' -r %d', skip_initialize)];
+if (context.skip_initialize > 0)
+    arguments = [arguments, sprintf(' -r %d', context.skip_initialize)];
 end;
 
 if ~isempty(tracker.trax_parameters) && iscell(tracker.trax_parameters)
@@ -96,7 +84,7 @@ library_path = '';
 % in case when we only want to know runtime command for testing
 if isfield(context, 'fake') && context.fake
     trajectory = command;
-    time = working_directory;
+    time = context.directory;
     return;
 end
 
@@ -110,9 +98,9 @@ end;
 old_directory = pwd;
 try
 
-    print_debug(['INFO: Executing "', command, '" in "', working_directory, '".']);
+    print_debug(['INFO: Executing "', command, '" in "', context.directory, '".']);
 
-    cd(working_directory);
+    cd(context.directory);
 
     if is_octave()
         tic;
@@ -177,7 +165,7 @@ cd(old_directory);
 
 if get_global_variable('cleanup', 1)
     % clean-up temporary directory
-    recursive_rmdir(working_directory);
+    recursive_rmdir(context.directory);
 end;
 
 end

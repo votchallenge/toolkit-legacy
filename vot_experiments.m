@@ -48,15 +48,15 @@ function context = execute_iterator(event, context)
             
             print_text('Sequence %s', event.sequence.name);
 
-            arguments = {};
+            context = struct();
             if isfield(event.experiment, 'parameters')
-                arguments = struct2opt(event.experiment.parameters);
+                context = event.experiment.parameters;
             end;
             
             sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
                 event.sequence.name);
             
-            repeat_trial(event.tracker, event.sequence, sequence_directory, arguments{:});
+            repeat_trial(event.tracker, event.sequence, sequence_directory, context);
             
     end;
 

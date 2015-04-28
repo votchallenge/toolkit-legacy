@@ -91,7 +91,7 @@ while 1
     
     trajectories = {};
          
-    for i = 1:get_global_variable('repeat', 1)
+    for i = 1:experiments{selected_experiment}.parameters.repetitions;
     
         tfile = fullfile(sequence_directory, ...
             sprintf('%s_%03d.txt', sequences{selected_sequence}.name, i));

@@ -12,7 +12,7 @@ function [failure_histograms] = analyze_failures(experiment, trackers, sequences
     end 
 
 
-    repeat = get_global_variable('repeat', 1);
+    repeat = experiment.parameters.repetitions;
 
     print_text('Failure analysis for experiment %s ...', experiment.name);
 

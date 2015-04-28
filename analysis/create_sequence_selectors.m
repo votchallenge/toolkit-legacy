@@ -28,8 +28,8 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
         end;
     end;    
     
-    repeat = get_global_variable('repeat', 1);
-    burnin = get_global_variable('burnin', 0);    
+    repeat = experiment.parameters.repetitions;
+    burnin = experiment.parameters.burnin;
 
     if ~exist(fullfile(tracker.directory, experiment.name), 'dir')
         print_debug('Warning: Results not available %s', tracker.identifier);

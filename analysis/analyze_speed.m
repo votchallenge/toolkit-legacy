@@ -114,7 +114,7 @@ function context = speed_iterator(event, context)
             average_original = mean(average_speed);
             
             if isfield(event.tracker, 'performance')           
-                average_normalized = mean(normalize_speed(average_speed, failures(valid), event.tracker, event.sequence));
+                average_normalized = mean(normalize_speed(average_speed, failures(valid), event.experiment.parameters.skip_initialize, event.tracker, event.sequence));
             else
 				average_normalized = NaN;
                 print_debug('Warning: No performance profile for tracker %s.', event.tracker.identifier);

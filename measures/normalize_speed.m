@@ -1,4 +1,4 @@
-function [normalized_speed, actual_speed] = normalize_speed(speed, failures, tracker, sequence)
+function [normalized_speed, actual_speed] = normalize_speed(speed, failures, skipping, tracker, sequence)
 
 if ~isfield(tracker, 'performance')
     error('Tracker %s has no performance profile, unable to normalize speed.', tracker.identifier);
@@ -8,7 +8,6 @@ performance = tracker.performance;
 
 factor = performance.nonlinear_native;
 startup = 0;
-skipping = get_global_variable('skipping', 1) - 1;
 
 if strcmpi(tracker.interpreter, 'matlab')
     if isfield(performance, 'matlab_startup')
@@ -24,11 +23,11 @@ end
 failure_count = cellfun(@(x) numel(x), failures, 'UniformOutput', true);
 
 if tracker.trax
-	actual_length = sequence.length - skipping * failure_count;
+	actual_length = sequence.length - (skipping - 1) * failure_count;
 	full_length = sequence.length;
 	startup_time = startup * (1 + failure_count);
 else
-	full_length = cellfun(@(x) sum(sequence.length - x - skipping), failures, 'UniformOutput', true) + sequence.length;
+	full_length = cellfun(@(x) sum(sequence.length - x - (skipping - 1)), failures, 'UniformOutput', true) + sequence.length;
 	actual_length = full_length;
 	startup_time = startup * (1 + failure_count);
 end;

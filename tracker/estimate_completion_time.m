@@ -4,7 +4,7 @@ failures = 8;
 
 fps = 0.5;
 
-repeats = get_global_variable('repeat', 1);
+repeats = 1;
 
 args = varargin;
 for j=1:2:length(args)
