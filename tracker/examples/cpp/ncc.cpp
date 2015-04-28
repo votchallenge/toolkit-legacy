@@ -9,7 +9,7 @@
 #ifdef TRAX
 #include <trax.h>
 #else
-#include "vot.hpp"
+#include "vot2014.hpp"
 #endif
 
 class NCCTracker

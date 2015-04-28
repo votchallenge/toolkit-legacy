@@ -5,7 +5,7 @@
  * The main function of this example is to show the developers how to modify
  * their trackers to work with the evaluation environment.
  *
- * Copyright (c) 2013, Luka Cehovin
+ * Copyright (c) 2015, VOT Committee
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
-#include "vot.h"
+#include "vot2014.h"
 
 int main( int argc, char** argv)
 {

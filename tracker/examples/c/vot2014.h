@@ -3,7 +3,7 @@
  * This header file contains C functions that can be used to quickly integrate
  * VOT challenge support into your C or C++ tracker.
  *
- * Copyright (c) 2013, Luka Cehovin
+ * Copyright (c) 2015, VOT Committee
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
