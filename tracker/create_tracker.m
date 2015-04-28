@@ -72,8 +72,10 @@ else
 	tracker_configuration = str2func(['tracker_' , family_identifier]);
 	tracker_configuration();
 
-	tracker_label = strtrim(tracker_label);
-
+    if ischar(tracker_label)
+        tracker_label = strtrim(tracker_label);
+    end;
+    
     if ~isempty(version)
         tracker_label = sprintf('%s (%s)', tracker_label, num2str(version));
     end;
