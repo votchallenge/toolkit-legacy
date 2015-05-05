@@ -13,9 +13,9 @@ function context = fingerprint_iterator(event, context)
             
             directory = fullfile(event.tracker.directory, event.experiment.name);
 
-            dates = zeros(1, event.experiment.parameters.repeat);
+            dates = zeros(1, event.experiment.parameters.repetitions);
             
-            for j = 1:event.experiment.parameters.repeat
+            for j = 1:event.experiment.parameters.repetitions
 
                 result_file = fullfile(directory, event.sequence.name, sprintf('%s_%03d.txt', event.sequence.name, j));
 
