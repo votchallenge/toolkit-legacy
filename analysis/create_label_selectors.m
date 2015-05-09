@@ -29,7 +29,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
         end;
     end;
 
-    repeat = experiment.parameters.repeat;
+    repeat = experiment.parameters.repetitions;
     burnin = experiment.parameters.burnin;
 
     if ~exist(fullfile(tracker.directory, experiment.name), 'dir')

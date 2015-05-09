@@ -72,7 +72,7 @@ function context = speed_iterator(event, context)
             
             print_debug('Sequence %s', event.sequence.name);
 
-            repeat = event.experiment.parameters.repeat;
+            repeat = event.experiment.parameters.repetitions;
             
             reliability = nan(repeat, 1);
 			failures = cell(repeat, 1);
