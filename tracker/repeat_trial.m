@@ -1,4 +1,14 @@
 function repeat_trial(tracker, sequence, directory, context)
+% repeat_trial Repeats running a tracker on a given sequence
+% The core function of experimental evaluation. Repeats running a tracker on a given sequence
+% for a number of times, taking into account its potential deterministic nature and 
+% various properties of experiments.
+%
+% Input:
+% - tracker (struct): Tracker structure.
+% - sequence (struct): Sequence structure.
+% - directory (string): Directory where the results are saved.
+% - context (struct): Execution context structure. This structure contains parameters of the execution.
 
 defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
 
