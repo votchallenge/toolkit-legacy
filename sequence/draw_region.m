@@ -1,4 +1,14 @@
 function draw_region(region, color, width)
+% draw_region Draw a region on the current figure
+%
+% This functions is an utility that draws a region with a given color and stroke width.
+% A region can be a rectangle or a polygon.
+%
+% Input:
+% - region (double vector): A vector of numbers describing a region.
+% - color (double vector): A `3x1` matrix denoting color of the stroke.
+% - width (double): Width of a stroke.
+
 
 if nargin < 2
     color = [1, 0, 0];

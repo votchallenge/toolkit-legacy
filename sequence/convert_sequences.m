@@ -1,4 +1,16 @@
 function converted_sequences = convert_sequences(sequences, converter)
+% convert_sequences Converts sequences using a converter
+%
+% This functions is an utility function that converts a set of sequences using 
+% a given converter. The benefit of using this function is that each sequence
+% is checked if it was already converted.
+%
+% Input:
+% - sequences (cell): Cell array of sequence structures.
+% - converter (function, string): A function handle or a string that can be resolved to a converter function.
+%
+% Output:
+% - converted_sequences: Cell array of converted sequence structures.
 
 if isempty(converter)
     converted_sequences = sequences;

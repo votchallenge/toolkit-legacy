@@ -1,4 +1,16 @@
 function [resized_sequence] = sequence_resize(sequence, ratio)
+% sequence_resize Returns resized sequence
+%
+% This sequence converter returns a sequence with resized frames and annotations.
+%
+% Cache notice: The results of this function are cached in the workspace cache directory.
+%
+% Input:
+% - sequence (structure): A valid sequence structure.
+% - ratio (double): Resize ratio (between 10 and 0.1)
+%
+% Output:
+% - resized_sequence (structure): A sequence descriptor of a converted sequence.
 
 ratio = min(10, max(0.1, ratio));
 
@@ -15,6 +27,8 @@ if file_newer_than(cache_groundtruth, sequence_groundtruth)
     resized_sequence = create_sequence(cache_directory, 'name', sequence.name);
     resized_sequence.labels.names = sequence.labels.names;
     resized_sequence.labels.data = sequence.labels.data;
+    resized_sequence.values.names = sequence.values.names;
+    resized_sequence.values.data = sequence.values.data;
     return;
 end;
 
@@ -44,5 +58,7 @@ resized_sequence = create_sequence(cache_directory, 'name', sequence.name);
 
 resized_sequence.labels.names = sequence.labels.names;
 resized_sequence.labels.data = sequence.labels.data;
+resized_sequence.values.names = sequence.values.names;
+resized_sequence.values.data = sequence.values.data;
 
 end
