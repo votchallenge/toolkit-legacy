@@ -1,14 +1,17 @@
 function [trajectory, time] = trax_wrapper(tracker, sequence, context)
-% TRAX_WRAPPER  A wrapper around the external TraX client that handler running
-% the tracker.
+% trax_wrapper tracker integration approach using TraX protocol
 %
-%   [TRAJECTORY, TIME] = TRAX_WRAPPER(TRACKER, SEQUENCE, CONTEXT)
-%              Runs the tracker on a sequence. The resulting trajectory is
-%              a composite of all correctly tracked fragments. Where
-%              reinitialization occured, the frame is marked using a
-%              special notation.
+% A wrapper around external TraX client that handles running the tracker.
+% This function supports the new tracker integration approach using TraX protocol.
 %
-%   See also RUN_TRIAL.
+% Input:
+% - tracker: Tracker structure.
+% - sequence: Sequence structure.
+% - context: Execution context structure. This structure contains parameters of the execution.
+%
+% Output:
+% - trajectory: A trajectory In case of fake execution mode the function returns the execution command string.
+% - time: Elapsed time in seconds. In case of fake execution mode the function returns the working directory.
 
 trax_executable = get_global_variable('trax_client', '');
 

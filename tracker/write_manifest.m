@@ -1,4 +1,14 @@
 function [manifest] = write_manifest(tracker)
+% write_manifest Write a manifest file for the tracker.
+%
+% Write a manifest file for the tracker. The manifest file contains some system
+% statistics that can be used for debugging and analysis.
+%
+% Input:
+% - tracker: Tracker structure.
+%
+% Output:
+% - manifest: Full path to the manifest file that is located in tracker result directory.
 
 mkpath(tracker.directory);
 

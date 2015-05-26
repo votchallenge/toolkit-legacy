@@ -1,14 +1,17 @@
 function [trajectory, time] = system_wrapper(tracker, sequence, context)
-% SYSTEM_WRAPPER  A wrapper around external system command that handles 
-% reinicialization when the tracker fails.
+% system_wrapper Legacy approach to experiment execution
 %
-%   [TRAJECTORY, TIME] = SYSTEM_WRAPPER(TRACKER, SEQUENCE, CONTEXT)
-%              Runs the tracker on a sequence. The resulting trajectory is
-%              a composite of all correctly tracked fragments. Where
-%              reinitialization occured, the frame is marked using a
-%              special notation.
+% A wrapper around external system command that handles reinitialization when the tracker fails.
+% This function supports the legacy approach to experiment execution.
 %
-%   See also RUN_TRACKER.
+% Input:
+% - tracker: Tracker structure.
+% - sequence: Sequence structure.
+% - context: Execution context structure. This structure contains parameters of the execution.
+%
+% Output:
+% - trajectory: A trajectory In case of fake execution mode the function returns the execution command string.
+% - time: Elapsed time in seconds. In case of fake execution mode the function returns the working directory.
 
 defaults = struct('directory', tempname, 'skip_labels', {{}}, 'skip_initialize', 1, 'failure_overlap',  -1);
 
@@ -91,13 +94,11 @@ time = total_time / total_frames;
 end
 
 function [trajectory, time] = run_once(working_directory, tracker, sequence, start, context)
-% RUN_TRACKER  Generates input data for the tracker, runs the tracker and
-% validates results.
+% Generates input data for the tracker, runs the tracker and validates results.
 %
 %   [TRAJECTORY, TIME] = RUN_TRACKER(TRACKER, SEQUENCE, START, CONTEXT)
 %              Runs the tracker on a sequence that with a specified offset.
 %
-%   See also RUN_TRIAL, SYSTEM.
 
 % create temporary directory and generate input data
 

@@ -1,9 +1,19 @@
 function [estimate] = estimate_completion_time(sequences, varargin)
+% estimate_completion_time Estimates completion time for a tracker
+%
+% Estimates time for a pass over a given set of sequences given some basic performance characteristics.
+%
+% Input:
+% - sequences: Cell array of sequence structures.
+% - varargin[FPS]: Average speed of a tracker (frames per second).
+% - varargin[Failures]: Average number of failures per sequence.
+% - varargin[Repeats]: Required number of repetitions for each sequence.
+%
+% Output:
+% - estimate: Completion time estimate given in number of seconds
 
 failures = 8;
-
 fps = 0.5;
-
 repeats = 1;
 
 args = varargin;
