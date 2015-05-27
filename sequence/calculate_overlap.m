@@ -1,10 +1,22 @@
 function [overlap, only1, only2] = calculate_overlap(T1, T2)
-% CALCULATE_OVERLAP  Calculates per-frame overlap for two bounding-box trajectories.
-%   OVERLAP = CALCULATE_OVERLAP(T1, T2) calculates overlap between trajectories
-%       T1 and T2, where T1 and T2 are matrices of size N1 x 4 and N2 x 4, where
-%       the corresponding columns for each matrix describe the upper left and top
-%       coordinate as well as width and height of the bounding box. The resulting
-%       vector OVERLAP is of size min(N1, N2) x 1.
+% calculate_overlap  Calculates overlap for two trajectories
+%
+% The function calculates per-frame overlap between two trajectories. Besides the
+% region overlap the function also returns cointainment of the second trajectory in the
+% first and containment of the first trajectory in the second.
+%
+% If the trajectories are not of equal length, then the overlaps are calculated up
+% to the end of the shorter one.
+%
+% Input:
+% - T1 (cell): The first trajectory.
+% - T2 (cell): The second trajectory.
+%
+% Output:
+% - overlap: A vector of per-frame overlaps.
+% - only1: A vector of per-frame containment of the second trajectory in the first.
+% - only2: A vector of per-frame containment of the first trajectory in the second.
+
 
 len = min(size(T1, 1), size(T2, 1));
 T1 = T1(1:len, :);

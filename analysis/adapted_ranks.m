@@ -1,34 +1,43 @@
-function a_ranks = adapted_ranks(ranks, different, mode)
+function adapted = adapted_ranks(ranks, different, mode)
+% adapted_ranks Performs rank adaptation on a set of ranks
+%
+% Input:
+% - ranks (integer): A
+% - different (boolean matrix): A index of a frame or a vector of indices of frames.
+% - 
+%
+% Output
+% - region: A region description matrix or a cell array of region description matrices if more than one frame was requested.
 
-a_ranks = zeros(1, length(ranks)) ;
+adapted = zeros(1, length(ranks)) ;
 
 switch mode
 
 	case 'mean'
 
 		for tracker = 1:length(ranks)
-			a_ranks(tracker) = mean(ranks(find(~different(tracker,:)))) ; %#ok<FNDSB>
+			adapted(tracker) = mean(ranks(find(~different(tracker,:)))) ; %#ok<FNDSB>
 		end 
 
 	case 'median'
 
 		for tracker = 1:length(ranks)
-			a_ranks(tracker) = median(ranks(find(~different(tracker,:)))) ; %#ok<FNDSB>
+			adapted(tracker) = median(ranks(find(~different(tracker,:)))) ; %#ok<FNDSB>
 		end 
 
 	case 'best'
 
 		for tracker = 1:length(ranks)
-			a_ranks(tracker) = min(ranks(find(~different(tracker,:)))) ; %#ok<FNDSB>
+			adapted(tracker) = min(ranks(find(~different(tracker,:)))) ; %#ok<FNDSB>
 		end 
 
 	case 'reranked'
 
 		for tracker = 1:length(ranks)
-            a_ranks(tracker) = min(ranks(find(different(tracker,:) == 0)));  %#ok<FNDSB>
+            adapted(tracker) = min(ranks(find(different(tracker,:) == 0)));  %#ok<FNDSB>
         end 
 
-        [~, ~, reranked] = unique(a_ranks);
-        a_ranks = reranked; 
+        [~, ~, reranked] = unique(adapted);
+        adapted = reranked; 
 
 end;
