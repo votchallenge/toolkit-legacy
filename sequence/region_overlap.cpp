@@ -4,9 +4,9 @@
 #include "mex.h"
 #include "region.h"
 
-Region* get_polygon(const mxArray * input) {
+region_container* get_polygon(const mxArray * input) {
     
-    Region* p = NULL;
+    region_container* p = NULL;
 	double *r = (double*)mxGetPr(input);
     int l = mxGetN(input);
     
@@ -42,8 +42,8 @@ Region* get_polygon(const mxArray * input) {
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-	Region* p1;
-	Region* p2;
+	region_container* p1;
+	region_container* p2;
 
 	if( nrhs != 2 ) mexErrMsgTxt("Two vector arguments (regions) required.");
 	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");
@@ -65,7 +65,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
     if (p1 && p2) {
         
-        Overlap overlap = region_compute_overlap(p1, p2);
+        region_overlap overlap = region_compute_overlap(p1, p2);
 
         result[0] = overlap.overlap;
         result[1] = overlap.only1;
