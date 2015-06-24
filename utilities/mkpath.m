@@ -1,4 +1,15 @@
 function [result] = mkpath(filepath)
+% mkpath Creates a directory path
+%
+% Creates a given path by recurively adding directories.
+%
+% Input:
+% - filepath (string): A path to create.
+%
+% Output:
+% - result (boolean): True if successful.
+%
+
 
 if exist(filepath) == 2
     result = 0;

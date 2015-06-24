@@ -1,4 +1,20 @@
 function [success] = compile_mex(name, files, includes, directory)
+% compile_mex Compile given source files to a MEX function
+%
+% Compiles or recompiles given source files to a MEX function taking 
+% into account source files timestamps. Also works in Octave by switching
+% to mkoctfile command.
+%
+% Input:
+% - name (string): Name of MEX function.
+% - files (cell array): Array of source files.
+% - includes (cell array): Optional array of include directories.
+% - directory (string): Optional path of target directory.
+%
+% Output:
+% - success (boolean): True if successful.
+%
+
 
     function datenum = file_timestamp(filename)
         if ~exist(filename, 'file')

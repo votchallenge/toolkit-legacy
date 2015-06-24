@@ -168,7 +168,7 @@ cd(old_directory);
 
 if get_global_variable('cleanup', 1)
     % clean-up temporary directory
-    recursive_rmdir(context.directory);
+    rmpath(context.directory);
 end;
 
 end

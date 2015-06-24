@@ -213,7 +213,7 @@ end;
 
 if get_global_variable('cleanup', 1)
     % clean-up temporary directory
-    recursive_rmdir(working_directory);
+    rmpath(working_directory);
 end;
 
 end
