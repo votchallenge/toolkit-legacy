@@ -10,7 +10,7 @@ function converted_sequences = convert_sequences(sequences, converter)
 % - converter (function, string): A function handle or a string that can be resolved to a converter function.
 %
 % Output:
-% - converted_sequences: Cell array of converted sequence structures.
+% - converted_sequences (cell): Cell array of converted sequence structures.
 
 if isempty(converter)
     converted_sequences = sequences;
@@ -26,6 +26,18 @@ converted_sequences = cellfun(@(x) convert_sequence(x, converter), sequences,'Un
 end
 
 function sequence = convert_sequence(sequence, converter)
+% convert_sequence Converts sequence using a converter
+%
+% Converts a single sequence using a converter
+%
+% Input:
+% - sequence (structure): Input sequence structure.
+% - converter (function): A function handle of a converter function.
+%
+% Output:
+% - sequence (structure): Converted sequence structure.
+%
+
 
     if isfield(sequence, 'converter')
         % If  the sequence is already converted with this converter

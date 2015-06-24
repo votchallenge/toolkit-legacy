@@ -1,31 +1,6 @@
 // md5hash.c
 // 128 bit MD5 checksum: file, string, byte stream
 // This function calculates a 128 bit checksum for arrays or files.
-// Digest = md5hash(Data, [InClass], [OutClass])
-// INPUT:
-//   Data:   Data array or file name. Either numerical or CHAR array.
-//           Currently only files and arrays with up to 2^32 bytes (2.1GB) are
-//           accepted.
-//   InClass: String to declare the type of the 1st input.
-//           Optional. Default: 'Char'.
-//           'File': [Data] is a file name as string. The digest is calculated
-//                   for this file.
-//           'Char': [Data] is a char array to calculate the digest for. Only the
-//                   ASCII part of the Matlab CHARs is used, such that the digest
-//                   is the same as if the Matlab string is written to a file as
-//                   UCHAR, e.g. with FWRITE.
-//           'Unicode': All bytes of the input [Data] are used to calculate the
-//                   digest. If [Data] has a numerical type, this method is
-//                   applied ever.
-//   OutClass: String, format of the output. Just the first character matters.
-//           Optional, default: 'hex'.
-//           'hex': [1 x 32] string as lowercase hexadecimal number.
-//           'HEX': [1 x 32] string as lowercase hexadecimal number.
-//           'Dec': [1 x 16] double vector with UINT8 values.
-//           'Base64': [1 x 22] string, encoded to base 64 (A:Z,a:z,0:9,+,/).
-//
-// OUTPUT:
-//   Digest: A 128 bit number is replied in a format depending on [OutClass].
 //
 // EXAMPLES:
 //   Three methods to get the MD5 of a file:
@@ -62,8 +37,6 @@
 //          Modifications:
 //          - Acceleration:  Unrolled loops. Compacted macros FF, GG, HH, II.
 //          - Mex-interface: Input and output from and to Matlab.
-//
-// See also: CalcCRC32.
 //
 // Michael Kleder has published a Java call to compute the MD5 and SHA sums:
 //   http://www.mathworks.com/matlabcentral/fileexchange/8944 

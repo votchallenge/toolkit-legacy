@@ -1,4 +1,19 @@
-function [M] = readfile(filename, varargin)
+function data = readfile(filename, varargin)
+% readfile Parse a file to a cell array
+%
+% A general purpose function that parses a file into a cell array of
+% elements based on a delimiter string and a parser function.
+%
+% Input:
+% - filename (<type>): <description>
+% - varargin[Delimiter] (string): An element delimiter string.
+% - varargin[Parser] (function): A parser function that receives text data 
+%   for an element and returns parsed content.
+%
+% Output:
+% - data (cell): Resulting cell array.
+%
+
 
 parser = @default_cell_parser;
 
@@ -18,7 +33,7 @@ end
 
 
 % Initialize the variable output argument
-M = cell(0, 0);
+data = cell(0, 0);
 
 fid = fopen(filename, 'r');
 
@@ -54,9 +69,9 @@ while true
     parsed = cellfun(parser, elements, 'UniformOutput', false);
 
     if (lineindex == 1)
-        M = parsed;
+        data = parsed;
     else
-        M(lineindex, :) = parsed;
+        data(lineindex, :) = parsed;
     end
     
 end;

@@ -1,5 +1,27 @@
-function hf = generate_permutation_plot(trackers, values, criteria, varargin)
-
+function handle = generate_ordering_plot(trackers, values, criteria, varargin)
+% generate_ordering_plot Generate a per-selector ordering plot.
+%
+% Generate a per-selector ordering plot for either accuracy of robustness
+% for a set of criteria.
+%
+% Input:
+% - trackers (cell): A cell array of tracker structures.
+% - values (matrix): Ranking or raw values for trackers.
+% - criteria (cell): An array of criteria names.
+% - varargin[Title] (string): A title of the plot.
+% - varargin[Normalized] (boolean): A sensitivity parameter value.
+% - varargin[Visible] (boolean): Is the figure visible on the display.
+% - varargin[Width] (double): Figure width hint.
+% - varargin[Height] (double): Figure height hint.
+% - varargin[Flip] (boolean): Flip the horizontal axsis.
+% - varargin[Type] (string): Name of the horizontal axis.
+% - varargin[Scope] (double): Maximum number in horizontal axsis.
+% - varargin[Handle] (handle): Plot on existing figure handle.
+% - varargin[Legend] (boolean): Render plot legend.
+%
+% Output:
+% - handle (handle): A figure handle.
+%
     plot_title = [];
     normalized = 0;
     width = 9;
@@ -8,11 +30,15 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
     type = 'Rank';
     flip = 0;
     show_legend = 1;
+    visible = false;
+    handle = [];
     
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
             case 'title'
                 plot_title = varargin{i+1}; 
+            case 'visible'
+                visible = varargin{i+1}; 
             case 'normalized'
                 normalized = varargin{i+1};      
             case 'width'
@@ -25,6 +51,8 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
                 type = varargin{i+1};
             case 'flip'
                 flip = varargin{i+1}; 
+            case 'handle'
+                handle = varargin{i+1};
             case 'legend'
                 show_legend = varargin{i+1};
             otherwise 
@@ -32,7 +60,15 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
         end
     end 
 
-    hf = figure('Visible', 'off');
+    if isempty(handle)
+        if ~visible
+            handle = figure('Visible', 'off');
+        else
+            handle = figure();
+        end
+    else
+        figure(handle);
+    end;
 
     [~, I] = sort(values, 2, 'ascend');
 
@@ -82,6 +118,6 @@ function hf = generate_permutation_plot(trackers, values, criteria, varargin)
     set(gca, 'LineWidth', 2);
     hold off;
     
-    set(hf, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
+    set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
 
     

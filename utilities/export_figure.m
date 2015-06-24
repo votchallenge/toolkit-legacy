@@ -1,4 +1,19 @@
 function fullpath = export_figure(handle, filename, format, varargin)
+% export_figure Export a figure to various formats.
+%
+% Utility function that exports a figure to various formats taking care
+% of caching as well as some other options.
+%
+% Input:
+% - handle (handle): Handle of a figure.
+% - filename (string): Filename of the target file without extension.
+% - format (string): Target format (fig, eps or png).
+% - varargin[Cache] (boolean): Use caching. Disabled by default.
+%
+% Output:
+% - fullpath (string): Path to the resulting file.
+%
+
 
 cache = false;
 

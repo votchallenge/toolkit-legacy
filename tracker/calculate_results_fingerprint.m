@@ -18,6 +18,18 @@ hash = md5hash(time_string);
 end
 
 function context = fingerprint_iterator(event, context)
+% fingerprint_iterator Iterator function
+%
+% Iterator function that calculates parts of the fingerprint.
+%
+% Input:
+% - event (structure): Event structure.
+% - context (structure): Context structure.
+%
+% Output:
+% - context (structure): Modified context structure.
+%
+
 
     switch (event.type)
         case 'sequence_enter'
