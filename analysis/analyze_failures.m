@@ -1,4 +1,18 @@
 function [failure_histograms] = analyze_failures(experiment, trackers, sequences, varargin)
+% analyze_failures Perform failure frequency analysis
+%
+% This function performs failure frequency analysis for a set of trackers
+% on a set of sequences and experiments.
+%
+% Input:
+% - experiment (cell): A cell array of valid experiment structures.
+% - trackers (cell): A cell array of valid tracker descriptor structures.
+% - sequences (cell): A cell array of valid sequence descriptor structures.
+% - varargin[Cache] (string): Path to cache directory.
+%
+% Output:
+% - failure_histograms (cell): A cell array (one element for each experiment) of cell arrays (one for each sequence) of double matrices that contain per-frame failure frequencies for all trackers.   
+%
 
     cache = fullfile(get_global_variable('directory'), 'cache');
     

@@ -1,4 +1,20 @@
 function [normalized_speed, actual_speed] = normalize_speed(speed, failures, skipping, tracker, sequence)
+% normalize_speed Normalizes tracker speed estimate
+%
+% This function normalizes speed estimates based on performance profile and some information about 
+% the way the measurement was obtained (sequence, number of failures, frame skipping).
+%
+% Input:
+% - speed (double): The initial speed estimate.
+% - failures (double): Number of failures of the tracker.
+% - skipping (integer): Number of skipped frames after each failure.
+% - tracker (structure): A valid tracker descriptor.
+% - sequence (structure): A valid sequence descriptor.
+%
+% Output:
+% - normalized_speed (double): Normalized speed estimate.
+% - actual_speed (double): Corrected raw speed based on supplied information,
+%
 
 if ~isfield(tracker, 'performance')
     error('Tracker %s has no performance profile, unable to normalize speed.', tracker.identifier);

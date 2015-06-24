@@ -1,4 +1,18 @@
 function [accuracy, frames] = estimate_accuracy(trajectory, sequence, varargin)
+% estimate_accuracy Calculate accuracy score
+%
+% Calculate accuracy score as average overlap over the entire sequence.
+%
+% Input:
+% - trajectory (cell): A trajectory as a cell array of regions.
+% - sequence (cell or structure): Can be another trajectory or a valid sequence descriptor.
+% - varargin[Burnin] (integer): Number of frames that have to be ignored after the failure.
+%
+% Output:
+% - accuracy (double): Average overlap.
+% - frames (double vector): Per-frame overlaps.
+%
+
 
 burnin = 0;
 

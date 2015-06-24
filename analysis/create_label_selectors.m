@@ -1,4 +1,16 @@
 function selectors = create_label_selectors(experiment, sequences, labels) %#ok<INUSL>
+% create_label_selectors Create per-label selector
+%
+% Create a set of selectors for a set of labels upon a set of sequences.
+%
+% Input:
+% - experiment (structure): A valid experiment descriptor.
+% - sequences (cell): A cell array of valid sequence descriptors.
+% - labels (cell): A cell array of label names.
+%
+% Output:
+% - selectors (cell): A cell array of selector structures, one for each label.
+%
 
     selectors = cellfun(@(label) struct('name', sprintf('label_%s', label), ...
         'title', label, ...
