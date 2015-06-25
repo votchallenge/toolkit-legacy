@@ -41,7 +41,7 @@ for e = 1:numel(experiments)
         ends = cellfun(@(x) find(diff([0; x; 0]) < 0), labelsplit, 'UniformOutput', 0);
 
         hold on;
-        timeline(experiment_sequences{s}.labels.names, starts, ends);
+        generate_timeline(experiment_sequences{s}.labels.names, starts, ends);
         combined_histogram = sum(histograms{s}, 1);
         combined_histogram = (combined_histogram / max(combined_histogram)) * numel(experiment_sequences{s}.labels.names);
         plot(combined_histogram);

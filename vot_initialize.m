@@ -12,7 +12,7 @@ set_global_variable('directory', pwd());
 
 stacks = {};
 
-files = dir(fullfile(script_directory, 'experiment'));
+files = dir(fullfile(script_directory, 'stacks'));
 
 for i = 1:length(files)
     if ~files(i).isdir && strncmp(files(i).name, 'stack_', 6)

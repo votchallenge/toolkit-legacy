@@ -1,4 +1,15 @@
-function [sequences] = load_sequences(directory, varargin)
+function sequences = load_sequences(directory, varargin)
+% load_sequences Load a set of sequences
+%
+% Create a cell array of new sequence structures for sequences, specified in a listing file.
+%
+% Input:
+% - directory: Path to the directory with sequences.
+% - varargin[List]: Name of the file that lists all the sequences. By default `list.txt` is used.
+% - varargin[Dummy]: Create the sequence structures without checking if all the images exist.
+%
+% Output:
+% - sequences: A cell array of new sequence structures.
 
 list = 'list.txt';
 dummy = false;
@@ -31,7 +42,7 @@ if ~exist(list_file, 'file') && ~isempty(bundle_url)
 		delete(bundle);
         list_file = fullfile(directory, 'list.txt');
     catch
-        print_text('Unable to retrieve sequence bundle. Follow the instructions in README.md to install it manually.');
+        print_text('Unable to retrieve sequence bundle from the VOT server. This is either a connection problem or the server is temporary offline.');
         return;
     end;
 end;

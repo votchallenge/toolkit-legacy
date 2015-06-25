@@ -1,8 +1,25 @@
-function hf = generate_trackers_legend(trackers, varargin)
+function handle = generate_trackers_legend(trackers, varargin)
+% generate_ar_plot Generate an tracker legend plot
+%
+% The function generates dedicated tracker legend plot. Tracker labels and
+% their symbols are ordered in a grid.
+%
+% Input:
+% - trackers (cell): A cell array of tracker structures.
+% - varargin[Visible] (boolean): Is the figure visible on the display.
+% - varargin[Width] (double): Figure width hint.
+% - varargin[Height] (double): Figure height hint.
+% - varargin[Rows] (integer): Number of rows in a grid.
+% - varargin[Columns] (integer): Number of columns in a grid.
+% - varargin[Handle] (handle): Plot on existing figure handle.
+%
+% Output:
+% - handle (handle): A figure handle.
+%
 
     width = [];
     height = [];
-    hf = [];
+    handle = [];
     
     columns = 1;
     rows = numel(trackers); 
@@ -17,7 +34,7 @@ function hf = generate_trackers_legend(trackers, varargin)
             case 'visible'
                 visible = varargin{i+1};                
             case 'handle'
-                hf = varargin{i+1};
+                handle = varargin{i+1};
             case 'columns'
                 columns = varargin{i+1};
             case 'rows'
@@ -37,14 +54,14 @@ function hf = generate_trackers_legend(trackers, varargin)
     
     [Y, X] = meshgrid(1:rows, 1:columns);
     
-    if isempty(hf)
+    if isempty(handle)
         if ~visible
-            hf = figure('Visible', 'off');
+            handle = figure('Visible', 'off');
         else
-            hf = figure();
+            handle = figure();
         end
     else
-        figure(hf);
+        figure(handle);
     end;
 
     hold on; 
@@ -84,6 +101,6 @@ function hf = generate_trackers_legend(trackers, varargin)
 	set(gca,'YDir','reverse');
     box off; grid off; axis off;
 
-    set(hf, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', limits);
+    set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', limits);
 
     hold off;

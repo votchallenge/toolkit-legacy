@@ -1,4 +1,24 @@
-function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
+function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
+% generate_ar_plot Generate an A-R plot
+%
+% The function generates an A-R plot for a sequence of measurements.
+%
+% Input:
+% - trackers (cell): A cell array of tracker structures.
+% - accuracy (matrix): Accuracy measurements.
+% - robustness (matrix): Robustness measurements.
+% - varargin[Title] (string): A title of the plot.
+% - varargin[Sensitivity] (double): A sensitivity parameter value.
+% - varargin[Visible] (boolean): Is the figure visible on the display.
+% - varargin[Width] (double): Figure width hint.
+% - varargin[Height] (double): Figure height hint.
+% - varargin[Callback] (function): A custom callback that does the plotting.
+% - varargin[Handle] (handle): Plot on existing figure handle.
+% - varargin[Legend] (boolean): Render plot legend.
+%
+% Output:
+% - handle (handle): A figure handle.
+%
 
     plot_title = [];
     sensitivity = 30;
@@ -6,7 +26,7 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
     width = [];
     height = [];
 
-    hf = [];
+    handle = [];
     
     plot_callback = @default_plot_ar;
     
@@ -27,7 +47,7 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
             case 'callback'
                 plot_callback = varargin{i+1};
             case 'handle'
-                hf = varargin{i+1};
+                handle = varargin{i+1};
             case 'legend'
                 show_legend = varargin{i+1};                    
             otherwise 
@@ -43,14 +63,14 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
         height = 4;
     end
 
-    if isempty(hf)
+    if isempty(handle)
         if ~visible
-            hf = figure('Visible', 'off');
+            handle = figure('Visible', 'off');
         else
-            hf = figure();
+            handle = figure();
         end
     else
-        figure(hf);
+        figure(handle);
     end;
 
     hold on; box on; grid on;
@@ -95,7 +115,7 @@ function hf = generate_ar_plot(trackers, accuracy, robustness, varargin)
     xlim([0, 1]); 
     ylim([0, 1]);
 
-    set(hf, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
+    set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
 
     hold off;
     

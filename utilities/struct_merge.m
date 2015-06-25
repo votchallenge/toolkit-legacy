@@ -1,23 +1,22 @@
 function merged = struct_merge(from, to)
-% struct_merge merges a from structure (array) to a to structure (array) in a recursive 
-% manner when values contain structures (arrays).
+% struct_merge merges a from structure to another in a recursive manner
 %
-%   copyright @2014 Dongxi Zheng (author), modified by Luka Cehovin
+% This function merges a from structure (array) to a to structure (array)
+% in a recursive manner when values contain structures (arrays). At any
+% level: 1) If two single structures are to be merged, the same fields in
+% the to structure are overwritten by the fields in the from structure.
+% Extract fields from the from structure are added to the to structure.
+% 2) If one or both of the structures are arrays, they are concatenated
+% in terms of their elements and merged in terms of their fields.
 %
-%   description:
-%   This function merges a from structure (array) to a to structure (array)
-%   in a recursive manner when values contain structures (arrays). At any
-%   level: 1) If two single structures are to be merged, the same fields in
-%   the to structure are overwritten by the fields in the from structure.
-%   Extract fields from the from structure are added to the to structure.
-%   2) If one or both of the structures are arrays, they are concatenated
-%   in terms of their elements and merged in terms of their fields.
+% Credit: Dongxi Zheng (2014)
 %
-%   input:
-%       from - a structure (or structure array) to be merged to another
-%       to - a structure (or structure array) to be merged to
-%   output:
-%       merged - a merged structure (or structure array)
+% Input:
+% - from (structure): A structure (or structure array) to be merged to another.
+% - to (structure): A structure (or structure array) to be merged to.
+%
+% Output:
+% - merged (structure): A merged structure (or structure array).
 
 if isstruct(from) && isstruct(to)   
     from_count = numel(from);

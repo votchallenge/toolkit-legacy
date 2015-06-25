@@ -1,6 +1,7 @@
+//
+// This MEX function can be used to perform several native benchmarks.
 
 // Normal C / C++ includes
-
 #include <stdio.h>
 #include <string.h>
 

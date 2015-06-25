@@ -1,4 +1,15 @@
 function [grayscale_sequence] = sequence_grayscale(sequence)
+% sequence_grayscale Returns grayscale sequence
+%
+% This sequence converter returns a grayscale version of an input sequence.
+%
+% Cache notice: The results of this function are cached in the workspace cache directory.
+%
+% Input:
+% - sequence (structure): A valid sequence structure.
+%
+% Output:
+% - grayscale_sequence (structure): A sequence descriptor of a converted sequence.
 
 cache_directory = fullfile(get_global_variable('directory'), 'cache', 'grayscale', sequence.name);
 

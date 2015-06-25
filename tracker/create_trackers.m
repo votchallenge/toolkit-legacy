@@ -1,4 +1,21 @@
 function [trackers] = create_trackers(varargin)
+% create_trackers Creates a set of trackers
+%
+% Create a cell array of new tracker structures from identifiers or file lists of identifiers.
+%
+% This functions checks each argument if it is a valid file and openes it as a text file of
+% comma and new line separated tracker identifiers. If an argument is not a file then it is
+% considered an identifier.
+%
+% Examples:
+% 
+%     trackers = create_trackers('trackers.txt', 'NCC'); % Load tracker identifiers from file trackers.txt and add a tracker NCC
+%
+% Input:
+% - varargin: A list of strings denoting either files containing tracker identifiers or valid identifiers. See `valid_identifier` for more details.
+%
+% Output:
+% - trackers: A cell array of new tracker structures.
 
 identifiers = {};
 
@@ -11,9 +28,11 @@ for j = 1:nargin
         identifiers = [identifiers; ids(:)]; %#ok<AGROW>
 
     else
-        
-        % if the argument is not a file name ...
-        identifiers = [identifiers; varargin(j)]; %#ok<AGROW>
+
+        % if the argument is not a file name, but it is still a string ...
+        if ischar(varargin(j))
+            identifiers = [identifiers; varargin(j)]; %#ok<AGROW>
+        end;
 
     end;
     

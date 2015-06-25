@@ -1,4 +1,13 @@
 function compile_all_native(output_path)
+% compile_all_native Compile all native components
+%
+% A script that compiles all native components (MEX functions) and places
+% them in a given output directory.
+%
+% Input:
+% - output_path (string): Path to output directory.
+%
+
 
 toolkit_path = get_global_variable('toolkit_path');
 
@@ -12,7 +21,7 @@ print_text('Compiling MEX files ...');
 
 success = true;
 
-success = success && compile_mex('region_overlap', {fullfile(toolkit_path, 'measures', 'region_overlap.cpp'), ...
+success = success && compile_mex('region_overlap', {fullfile(toolkit_path, 'sequence', 'region_overlap.cpp'), ...
     fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
 
 success = success && compile_mex('region_mask', {fullfile(toolkit_path, 'sequence', 'region_mask.cpp'), ...
@@ -27,7 +36,7 @@ success = success && compile_mex('read_trajectory', {fullfile(toolkit_path, 'seq
 success = success && compile_mex('write_trajectory', {fullfile(toolkit_path, 'sequence', 'write_trajectory.cpp'), ...
     fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
 
-success = success && compile_mex('benchmark_native', {fullfile(toolkit_path, 'measures', 'benchmark_native.cpp')}, ...
+success = success && compile_mex('benchmark_native', {fullfile(toolkit_path, 'tracker', 'benchmark_native.cpp')}, ...
     {}, output_path);
 
 success = success && compile_mex('md5hash', {fullfile(toolkit_path, 'utilities', 'md5hash.cpp')}, ...
@@ -41,6 +50,19 @@ end
 
 
 function [success] = get_trax_source(trax_path)
+% get_trax_source Download external components from TraX repository.
+%
+% To reduce redundant code, a part of the source for MEX files is provided
+% by the TraX library. This function downloads and unpacks the source of
+% the library and places it in a desired directory.
+%
+% Input:
+% - trax_path (string): Path to the destination directory.
+%
+% Output:
+% - success (boolean): True on success.
+%
+
 
 trax_url = 'https://github.com/lukacu/trax/archive/master.zip';
 
@@ -61,7 +83,7 @@ if ~exist(trax_header, 'file')
         print_text('Unable to retrieve TraX source code.');
         success = false;
     end;
-    recursive_rmdir(working_directory);
+    rmpath(working_directory);
 else
     print_debug('TraX source code already present.');
     success = true;

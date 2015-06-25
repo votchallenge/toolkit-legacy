@@ -1,4 +1,16 @@
 function string = format_interval(time)
+% format_interval Format a time interval
+%
+% Formats a given time interval in seconds to a string containing
+% days, hours and minutes.
+%
+% Input:
+% - time (dobule): A numeric representation of time interval in seconds.
+%
+% Output:
+% - string (string): A string representation of the interval
+%
+
 
 days = floor(time / (24*60*60));
 

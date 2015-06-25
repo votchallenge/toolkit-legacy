@@ -1,4 +1,15 @@
 function selectors = create_sequence_selectors(experiment, sequences) %#ok<INUSL>
+% create_sequence_selectors Create per-sequence selectors
+%
+% Creates a set of selectors for a given set of sequences where each selector corresponds to a single selector.
+%
+% Input:
+% - experiment (structure): A valid experiment descriptor.
+% - sequences (cell): A cell array of valid sequence descriptors.
+%
+% Output:
+% - selectors (cell): A cell array of selector structures, one for each sequence.
+%
 
     selectors = cellfun(@(sequence, i) struct('name', sprintf('sequence_%s', sequence.name), ...
         'title', sequence.name, ...

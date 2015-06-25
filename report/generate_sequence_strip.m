@@ -1,5 +1,23 @@
-function [hf] = generate_sequence_strip(sequence, trajectories, varargin)
+function handle = generate_sequence_strip(sequence, trajectories, varargin)
+% generate_ar_plot Generate an preview of a sequence as a strip of frames
+%
+% The function generates dedicated tracker legend plot. Tracker labels and
+% their symbols are ordered in a grid.
+%
+% Input:
+% - trackers (cell): A cell array of tracker structures.
+% - varargin[Handle] (handle): Plot on existing figure handle.
+% - varargin[Visible] (boolean): Is the figure visible on the display.
+% - varargin[Window] (double): Figure width hint.
+% - varargin[Samples] (double): Figure height hint.
+% - varargin[Scale] (integer): Number of rows in a grid.
+% - varargin[Columns] (integer): Number of columns in a grid.
+%
+% Output:
+% - handle (handle): A figure handle.
+%
 
+handle = -1;
 visible = false;
 trajectories_markers = {};
 window = 120;
@@ -7,11 +25,14 @@ samples = 12;
 scale = 1;
 frame_numbers = false;
 
-groundtruth_color = [0, 1, 0];
-trajectories_colors = repmat([1, 0, 0], length(trajectories), 1);
+groundtruth_color = [1, 1, 1];
+trajectories_colors = mat2cell(repmat([1, 0, 0], length(trajectories), 1), ...
+    ones(length(trajectories), 1));
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
+        case 'handle'
+            handle = varargin{i+1}; 
         case 'visible'
             visible = varargin{i+1};    
         case 'window'
@@ -33,20 +54,22 @@ for i = 1:2:length(varargin)
     end
 end 
 
-
 if numel(samples) > 1
     indices = samples(samples > 0 & samples <= sequence.length);
 else
     indices = round(linspace(1, sequence.length, samples));
 end;
 
-if visible
-    hf = figure();
+if ishandle(handle)
+    set(0, 'CurrentFigure', handle);
 else
-    hf = figure('Visible', 'off');
+    if visible
+        handle = figure();
+    else
+        handle = figure('Visible', 'off');
+    end;
 end;
-
-handles = tight_subplot(1, length(indices), 0, 0, 0);
+handles = tight_subplots(1, length(indices), 0, 0, 0);
 
 for i = 1:length(indices)
 
@@ -73,7 +96,7 @@ for i = 1:length(indices)
     axes(handles(i)); %#ok<LAXES>
     
     if ~visible
-        set(hf, 'Visible', 'off');
+        set(handle, 'Visible', 'off');
     end;
 
     axis tight;
@@ -98,7 +121,7 @@ for i = 1:length(indices)
             bounds = region_convert(region, 'rectangle');
             center = bounds(1:2) + bounds(3:4) / 2;
 
-            plot(center(1), center(2), trajectories_markers{t}, 'MarkerSize', 7, 'LineWidth', 1.2, 'Color', trajectories_colors{t});
+            plot(center(1), center(2), trajectories_markers{t}, 'MarkerSize', 7, 'LineWidth', 1.5, 'Color', trajectories_colors{t});
 
         end;
         
@@ -125,4 +148,4 @@ end
 width = numel(indices);
 height = 1;
 
-set(hf, 'PaperUnits', 'inches', 'PaperSize', [width, height] * scale, 'PaperPosition', [0, 0, width, height] * scale);
+set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height] * scale, 'PaperPosition', [0, 0, width, height] * scale);

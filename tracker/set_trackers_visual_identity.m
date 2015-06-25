@@ -1,4 +1,14 @@
 function [styled_trackers] = set_trackers_visual_identity(trackers, varargin)
+% set_trackers_visual_identity Generate visual identity information
+%
+% Generate visual identity information for a set of trackers.
+%
+% Input:
+% - trackers: Cell array of tracker structures.
+% - varargin[Groups]: An array of group identifiers. A vector of the same length as the trackers cell array where each number denotes a group for the corresponding tracker. Trackers in the same group get the same color.
+%
+% Output:
+% - styled_trackers: A modified cell array of tracker structures with their visualization information updated.
 
 groups = [];
 

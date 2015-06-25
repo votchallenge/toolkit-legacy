@@ -8,9 +8,9 @@
 #define MEX_TEST_VECTOR(I) (mxGetNumberOfDimensions(prhs[I]) == 2 && mxGetM(prhs[I]) == 1)
 
 
-Region* get_polygon(const mxArray * input) {
+region_container* get_polygon(const mxArray * input) {
     
-    Region* p = NULL;
+    region_container* p = NULL;
 	double *r = (double*)mxGetPr(input);
     int l = mxGetN(input);
     
@@ -57,7 +57,7 @@ int getSingleInteger(const mxArray *arg) {
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-	Region* p = NULL;
+	region_container* p = NULL;
 
 	if( nrhs != 3 ) mexErrMsgTxt("Two vector and two integer arguments required.");
 	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");

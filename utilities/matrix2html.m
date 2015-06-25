@@ -1,23 +1,16 @@
 function matrix2html(matrix, filename, varargin)
-% matrix2html(matrix, filename, varargs)
-% where
-%   - matrix is a 2 dimensional numerical or cell array
-%   - filename is a valid filename or a file handler be stored
-%   - varargs is one ore more of the following (denominator, value) combinations
-%      + 'rowLabels', array -> Can be used to label the rows of the
-%      resulting latex table
-%      + 'columnLabels', array -> Can be used to label the columns of the
-%      resulting latex table
-%      + 'format', 'value' -> Can be used to format the input data. 'value'
-%      has to be a valid format string, similar to the ones used in
-%      fprintf('format', value);
-%      + 'class', 'value' -> CSS class of the table
+% matrix2html Generates a HTML table for a given matrix
 %
-% Example input:
-%   matrix = [1.5 1.764; 3.523 0.2];
-%   rowLabels = {'row 1', 'row 2'};
-%   columnLabels = {'col 1', 'col 2'};
-%   matrix2html(matrix, 'out.html', 'rowLabels', rowLabels, 'columnLabels', columnLabels, 'format', '%-6.2f');
+% The function generates a HTML table based on a given matrix or cell array.
+% 
+% Input
+% - matrix (matrix): A 2 dimensional numerical or cell array
+% - filename (string): A valid filename or a file handle
+% - varargs[RowLabels] (array): Can be used to label the rows of the table
+% - varargs[ColumnLabels] (array): Can be used to label the columns of the table
+% - varargs[Format] (string): Format of the numeric input data in the printf format.
+% - varargs[Class] (string): CSS class of the table.
+% - varargs[Title] (string): Title of the table.
 %
 
     rowLabels = [];

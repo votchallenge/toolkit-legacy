@@ -1,7 +1,7 @@
 function [document] = report_article(context, experiments, trackers, sequences, varargin)
 
 arplot = true;
-permutationplot = false;
+orderingplot = false;
 ratio = 0.5;
 spotlight = [];
 master_legend = true;
@@ -10,8 +10,8 @@ for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
         case 'arplot'
             arplot = varargin{i+1};
-        case 'permutationplot'
-            permutationplot = varargin{i+1};
+        case 'orderingplot'
+            orderingplot = varargin{i+1};
         case 'combineweight'
             ratio = varargin{i+1};
         case 'spotlight'
@@ -50,7 +50,7 @@ print_text('Ranking report ...'); print_indent(1);
 [ranking_document, ranks] = report_ranking(context, trackers, sequences, experiments, ...
     'uselabels', false, 'usepractical', true, 'tableformat', 'fragmented', ...
     'tableorientation', 'selectors', ...
-    'arplot', arplot, 'permutationplot', permutationplot, 'hidelegend', master_legend);
+    'arplot', arplot, 'orderingplot', orderingplot, 'hidelegend', master_legend);
 
 combined_ranks = squeeze(mean(ranks, 1));
 

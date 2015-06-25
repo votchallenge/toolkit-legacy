@@ -1,7 +1,7 @@
 function [document] = report_challenge(context, experiments, trackers, sequences, varargin)
 
 arplot = true;
-permutationplot = false;
+orderingplot = false;
 speed = true;
 failures = true;
 difficulty = true;
@@ -18,8 +18,8 @@ for i = 1:2:length(varargin)
             difficulty = varargin{i+1};             
         case 'arplot'
             arplot = varargin{i+1};
-        case 'permutationplot'
-            permutationplot = varargin{i+1};
+        case 'orderingplot'
+            orderingplot = varargin{i+1};
         case 'combineweight'
             ratio = varargin{i+1};
         case 'masterlegend'
@@ -68,7 +68,7 @@ end
 print_indent(-1);
 
 [ranking_document, ranks] = report_ranking(context, trackers, sequences, experiments, ...
-    'uselabels', true, 'usepractical', true, 'arplot', arplot, 'permutationplot', permutationplot, ...
+    'uselabels', true, 'usepractical', true, 'arplot', arplot, 'orderingplot', orderingplot, ...
     'hidelegend', master_legend);
 
 print_indent(-1);

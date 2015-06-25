@@ -1,4 +1,19 @@
 function [normalized, original] = analyze_speed(experiments, trackers, sequences, varargin)
+% analyze_speed Perform speed analysis
+%
+% Perform speed analysis on a set of experiments, trackers, and sequences. Returns 
+% normalized and raw average speed.
+%
+% Input:
+% - experiments (cell): A cell array of valid experiment structures.
+% - trackers (cell): A cell array of valid tracker descriptors.
+% - sequences (cell): A cell array of valid sequence descriptors.
+% - varargin[Cache] (string): Cache directory.
+%
+% Output:
+% - normalized (double matrix): Normalized speed.
+% - original (double matrix): Raw speed.
+%
 
 cache = fullfile(get_global_variable('directory'), 'cache');
 
@@ -45,6 +60,16 @@ save(cache_file, 'normalized', 'original');
 end
 
 function context = speed_iterator(event, context)
+% speed_iterator Internal iterator function
+%
+% Input:
+% - event (structure): Iteration event.
+% - context (structure): Iteration context.
+%
+% Output:
+% - context (structure): Iterator context.
+%
+
 
     switch (event.type)
         case 'experiment_enter'
