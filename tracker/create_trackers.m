@@ -20,8 +20,11 @@ function [trackers] = create_trackers(varargin)
 identifiers = {};
 
 for j = 1:nargin
-
-    if exist(varargin{j}, 'file')
+    
+    %check if the first argument is a file, if so it is a 
+    %text file containing a list of tracker names, ignore directories
+    %(since the results folder migtht be on the path)
+    if exist(varargin{j}, 'file') == 2
 
         ids = readfile(varargin{j}, 'Delimiter', ',');
 
@@ -30,7 +33,7 @@ for j = 1:nargin
     else
 
         % if the argument is not a file name, but it is still a string ...
-        if ischar(varargin(j))
+        if ischar(varargin{j})
             identifiers = [identifiers; varargin(j)]; %#ok<AGROW>
         end;
 
