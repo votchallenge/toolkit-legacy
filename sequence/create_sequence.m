@@ -1,21 +1,16 @@
 function [sequence] = create_sequence(directory, varargin)
-% create_sequence Create a new sequence descriptor
-%
-% Create a new sequence structure by loading the information from the directory.
-%
-% Input:
-% - directory: Path to the sequence directory.
-% - varargin[Name]: Name of the sequence. By default the name of the directory is taken as the name of the sequence.
-% - varargin[Mask]: File pattern for images. By default '%08d.jpg' is used.
-% - varargin[Dummy]: Create the sequence structure without checking if all the images exist.
-% - varargin[Start]: The number of the first frame in the sequence (1 by default).
-%
-% Output:
-% - sequence: A new sequence structure.
 
 start = 1;
-mask = '%08d.jpg';
 dummy = false;
+
+if all(size(dir([directory '/*.jpg'])))
+    mask = '%08d.jpg';
+elseif all(size(dir([directory '/*.png'])))
+    mask = '%08d.png';
+else
+    error('Unkown file ending for sequence frames');
+end;
+
 
 [parent, name] = fileparts(directory);
 
@@ -35,7 +30,7 @@ for i = 1:2:length(varargin)
 end 
 
 sequence = struct('name', name, 'directory', directory, ...
-        'mask', '%08d.jpg', 'length', 0, ...
+        'mask', mask, 'length', 0, ...
         'file', 'groundtruth.txt');
 
 sequence.groundtruth = read_trajectory(fullfile(sequence.directory, sequence.file));
