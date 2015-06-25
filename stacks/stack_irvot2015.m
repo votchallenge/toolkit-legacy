@@ -1,6 +1,6 @@
 function experiments = stack_irvot2015()
 
-set_global_variable('bundle', 'file:///home/gustav/Downloads/irsequences.zip');
+set_global_variable('bundle', 'https://liu.box.com/shared/static/4yczc0pb5uwjvvm54zfh601aj5vdz7q7.zip');
 
 baseline.name = 'baseline';
 baseline.converter = [];
