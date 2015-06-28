@@ -1,31 +1,63 @@
-function [sequences, experiments] = vot_environment()
+function [sequences, experiments] = workspace_load(varargin)
+% workspace_load Initializes the current workspace 
+%
+% This function initializes the current workspace by reading sequences and
+% experiments as well as initializing global variables. It also checks if native
+% resources have to be downloaded or compiled.
+%
+% To make loading faster when running the script multiple times, it checks if
+% sequences and experiments variables exist in the workspace and if they are 
+% cell arrays and just reuses them. No further check is performed so this may
+% lead to problems when switching workspaces. Clear the workspace or use 'Force'
+% argument to avoid issues with cached data.
+%
+% Input:
+% - varargin[Force] (boolean): Force reloading the sequences and experiments.
+%
+% Output:
+% - sequences (cell): Array of sequence structures.
+% - experiments (cell): Array of experiment structures.
+%
 
-try 
-    
-    % Attempts to load variables from the workspace namespace to save 
-    % some time
-    sequences = evalin('base', 'sequences');
-    experiments = evalin('base', 'experiments');
-    
-    % Are variables correts at a glance ...
-    cached = iscell(sequences) && iscell(experiments);
-    
-catch 
-    
-    cached = false;
-    
+force = false;
+
+args = varargin;
+for j=1:2:length(args)
+    switch lower(varargin{j})
+        case 'force', force = args{j+1};         
+        otherwise, error(['unrecognized argument ' args{j}]);
+    end
 end
+
+if ~force
+
+    try 
+        
+        % Attempts to load variables from the workspace namespace to save 
+        % some time
+        sequences = evalin('base', 'sequences');
+        experiments = evalin('base', 'experiments');
+        
+        % Are variables correts at a glance ...
+        cached = iscell(sequences) && iscell(experiments);
+        
+    catch 
+        
+        cached = false;
+        
+    end
+
+else
+
+    cached = false;
+
+end;
 
 configuration_file = fullfile(pwd(), 'configuration.m');
 
 if ~exist(configuration_file, 'file')
-    error('Directory is probably not a VOT workspace. Please run vot_initialize first.');
+    error('Directory is probably not a VOT workspace. Please run workspace_create first.');
 end;
-
-script_directory = fileparts(mfilename('fullpath'));
-include_dirs = cellfun(@(x) fullfile(script_directory,x), {'', 'utilities', ...
-    'analysis', 'tracker', 'sequence', 'measures', 'experiment' ,'report'}, 'UniformOutput', false); 
-addpath(include_dirs{:});
 
 % Some defaults
 set_global_variable('toolkit_path', fileparts(mfilename('fullpath')));

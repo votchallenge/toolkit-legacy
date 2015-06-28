@@ -32,9 +32,9 @@ environment_version = version();
 
 fid = fopen(manifest, 'w');
 
-vot_info = vot_information();
+version = toolkit_version();
 
-fprintf(fid, 'toolkit.version=%d\n', vot_info.version);
+fprintf(fid, 'toolkit.version=%d.%d\n', version.major, version.minor);
 fprintf(fid, 'tracker.identifier=%s\n', tracker.identifier);
 fprintf(fid, 'tracker.protocol=%s\n', protocol);
 fprintf(fid, 'timestamp=%s\n', datestr(now, 31));

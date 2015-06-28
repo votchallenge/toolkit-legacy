@@ -1,4 +1,14 @@
-function vot_browse(trackers, sequences, experiments)
+function workspace_browse(trackers, sequences, experiments, varargin)
+% workspace_browse Browse and visualize the results in the workspace
+%
+% The function provides an interactive interface for browsing results in
+% the workspace.
+%
+% Input:
+% - trackers (cell or structure): Array of tracker structures.
+% - sequences (cell or structure): Array of sequence structures.
+% - experiments (cell or structure): Array of experiment structures.
+%
 
 selected_tracker = [];
 selected_experiment = [];

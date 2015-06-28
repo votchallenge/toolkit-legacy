@@ -1,4 +1,14 @@
-function vot_test(tracker, sequences)
+function workspace_test(tracker, sequences, varargin)
+% workspace_test Tests the integration of a tracker into the toolkit
+%
+% Tests the integration of a tracker into the toolkit in a manual or
+% automatic mode, visualizes results and estimates time to complete
+% an experiment.
+%
+% Input:
+% - tracker (structure): A valid tracker structure.
+% - sequences (cell or structure): Array of sequence structures.
+%
 
 current_sequence = get_global_variable('current_sequence', 1);
 
@@ -11,7 +21,7 @@ performance = struct('frames', 0, 'time', 0);
 print_text('');
 print_text('***************************************************************************');
 print_text('');
-print_text('Welcome to the VOT sandbox!');
+print_text('Welcome to the VOT workspace testing utility!');
 print_text('This process will help you prepare your tracker for the evaluation.');
 print_text('When beginning with the integration it is recommended to follow the steps ');
 print_text('a, b, c to verify the execution and the output data.');
