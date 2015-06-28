@@ -1,5 +1,5 @@
 function [trajectory, time] = trax_wrapper(tracker, sequence, context)
-% trax_wrapper tracker integration approach using TraX protocol
+% trax_wrapper Tracker integration approach using TraX protocol
 %
 % A wrapper around external TraX client that handles running the tracker.
 % This function supports the new tracker integration approach using TraX protocol.

@@ -1,5 +1,6 @@
 function repeat_trial(tracker, sequence, directory, context)
 % repeat_trial Repeats running a tracker on a given sequence
+%
 % The core function of experimental evaluation. Repeats running a tracker on a given sequence
 % for a number of times, taking into account its potential deterministic nature and 
 % various properties of experiments.

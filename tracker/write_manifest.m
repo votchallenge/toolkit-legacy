@@ -1,5 +1,5 @@
 function [manifest] = write_manifest(tracker)
-% write_manifest Write a manifest file for the tracker.
+% write_manifest Write a manifest file for the tracker
 %
 % Write a manifest file for the tracker. The manifest file contains some system
 % statistics that can be used for debugging and analysis.
@@ -14,7 +14,7 @@ mkpath(tracker.directory);
 
 manifest = fullfile(tracker.directory, 'manifest.txt');
 
-[platform_str,platform_maxsize,platform_endian] = computer();
+[platform_str, platform_maxsize, platform_endian] = computer();
 
 if is_octave()
     environment = 'octave';

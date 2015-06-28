@@ -1,4 +1,13 @@
 function visualize_sequence(sequence, varargin)
+% visualize_sequence Interactive sequence visualization
+%
+% The function intereactivelly visualizes the given sequence and a set of results.
+%
+% Input:
+% - sequence (structure): A valid sequence structure.
+% - varargin (cell): An array of trajectories that are visualized together with
+%   ground-truth data.
+%
 
 print_text('Press arrow keys or S,D,F,G to navigate the sequence, Q to quit.');
 

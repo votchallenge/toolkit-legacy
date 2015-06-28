@@ -14,11 +14,10 @@ function workspace_evaluate(trackers, sequences, experiments, varargin)
 
 mode = 'execute';
 
-args = varargin;
-for j=1:2:length(args)
+for j=1:2:length(varargin)
     switch lower(varargin{j})
-        case 'mode', mode = args{j+1};         
-        otherwise, error(['unrecognized argument ' args{j}]);
+        case 'mode', mode = varargin{j+1};         
+        otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
 
