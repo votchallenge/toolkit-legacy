@@ -1,5 +1,5 @@
 function hash = md5hash(data, input, output) %#ok<STOUT,INUSD>
-% md5hash Calcupate 128 bit MD5 checksum
+% md5hash Calculate 128 bit MD5 checksum
 %
 % This function calculates a 128 bit checksum for arrays and files.
 %

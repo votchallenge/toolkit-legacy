@@ -1,5 +1,5 @@
 function print_debug(text, varargin)
-% print_debug Prints formatted debug text.
+% print_debug Prints formatted debug text
 %
 % Formats and prints text if global debug option is enabled.
 %

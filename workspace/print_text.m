@@ -1,5 +1,5 @@
 function print_text(text, varargin)
-% print_debug Prints formatted text.
+% print_debug Prints formatted text
 %
 % Formats and prints text taking into account the indent level that can be adjusted using print_indent function.
 %

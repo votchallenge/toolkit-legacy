@@ -1,5 +1,5 @@
 function  relative_path = relativepath( target_path, root_path )
-% relativepath 
+% relativepath Returns the relative path from an root path to the target path
 %
 % Returns the relative path from an root path to the target path.
 % Both arguments must be strings with absolute paths.
