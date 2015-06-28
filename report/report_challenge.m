@@ -1,4 +1,24 @@
 function [document] = report_challenge(context, experiments, trackers, sequences, varargin)
+% report_challenge Generate an official challenge report
+%
+% Generate a per-label A-R ranking analysis report as well as some additional analysis that is
+% used to obtain challenge results.
+%
+% Input:
+% - context (structure): Report context structure.
+% - trackers (cell): An array of tracker structures.
+% - sequences (cell): An array of sequence structures.
+% - experiments (cell): An array of experiment structures.
+% - varargin[Speed] (boolean): Generate speed report.
+% - varargin[Failures] (boolean): Generate failures report.
+% - varargin[OrderingPlot] (boolean): Generate ordering plots.
+% - varargin[ARPlot] (boolean): Generate A-R plots.
+% - varargin[CombineWeight] (double): Averaging factor between 0 and 1 for combining accuracy and robustness ranking.
+% - varargin[MasterLegend] (boolean): Use a single master legend instead of including it .
+%
+% Output:
+% - document (structure): Resulting document structure.
+%
 
 arplot = true;
 orderingplot = false;
