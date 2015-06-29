@@ -1,9 +1,12 @@
 % This script can be used to test the integration of a tracker to the
 % framework.
 
-[sequences, experiments] = vot_environment();
+addpath('{{toolkit}}');
+toolkit_path;
+
+[sequences, experiments] = workspace_load();
 
 tracker = create_tracker('{{tracker}}');
 
-vot_test(tracker, sequences);
+workspace_test(tracker, sequences);
 

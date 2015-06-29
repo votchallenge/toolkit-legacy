@@ -1,4 +1,26 @@
 function [new, mask] = patch_operation(matrix, patch, offset, operation)
+% patch_operation Performs a point-wise operation with two unequal matrices
+%
+% Performs a point-wise operation (e.g. assignment, arithmetic) between two matrices
+% that are not of the same size with a given offset. The result has the size of the 
+% first matrix and the outlying elements are left intact.
+%
+% Input:
+% - matrix (matrix): First operand matrix.
+% - patch (matrix): Second operand matrix.
+% - offset (vector): Two-element vector that defines the row and column offset of the second operand.
+% - operation (char): A char that defines the type of the operation.
+%     - '+': addition
+%     - '-': subraction
+%     - '*': multiplication
+%     - '/': division
+%     - '=': assignment
+%
+% Output:
+% - new (matrix): Resulting matrix.
+% - mask (matrix): Binary mask of the elements that were affected by the operation.
+%
+
 
 if nargin < 4
     operation = '=';
@@ -37,8 +59,6 @@ switch (operation)
         new(xd1:xd2, yd1:yd2, :) = new(xd1:xd2, yd1:yd2, :) ./ patch(xs1:xs2, ys1:ys2, :);
     case '='
         new(xd1:xd2, yd1:yd2, :) = patch(xs1:xs2, ys1:ys2, :);
-    case '<'
-        new(xd1:xd2, yd1:yd2, :) = (new(xd1:xd2, yd1:yd2, :) - patch(xs1:xs2, ys1:ys2, :)) > 0;
 end;
 
 if (nargout > 1)

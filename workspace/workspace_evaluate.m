@@ -1,12 +1,23 @@
-function vot_experiments(trackers, sequences, experiments, varargin)
+function workspace_evaluate(trackers, sequences, experiments, varargin)
+% workspace_evaluate Perform evaluation of a set of trackers
+%
+% Perform or prepare evaluation of a set of trackers on a set of sequences for 
+% a set of experiments.
+%
+% Input:
+% - trackers (cell or structure): Array of tracker structures.
+% - sequences (cell or structure): Array of sequence structures.
+% - experiments (cell or structure): Array of experiment structures.
+% - varargin[Mode] (string, optional): Evaluation mode, at the moment only 'execute' mode is supported.
+%
+
 
 mode = 'execute';
 
-args = varargin;
-for j=1:2:length(args)
+for j=1:2:length(varargin)
     switch lower(varargin{j})
-        case 'mode', mode = args{j+1};         
-        otherwise, error(['unrecognized argument ' args{j}]);
+        case 'mode', mode = varargin{j+1};         
+        otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
 

@@ -1,5 +1,5 @@
 function [tracker] = create_tracker(identifier, varargin)
-% create_tracker Create a new tracker structure.
+% create_tracker Create a new tracker structure
 %
 % tracker = create_tracker(identifier, ...) 
 %

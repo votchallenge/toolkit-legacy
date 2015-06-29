@@ -1,8 +1,8 @@
 function [status] = rmpath(root)
-% rmpath Deletes the file or directory recursivelly
+% rmpath Deletes the file or directory recursively
 %
 % Deletes the file or directory. If the root is a directory then all its
-% content is deleted recursivelly.
+% content is deleted recursively.
 %
 % Input:
 % - root (string): Path to file or root directory to delete.

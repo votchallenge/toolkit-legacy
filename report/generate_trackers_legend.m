@@ -1,5 +1,5 @@
 function handle = generate_trackers_legend(trackers, varargin)
-% generate_ar_plot Generate an tracker legend plot
+% generate_ar_plot Generate a tracker legend plot
 %
 % The function generates dedicated tracker legend plot. Tracker labels and
 % their symbols are ordered in a grid.

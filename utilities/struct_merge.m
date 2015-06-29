@@ -1,5 +1,5 @@
 function merged = struct_merge(from, to)
-% struct_merge merges a from structure to another in a recursive manner
+% struct_merge Merges a from structure to another in a recursive manner
 %
 % This function merges a from structure (array) to a to structure (array)
 % in a recursive manner when values contain structures (arrays). At any

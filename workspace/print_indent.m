@@ -1,5 +1,5 @@
 function print_indent(indent)
-% print_indent Modify the indent of the output.
+% print_indent Modify the indent of the output
 %
 % Increases of decreases the indent of the output for function print_text.
 % Can be used to structure the output in hierarchical calls.

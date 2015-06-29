@@ -2,7 +2,10 @@
 % in the same manner as for the VOT challenge
 % You can copy and modify it to create a different analyis
 
-[sequences, experiments] = vot_environment();
+addpath('{{toolkit}}');
+toolkit_path;
+
+[sequences, experiments] = workspace_load();
 
 error('Analysis not configured!'); % Remove this line after proper configuration
 

@@ -1,5 +1,5 @@
 function fullpath = export_figure(handle, filename, format, varargin)
-% export_figure Export a figure to various formats.
+% export_figure Export a figure to various formats
 %
 % Utility function that exports a figure to various formats taking care
 % of caching as well as some other options.

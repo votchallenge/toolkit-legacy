@@ -1,4 +1,23 @@
 function [document] = report_article(context, experiments, trackers, sequences, varargin)
+% report_article Generate an article friendly report
+%
+% Generate a per-sequence A-R ranking analysis report as well as some additional analysis that is
+% more suitable for interpretation in articles.
+%
+% Input:
+% - context (structure): Report context structure.
+% - trackers (cell): An array of tracker structures.
+% - sequences (cell): An array of sequence structures.
+% - experiments (cell): An array of experiment structures.
+% - varargin[OrderingPlot] (boolean): Generate ordering plots.
+% - varargin[ARPlot] (boolean): Generate A-R plots.
+% - varargin[CombineWeight] (double): Averaging factor between 0 and 1 for combining accuracy and robustness ranking.
+% - varargin[Spotlight] (string): Identifier of a tracker that is in the spotlight of the analysis.
+% - varargin[MasterLegend] (boolean): Use a single master legend instead of including it .
+%
+% Output:
+% - document (structure): Resulting document structure.
+%
 
 arplot = true;
 orderingplot = false;
