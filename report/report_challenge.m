@@ -1,7 +1,27 @@
 function [document] = report_challenge(context, experiments, trackers, sequences, varargin)
+% report_challenge Generate an official challenge report
+%
+% Generate a per-label A-R ranking analysis report as well as some additional analysis that is
+% used to obtain challenge results.
+%
+% Input:
+% - context (structure): Report context structure.
+% - trackers (cell): An array of tracker structures.
+% - sequences (cell): An array of sequence structures.
+% - experiments (cell): An array of experiment structures.
+% - varargin[Speed] (boolean): Generate speed report.
+% - varargin[Failures] (boolean): Generate failures report.
+% - varargin[OrderingPlot] (boolean): Generate ordering plots.
+% - varargin[ARPlot] (boolean): Generate A-R plots.
+% - varargin[CombineWeight] (double): Averaging factor between 0 and 1 for combining accuracy and robustness ranking.
+% - varargin[MasterLegend] (boolean): Use a single master legend instead of including it .
+%
+% Output:
+% - document (structure): Resulting document structure.
+%
 
 arplot = true;
-permutationplot = false;
+orderingplot = false;
 speed = true;
 failures = true;
 difficulty = true;
@@ -18,8 +38,8 @@ for i = 1:2:length(varargin)
             difficulty = varargin{i+1};             
         case 'arplot'
             arplot = varargin{i+1};
-        case 'permutationplot'
-            permutationplot = varargin{i+1};
+        case 'orderingplot'
+            orderingplot = varargin{i+1};
         case 'combineweight'
             ratio = varargin{i+1};
         case 'masterlegend'
@@ -68,7 +88,7 @@ end
 print_indent(-1);
 
 [ranking_document, ranks] = report_ranking(context, trackers, sequences, experiments, ...
-    'uselabels', true, 'usepractical', true, 'arplot', arplot, 'permutationplot', permutationplot, ...
+    'uselabels', true, 'usepractical', true, 'arplot', arplot, 'orderingplot', orderingplot, ...
     'hidelegend', master_legend);
 
 print_indent(-1);

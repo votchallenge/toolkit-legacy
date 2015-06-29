@@ -1,8 +1,16 @@
 function [sequence] = create_sequence(directory, varargin)
 
 start = 1;
-mask = '%08d.jpg';
 dummy = false;
+
+if all(size(dir([directory '/*.jpg'])))
+    mask = '%08d.jpg';
+elseif all(size(dir([directory '/*.png'])))
+    mask = '%08d.png';
+else
+    error('Unkown file ending for sequence frames');
+end;
+
 
 [parent, name] = fileparts(directory);
 
@@ -22,7 +30,7 @@ for i = 1:2:length(varargin)
 end 
 
 sequence = struct('name', name, 'directory', directory, ...
-        'mask', '%08d.jpg', 'length', 0, ...
+        'mask', mask, 'length', 0, ...
         'file', 'groundtruth.txt');
 
 sequence.groundtruth = read_trajectory(fullfile(sequence.directory, sequence.file));

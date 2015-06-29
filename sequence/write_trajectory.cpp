@@ -27,7 +27,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	char* path = getString(prhs[0]);
 
-	std::vector<Region*> regions;
+	std::vector<region_container*> regions;
 
 	if (!mxIsCell(prhs[1]))
 		mexErrMsgTxt("Second argument must be a cell array");
@@ -41,7 +41,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 		mxArray* val = mxGetCell (prhs[1], i);
 		double *d = (double*) mxGetPr(val);
-		Region* region = NULL;
+		region_container* region = NULL;
 
 		int l = MAX(mxGetM(val), mxGetN(val));
 
@@ -84,7 +84,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
     	for (int i = 0; i < regions.size(); i++) {
 
-			Region* region = regions[i];
+			region_container* region = regions[i];
 
 			char * tmp = region_string(region);
 

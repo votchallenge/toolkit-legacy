@@ -1,4 +1,16 @@
 function answer = file_newer_than(candidate, original)
+% file_newer_than Test if the first file is newer than the second file
+%
+% Test if the first file is newer than the second file.
+%
+% Input:
+% - candidate (string): Path to the first file.
+% - original (string): Path to the second file.
+%
+% Output:
+% - answer (boolean): True if the first file is newer than the second one.
+%
+
 
 candidate_metadata  = dir(candidate);
 original_metadata  = dir(original);

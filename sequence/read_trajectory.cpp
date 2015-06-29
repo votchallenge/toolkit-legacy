@@ -34,7 +34,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	std::ifstream ifs;
 	ifs.open (path, std::ifstream::in);
 
-	vector<Region*> regions;
+	vector<region_container*> regions;
 
 	if (ifs.is_open()) {
 
@@ -50,7 +50,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 			if (!ifs.good()) break;
 
-			Region* region = NULL;
+			region_container* region = NULL;
 
 			if (region_parse(line_buffer, &region)) {
 
@@ -71,7 +71,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		for (int i = 0; i < regions.size(); i++) {
 
 			mxArray* val = NULL;
-			Region* region = regions[i];
+			region_container* region = regions[i];
 
 			switch (region->type) {
 			case RECTANGLE: {

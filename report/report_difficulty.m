@@ -1,4 +1,21 @@
 function [document] = report_difficulty(context, trackers, sequences, experiments, varargin)
+% report_difficulty Generate a difficulty report for labels or sequences
+%
+% Performs A-R ranking analysis and generates a report that shows the difficulty of individual
+% labels or sequences.
+%
+% Input:
+% - context (structure): Report context structure.
+% - trackers (cell): An array of tracker structures.
+% - sequences (cell): An array of sequence structures.
+% - experiments (cell): An array of experiment structures.
+% - varargin[UsePractical] (boolean): Use practical difference.
+% - varargin[UseLabels] (boolean): Rank according to labels (otherwise rank according to sequences).
+% - varargin[Alpha] (boolean): Statistical significance parameter.
+%
+% Output:
+% - document (structure): Resulting document structure.
+%
 
 uselabels = true;
 usepractical = true;

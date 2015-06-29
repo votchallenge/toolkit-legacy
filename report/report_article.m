@@ -1,7 +1,26 @@
 function [document] = report_article(context, experiments, trackers, sequences, varargin)
+% report_article Generate an article friendly report
+%
+% Generate a per-sequence A-R ranking analysis report as well as some additional analysis that is
+% more suitable for interpretation in articles.
+%
+% Input:
+% - context (structure): Report context structure.
+% - trackers (cell): An array of tracker structures.
+% - sequences (cell): An array of sequence structures.
+% - experiments (cell): An array of experiment structures.
+% - varargin[OrderingPlot] (boolean): Generate ordering plots.
+% - varargin[ARPlot] (boolean): Generate A-R plots.
+% - varargin[CombineWeight] (double): Averaging factor between 0 and 1 for combining accuracy and robustness ranking.
+% - varargin[Spotlight] (string): Identifier of a tracker that is in the spotlight of the analysis.
+% - varargin[MasterLegend] (boolean): Use a single master legend instead of including it .
+%
+% Output:
+% - document (structure): Resulting document structure.
+%
 
 arplot = true;
-permutationplot = false;
+orderingplot = false;
 ratio = 0.5;
 spotlight = [];
 master_legend = true;
@@ -10,8 +29,8 @@ for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
         case 'arplot'
             arplot = varargin{i+1};
-        case 'permutationplot'
-            permutationplot = varargin{i+1};
+        case 'orderingplot'
+            orderingplot = varargin{i+1};
         case 'combineweight'
             ratio = varargin{i+1};
         case 'spotlight'
@@ -50,7 +69,7 @@ print_text('Ranking report ...'); print_indent(1);
 [ranking_document, ranks] = report_ranking(context, trackers, sequences, experiments, ...
     'uselabels', false, 'usepractical', true, 'tableformat', 'fragmented', ...
     'tableorientation', 'selectors', ...
-    'arplot', arplot, 'permutationplot', permutationplot, 'hidelegend', master_legend);
+    'arplot', arplot, 'orderingplot', orderingplot, 'hidelegend', master_legend);
 
 combined_ranks = squeeze(mean(ranks, 1));
 

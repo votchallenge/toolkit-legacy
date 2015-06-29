@@ -1,4 +1,16 @@
 function [s] = readstruct(filename)
+% readstruct Read a key-value file to a structure
+%
+% This function reads a key-value file to a structure. If possible, the
+% values are converted to numbers, otherwise the value is kept as string.
+%
+% Input:
+% - filename (string): Path to the file.
+%
+% Output:
+% - s (structure): Resulting structure.
+%
+
 
 fid = fopen(filename);
 lines = textscan(fid, '%s', 'Delimiter', '\n');

@@ -1,4 +1,23 @@
-function hf = generate_ranking_plot(trackers, accuracy, robustness, varargin)
+function handle = generate_ranking_plot(trackers, accuracy, robustness, varargin)
+% generate_ar_plot Generate an A-R ranking plot
+%
+% The function generates an A-R ranking plot for a sequence of measurements.
+%
+% Input:
+% - trackers (cell): A cell array of tracker structures.
+% - accuracy (matrix): Accuracy ranks.
+% - robustness (matrix): Robustness ranks.
+% - varargin[Title] (string): A title of the plot.
+% - varargin[Limit] (double): A manually set maximum rank.
+% - varargin[Visible] (boolean): Is the figure visible on the display.
+% - varargin[Width] (double): Figure width hint.
+% - varargin[Height] (double): Figure height hint.
+% - varargin[Handle] (handle): Plot on existing figure handle.
+% - varargin[Legend] (boolean): Render plot legend.
+%
+% Output:
+% - handle (handle): A figure handle.
+%
 
     plot_title = [];
     visible = false; 
@@ -6,7 +25,7 @@ function hf = generate_ranking_plot(trackers, accuracy, robustness, varargin)
     width = [];
     height = [];
 
-    hf = [];
+    handle = [];
 
     show_legend = true;
     
@@ -23,7 +42,7 @@ function hf = generate_ranking_plot(trackers, accuracy, robustness, varargin)
             case 'height'
                 height = varargin{i+1};
             case 'handle'
-                hf = varargin{i+1};
+                handle = varargin{i+1};
             case 'legend'
                 show_legend = varargin{i+1};                    
             otherwise 
@@ -31,14 +50,14 @@ function hf = generate_ranking_plot(trackers, accuracy, robustness, varargin)
         end
     end 
 
-    if isempty(hf)
+    if isempty(handle)
         if ~visible
-            hf = figure('Visible', 'off');
+            handle = figure('Visible', 'off');
         else
-            hf = figure();
+            handle = figure();
         end
     else
-        figure(hf);
+        figure(handle);
     end;
 
     if isempty(width)
@@ -74,6 +93,6 @@ function hf = generate_ranking_plot(trackers, accuracy, robustness, varargin)
     xlim([1, plot_limit]); 
     ylim([1, plot_limit]);
     
-    set(hf, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
+    set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
     
     hold off;

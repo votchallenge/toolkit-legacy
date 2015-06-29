@@ -1,8 +1,31 @@
 function [document, averaged_ranks] = report_ranking(context, trackers, sequences, experiments, varargin)
+% report_ranking Generate a report based on A-R ranking
+%
+% Performs A-R ranking analysis and generates a report based on the results.
+%
+% Input:
+% - context (structure): Report context structure.
+% - trackers (cell): An array of tracker structures.
+% - sequences (cell): An array of sequence structures.
+% - experiments (cell): An array of experiment structures.
+% - varargin[UsePractical] (boolean): Use practical difference.
+% - varargin[UseLabels] (boolean): Rank according to labels (otherwise rank according to sequences).
+% - varargin[OrderingPlot] (boolean): Generate ordering plots.
+% - varargin[ARPlot] (boolean): Generate A-R plots.
+% - varargin[Average] (boolean): Averaging type.
+% - varargin[Alpha] (boolean): Statistical significance parameter.
+% - varargin[TableFormat] (boolean): Table format.
+% - varargin[TableOrientation] (boolean): Table orientation.
+% - varargin[HideLegend] (boolean): Hide legend in plots.
+%
+% Output:
+% - document (structure): Resulting document structure.
+% - averaged_ranks (matrix): Averaged ranks for entire set.
+%
 
 uselabels = get_global_variable('report_labels', true);
 usepractical = get_global_variable('report_ranking_practical', true);
-permutationplot = get_global_variable('report_ranking_permutationplot', false);
+orderingplot = get_global_variable('report_ranking_ordering', false);
 hidelegend = get_global_variable('report_legend_hide', false);
 arplot = get_global_variable('report_ranking_arplot', true);
 average = get_global_variable('report_ranking_average', 'weighted_mean');
@@ -18,8 +41,8 @@ for i = 1:2:length(varargin)
             usepractical = varargin{i+1};
         case 'uselabels'
             uselabels = varargin{i+1};
-        case 'permutationplot'
-            permutationplot = varargin{i+1};
+        case 'orderingplot'
+            orderingplot = varargin{i+1};
         case 'arplot'
             arplot = varargin{i+1};
         case 'average'
@@ -144,42 +167,42 @@ for e = 1:length(experiments)
     
     document.subsection('Detailed plots');
 
-    if permutationplot
+    if orderingplot
               
         document.raw('<div class="imagegrid">\n');
         
-        h = generate_permutation_plot(trackers, results{e}.accuracy.ranks, selector_labels, ...
+        h = generate_ordering_plot(trackers, results{e}.accuracy.ranks, selector_labels, ...
             'flip', 1, 'legend', ~hidelegend);
-        document.figure(h, sprintf('permutation_accuracy_%s', experiments{e}.name), ...
-            'Ranking permutations for accuracy rank');
+        document.figure(h, sprintf('ordering_accuracy_%s', experiments{e}.name), ...
+            'Ranking orderings for accuracy rank');
 
         close(h);
 
-        h = generate_permutation_plot(trackers, results{e}.accuracy.value, selector_labels, ...
+        h = generate_ordering_plot(trackers, results{e}.accuracy.value, selector_labels, ...
             'scope', [0, 1], 'type', 'Overall overlap', 'legend', ~hidelegend);
-        document.figure(h, sprintf('permutation_overlap_%s', experiments{e}.name), ...
-            'Permutations for overall overlap');    
+        document.figure(h, sprintf('ordering_overlap_%s', experiments{e}.name), ...
+            'Orderings for overall overlap');    
 
         close(h);
 
         document.raw('</div>\n');
         document.raw('<div class="imagegrid">\n');        
         
-        h = generate_permutation_plot(trackers, results{e}.robustness.ranks, selector_labels, ...
+        h = generate_ordering_plot(trackers, results{e}.robustness.ranks, selector_labels, ...
             'flip', 1, 'legend', ~hidelegend);
-        document.figure(h, sprintf('permutation_robustness_%s', experiments{e}.name), ...
-            'Ranking permutations for robustness rank');
+        document.figure(h, sprintf('ordering_robustness_%s', experiments{e}.name), ...
+            'Ranking orderings for robustness rank');
 
         close(h);
 
         robustness = results{e}.robustness.normalized .* sensitivity;
         
-        h = generate_permutation_plot(trackers, robustness, selector_labels, ...
+        h = generate_ordering_plot(trackers, robustness, selector_labels, ...
             'scope', [0, max(robustness(:))+eps], 'type', ...
             'Failures', 'legend', ~hidelegend);
 
-        document.figure(h, sprintf('permutation_failures_%s', experiments{e}.name), ...
-            'Permutations for failures');
+        document.figure(h, sprintf('ordering_failures_%s', experiments{e}.name), ...
+            'Orderings for failures');
 
         close(h);
             

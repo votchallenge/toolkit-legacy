@@ -1,4 +1,18 @@
 function [transformed_sequence] = sequence_pixelchange(sequence, operation, name)
+% sequence_pixelchange Returns sequence with arbitrary pixel transformation
+%
+% This sequence converter returns sequence with arbitrary pixel transformation that preserves the 
+% size of the image and the groundtruth.
+%
+% Cache notice: The results of this function are cached in the workspace cache directory.
+%
+% Input:
+% - sequence (structure): A valid sequence structure.
+% - operation (function): A handle of the pixel transformation function.
+% - name (string, optional): Name of the operation for caching purposes.
+%
+% Output:
+% - tranform_sequence (structure): A sequence descriptor of a converted sequence.
 
 if ischar(operation)
     operation_name = operation;
@@ -22,8 +36,8 @@ sequence_groundtruth = fullfile(sequence.directory, 'groundtruth.txt');
 
 if file_newer_than(cache_groundtruth, sequence_groundtruth)
     transformed_sequence = create_sequence(cache_directory, 'name', sequence.name);
-%     transformed_sequence.labels.names = sequence.labels.names;
-%     transformed_sequence.labels.data = sequence.labels.data;
+    transformed_sequence.values.names = sequence.values.names;
+    transformed_sequence.values.data = sequence.values.data;
     return;
 end;
 
@@ -70,6 +84,6 @@ write_trajectory(cache_groundtruth, sequence.groundtruth);
 
 transformed_sequence = create_sequence(cache_directory, 'name', sequence.name);
 
-% transformed_sequence.labels.names = sequence.labels.names;
-% transformed_sequence.labels.data = sequence.labels.data;
+transformed_sequence.values.names = sequence.values.names;
+transformed_sequence.values.data = sequence.values.data;
 

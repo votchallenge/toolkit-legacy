@@ -1,64 +1,58 @@
-function  rel_path = relativepath( tgt_path, act_path )
-%RELATIVEPATH  returns the relative path from an actual path to the target path.
-%   Both arguments must be strings with absolute paths.
-%   The actual path is optional, if omitted the current dir is used instead.
-%   In case the volume drive letters don't match, an absolute path will be returned.
-%   If a relative path is returned, it always starts with '.\' or '..\'
+function  relative_path = relativepath( target_path, root_path )
+% relativepath Returns the relative path from an root path to the target path
 %
-%   Syntax:
-%      rel_path = RELATIVEPATH( target_path, actual_path )
-%   
-%   Parameters:
-%      target_path        - Path which is targetted
-%      actual_path        - Start for relative path (optional, default = current dir)
+% Returns the relative path from an root path to the target path.
+% Both arguments must be strings with absolute paths.
+% The actual path is optional, if omitted the current dir is used instead.
+% In case the volume drive letters don't match, an absolute path will be returned.
+% If a relative path is returned, it always starts with '.\' or '..\'
 %
-%   Examples:
-%      relativepath( 'C:\local\data\matlab' , 'C:\local' ) = '.\data\matlab\'
-%      relativepath( 'A:\MyProject\'        , 'C:\local' ) = 'a:\myproject\'
+% Credit: Jochen Lenz
 %
-%      relativepath( 'C:\local\data\matlab' , cd         ) is the same as
-%      relativepath( 'C:\local\data\matlab'              )
+% Input:
+% - target_path (string): Absolute path.
+% - root_path (string, optional): Start for relative path. Defaults to current directory.
 %
-%   See also:  ABSOLUTEPATH PATH
-
-%   Jochen Lenz
+% Output:
+% - relative_path (string): Relative path.
+%
 
 
 % 2nd parameter is optional:
 if  nargin < 2
-   act_path = cd;
+   root_path = cd;
 end
 
 % Predefine return string:
-rel_path = '';
+relative_path = '';
 
 % Make sure strings end by a filesep character:
-if  isempty(act_path)  ||   ~isequal(act_path(end),filesep)
-   act_path = [act_path filesep];
+if  isempty(root_path)  ||   ~isequal(root_path(end),filesep)
+   root_path = [root_path filesep];
 end
-if  isempty(tgt_path)  ||   ~isequal(tgt_path(end),filesep)
-   tgt_path = [tgt_path filesep];
+if  isempty(target_path)  ||   ~isequal(target_path(end),filesep)
+   target_path = [target_path filesep];
 end
 
 if isunix()
-	[act_path] = fileparts(act_path);
-	[tgt_path] = fileparts(tgt_path);
+	[root_path] = fileparts(root_path);
+	[target_path] = fileparts(target_path);
 else
 	% Convert to all lowercase:
-	[act_path] = fileparts(lower(act_path));
-	[tgt_path] = fileparts(lower(tgt_path));
+	[root_path] = fileparts(lower(root_path));
+	[target_path] = fileparts(lower(target_path));
 end;
 
 % Create a cell-array containing the directory levels:
-act_path_cell = pathparts(act_path);
-tgt_path_cell = pathparts(tgt_path);
+act_path_cell = pathparts(root_path);
+tgt_path_cell = pathparts(target_path);
 
 % If volumes are different, return absolute path:
 if  isempty(act_path_cell)  ||   isempty(tgt_path_cell)
    return  % rel_path = ''
 else
    if  ~isequal( act_path_cell{1} , tgt_path_cell{1} )
-      rel_path = tgt_path;
+      relative_path = target_path;
       return
    end
 end
@@ -75,19 +69,19 @@ end
 
 % As much levels down ('..\') as levels are remaining in "act_path":
 for  i = 1 : length(act_path_cell)
-   rel_path = fullfile('..', rel_path);
+   relative_path = fullfile('..', relative_path);
 end
 
 % Relative directory levels to target directory:
 for  i = 1 : length(tgt_path_cell)
-   rel_path = fullfile(rel_path, tgt_path_cell{i});
+   relative_path = fullfile(relative_path, tgt_path_cell{i});
 end
 
 % Start with '.' or '..' :
-if  isempty(rel_path)
-   rel_path = ['.', filesep];
-elseif  ~isequal(rel_path(1),'.')
-   rel_path = fullfile('.', rel_path);
+if  isempty(relative_path)
+   relative_path = ['.', filesep];
+elseif  ~isequal(relative_path(1),'.')
+   relative_path = fullfile('.', relative_path);
 end
 
 return

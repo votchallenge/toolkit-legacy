@@ -1,4 +1,17 @@
 function [document] = report_sequences_preview(context, sequences, varargin)
+% report_sequences_preview Create an overview document for the given sequences
+%
+% The function generates a report document for the given sequences by providing a
+% preview of each sequence.
+%
+% Input:
+% - context (structure): A report context structure.
+% - sequences (cell): An array of sequence descriptors.
+% - varargin[Frames] (integer): Number of frames for each sequence to present in a strip.
+%
+% Output:
+% - document (structure): A document structure.
+%
 
 document = create_document(context, 'sequences', 'title', 'Sequences preview');
 

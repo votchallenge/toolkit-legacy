@@ -1,4 +1,13 @@
 function visualize_sequence(sequence, varargin)
+% visualize_sequence Interactive sequence visualization
+%
+% The function intereactivelly visualizes the given sequence and a set of results.
+%
+% Input:
+% - sequence (structure): A valid sequence structure.
+% - varargin (cell): An array of trajectories that are visualized together with
+%   ground-truth data.
+%
 
 print_text('Press arrow keys or S,D,F,G to navigate the sequence, Q to quit.');
 
@@ -24,7 +33,7 @@ if ~isempty(sequence.labels.names)
 
     subplot(2,1,2);
     hold on;
-    timeline(names, starts, ends);
+    generate_timeline(names, starts, ends);
     set(gca,'xlim',[0 sequence.length]);
     slider = line([1 1], [0 numel(names)+1], 'LineWidth', 3, 'Color', [0 0 0 ]);
     hold off;

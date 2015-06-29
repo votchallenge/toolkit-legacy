@@ -1,10 +1,20 @@
 function [manifest] = write_manifest(tracker)
+% write_manifest Write a manifest file for the tracker
+%
+% Write a manifest file for the tracker. The manifest file contains some system
+% statistics that can be used for debugging and analysis.
+%
+% Input:
+% - tracker: Tracker structure.
+%
+% Output:
+% - manifest: Full path to the manifest file that is located in tracker result directory.
 
 mkpath(tracker.directory);
 
 manifest = fullfile(tracker.directory, 'manifest.txt');
 
-[platform_str,platform_maxsize,platform_endian] = computer();
+[platform_str, platform_maxsize, platform_endian] = computer();
 
 if is_octave()
     environment = 'octave';
@@ -22,9 +32,9 @@ environment_version = version();
 
 fid = fopen(manifest, 'w');
 
-vot_info = vot_information();
+version = toolkit_version();
 
-fprintf(fid, 'toolkit.version=%d\n', vot_info.version);
+fprintf(fid, 'toolkit.version=%d.%d\n', version.major, version.minor);
 fprintf(fid, 'tracker.identifier=%s\n', tracker.identifier);
 fprintf(fid, 'tracker.protocol=%s\n', protocol);
 fprintf(fid, 'timestamp=%s\n', datestr(now, 31));

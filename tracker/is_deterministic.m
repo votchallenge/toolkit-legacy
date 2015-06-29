@@ -1,4 +1,17 @@
 function result = is_deterministic(sequence, repetitions, directory)
+% is_deterministic Test if a tracker is deterministic
+%
+% Test if a tracker is deterministic for a given sequence. This is done by considering
+% first three trajectories for a given sequence and checking if the regions are equivalent
+% for every frame.
+%
+% Input:
+% - sequence: A sequence structure.
+% - repetitions: An integer number denoting the maximum number of repetitions.
+% - directory: A full path to the directory containing the results for the sequence.
+%
+% Output
+% - result: True if the tracker is deterministic.
 
 result = 1;
 

@@ -7,9 +7,9 @@
 
 using namespace std;
 
-Region* array_to_region(const mxArray * input) {
+region_container* array_to_region(const mxArray * input) {
     
-    Region* p = NULL;
+    region_container* p = NULL;
 	double *r = (double*)mxGetPr(input);
     int l = mxGetN(input);
     
@@ -46,7 +46,7 @@ Region* array_to_region(const mxArray * input) {
     
 }
 
-mxArray* region_to_array(const Region* region) {
+mxArray* region_to_array(const region_container* region) {
 
 	mxArray* val = NULL;
 
@@ -100,7 +100,7 @@ string get_string(const mxArray *arg) {
     return str;
 }
 
-bool get_region_code(string str, RegionType& type) {
+bool get_region_code(string str, region_type& type) {
     
     if (str == "rectangle") {
         type = RECTANGLE;
@@ -117,9 +117,9 @@ bool get_region_code(string str, RegionType& type) {
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-	RegionType format;
-	Region* p;
-	Region* c;
+	region_type format;
+	region_container* p;
+	region_container* c;
 
 	if( nrhs != 2 ) mexErrMsgTxt("Two vector arguments (region and format) required.");
 	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");

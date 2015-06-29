@@ -1,4 +1,33 @@
 function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
+% analyze_ranks Performs ranking analysis
+%
+% Performs ranking analysis for a given experiment on a set trackers and sequences.
+%
+% Input:
+% - experiment (structure): A valid experiment structures.
+% - trackers (cell): A cell array of valid tracker descriptor structures.
+% - sequences (cell): A cell array of valid sequence descriptor structures.
+% - varargin[UseLabels] (boolean): Perform per-label 
+% - varargin[UsePractical] (boolean): Use practical difference for accuracy.
+% - varargin[Average] (string): How to compute average rank.
+%     - weighted_mean: Average ranks, average values by taking into account length
+%     - mean: Average ranks, average values
+%     - gather: gather all frames and compute ranking on a single combined sequence
+% - varargin[Alpha] (boolean): Statistical significance parameter.
+% - varargin[Cache] (string): Cache directory.
+% - varargin[Adaptation] (string): Type of rank adaptation. See
+% adapter_ranks for more details.
+%
+% Output:
+% - result (structure): A structure with the following fields
+%     - accuracy
+%          - value: average overlap matrix
+%          - ranks: accuracy ranks matrix
+%     - robustness
+%          - value: number of failures matrix
+%          - ranks: robustness ranks matrix
+%     - lengths: number of frames for individual selectors
+%
 
     usepractical = false;
     uselabels = true;
@@ -283,7 +312,7 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
                 
             else
                 
-                [ha, hr] = compare_trackers(O1, F1, O2, F2, alpha, practical);
+                [ha, hr] = test_significance(O1, F1, O2, F2, alpha, practical);
 
             end;
             
@@ -296,4 +325,59 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
 
 end
 
+function [ha, hr] = test_significance(A1, R1, A2, R2, alpha, practical)
+% test_significance Verify difference of A-R performance for two trackers
+%
+% Compare A-R performance of two trackers taking into account statistical
+% and practical difference of results.
+%
+% Input:
+% - A1 (double matrix): Per-frame accuracy for first tracker
+% - R1 (double matrix): Per-segment robustness for first tracker
+% - A2 (double matrix): Per-frame accuracy for second tracker
+% - R2 (double matrix): Per-segment robustness for second tracker
+% - alpha (double): Confidence parameter
+% - practical (boolean): Take into account
+%
+% Output:
+% - ha (boolean): Is accuracy different
+% - hr (boolean): Is robustness different
+%
+ 
+    % Testing accuracy significance
 
+    % Statistical test
+    dif = A1 - A2;
+    valid = ~isnan(dif);
+    dif = dif(valid) ;
+    if (length(dif) < 5)
+        print_text('Warning: less than 5 samples when comparing trackers.');
+        ha = 0;
+    else
+        if (is_octave)
+            pa = wilcoxon_test(A1, A2);
+            ha = (pa <= alpha);
+        else
+            [~, ha, ~] = signrank(dif, [], 'alpha', alpha ) ;
+        end;
+    end;               
+
+    % Practical difference of accuracy
+    if ~isempty(practical)
+        if abs(mean(dif' ./ practical(valid))) < 1
+            ha = 0;
+        end;
+
+    end;
+
+    % Testing robustness significance
+    R1 = R1(:);
+    R2 = R2(:);
+    if (is_octave)
+       pr = u_test(R1, R2);
+       hr = (pr <= alpha);
+    else
+       [~, hr] = ranksum(R1, R2, 'alpha', alpha) ;
+    end;
+
+end

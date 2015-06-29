@@ -1,13 +1,26 @@
-function noisy_sequence = sequence_transform_initialization(sequence, transform, format)
+function tranform_sequence = sequence_transform_initialization(sequence, transform, format)
+% sequence_transform_initialization Returns sequence with transformed initialization
+%
+% This sequence converter returns a sequence that has a modified initialize handler that
+% transforms the region before handing it over to the tracker. This can be used to 
+% to introduce noise.
+%
+% Input:
+% - sequence (structure): A valid sequence structure.
+% - transform (function): A handle of transformation function.
+% - format (string, optional): Region format identifier for coercion.
+%
+% Output:
+% - tranform_sequence (structure): A sequence descriptor of a converted sequence.
 
 if nargin < 3
     format = [];
 end;
 
-noisy_sequence = sequence;
-noisy_sequence.initialize = @transform_initialization;
-noisy_sequence.initialize_transform = transform;
-noisy_sequence.initialize_format = format;
+tranform_sequence = sequence;
+tranform_sequence.initialize = @transform_initialization;
+tranform_sequence.initialize_transform = transform;
+tranform_sequence.initialize_format = format;
 
 end
 

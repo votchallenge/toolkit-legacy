@@ -1,4 +1,17 @@
 function generate_from_template(filename, template, varargin)
+% generate_from_template Generate a new file from a template file
+%
+% Generate a new file from a template file by % inserting given variables 
+% into the placeholders. The placeholders in the template file are denoted
+% by ''{{ variable_name }}''.
+%
+% Input:
+% - filename (string): Path to the destination file.
+% - template (string): Path to the template file.
+% - varargin (cell): Pairs of strings, the first string denotes the name of
+% the variable and the second one denotes the value.
+%
+
 
 report = fileread(template);
 

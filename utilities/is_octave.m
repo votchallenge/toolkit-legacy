@@ -1,7 +1,12 @@
-% Checks if the environment is GNU/Octave or MatLab
-% returns 1 if the environment is GNU/Octave
-%         0 if the environment is Matlab
 function [inOctave] = is_octave()
+% is_octave Test if in GNU/Octave or Matlab
+%
+% The function returns true only if it is run in GNU/Octave.
+%
+% Output:
+% - inOctave (boolean): True if run in GUN/Octave, false if run in Matlab.
+%
+
 try
     OCTAVE_VERSION;
     inOctave = 1;

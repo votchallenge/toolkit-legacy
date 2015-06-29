@@ -1,4 +1,18 @@
 function [tracker] = create_tracker(identifier, varargin)
+% create_tracker Create a new tracker structure
+%
+% tracker = create_tracker(identifier, ...) 
+%
+% Create a new tracker structure by searching for a tracker definition file using given
+% tracker identifier string.
+%
+% Input:
+% - identifier: A valid tracker identifier string. See `valid_identifier` for more details.
+% - varargin[Version]: Version of a tracker. See tracker versioning for more details.
+% - varargin[MakeDirectory]: A boolean indicating if a result directory should be automatically generated.
+%
+% Output:
+% - tracker: A new tracker structure.
 
 version = [];
 makedirectory = true;

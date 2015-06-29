@@ -1,4 +1,20 @@
 function context = create_report_context(name, varargin)
+% create_report_context Create report context structure
+%
+% Creates a new report context structure that can be used to generate
+% report documents.
+%
+% Input:
+% - name (string): Name of the report. Is used to name a directory where the report is stored in.
+% - varargin[Title] (string): A human-friendly name of the report. May be more verbose than report name.
+% - varargin[LaTeX] (boolean): Should the report be LaTeX compatible (export EPS figures and add table export options).
+% - varargin[Raw] (boolean): Should internal raw figures and data also be saved for future processing.
+% - varargin[Cache] (boolean): Should cache be used.
+%
+% Output:
+% - context (structure): A report context structure.
+%
+
 
 title = name;
 latex = false;

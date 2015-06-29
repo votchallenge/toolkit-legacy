@@ -1,5 +1,17 @@
 function context = iterate(experiments, trackers, sequences, varargin)
-% Performs iteration over a given experiment, tracker and sequence triplets
+% iterate Iterates over experiment, tracker and sequence triplets
+%
+% Performs iteration over a given experiment, tracker and sequence triplets.
+%
+% Input:
+% - experiments (cell, structure): Array of experiment structures.
+% - trackers (cell, structure): Array of tracker structures.
+% - sequences (cell, structure): Array of sequence structures.
+% - varargin[Iterator] (function): Function handle of the iterator function.
+% - varargin[Context] (structure): Initial iteration context.
+%
+% Output:
+% - context (structure): resutling structure.
 
 iterator = @default_iterator;
 context = [];
