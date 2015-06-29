@@ -1,7 +1,7 @@
-function [tracker] = create_tracker(identifier, varargin)
-% create_tracker Create a new tracker structure
+function [tracker] = tracker_load(identifier, varargin)
+% tracker_load Create a new tracker descriptor structure
 %
-% tracker = create_tracker(identifier, ...) 
+% tracker = tracker_load(identifier, ...) 
 %
 % Create a new tracker structure by searching for a tracker definition file using given
 % tracker identifier string.

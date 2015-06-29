@@ -28,7 +28,9 @@ temporary_file = tempname;
 temporary_metadata = [tempname, '.mat'];
 temporary_fid = fopen(temporary_file, 'w');
 
-template_file = get_global_variable('report_template');
+template_file = fullfile(fileparts(mfilename('fullpath')), 'templates', 'report.html');
+% Check if template is manually defined
+template_file = get_global_variable('report_template', template_file);
 
 target_file = fullfile(context.root, sprintf('%s%s.html', context.prefix, name));
 
@@ -64,14 +66,6 @@ document.include('css', 'report.css');
 end
 
 function write_report_document(document)
-% write_report_document <short description>
-%
-% <long description>
-%
-% Input:
-% - document (<type>): <description>
-%
-
 
     fclose(document.fid);
 
@@ -115,93 +109,36 @@ end
 
 
 function insert_chapter(document, text)
-% insert_chapter <short description>
-%
-% <long description>
-%
-% Input:
-% - document (<type>): <description>
-% - text (<type>): <description>
-%
-
 
     fprintf(document.fid, '<h1>%s</h1>', text);
 
 end
 
 function insert_section(document, text)
-% insert_section <short description>
-%
-% <long description>
-%
-% Input:
-% - document (<type>): <description>
-% - text (<type>): <description>
-%
-
 
     fprintf(document.fid, '<h2>%s</h2>', text);
     
 end
 
 function insert_subsection(document, text)
-% insert_subsection <short description>
-%
-% <long description>
-%
-% Input:
-% - document (<type>): <description>
-% - text (<type>): <description>
-%
-
 
     fprintf(document.fid, '<h3>%s</h3>', text);
 
 end
 
 function insert_text(document, text)
-% insert_text <short description>
-%
-% <long description>
-%
-% Input:
-% - document (<type>): <description>
-% - text (<type>): <description>
-%
-
 
     fprintf(document.fid, '<p>%s</p>', text);
 
 end
 
 function insert_link(document, url, text)
-% insert_link <short description>
-%
-% <long description>
-%
-% Input:
-% - document (<type>): <description>
-% - url (<type>): <description>
-% - text (<type>): <description>
-%
-
 
     fprintf(document.fid, '<a href="%s">%s</a>', url, text);
 
 end
 
 function insert_table(context, document, data, varargin)
-% insert_table <short description>
-%
-% <long description>
-%
-% Input:
-% - context (<type>): <description>
-% - document (<type>): <description>
-% - data (<type>): <description>
-% - varargin (<type>): <description>
-%
-
 
     if context.exportlatex
     
@@ -223,17 +160,6 @@ function insert_table(context, document, data, varargin)
 end
 
 function include_resource(context, document, type, name)
-% include_resource <short description>
-%
-% <long description>
-%
-% Input:
-% - context (<type>): <description>
-% - document (<type>): <description>
-% - type (<type>): <description>
-% - name (<type>): <description>
-%
-
 
     resource_destination = fullfile(context.root, 'resources', type, name);
     resource_source = fullfile(get_global_variable('toolkit_path'), 'report', 'resources', type, name);
@@ -266,18 +192,6 @@ function include_resource(context, document, type, name)
 end
 
 function insert_figure(context, fid, handle, id, title)
-% insert_figure <short description>
-%
-% <long description>
-%
-% Input:
-% - context (<type>): <description>
-% - fid (<type>): <description>
-% - handle (<type>): <description>
-% - id (<type>): <description>
-% - title (<type>): <description>
-%
-
 
     fprintf(fid, '<div class="plot">\n');
 

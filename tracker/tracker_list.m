@@ -1,5 +1,5 @@
-function [trackers] = create_trackers(varargin)
-% create_trackers Creates a set of trackers
+function [trackers] = tracker_list(varargin)
+% tracker_list Creates a set of tracker descriptor structures
 %
 % Create a cell array of new tracker structures from identifiers or file lists of identifiers.
 %
@@ -9,7 +9,7 @@ function [trackers] = create_trackers(varargin)
 %
 % Examples:
 % 
-%     trackers = create_trackers('trackers.txt', 'NCC'); % Load tracker identifiers from file trackers.txt and add a tracker NCC
+%     trackers = tracker_list('trackers.txt', 'NCC'); % Load tracker identifiers from file trackers.txt and add a tracker NCC
 %
 % Input:
 % - varargin: A list of strings denoting either files containing tracker identifiers or valid identifiers. See `valid_identifier` for more details.
@@ -53,7 +53,7 @@ for i = 1:size(identifiers, 1)
         break;
     end
 
-    trackers{i} = create_tracker(tracker_identifier);
+    trackers{i} = tracker_load(tracker_identifier);
 
 end;
 

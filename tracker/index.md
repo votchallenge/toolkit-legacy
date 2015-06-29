@@ -43,7 +43,7 @@ Most of the values in the descriptor are loaded from a tracker
 definition file. The definition file is a Matlab/Octave script with the
 name `tracker_<identifier>.m` that has to be visible to the interpreted
 (located in path). The file should define the following variables that
-are used by create_tracker to construct the descriptor structure:
+are used by tracker_load to construct the descriptor structure:
 
 -   **tracker_identifier** *(string)*: Tracker identifier string. See
     valid_identifier for more details.
@@ -61,8 +61,9 @@ Module functions
 
 ### Creation
 
--   [create_tracker](create_tracker.m) - Create a new tracker structure
--   [create_trackers](create_trackers.m) - Creates a set of trackers
+-   [tracker_create](tracker_create.m) - Create a new tracker configuration file
+-   [tracker_load](tracker_load.m) - Create a new tracker descriptor structure
+-   [tracker_list](tracker_list.m) - Create a set of tracker descriptor structures
 
 ### Execution
 
@@ -91,5 +92,6 @@ General utility functions for trackers.
 -   [write_manifest](write_manifest.m) - Write a manifest file for the tracker
 -   [pack_results](pack_results.m) - Packs results for a tracker to an archive
 -   [benchmark_hardware](benchmark_hardware.m) - Perform a simple benchmark
+-   [generate_matlab_command](generate_matlab_command.m) - Generate command line for Matlab tracker
 -   benchmark_native - A MEX function that performs several native benchmarks
 

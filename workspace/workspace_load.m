@@ -70,7 +70,6 @@ set_global_variable('bundle', []);
 set_global_variable('cleanup', 1);
 set_global_variable('report', 1);
 set_global_variable('matlab_startup_model', [923.5042, -4.2525]);
-set_global_variable('report_template', fullfile(get_global_variable('toolkit_path'), 'templates', 'report.html'));
 
 print_text('Initializing VOT environment ...');
 

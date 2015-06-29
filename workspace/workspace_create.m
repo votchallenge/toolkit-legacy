@@ -24,17 +24,18 @@ end
 
 script_directory = fileparts(mfilename('fullpath'));
 
-set_global_variable('toolkit_path', fileparts(script_direcory));
+set_global_variable('toolkit_path', fileparts(script_directory));
 set_global_variable('indent', 0);
 set_global_variable('directory', pwd());
 
 stacks = {};
 
-files = dir(fullfile(script_directory, 'stacks'));
+files = dir(fullfile(fileparts(script_directory), 'stacks'));
 
 for i = 1:length(files)
+    files(i).name
     if ~files(i).isdir && strncmp(files(i).name, 'stack_', 6)
-        stacks{end+1} = files(i).name(7:end-2);
+        stacks{end+1} = files(i).name(7:end-2); %#ok<AGROW>
     end;
 end
 
@@ -86,6 +87,29 @@ else
 
 end
 
+if isempty(tracker)
+    tracker = true;
+end;
+
+if islogical(tracker)
+
+    tracker_identifier = input('Input an unique identifier for your tracker: ', 's');
+
+else
+
+    tracker_identifier = tracker;
+    tracker = true;
+
+end
+
+if ~valid_identifier(tracker_identifier)
+    error('Not a valid tracker identifier!');
+end;
+
+if tracker
+    tracker_create('identifier', tracker_identifier, 'directory', directory);
+end;
+
 variables = {'version', num2str(version.major), ...
     'tracker', tracker_identifier, 'stack', selected_stack, ...
     'toolkit', get_global_variable('toolkit_path')};
@@ -107,27 +131,6 @@ generate_from_template(fullfile(directory, 'run_browse.m'), ...
 
 generate_from_template(fullfile(directory, 'run_analysis.m'), ...
     fullfile(templates_directory, 'run_analysis.tpl'), variables{:});
-
-if islogical(tracker)
-
-    tracker_identifier = input('Input an unique identifier for your tracker: ', 's');
-
-    if ~valid_identifier(tracker_identifier)
-        error('Not a valid tracker identifier!');
-    end;
-
-    if tracker
-        
-    end
-
-elseif ~isempty(tracker)
-
-
-
-end
-
-%generate_from_template(fullfile(directory, ['tracker_', tracker_identifier, '.m']), ...
-%    fullfile(templates, 'tracker.tpl'), variables{:});
 
 % Print further instructions ...
 

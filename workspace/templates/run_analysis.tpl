@@ -2,14 +2,13 @@
 % in the same manner as for the VOT challenge
 % You can copy and modify it to create a different analyis
 
-addpath('{{toolkit}}');
-toolkit_path;
+addpath('{{toolkit}}'); toolkit_path; % Make sure that VOT toolkit is in the path
 
 [sequences, experiments] = workspace_load();
 
-error('Analysis not configured!'); % Remove this line after proper configuration
+error('Analysis not configured! Please edit run_analysis.m file.'); % Remove this line after proper configuration
 
-trackers = create_trackers('{{tracker}}', 'TODO'); % TODO: add more trackers here
+trackers = tracker_list('{{tracker}}', 'TODO'); % TODO: add more trackers here
 
 context = create_report_context('report_{{stack}}_{{tracker}}');
 
