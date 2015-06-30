@@ -59,10 +59,12 @@ while 1
             
             [command, directory] = tracker.run(tracker, sequences{current_sequence}, struct('repetition', 1, 'repetitions', 1, 'fake', true));
 
+            launcher_script = generate_launcher_script(tracker, command, directory);
+            
             print_text('Input data generated in directory "%s"', directory);
-            print_text('Open the directory in a terminal and manually execute the tracker command.');
-            print_text('The current command as defined in the environment is: %s', command);
-            print_text('Once the tracker is working as expected, delete the directory.');
+            print_text('Open the directory in a terminal and manually execute the generated launch script.');
+            print_text('The generated launcher script is named: %s', launcher_script);
+            print_text('Once the tracker is working as expected (generates the output.txt), delete the directory.');
         end;
     case 'b'
         current_sequence = select_sequence(sequences);       
@@ -104,6 +106,49 @@ while 1
     end;
     
 end;
+
+end
+
+function launcher_script = generate_launcher_script(tracker, command, directory)
+
+    variables = struct;
+
+    if ispc
+        library_var = 'PATH';
+        script_suffix = '.bat';
+        variable_define = 'set';
+    else
+        library_var = 'LD_LIBRARY_PATH';
+        script_suffix = '.sh';
+        variable_define = 'export';
+    end;
+
+    if ~isempty(tracker.linkpath)
+        userpath = tracker.linkpath{end};
+        if length(tracker.linkpath) > 1
+            userpath = [sprintf(['%s', pathsep], tracker.linkpath{1:end-1}), userpath];
+        end;
+        variables.(library_var) = userpath;
+    end;
+    
+    launcher_script = fullfile(directory, ['launcher', script_suffix]);
+    
+    fid = fopen(launcher_script, 'w');
+    
+    fields = repmat(fieldnames(variables), numel(variables), 1);
+    values = struct2cell(variables);
+    
+    cellfun(@(x, y) fprintf(fid, '%s "%s=%s"\n', variable_define, x, y), fields, values, 'UniformOutput', 0);
+    
+    fprintf(fid, '%s\n', command);
+    
+    fclose(fid);
+    
+    if isunix
+       fileattrib(launcher_script, '+x'); 
+    end
+    
+end
 
 
 

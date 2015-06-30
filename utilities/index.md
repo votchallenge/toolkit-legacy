@@ -33,6 +33,6 @@ Module functions
 -   [strjoin](strjoin.m) - Joins multiple strings
 -   [format_interval](format_interval.m) - Format a time interval
 -   [patch_operation](patch_operation.m) - Performs a point-wise operation with two unequal matrices
--   [compile_all_native](compile_all_native.m) - Compile all native components
+-   [initialize_native](initialize_native.m) - Initialize all native components
 -   [compile_mex](compile_mex.m) - Compile given source files to a MEX function
 

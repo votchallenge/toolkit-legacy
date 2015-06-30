@@ -60,15 +60,15 @@ if ~exist(configuration_file, 'file')
 end;
 
 % Some defaults
-set_global_variable('toolkit_path', fileparts(mfilename('fullpath')));
+set_global_variable('toolkit_path', fileparts(fileparts(mfilename('fullpath'))));
 set_global_variable('indent', 0);
 set_global_variable('directory', pwd());
 set_global_variable('debug', 0);
 set_global_variable('cache', 1);
-set_global_variable('pack', 1);
 set_global_variable('bundle', []);
 set_global_variable('cleanup', 1);
-set_global_variable('report', 1);
+set_global_variable('trax_url', 'https://github.com/lukacu/trax/archive/master.zip');
+set_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
 set_global_variable('matlab_startup_model', [923.5042, -4.2525]);
 
 print_text('Initializing VOT environment ...');
@@ -87,11 +87,11 @@ catch e
     end; 
 end;
 
-native_dir = fullfile(get_global_variable('toolkit_path'), 'mex');
+native_dir = fullfile(get_global_variable('toolkit_path'), 'native');
 mkpath(native_dir);
 addpath(native_dir);
 
-compile_all_native(native_dir);
+initialize_native(native_dir);
 
 if cached
     print_debug('Skipping loading experiments and sequences');
