@@ -1,8 +1,5 @@
 *~
-mex
-documentation/documentation.*
-documentation/*.wiki
-trax
+native
 cache/
 sequences/
 tracker/examples/c/camshift
