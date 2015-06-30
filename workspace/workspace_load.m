@@ -71,6 +71,7 @@ set_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
 set_global_variable('trax_url', 'https://github.com/lukacu/trax/archive/master.zip');
 set_global_variable('trax_mex', []);
 set_global_variable('trax_client', []);
+set_global_variable('trax_timeout', 30);
 set_global_variable('matlab_startup_model', [923.5042, -4.2525]);
 
 print_text('Initializing VOT environment ...');

@@ -60,6 +60,10 @@ if (context.skip_initialize > 0)
     arguments = [arguments, sprintf(' -r %d', context.skip_initialize)];
 end;
 
+% Specify timeout period
+timeout = get_global_variable('trax_timeout', 30);
+arguments = [arguments, sprintf(' -t %d', timeout)];
+
 if ~isempty(tracker.trax_parameters) && iscell(tracker.trax_parameters)
     for i = 1:size(tracker.trax_parameters, 1)
         arguments = [arguments, sprintf(' -p "%s=%s"', ...
@@ -67,10 +71,8 @@ if ~isempty(tracker.trax_parameters) && iscell(tracker.trax_parameters)
     end
 end
 
-% mwrapper requires matlab root on Unix
-if ~ispc
-    arguments = [arguments, ' -e "MATLAB_ROOT=', matlabroot, '"'];
-end
+% hint to tracker that it should use trax
+arguments = [arguments, ' -e "TRAX=1"'];
 
 if ispc
 command = sprintf('"%s" %s -I "%s" -G "%s" -O "%s" -S "%s" -T "%s" -- %s', trax_executable, ...
