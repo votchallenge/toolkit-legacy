@@ -13,6 +13,13 @@ function command = generate_matlab_command(script, paths)
 % - command (string): Generated command string.
 %
 
+trax_mex = get_global_variable('trax_mex');
+
+% If path to trax mex file is set then we attempt to export it to tracker
+if ~isempty(trax_mex)
+    paths{end+1} = trax_mex;
+end
+
 path_string = strjoin(cellfun(@(p) sprintf('addpath(''%s'');', p), paths, 'UniformOutput', false), '');
 
 if ispc()

@@ -10,6 +10,7 @@ function initialize_native(output_path)
 
 toolkit_path = get_global_variable('toolkit_path');
 
+% First attempt to download precompiled binaries
 if download_native(output_path)
     return;
 end;
@@ -76,54 +77,57 @@ function success = download_native(native_dir)
 
 success = false;
 
-if exist(fullfile(native_dir, 'trax.h'), 'file') == 2
-    success = true;
-    return;
-end
+if ~(exist(fullfile(native_dir, 'trax.h'), 'file') == 2)
 
-if ispc()
-    ostype = 'windows';
-elseif ismac()
-    ostype = 'mac';
-else
-    ostype = 'linux';
-end
+    if ispc()
+        ostype = 'windows';
+    elseif ismac()
+        ostype = 'mac';
+    else
+        ostype = 'linux';
+    end
 
-if ~isempty(strfind(computer('arch'), '64'))
-    arch = '64';
-else
-    arch = '32';
+    if ~isempty(strfind(computer('arch'), '64'))
+        arch = '64';
+    else
+        arch = '32';
+    end;
+
+    tempdir = tempname;
+    mkdir(tempdir);
+
+    native_url = get_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
+
+    vot_bundle_url = sprintf('%svot-%s%s.zip', native_url, ostype, arch);
+    trax_bundle_url = sprintf('%strax-%s%s.zip', native_url, ostype, arch);
+
+    try 
+        print_debug('Downloading from %s.', vot_bundle_url);
+        urlwrite(vot_bundle_url, fullfile(tempdir, 'vot.zip'));
+        print_debug('Downloading from %s.', trax_bundle_url);
+        urlwrite(trax_bundle_url, fullfile(tempdir, 'trax.zip'));
+    catch
+        return;
+    end
+
+    print_text('Downloaded native file bundles.');
+
+    unzip(fullfile(tempdir, 'vot.zip'), native_dir);
+    delete(fullfile(tempdir, 'vot.zip'));
+
+    unzip(fullfile(tempdir, 'trax.zip'), native_dir);
+    delete(fullfile(tempdir, 'trax.zip'));
+
+    rmpath(tempdir);
+
 end;
-
-tempdir = tempname;
-mkdir(tempdir);
-
-native_url = get_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
-
-vot_bundle_url = sprintf('%svot-%s%s.zip', native_url, ostype, arch);
-trax_bundle_url = sprintf('%strax-%s%s.zip', native_url, ostype, arch);
-
-try 
-    print_debug('Downloading from %s.', vot_bundle_url);
-    urlwrite(vot_bundle_url, fullfile(tempdir, 'vot.zip'));
-    print_debug('Downloading from %s.', trax_bundle_url);
-    urlwrite(trax_bundle_url, fullfile(tempdir, 'trax.zip'));
-catch
-    return;
-end
-
-print_text('Downloaded native file bundles.');
-
-unzip(fullfile(tempdir, 'vot.zip'), native_dir);
-delete(fullfile(tempdir, 'vot.zip'));
-
-unzip(fullfile(tempdir, 'trax.zip'), native_dir);
-delete(fullfile(tempdir, 'trax.zip'));
-
-rmpath(tempdir);
 
 if exist(fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')), 'file') == 2
     set_global_variable('trax_client', fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')));
+end
+
+if exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 2
+    set_global_variable('trax_mex', fullfile(native_dir, 'mex'));
 end
 
 success = true;
