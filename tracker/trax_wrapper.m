@@ -71,8 +71,15 @@ if ~isempty(tracker.trax_parameters) && iscell(tracker.trax_parameters)
     end
 end
 
-% hint to tracker that it should use trax
+% Hint to tracker that it should use trax
 arguments = [arguments, ' -e "TRAX=1"'];
+
+
+% If we are running Matlab tracker on Windows, we have to use TCP/IP
+% sockets
+if ispc && strcmpi(tracker.interpreter, 'matlab')
+    arguments = [arguments, ' -X'];
+end
 
 if ispc
 command = sprintf('"%s" %s -I "%s" -G "%s" -O "%s" -S "%s" -T "%s" -- %s', trax_executable, ...
