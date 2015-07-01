@@ -1,4 +1,4 @@
-/* -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 4; tab-width: 4 -*- */
+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * This is an example of a stationary tracker. It only reports the initial 
  * position for all frames and is used for testing purposes.
@@ -36,7 +36,10 @@
 
 #include <stdio.h>
 #include <ctype.h>
-#include "vot2014.h"
+
+// Comment line below if you want to use rectangles
+#define VOT_POLYGON
+#include "vot.h"
 
 int main( int argc, char** argv)
 {
@@ -45,7 +48,14 @@ int main( int argc, char** argv)
     // *****************************************
     // VOT: Call vot_initialize at the beginning
     // *****************************************
-    VOTPolygon selection = vot_initialize();
+    vot_region* selection = vot_initialize();
+
+    // Process the first frame
+    const char* imagefile = vot_frame();
+    if (!imagefile) {
+        vot_quit();
+        exit(0);
+    }
 
     for(f = 1;; f++)
     {
@@ -68,10 +78,12 @@ int main( int argc, char** argv)
 
     }
 
+    vot_region_release(&selection);
+
     // *************************************
     // VOT: Call vot_deinitialize at the end
     // *************************************
-    vot_deinitialize();
+    vot_quit();
 
     return 0;
 }
