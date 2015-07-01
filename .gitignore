@@ -1,5 +1,5 @@
 *~
-native
+/native/
 cache/
 sequences/
 tracker/examples/c/camshift
