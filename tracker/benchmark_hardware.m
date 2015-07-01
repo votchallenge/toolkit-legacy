@@ -1,16 +1,13 @@
-function [filename] = benchmark_hardware(tracker)
-% benchmark_hardware Perform a simple benchmark
+function filename = benchmark_hardware(varargin)
+% benchmark_hardware Perform a simple hardware benchmark
 %
 % Performs a simple benchmark of the computer that can be later used to normalize
 % the speed estimate between results obtained on different hardware.
 %
-% Input:
-% - tracker: A valid tracker descriptor structure.
-%
 % Output:
-% - filename: Path to the performance profile.
+% - filename: Path to the local performance profile.
 %
-filename = fullfile(tracker.directory, 'performance.txt');
+filename = fullfile(get_global_variable('directory'), 'results', 'performance.txt');
 
 if exist(filename, 'file')
     print_debug('Skipping hardware performance benchmark');
