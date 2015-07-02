@@ -24,9 +24,9 @@ for j = 1:nargin
     %check if the first argument is a file, if so it is a 
     %text file containing a list of tracker names, ignore directories
     %(since the results folder migtht be on the path)
-    if exist(varargin{j}, 'file') == 2
+    if exist(fullfile(pwd(), varargin{j}), 'file') == 2
 
-        ids = readfile(varargin{j}, 'Delimiter', ',');
+        ids = readfile(fullfile(pwd(), varargin{j}), 'Delimiter', ',');
 
         identifiers = [identifiers; ids(:)]; %#ok<AGROW>
 
