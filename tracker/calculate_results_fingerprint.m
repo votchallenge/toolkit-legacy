@@ -34,22 +34,22 @@ function context = fingerprint_iterator(event, context)
     switch (event.type)
         case 'sequence_enter'
             
-            directory = fullfile(event.tracker.directory, event.experiment.name);
-
-            dates = zeros(1, event.experiment.parameters.repetitions);
+            execution_parameters = struct();
+            if isfield(event.experiment, 'parameters')
+                execution_parameters = event.experiment.parameters;
+            end;
             
-            for j = 1:event.experiment.parameters.repetitions
+            sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
+                event.sequence.name);
+            
+            [files, completed] = tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
+                'type', event.experiment.type, 'parameters', execution_parameters, 'scan', true);
 
-                result_file = fullfile(directory, event.sequence.name, sprintf('%s_%03d.txt', event.sequence.name, j));
-
-                if exist(result_file, 'file')
-                   
-                    stat = dir(result_file);
-                    
-                    dates(j) = stat.datenum;
-                    
-                end
-
+            dates = zeros(1, numel(files));
+            
+            for j = 1:numel(files)
+                stat = dir(files{j});
+                dates(j) = stat.datenum;
             end; 
             
             context = [context, dates];

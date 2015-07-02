@@ -67,7 +67,7 @@ Module functions
 
 ### Execution
 
--   [repeat_trial](repeat_trial.m) - Repeats running a tracker on a given sequence
+-   [tracker_evaluate](tracker_evaluate.m) - Evaluates a tracker on a given sequence for experiment
 -   [prepare_trial_data](prepare_trial_data.m) - Prepares data for a trial run
 -   [system_wrapper](system_wrapper.m) - Legacy approach to experiment execution
 -   [trax_wrapper](trax_wrapper.m) - Tracker integration approach using TraX protocol
@@ -90,7 +90,6 @@ General utility functions for trackers.
 -   [order_trackers](order_trackers.m) - Change the order of trackers
 -   [valid_identifier](valid_identifier.m) - Verifies tracker identifier
 -   [write_manifest](write_manifest.m) - Write a manifest file for the tracker
--   [pack_results](pack_results.m) - Packs results for a tracker to an archive
 -   [benchmark_hardware](benchmark_hardware.m) - Perform a simple benchmark
 -   [generate_matlab_command](generate_matlab_command.m) - Generate command line for Matlab tracker
 -   benchmark_native - A MEX function that performs several native benchmarks

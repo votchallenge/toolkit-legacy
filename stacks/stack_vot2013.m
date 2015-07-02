@@ -4,7 +4,7 @@ set_global_variable('bundle', 'http://box.vicos.si/vot/vot2013.zip');
 
 baseline.name = 'baseline';
 baseline.converter = [];
-baseline.execution = 'default';
+baseline.type = 'supervised';
 baseline.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
 baseline.parameters.repetitions = 15;
@@ -15,7 +15,7 @@ baseline.parameters.failure_overlap = 0;
 region_noise.name = 'region_noise';
 region_noise.converter = @(sequence) sequence_transform_initialization(...
     sequence, @noisy_transform, 'rectangle');
-region_noise.execution = 'default';
+region_noise.type = 'supervised';
 region_noise.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
 region_noise.parameters.repetitions = 15;
@@ -25,7 +25,7 @@ region_noise.parameters.failure_overlap = 0;
 
 grayscale.name = 'grayscale';
 grayscale.converter = 'sequence_grayscale';
-grayscale.execution = 'default';
+grayscale.type = 'supervised';
 grayscale.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
 grayscale.parameters.repetitions = 15;

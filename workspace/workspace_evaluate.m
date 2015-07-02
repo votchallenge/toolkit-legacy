@@ -11,12 +11,11 @@ function workspace_evaluate(trackers, sequences, experiments, varargin)
 % - varargin[Mode] (string, optional): Evaluation mode, at the moment only 'execute' mode is supported.
 %
 
-
 mode = 'execute';
 
 for j=1:2:length(varargin)
     switch lower(varargin{j})
-        case 'mode', mode = varargin{j+1};         
+        case 'mode', mode = varargin{j+1};      
         otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
@@ -59,16 +58,17 @@ function context = execute_iterator(event, context)
             
             print_text('Sequence %s', event.sequence.name);
 
-            context = struct();
+            execution_parameters = struct();
             if isfield(event.experiment, 'parameters')
-                context = event.experiment.parameters;
+                execution_parameters = event.experiment.parameters;
             end;
             
             sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
                 event.sequence.name);
-            
-            repeat_trial(event.tracker, event.sequence, sequence_directory, context);
-            
+
+            tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
+                'type', event.experiment.type, 'parameters', execution_parameters);
+
     end;
 
 end
