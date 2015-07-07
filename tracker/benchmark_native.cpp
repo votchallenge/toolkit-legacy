@@ -111,6 +111,8 @@ int getSingleInteger(const mxArray *arg) {
 
     if (mxIsDouble(arg))
         return (int) ((double*)mxGetPr(arg))[0];
+
+    return 0;
 }
 
 char* getString(const mxArray *arg) {

@@ -53,6 +53,8 @@ int getSingleInteger(const mxArray *arg) {
 
     if (mxIsDouble(arg))
         return (int) ((double*)mxGetPr(arg))[0];
+
+    return 0;
 }
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
