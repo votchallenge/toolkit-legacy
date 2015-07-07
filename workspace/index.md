@@ -5,6 +5,45 @@ This module contains functions that are used to initialize, load and use a works
 directory, separate from the toolkit directory, where experiment-specific results are stored. The directory contains
 several special subdirectories that contain sequence data, per-tracker raw results, report documents, and cached data.
 
+About workspace
+---------------
+
+The workspace is automatically populated with several subdirectories:
+
+* `sequences/` - This subdirectory contains sequence data. By default the testing sequence dataset will be automatically downloaded the first time the evaluation starts in a specific working directory. Alternatively you can download the entire dataset manually and extract it to this directory. Each sequence is contained in a separate directory with the following structure:
+	- `<sequence name>/` - A directory that contains a sequence.
+		* `groundtruth.txt` - Annotations file.
+   		* `00000001.jpg`
+   		* `00000002.jpg`
+   		* `00000003.jpg`
+   		* `...`
+* `results/` - Results of the tracking for multiple trackers.
+	- `<tracker identifier>/` - All results for a specific tracker.
+		* `<experiment name>/` - All results for a specific experiment.
+   		* `<sequence name>/` - All results for a sequence.
+   			* `<sequence name>_<iteration>.txt` - Result data for iteration.
+* `cache/` - Cached data that can be deleted and can be generated on demand. An example of this are gray-scale sequences that are generated from their color originals on demand.
+
+Evaluation process
+------------------
+
+By default the entire evaluation is performed sequentially as described by the following pseudo-code:
+
+    tracker t
+    for experiment e:
+        for sequence s:
+            repeat r times (if tracker is stochastic):
+                perform trial for (t, s)
+            end
+        end
+    end
+
+Each trial contains one or more executions of the tracker. The idea is that if the tracker fails during tracking the execution (the failure criterion can be experiment dependent) it is repeated from the point of the failure (plus additional offset frames if specified).
+
+In the case of stochastic trackers, each sequence is evaluated multiple times. If the tracker produces identical trajectories two times in a row, the tracker is considered deterministic and further iterations are omitted. It is therefore important that the stochastic nature of a tracker is appropriately addressed (proper random seed initialization).
+
+Because of the thorough methodology, the entire execution can take quite some time. The function [workspace_test](workspace_test.m) provides an option for estimating the processing time for the entire evaluation based on a single run on one sequence.
+
 Module functions
 ----------------
 

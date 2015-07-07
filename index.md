@@ -10,7 +10,7 @@ subscribe to the VOT [mailing list](https://service.ait.ac.at/mailman/listinfo/v
 Platform support
 ----------------
 
-The toolkit is written in Matlab language with a strong emphasis on Octave compatibility as well as support for multiple versions of Matlab (at the moment it was tested with versions from 2011 to 2014).
+The toolkit is written in Matlab language with a strong emphasis on Octave compatibility as well as support for multiple versions of Matlab (at the moment it was tested with versions from 2011 to 2015).
 
 The code should work on Windows, Linux and OSX, however, it is hard to verify this on all versions and system configurations. If you therefore find that there are some issues on your computer setup, submit a bug report at [Github](https://github.com/vicoslab/vot-toolkit/issues/new) as soon as possible.
 
