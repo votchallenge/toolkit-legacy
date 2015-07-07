@@ -11,6 +11,7 @@ function matrix2html(matrix, filename, varargin)
 % - varargs[Format] (string): Format of the numeric input data in the printf format.
 % - varargs[Class] (string): CSS class of the table.
 % - varargs[Title] (string): Title of the table.
+% - varargs[EmbedNumers] (boolean): Embed numerical data as data attributes.
 %
 
     rowLabels = [];
@@ -18,6 +19,7 @@ function matrix2html(matrix, filename, varargin)
     format = '%.2f';
     css_class = [];
     title = [];
+    embed_numbers = false;
     if (rem(nargin,2) == 1 || nargin < 2)
         error('Incorrect number of arguments to %s.', mfilename);
     end
@@ -33,15 +35,17 @@ function matrix2html(matrix, filename, varargin)
             case 'class'
                 css_class = varargin{i+1};
             case 'title'
-                title = varargin{i+1};    
+                title = varargin{i+1};
+            case 'embednumbers'
+                embed_numbers = varargin{i+1};    
             otherwise 
                 error(['Unknown switch ', varargin{i}, '!']) ;
         end
     end     
 
-    rowLabels = matrix2cells(rowLabels, 'th', format);
-    colLabels = matrix2cells(colLabels, 'th', format);
-    matrix = matrix2cells(matrix, 'td', format);                
+    rowLabels = matrix2cells(rowLabels, 'th', format, false);
+    colLabels = matrix2cells(colLabels, 'th', format, false);
+    matrix = matrix2cells(matrix, 'td', format, embed_numbers);                
 
     if (ischar(filename))
         fid = fopen(filename, 'w');
@@ -57,15 +61,20 @@ function matrix2html(matrix, filename, varargin)
         stub{1, 1} = sprintf('<th colspan="%d" rowspan="%d">&nbsp;</th>', ...
                 size(rowLabels, 2), size(colLabels, 1));
         
-        matrix = cat(2, cat(1, stub, rowLabels), cat(1, colLabels, matrix));
+        head = cat(2, stub, colLabels);
+            
+        body = cat(2, rowLabels, matrix);
 
     elseif ~isempty(colLabels)
 
-        matrix = cat(1, colLabels, matrix);
+        head = colLabels;
+        
+        body = matrix;
 
     elseif ~isempty(rowLabels)
-
-        matrix = cat(2, rowLabels, matrix);
+       
+        head = [];
+        body = cat(2, rowLabels, matrix);
 
     end;
 
@@ -79,17 +88,29 @@ function matrix2html(matrix, filename, varargin)
     else
         fprintf(fid, '<table>\n');
     end
+
+    if ~isempty(head)
     
-    skip = cellfun(@(x) isempty(x), matrix, 'UniformOutput', true);
+        skip = cellfun(@(x) isempty(x), head, 'UniformOutput', true);
+        fprintf(fid, '<thead>');
+        for i = 1 : size(head, 1)
+            fprintf(fid, '<tr>');
+            cellfun(@(x) fprintf(fid, x), head(i, ~skip(i, :)), 'UniformOutput', true);
+            fprintf(fid, '</tr>');
+        end;    
+        fprintf(fid, '</thead>');
+    end;
     
-    for i = 1 : size(matrix, 1)
+    skip = cellfun(@(x) isempty(x), body, 'UniformOutput', true);
+    
+    fprintf(fid, '<tbody>');
+    for i = 1 : size(body, 1)
         fprintf(fid, '<tr>');
-
-        cellfun(@(x) fprintf(fid, x), matrix(i, ~skip(i, :)), 'UniformOutput', true);
-
+        cellfun(@(x) fprintf(fid, x), body(i, ~skip(i, :)), 'UniformOutput', true);
         fprintf(fid, '</tr>');
     end;
-
+    fprintf(fid, '</tbody>');
+    
     fprintf(fid, '</table>\r\n');
     
     if (close_file)
@@ -98,20 +119,15 @@ function matrix2html(matrix, filename, varargin)
 
 end
 
-function [cells] = matrix2cells(matrix, element, format)
+function [cells] = matrix2cells(matrix, element, format, embed_numbers)
 
     if isnumeric(matrix)
-        cells =  cellfun(@(x) num2str(x, format), ...
-            num2cell(matrix), 'UniformOutput', false);
-        rowspan = ones(size(cells));
-        colspan = ones(size(cells));
-        attributes = repmat({''}, size(cells, 1), size(cells, 2));
-    else
-        [cells, rowspan, colspan, attributes] = cellfun(@(x) cell2cell(x, format), ...
-            matrix, 'UniformOutput', false);
-        rowspan = cell2mat(rowspan);
-        colspan = cell2mat(colspan);
-    end    
+        matrix = num2cell(matrix);
+    end;
+    [cells, rowspan, colspan, attributes] = cellfun(@(x) cell2cell(x, format, embed_numbers), ...
+        matrix, 'UniformOutput', false);
+    rowspan = cell2mat(rowspan);
+    colspan = cell2mat(colspan);
 
     width = size(matrix, 2);
     height = size(matrix, 1);
@@ -149,7 +165,7 @@ function [cells] = matrix2cells(matrix, element, format)
     
 end
 
-function [str, rowspan, colspan, cell_attributes] = cell2cell(s, format)
+function [str, rowspan, colspan, cell_attributes] = cell2cell(s, format, embed_numbers)
 
     rowspan = 1;
     colspan = 1;
@@ -158,6 +174,9 @@ function [str, rowspan, colspan, cell_attributes] = cell2cell(s, format)
     
     if isnumeric(s)
         str = num2str(s, format);
+        if embed_numbers
+            cell_attributes = [cell_attributes, sprintf(' data-numeric="%f" ', s)];
+        end;
         return;
     elseif ~isstruct(s)
         str = s;
@@ -184,6 +203,9 @@ function [str, rowspan, colspan, cell_attributes] = cell2cell(s, format)
     end
 
     if isnumeric(s.text)
+        if embed_numbers
+            cell_attributes = [cell_attributes, sprintf(' data-numeric="%f" ', s.text)];
+        end;
         str = num2str(s.text, format);
     else
         str = s.text;
