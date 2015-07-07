@@ -62,6 +62,7 @@ document.link = @(url, text, varargin) insert_link(document, url, sprintf(text, 
 document.figure = @(handle, id, title) insert_figure(context, document.fid, handle, id, title);
 
 document.include('css', 'report.css');
+document.include('js', 'jquery.js');
 
 end
 
@@ -98,9 +99,12 @@ function write_report_document(document)
         head = strjoin(head_tokens, '');
     end;
     
+    version = toolkit_version();
+
     generate_from_template(document.target_file, document.template_file, ...
         'body', fileread(document.temporary_file), 'title', document.title, ...
-        'timestamp', datestr(now, 31), 'head', head);
+        'timestamp', datestr(now, 31), 'head', head, ... 
+        'toolkit', sprintf('VOT toolkit %d.%d', version.major, version.minor));
     
     delete(document.temporary_file);
     delete(document.temporary_metadata);
@@ -140,19 +144,10 @@ end
 
 function insert_table(context, document, data, varargin)
 
-    if context.exportlatex
+    document.include('js', 'jquery.export.js');
+
+    fprintf(document.fid, '<div class="table export">');
     
-        document.include('js', 'jquery.js');
-        document.include('js', 'jquery.latex.js');
-
-        fprintf(document.fid, '<div class="table latex">');
-        
-    else
-        
-        fprintf(document.fid, '<div class="table">');
-        
-    end;
-
     matrix2html(data, document.fid, varargin{:});
 
     fprintf(document.fid, '</div>');
@@ -168,13 +163,6 @@ function include_resource(context, document, type, name)
         return;
     end;
 
-    if ~exist(resource_destination, 'file') || ...
-        file_newer_than(resource_source, resource_destination)
-        mkpath(fullfile(context.root, 'resources', type));
-        copyfile(resource_source, resource_destination);
-    end;
-
-
     metadata = struct('resources', struct());
 
     if exist(document.temporary_metadata, 'file')
@@ -185,6 +173,11 @@ function include_resource(context, document, type, name)
     resource_id = strrep(strrep(strrep(resource_id, '/', '_'), '.', '_'), '-', '_');
     
     if ~isfield(metadata.resources, resource_id)
+        if ~exist(resource_destination, 'file') || ...
+            file_newer_than(resource_source, resource_destination)
+            mkpath(fullfile(context.root, 'resources', type));
+            copyfile(resource_source, resource_destination);
+        end;
         metadata.resources.(resource_id) = struct('type', type, 'name', name);
         save(document.temporary_metadata, 'metadata');
     end;
@@ -201,7 +194,7 @@ function insert_figure(context, fid, handle, id, title)
         '<img src="%s/%s%s.png" alt="%s" /><span class="caption">%s</span>\n', ...
         context.imagesurl, context.prefix, id, title, title);
 
-    if context.exportlatex
+    if context.exporteps
 
             export_figure(handle, fullfile(context.images, [context.prefix, id]), 'eps', 'cache', context.cache);
             

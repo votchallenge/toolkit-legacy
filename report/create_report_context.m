@@ -7,8 +7,8 @@ function context = create_report_context(name, varargin)
 % Input:
 % - name (string): Name of the report. Is used to name a directory where the report is stored in.
 % - varargin[Title] (string): A human-friendly name of the report. May be more verbose than report name.
-% - varargin[LaTeX] (boolean): Should the report be LaTeX compatible (export EPS figures and add table export options).
-% - varargin[Raw] (boolean): Should internal raw figures and data also be saved for future processing.
+% - varargin[FigureEPS] (boolean): Should the report also generate formaps in Encapsulated PostScript (for LaTeX).
+% - varargin[FigureRaw] (boolean): Should internal raw figures and data also be saved for future processing.
 % - varargin[Cache] (boolean): Should cache be used.
 %
 % Output:
@@ -17,18 +17,18 @@ function context = create_report_context(name, varargin)
 
 
 title = name;
-latex = false;
-raw = false;
+figure_eps = false;
+figure_raw = false;
 cache = false;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
         case 'title'
             title = varargin{i+1};
-        case 'latex'
-            latex = varargin{i+1};
-        case 'raw'
-            raw = varargin{i+1};
+        case 'figureeps'
+            figure_eps = varargin{i+1};
+        case 'figureraw'
+            figure_raw = varargin{i+1};
         case 'cache'
             cache = varargin{i+1};
         otherwise 
@@ -40,8 +40,8 @@ end
 context.root = fullfile(get_global_variable('directory'), 'reports', name);
 context.images = fullfile(context.root, 'images');
 context.raw = fullfile(context.root, 'raw');
-context.exportlatex = latex;
-context.exportraw = raw;
+context.exporteps = figure_eps;
+context.exportraw = figure_raw;
 context.prefix = '';
 context.imagesurl = 'images';
 context.rawurl = 'raw';

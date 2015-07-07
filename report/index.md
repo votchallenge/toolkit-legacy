@@ -13,7 +13,7 @@ Module functions
 -   [report_challenge](report_challenge.m) - Generate an official challenge report
 -   [report_article](report_article.m) - Generate an article friendly report
 -   [report_ranking](report_ranking.m) - Generate a report based on A-R ranking
--   [report_ranking_spotlight](report_ranking_spotlight.m) - 
+-   [report_ranking_spotlight](report_ranking_spotlight.m) - Generate a spotlight report based on A-R ranking
 -   [report_failures](report_failures.m) - Generate a statistic overview of occurences of failures
 -   [report_difficulty](report_difficulty.m) - Generate a difficulty report for labels or sequences
 -   [report_sequences_preview](report_sequences_preview.m) - Create an overview document for the given sequences
@@ -26,7 +26,7 @@ Module functions
 -   [generate_legend_plot](generate_legend_plot.m) - Generate a tracker legend plot
 -   [generate_sequence_strip](generate_sequence_strip.m) - Generate an preview of a sequence as a strip of frames
 -   [generate_timeline](generate_timeline.m) - Generate a timeline plot with intervals
--   [visualize_sequence_animation](visualize_sequence_animation.m)
+-   [generate_sequence_preview](generate_sequence_preview.m) - Generates a sequence preview image
 
 ### Utilities
 

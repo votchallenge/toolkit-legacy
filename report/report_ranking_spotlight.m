@@ -1,4 +1,22 @@
-function [document, highlights] = report_ranking_spotlight(context, trackers, sequences, experiments, spotlight, varargin)
+function [document] = report_ranking_spotlight(context, trackers, sequences, experiments, spotlight, varargin)
+% report_ranking Generate a spotlight report based on A-R ranking 
+%
+% Performs A-R ranking analysis and generates a spotlight report for a given tracker.
+%
+% Input:
+% - context (structure): Report context structure.
+% - trackers (cell): An array of tracker structures.
+% - sequences (cell): An array of sequence structures.
+% - experiments (cell): An array of experiment structures.
+% - spotlight (string): Identifier of a tracker in the input tracker set that will be spotlighted.
+% - varargin[UsePractical] (boolean): Use practical difference.
+% - varargin[UseLabels] (boolean): Rank according to labels (otherwise rank according to sequences).
+% - varargin[Average] (boolean): Averaging type.
+% - varargin[Alpha] (boolean): Statistical significance parameter.
+%
+% Output:
+% - document (structure): Resulting document structure.
+%
 
 uselabels = false;
 usepractical = false;
@@ -30,8 +48,6 @@ spotlight_tracker = trackers{spotlight_index};
 
 document = create_document(context, sprintf('ranking_spotlight_%s', spotlight_tracker.identifier), ...
     'title', sprintf('Ranking spotlights for tracker %s', spotlight_tracker.label));
-
-highlights = cell(length(experiments), 1);
 
 for e = 1:length(experiments)
 

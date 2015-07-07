@@ -1,4 +1,27 @@
-function visualize_sequence_animation(sequence, trajectories, file, varargin)
+function file = generate_sequence_preview(sequence, trajectories, file, varargin)
+% generate_sequence_preview Generates a sequence preview image
+%
+% Generates a preview animation for the sequence as an animated GIF.
+%
+% Input:
+% - sequence (structure): A valid sequence structure.
+% - trajectories (cell): An array of additional trajectories to draw.
+% - file (string): Path to the destination file.
+% - varargin[Samples] (integer): Number of preview images.
+% - varargin[Scale] (double): Scaling factor.
+% - varargin[Width] (double): Reference width.
+% - varargin[Height] (double): Reference height.
+% - varargin[GroundtruthColor] (vector): Color for groundtruth region.
+% - varargin[TrajectoryColor] (cell): Color for groundtruth region.
+% - varargin[Palette] (matrix): A color palette matrix for GIF images.
+% - varargin[Delay] (integer): Delay between frames for GIF animation.
+% - varargin[Loops] (integer): Number of loops in case for GIF animation.
+% - varargin[Static] (integer): Also export a static version of the first
+%   frame.
+%
+% Output:
+% - file (string): Path to the destination file.
+%
 
 loops = inf;
 delay = 0;
@@ -43,9 +66,7 @@ end;
 
 indices = round(linspace(1, sequence.length, samples));
 
-map = [];
-
-animation = zeros(ceil(sequence.height * scale), ceil(sequence.width * scale), 1, numel(indices));
+animation = zeros(ceil(sequence.height * scale), ceil(sequence.width * scale), numel(indices), 3);
 
 for i = 1:length(indices)
 
@@ -89,30 +110,36 @@ for i = 1:length(indices)
     
     end;
     
-    image = cat(3, image_red, image_green, image_blue);
-    
-    if isempty(map)
-    
-        [animation(:, :, 1, i), map] = rgb2ind(image, palette, 'nodither');
-    else
-                
-        animation(:, :, 1, i) = rgb2ind(image, map, 'nodither');
-    end;
-    
+    animation(:, :, i, :) = cat(3, image_red, image_green, image_blue);
+        
 end
 
-if ~isempty(map)
+strip = reshape(animation, size(animation, 1), size(animation, 2) * size(animation, 3), 3);
 
-    [directory, name, ext] = fileparts(file);
-    
-    file = fullfile(directory, [name, '.gif']);
-    
+% Obtain a palette over entire sequence strip, not just first
+% image.
+[strip, map] = rgb2ind(strip, palette, 'nodither');
+
+animation = reshape(strip, size(animation, 1), size(animation, 2), 1, size(animation, 3));
+
+[directory, name, ext] = fileparts(file);
+
+
+if static
+
+    file = fullfile(directory, [name, '_animated.gif']);
+
     imwrite(uint8(animation), map, file, 'DelayTime', delay, 'LoopCount', loops);
 
-    if static
-    
-        file = fullfile(directory, [name, '_static.gif']);
-        
-        imwrite(uint8(animation(:, :, :, 1)), map, file);
-    end
+    file_static = fullfile(directory, [name, '_static.gif']);
+
+    imwrite(uint8(animation(:, :, 1)), map, file_static);
+else
+
+    file = fullfile(directory, [name, '.gif']);
+
+    imwrite(uint8(animation), map, file, 'DelayTime', delay, 'LoopCount', loops);
+
 end
+
+

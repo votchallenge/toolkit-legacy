@@ -1,5 +1,14 @@
 LaTeX = new Object();
 
+LaTeX.classes = {
+    'first' : '';
+    'second' : '';
+    'third' : '';
+    'bad' : '';
+    'average' : '';
+    'good' : '';
+}
+
 LaTeX.augment = function(text, classes) {
 
     for (var cl in classes) {
@@ -89,7 +98,7 @@ $(function () {
     }
 
 
-    $.each($('.latex table'), function (i, table) {
+    $.each($('.export table'), function (i, table) {
 
         var converted = $('<pre>').hide();
 
