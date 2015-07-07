@@ -4,7 +4,7 @@ Tracker module
 The tracker module contains tracker related functions. The toolkit is highly flexible in 
 terms of integration of existing trackers that can be run as external programs 
 that communicate with the toolkit using a special protocol. For more information
-on the integration, please read the [integration tutorial](integration.md) or look
+on the integration, please read the [integration document](integration.md) or look
 at the examples in the `examples` directory.
 
 Tracker descriptor
