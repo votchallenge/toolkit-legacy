@@ -9,7 +9,7 @@ function ncc
 % *************************************************************
 % VOT: Always call exit command at the end to terminate Matlab!
 % *************************************************************
-%cleanup = onCleanup(@() exit() );
+cleanup = onCleanup(@() exit() );
 
 % *************************************************************
 % VOT: Set random seed to a different value every time.
