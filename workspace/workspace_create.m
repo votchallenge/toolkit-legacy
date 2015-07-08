@@ -33,7 +33,6 @@ stacks = {};
 files = dir(fullfile(fileparts(script_directory), 'stacks'));
 
 for i = 1:length(files)
-    files(i).name
     if ~files(i).isdir && strncmp(files(i).name, 'stack_', 6)
         stacks{end+1} = files(i).name(7:end-2); %#ok<AGROW>
     end;
