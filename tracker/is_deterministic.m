@@ -25,8 +25,6 @@ end;
 baseline = read_trajectory(result_file);
 baseline_valid = ~cellfun(@(x) numel(x) == 1, baseline, 'UniformOutput', true);
 
-print_debug('Checking if the tracker is deterministic ...');
-
 for i = 2:repetitions
 
     result_file = fullfile(directory, sprintf('%s_%03d.txt', sequence.name, i));
