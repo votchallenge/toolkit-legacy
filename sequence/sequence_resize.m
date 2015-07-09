@@ -52,7 +52,7 @@ function region = rescale_region(region)
 
 end
 
-write_trajectory(cache_groundtruth, cellfun(@(x) rescale_region(x), sequence.groundtruth));
+write_trajectory(cache_groundtruth, cellfun(@(x) rescale_region(x), sequence.groundtruth, 'UniformOutput', false));
 
 resized_sequence = create_sequence(cache_directory, 'name', sequence.name);
 
