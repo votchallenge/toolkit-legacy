@@ -45,16 +45,14 @@ name `tracker_<identifier>.m` that has to be visible to the interpreted
 (located in path). The file should define the following variables that
 are used by tracker_load to construct the descriptor structure:
 
--   **tracker_identifier** *(string)*: Tracker identifier string. See
-    valid_identifier for more details.
 -   **tracker_command** *(string)*: The executable command that is used to invoke the tracker program. Contains the full path to the executable and optional input arguments.
 -   **tracker_label** *(string, optional)*: Human friendly label of the
     tracker. There are no restrictions to the format of the tracker label, but please try to keep it similar to the tracker identifier. If no value is given, the identifier is used instead.
--   **tracker_linkpath** *(cell)*: An optional cell array of additional search-paths to be set before executing the tracker.
--   **tracker_interpreter** *(string)*: The type of interpreter used or empty string. If you are using Matlab, enter `matlab` here.
--   **tracker_metadata** *(structure)*: A structure of additional tracker information.
--   **tracker_trax** *(boolean)*: An optional logical flag. If the variable exists and is true then the tracker is using the TraX protocol and will be executed as such.
--   **tracker_trax_parameters** *(structure)*: Additional parameters that are passed to the tracker if the TraX protocol is used.
+-   **tracker_linkpath** *(cell, optional)*: An optional cell array of additional search-paths to be set before executing the tracker.
+-   **tracker_interpreter** *(string, optional)*: The type of interpreter used or empty string. If you are using Matlab, enter `matlab` here.
+-   **tracker_metadata** *(structure, optional)*: A structure of additional tracker information.
+-   **tracker_trax** *(boolean, optional)*: An optional logical flag. If the variable exists and is true then the tracker is using the TraX protocol and will be executed as such.
+-   **tracker_trax_parameters** *(structure, optional)*: Additional parameters that are passed to the tracker if the TraX protocol is used.
 
 Module functions
 ----------------
@@ -92,5 +90,6 @@ General utility functions for trackers.
 -   [write_manifest](write_manifest.m) - Write a manifest file for the tracker
 -   [benchmark_hardware](benchmark_hardware.m) - Perform a simple benchmark
 -   [generate_matlab_command](generate_matlab_command.m) - Generate command line for Matlab tracker
+-   [trax_test](trax_test.m) - Test support for TraX protocol
 -   benchmark_native - A MEX function that performs several native benchmarks
 

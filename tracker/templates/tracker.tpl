@@ -16,4 +16,3 @@ tracker_command = '<TODO: set a tracker executable command>';
 
 % tracker_linkpath = {}; % A cell array of custom library directories used by the tracker executable (optional)
 
-% tracker_trax = true; % Using a TraX protocol for communication (default, optional)
