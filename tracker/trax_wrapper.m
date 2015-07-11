@@ -112,6 +112,8 @@ try
 
     print_debug(['INFO: Executing "', command, '" in "', context.directory, '".']);
 
+    cleanup = onCleanup(@() cd(old_directory) ); % Set default path recovery handle
+    
     cd(context.directory);
 
     if is_octave()
@@ -174,10 +176,15 @@ catch e
 end;
 
 cd(old_directory);
+rehash;
 
 if get_global_variable('cleanup', 1)
-    % clean-up temporary directory
-    rmpath(context.directory);
+    try
+        % clean-up temporary directory
+        rmpath(context.directory);
+    catch
+        print_debug('WARNING: unable to remove directory %s', context.directory);
+    end
 end;
 
 end

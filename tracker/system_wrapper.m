@@ -133,6 +133,8 @@ try
 
     print_debug(['INFO: Executing "', tracker.command, '" in "', working_directory, '".']);
 
+    cleanup = onCleanup(@() cd(old_directory) ); % Set default path recovery handle
+    
     cd(working_directory);
 
     if is_octave()
@@ -181,6 +183,7 @@ catch e
 end;
 
 cd(old_directory);
+rehash;
 
 % validate and process results
 if exist(output_file, 'file')
@@ -212,8 +215,12 @@ if (n_frames ~= (sequence.length-start) + 1)
 end;
 
 if get_global_variable('cleanup', 1)
-    % clean-up temporary directory
-    rmpath(working_directory);
+    try
+        % clean-up temporary directory
+        rmpath(working_directory);
+    catch
+        print_debug('WARNING: unable to remove directory %s', working_directory);
+    end
 end;
 
 end
