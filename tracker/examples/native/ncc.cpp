@@ -40,6 +40,7 @@
 #include <iostream>
 #include <stdio.h>
 
+#define VOT_RECTANGLE
 #include "vot.h"
  
 class NCCTracker

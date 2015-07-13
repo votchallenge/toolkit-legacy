@@ -60,6 +60,10 @@
 #  define VOT_OPENCV
 #endif
 
+#ifndef VOT_RECTANGLE
+#define VOT_POLYGON
+#endif
+
 #ifdef VOT_POLYGON
 typedef struct vot_region {
     float* x;

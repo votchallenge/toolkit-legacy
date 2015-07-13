@@ -37,8 +37,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
-// Comment line below if you want to use rectangles
-#define VOT_POLYGON
+// Uncomment line below if you want to use rectangles
+// #define VOT_RECTANGLE
 #include "vot.h"
 
 int main( int argc, char** argv)
