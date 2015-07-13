@@ -42,7 +42,8 @@ if ~exist(list_file, 'file') && ~isempty(bundle_url)
 		delete(bundle);
         list_file = fullfile(directory, 'list.txt');
     catch
-        print_text('Unable to retrieve sequence bundle from the VOT server. This is either a connection problem or the server is temporary offline.');
+        print_text('Unable to retrieve sequence bundle from the server. This is either a connection problem or the server is temporary offline.');
+        print_text('Please try to download the bundle manually from %s and uncompress it to %s', bundle_url, directory);
         return;
     end;
 end;
@@ -63,7 +64,7 @@ while true
 
     print_debug('Loading sequence %s', sequence_name);
     
-    sequences{end+1} = create_sequence(sequence_directory, 'dummy', dummy);
+    sequences{end+1} = create_sequence(sequence_directory, 'dummy', dummy); %#ok<AGROW>
 
 end;
 
