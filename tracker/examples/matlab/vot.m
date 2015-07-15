@@ -58,7 +58,6 @@ function [handle, image, region] = tracker_initialize(format)
         
         if isempty(image) || isempty(region)
             tracker_quit(handle);
-            handle = [];
             return;
         end;
 

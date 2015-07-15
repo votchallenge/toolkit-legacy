@@ -108,7 +108,7 @@ while 1
                 disp(uint8(c));
             end
         catch e
-            print_text('Error %s', e);
+            print_text('Error %s', e.message);
         end
         %set(hf, 'currentcharacter', '?');
     %end;
