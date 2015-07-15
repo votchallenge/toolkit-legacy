@@ -165,21 +165,22 @@ function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers
 
         case 'weighted_mean'
 
-            accuracy.average_ranks = mean(accuracy.ranks, 1);
-            robustness.average_ranks = mean(robustness.ranks, 1);
+            accuracy.average_ranks = nanmean(accuracy.ranks, 1);
+            robustness.average_ranks = nanmean(robustness.ranks, 1);
 
-            accuracy.average_value = sum(accuracy.value .* repmat(lengths, 1, length(trackers)), 1) ./ sum(lengths);
-            robustness.average_value = sum(robustness.value .* repmat(lengths, 1, length(trackers)), 1) ./ sum(lengths);
-            robustness.average_normalized = sum(robustness.normalized .* repmat(lengths, 1, length(trackers)), 1) ./ sum(lengths);
+			usable = lengths > 0;
+            accuracy.average_value = sum(accuracy.value(usable, :) .* repmat(lengths(usable), 1, length(trackers)), 1) ./ sum(lengths(usable));
+            robustness.average_value = sum(robustness.value(usable, :) .* repmat(lengths(usable), 1, length(trackers)), 1) ./ sum(lengths(usable));
+            robustness.average_normalized = sum(robustness.normalized(usable, :) .* repmat(lengths(usable), 1, length(trackers)), 1) ./ sum(lengths(usable));
             
         case 'mean'
 
-            accuracy.average_ranks = mean(accuracy.ranks, 1);
-            robustness.average_ranks = mean(robustness.ranks, 1);
+            accuracy.average_ranks = nanmean(accuracy.ranks, 1);
+            robustness.average_ranks = nanmean(robustness.ranks, 1);
 
-            accuracy.average_value = mean(accuracy.value, 1);
-            robustness.average_value = mean(robustness.value, 1);
-            robustness.average_normalized = mean(robustness.normalized, 1);      
+            accuracy.average_value = nanmean(accuracy.value, 1);
+            robustness.average_value = nanmean(robustness.value, 1);
+            robustness.average_normalized = nanmean(robustness.normalized, 1);      
                     
         case 'pool'
             
