@@ -72,6 +72,10 @@ for i = 1:length(indices)
 
     image = double(imread(get_image(sequence, indices(i)))) / 255;
 
+    if size(image, 3) == 1
+       image = repmat(image, 1, 1, 3); 
+    end
+    
     image = imresize(image, scale);
 
     image_red = image(:, :, 1);
