@@ -14,6 +14,18 @@ selected_tracker = [];
 selected_experiment = [];
 selected_sequence = [];
 
+if ~iscell(trackers)
+	trackers = {trackers};
+end;
+
+if ~iscell(sequences)
+	sequences = {sequences};
+end;
+
+if ~iscell(experiments)
+	experiments = {experiments};
+end;
+
 while 1
     
     if isempty(selected_tracker)
@@ -54,43 +66,85 @@ while 1
     
     if isempty(selected_experiment)
 
-        print_text('Choose experiment:');
-        print_indent(1);
+        if length(experiments) == 1
+            selected_experiment = 1;
+            
+            continue;
+        else
 
-        for i = 1:length(experiments)
-            print_text('%d - "%s"', i, experiments{i}.name);
+            print_text('Choose experiment:');
+            print_indent(1);
+
+            for i = 1:length(experiments)
+                print_text('%d - "%s"', i, experiments{i}.name);
+            end;
+
+            print_text('b - Back');
+            print_text('e - Exit');
+            print_indent(-1);
+
+
+            option = input('Select experiment: ', 's');
+
+            if (option == 'q' || option == 'e')
+                break
+            end;
+            
+            if (option == 'b')
+                selected_experiment = [];
+                continue;
+            end;
+
+            selected_experiment = int32(str2double(option));
+
+            if isempty(selected_experiment) || selected_experiment < 1 || selected_experiment > length(experiments)
+                selected_experiment = [];
+            end;
+
+            continue;
         end;
-
-        print_text('e - Exit');
-        print_indent(-1);
-
-
-        option = input('Select experiment: ', 's');
-
-        if (option == 'q' || option == 'e')
-            break
-        end;
-        
-        selected_experiment = int32(str2double(option));
-
-        if isempty(selected_experiment) || selected_experiment < 1 || selected_experiment > length(experiments)
-            selected_experiment = [];
-        end;
-
-        continue;
-        
     end;
     
     if isempty(selected_sequence)
         
-        selected_sequence = select_sequence(sequences);       
+        if length(sequences) == 1
+            selected_sequence = 1;
+            
+            continue;
+        else
+
+            print_text('Choose sequence:');
+            print_indent(1);
+
+            for i = 1:length(sequences)
+                print_text('%d - "%s"', i, sequences{i}.name);
+            end;
+
+            print_text('b - Back');
+            print_text('e - Exit');
+            print_indent(-1);
+
+            option = input('Select sequence: ', 's');
+
+            if (option == 'q' || option == 'e')
+                break
+            end;
+            
+            if (option == 'b')
+                selected_sequence = [];
+                continue;
+            end;
+
+            selected_sequence = int32(str2double(option));
+
+            if isempty(selected_sequence) || selected_sequence < 1 || selected_sequence > length(sequences)
+                selected_sequence = [];
+            end;
+            
+            continue;
         
-        if isempty(selected_sequence)
-            selected_experiment = [];
         end;
-        
-        continue;
-        
+
     end;
     
     tracker = trackers{selected_tracker};
