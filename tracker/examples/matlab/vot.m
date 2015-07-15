@@ -57,7 +57,9 @@ function [handle, image, region] = tracker_initialize(format)
         handle = struct('trax', true);
         
         if isempty(image) || isempty(region)
-            handle.quit(handle);
+            tracker_quit(handle);
+            handle = [];
+            return;
         end;
 
         traxserver('status', region);
