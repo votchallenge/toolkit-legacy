@@ -44,7 +44,7 @@
 
 // Newer compilers support interactive checks for headers, otherwise we have to enable TraX support manually
 #ifdef __has_include
-#  if __has_include(trax.h)
+#  if __has_include("trax.h")
 #    include <trax.h>
 #    define VOT_TRAX
 #  endif
