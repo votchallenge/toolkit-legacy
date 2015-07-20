@@ -360,10 +360,10 @@ public:
 	    float right = FLT_MIN;
 
 	    for (int j = 0; j < _region->count; j++) {
-		    top = MIN(top, _region->y[i]);
-		    bottom = MAX(bottom, _region->y[i]);
-		    left = MIN(left, _region->x[i]);
-		    right = MAX(right, _region->x[i]);
+		    top = MIN(top, _region->y[j]);
+		    bottom = MAX(bottom, _region->y[j]);
+		    left = MIN(left, _region->x[j]);
+		    right = MAX(right, _region->x[j]);
 	    }
 
         rectangle.x = left;
