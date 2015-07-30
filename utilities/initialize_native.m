@@ -11,7 +11,7 @@ function initialize_native(output_path)
 toolkit_path = get_global_variable('toolkit_path');
 
 % First attempt to download precompiled binaries
-if download_native(output_path)
+if get_global_variable('native_download', true) && download_native(output_path)
     return;
 end;
 
