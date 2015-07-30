@@ -24,6 +24,9 @@ end
 
 script_directory = fileparts(mfilename('fullpath'));
 
+addpath(fileparts(script_directory));
+toolkit_path; % Setup the full toolkit path just in case
+
 set_global_variable('toolkit_path', fileparts(script_directory));
 set_global_variable('indent', 0);
 set_global_variable('directory', pwd());
