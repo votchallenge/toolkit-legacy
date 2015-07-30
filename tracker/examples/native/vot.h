@@ -55,6 +55,63 @@
 #  endif
 #endif
 
+// Alternative getline implementation for Windows compatibility
+size_t _getline(char **lineptr, size_t *n, FILE *stream) {
+
+    char *bufptr = NULL;
+    char *p = bufptr;
+    size_t size;
+    int c;
+
+    if (lineptr == NULL) {
+    	return -1;
+    }
+
+    if (stream == NULL) {
+    	return -1;
+    }
+
+    if (n == NULL) {
+    	return -1;
+    }
+
+    bufptr = *lineptr;
+    size = *n;
+
+    c = fgetc(stream);
+    if (c == EOF) {
+    	return -1;
+    }
+    if (bufptr == NULL) {
+    	bufptr = (char *) malloc(128);
+    	if (bufptr == NULL) {
+    		return -1;
+    	}
+    	size = 128;
+    }
+    p = bufptr;
+    while(c != EOF) {
+    	if ((p - bufptr) > (size - 1)) {
+    		size = size + 128;
+    		bufptr = (char *) realloc(bufptr, size);
+    		if (bufptr == NULL) {
+    			return -1;
+    		}
+    	}
+    	*p++ = c;
+    	if (c == '\n') {
+    		break;
+    	}
+    	c = fgetc(stream);
+    }
+
+    *p++ = '\0';
+    *lineptr = bufptr;
+    *n = size;
+
+    return p - bufptr - 1;
+}
+
 // Define VOT_OPENCV after including OpenCV core header to enable better OpenCV support
 #ifdef __OPENCV_CORE_HPP__
 #  define VOT_OPENCV
@@ -470,13 +527,13 @@ private:
     // Size of the sequence
     int _vot_sequence_size;
     // List of image file names
-    char** _vot_sequence = NULL;
+    char** _vot_sequence;
     // List of results
-    vot_region** _vot_result = NULL;
+    vot_region** _vot_result;
 
 #ifdef VOT_TRAX
 
-    trax_handle* _trax_handle = NULL;
+    trax_handle* _trax_handle;
     char _trax_image_buffer[VOT_READ_BUFFER];
 
 #ifdef VOT_POLYGON
@@ -532,7 +589,7 @@ trax_region* _region_to_trax(const vot_region* region) {
  */
 vot_region* VOT_PREFIX(vot_initialize)() {
 
-    int i, j;
+    int j;
     FILE *inputfile;
     FILE *imagesfile;
 
@@ -544,6 +601,7 @@ vot_region* VOT_PREFIX(vot_initialize)() {
         trax_configuration config;
         trax_image* _trax_image = NULL;
         trax_region* _trax_region = NULL;
+        _trax_handle = NULL;
         int response;
 
         #ifdef VOT_POLYGON
@@ -588,7 +646,7 @@ vot_region* VOT_PREFIX(vot_initialize)() {
     size_t linesiz = sizeof(char) * VOT_READ_BUFFER;
     char* linebuf = (char*) malloc(sizeof(char) * VOT_READ_BUFFER);
     
-    getline(&linebuf, &linesiz, inputfile);
+    _getline(&linebuf, &linesiz, inputfile);
     vot_region* region = _parse_region(linebuf);
 
     fclose(inputfile);
@@ -598,7 +656,7 @@ vot_region* VOT_PREFIX(vot_initialize)() {
 
     while (1) {
 
-        if ((linelen=getline(&linebuf, &linesiz, imagesfile))<1)
+        if ((linelen = _getline(&linebuf, &linesiz, imagesfile))<1)
             break;
 
         if ((linebuf)[linelen - 1] == '\n') {
@@ -744,3 +802,4 @@ int VOT_PREFIX(vot_end)() {
 }
 
 #endif
+
