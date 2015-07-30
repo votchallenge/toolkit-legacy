@@ -1,11 +1,16 @@
 
 #include <stdio.h>
-#include <string>
+#include <string.h>
 
 #include "mex.h"
 #include "region.h"
 
-using namespace std;
+#if defined(__OS2__) || defined(__WINDOWS__) || defined(WIN32) || defined(WIN64) || defined(_MSC_VER) 
+#define strcmpi _strcmpi
+#else
+#define strcmpi strcasecmp
+#endif
+
 
 region_container* array_to_region(const mxArray * input) {
     
@@ -82,7 +87,7 @@ mxArray* region_to_array(const region_container* region) {
 	return val;
 }
 
-string get_string(const mxArray *arg) {
+char* get_string(const mxArray *arg) {
 
 	if (mxGetM(arg) != 1)
 		mexErrMsgTxt("Must be an array of chars");
@@ -92,22 +97,18 @@ string get_string(const mxArray *arg) {
     char* cstr = (char *) malloc(sizeof(char) * (l + 1));
     
     mxGetString(arg, cstr, (l + 1));
-    
-	string str(cstr);
 
-	free(cstr);
-
-    return str;
+    return cstr;
 }
 
-bool get_region_code(string str, region_type& type) {
+bool get_region_code(char* str, region_type& type) {
     
-    if (str == "rectangle") {
+    if (strcmpi(str, "rectangle") == 0) {
         type = RECTANGLE;
 		return true;
     }
     
-    if (str == "polygon") {
+    if (strcmpi(str, "polygon") == 0) {
         type = POLYGON;
 		return true;
     } 
@@ -129,8 +130,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	if ( mxGetNumberOfDimensions(prhs[0]) > 2 || mxGetM(prhs[0]) > 1 ) mexErrMsgTxt("First input argument must be a vector");
 
-	if (!get_region_code(get_string(prhs[1]), format))
+    char* codestr = get_string(prhs[1]);
+
+	if (!get_region_code(codestr, format)) {
+        free(codestr);
 		mexErrMsgTxt("Not a valid format");
+    }
+
+    free(codestr);
 
 	p = array_to_region(prhs[0]);
 
