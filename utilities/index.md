@@ -13,7 +13,7 @@ Module functions
 -   [writestruct](writestruct.m) - Store a structure to file
 -   [file_newer_than](file_newer_than.m) - Test if the first file is newer than the second file
 -   [generate_from_template](generate_from_template.m) - Generate a new file from a template file
--   [rmpath](rmpah.m) - Deletes the file or directory recursively
+-   [delpath](delpath.m) - Deletes the file or directory recursively
 -   [mkpath](mkpath.m) - Creates a directory path
 -   [relativepath](relativepath.m) - Returns the relative path from an root path to the target path
 

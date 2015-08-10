@@ -1,5 +1,5 @@
-function [status] = rmpath(root)
-% rmpath Deletes the file or directory recursively
+function [status] = delpath(root)
+% delpath Deletes the file or directory recursively
 %
 % Deletes the file or directory. If the root is a directory then all its
 % content is deleted recursively.
@@ -28,7 +28,7 @@ function [status] = rmpath(root)
 
     sdirs = {data(isdir).name};
     for sdir = find(~ismember(sdirs, {'.','..'}))
-        status = status && rmpath(fullfile(root, sdirs{sdir})); 
+        status = status && delpath(fullfile(root, sdirs{sdir})); 
     end
 
     if (status)

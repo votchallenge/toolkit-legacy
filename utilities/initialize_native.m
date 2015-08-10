@@ -160,7 +160,7 @@ catch
     print_debug('Error downloading %s.', vot_hash_url);
 end
 
-rmpath(tempdir);
+delpath(tempdir);
 
 if exist(fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')), 'file') == 2
     set_global_variable('trax_client', fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')));
@@ -216,7 +216,7 @@ if ~exist(trax_header, 'file')
         print_text('Unable to retrieve TraX source code.');
         success = false;
     end;
-    rmpath(working_directory);
+    delpath(working_directory);
 else
     print_debug('TraX source code already present.');
     success = true;

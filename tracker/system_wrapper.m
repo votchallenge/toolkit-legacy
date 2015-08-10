@@ -217,7 +217,7 @@ end;
 if get_global_variable('cleanup', 1)
     try
         % clean-up temporary directory
-        rmpath(working_directory);
+        delpath(working_directory);
     catch
         print_debug('WARNING: unable to remove directory %s', working_directory);
     end

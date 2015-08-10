@@ -181,7 +181,7 @@ rehash;
 if get_global_variable('cleanup', 1)
     try
         % clean-up temporary directory
-        rmpath(context.directory);
+        delpath(context.directory);
     catch
         print_debug('WARNING: unable to remove directory %s', context.directory);
     end
