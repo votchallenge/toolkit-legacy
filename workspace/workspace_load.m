@@ -92,9 +92,9 @@ end;
 
 native_dir = fullfile(get_global_variable('toolkit_path'), 'native');
 mkpath(native_dir);
-addpath(native_dir);
-
+rmpath(native_dir); rehash; % Try to avoid locked files on Windows
 initialize_native(native_dir);
+addpath(native_dir);
 
 if cached
     print_debug('Skipping loading experiments and sequences');
