@@ -10,7 +10,10 @@ function [status] = rmpath(root)
 % Output:
 % - status (boolean): True on success.
 %
-
+    if ~exist(root, 'dir')
+        status = 0;
+        return;
+    end;
 
     status = 1;
 
