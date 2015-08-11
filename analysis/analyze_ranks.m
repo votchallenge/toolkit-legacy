@@ -54,9 +54,17 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
     end 
-
+    
     print_text('Ranking analysis for experiment %s ...', experiment.name);
-
+    
+    if experiment.parameters.repetitions < 5
+        error('The experiment specifies less than 5 repetitions. Not valid for statistical consideration.');
+    end
+    
+    if experiment.parameters.repetitions < 15
+        print_text('Warning: the experiment specifies less than 15 repetitions, the results may be statistically unstable.');
+    end;
+    
     print_indent(1);
 
     experiment_sequences = convert_sequences(sequences, experiment.converter);
