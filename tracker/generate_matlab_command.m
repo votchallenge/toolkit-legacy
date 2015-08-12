@@ -32,4 +32,6 @@ end
 
 argument_string = strjoin(matlab_flags, ' ');
 
-command = sprintf('%s %s -r "%s%s"', matlab_executable, argument_string, path_string, script);
+matlab_script = sprintf('try; %s%s; catch; quit; end;', path_string, script);
+
+command = sprintf('%s %s -r "%s"', matlab_executable, argument_string, matlab_script);
