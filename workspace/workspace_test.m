@@ -144,7 +144,7 @@ function launcher_script = generate_launcher_script(tracker, command, directory)
     
     fclose(fid);
     
-    if isunix
+    if isunix && ~is_octave
        fileattrib(launcher_script, '+x'); 
     end
     

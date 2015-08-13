@@ -42,7 +42,12 @@ for j = 1:nargin
 end;
 
 % remove the duplicate identifiers
-identifiers = unique(identifiers, 'stable');
+if is_octave
+    identifiers = unique(identifiers);
+    print_debug('Warning: Tracker order is not preserved due to Octave limitations.')
+else
+    identifiers = unique(identifiers, 'stable');
+end;
 
 trackers = cell(size(identifiers, 1), 1);
 
