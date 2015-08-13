@@ -45,7 +45,11 @@ switch lower(format)
         print( handle, '-depsc', [filename, '.eps']);
         cellfun(@restore_axis, allca, allbackup, 'UniformOutput', false);
     case 'png'
+        ah = get(handle, 'CurrentAxes');
+        title = get(ah, 'Title');
+        set(title, 'Visible', 'off');
         print( handle, '-dpng', '-r130', [filename, '.png']);
+        set(title, 'Visible', 'on');
     otherwise
         error('Unknown format');
 end;
