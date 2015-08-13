@@ -19,7 +19,7 @@ function matrix2html(matrix, filename, varargin)
     format = '%.2f';
     css_class = [];
     title = [];
-    embed_numbers = false;
+    embed_numbers = true;
     if (rem(nargin,2) == 1 || nargin < 2)
         error('Incorrect number of arguments to %s.', mfilename);
     end
@@ -33,7 +33,7 @@ function matrix2html(matrix, filename, varargin)
             case 'format'
                 format = lower(varargin{i+1});
             case 'class'
-                css_class = varargin{i+1};
+                css_class = [css_class, ' ', varargin{i+1}];
             case 'title'
                 title = varargin{i+1};
             case 'embednumbers'
