@@ -106,8 +106,6 @@ for e = 1:length(experiments)
 
     if arplot
     
-        document.raw('<div class="imagegrid">\n');
-
         plot_title = sprintf('Ranking plot for experiment %s', experiments{e}.name);
         plot_id = sprintf('rankingplot_%s', experiments{e}.name);
 
@@ -129,8 +127,6 @@ for e = 1:length(experiments)
         document.figure(hf, plot_id, plot_title);
 
         close(hf);
-
-        document.raw('</div>\n');
 
     end;
     
@@ -169,8 +165,6 @@ for e = 1:length(experiments)
 
     if orderingplot
               
-        document.raw('<div class="imagegrid">\n');
-        
         h = generate_ordering_plot(trackers, results{e}.accuracy.ranks, selector_labels, ...
             'flip', 1, 'legend', ~hidelegend);
         document.figure(h, sprintf('ordering_accuracy_%s', experiments{e}.name), ...
@@ -185,9 +179,6 @@ for e = 1:length(experiments)
 
         close(h);
 
-        document.raw('</div>\n');
-        document.raw('<div class="imagegrid">\n');        
-        
         h = generate_ordering_plot(trackers, results{e}.robustness.ranks, selector_labels, ...
             'flip', 1, 'legend', ~hidelegend);
         document.figure(h, sprintf('ordering_robustness_%s', experiments{e}.name), ...
@@ -205,15 +196,12 @@ for e = 1:length(experiments)
             'Orderings for failures');
 
         close(h);
-            
-        document.raw('</div>\n');
+
     end;
 
     if arplot
 
         for l = 1:length(selector_labels)
-
-            document.raw('<div class="imagegrid">\n');
 
             plot_title = sprintf('Ranking plot for label %s in experiment %s', ...
                 selector_labels{l}, experiments{e}.name);
@@ -239,8 +227,6 @@ for e = 1:length(experiments)
             document.figure(hf, plot_id, plot_title);
 
             close(hf);
-
-            document.raw('</div>\n');
 
         end;
     

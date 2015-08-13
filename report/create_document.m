@@ -47,8 +47,6 @@ document.include = @(type, name) include_resource(context, document, type, name)
 
 document.write = @() write_report_document(document);
 
-document.chapter = @(text, varargin) insert_chapter(document, sprintf(text, varargin{:}));
-
 document.section = @(text, varargin) insert_section(document, sprintf(text, varargin{:}));
 
 document.subsection = @(text, varargin) insert_subsection(document, sprintf(text, varargin{:}));
@@ -61,8 +59,11 @@ document.link = @(url, text, varargin) insert_link(document, url, sprintf(text, 
 
 document.figure = @(handle, id, title) insert_figure(context, document.fid, handle, id, title);
 
+document.include('css', 'bootstrap.css');
 document.include('css', 'report.css');
 document.include('js', 'jquery.js');
+document.include('js', 'bootstrap.js');
+document.include('js', 'layout.js');
 
 end
 
@@ -109,13 +110,6 @@ function write_report_document(document)
     delete(document.temporary_file);
     delete(document.temporary_metadata);
     
-end
-
-
-function insert_chapter(document, text)
-
-    fprintf(document.fid, '<h1>%s</h1>', text);
-
 end
 
 function insert_section(document, text)
@@ -207,7 +201,7 @@ end
 
 function insert_figure(context, fid, handle, id, title)
 
-    fprintf(fid, '<div class="image-wrapper stacking" data-stacking="3">\n');
+    fprintf(fid, '<div class="image-wrapper stacking">\n');
 
     export_figure(handle, fullfile(context.images, [context.prefix, id]), 'png', 'cache', context.cache);
 

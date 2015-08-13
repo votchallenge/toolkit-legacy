@@ -1,14 +1,41 @@
 
-div.grid_small {  display: inline-block; width: 200px; }
-div.grid_medium {  display: inline-block; width: 400px; }
-div.grid_large {  display: inline-block; width: 600px; }
+body {
+    position: relative;
+}
 
-p.plot { text-align: center; }
-div.imagegrid .plot {width: 45%; display: inline-block; }
-div.imagegrid .plot img {width: 100%;}
+footer {
+    clear: both;
+    padding-top: 60px;
+    text-align: center;
+}
 
-.plot { border: 1px #eeeeee solid; padding: 10px; margin-bottom: 20px; }
-.plot .caption { text-align: center; font-size: 110%; display: block; }
+.poweredby {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    text-align: center;
+    font-size: small;
+    color: #AAA;
+}
+
+body > .container {
+    margin-top: 60px;
+
+}
+
+footer ul.metadata {
+    color: #AAA;
+    font-size: 80%;
+    margin: 10px;
+    padding: 0;
+    list-style: none;
+}
+
+footer ul.metadata li {
+    display: inline-block;
+    padding: 0;
+    margin: 5px;
+}
+
 
 td.first { font-weight: bold; color: red; }
 td.second { font-weight: bold; color: blue; }
@@ -17,3 +44,60 @@ td.third { color: green; }
 td.good {  color: green; }
 td.average { color: gray; }
 td.bad { color: red; }
+
+.image-wrapper { border: 1px #eeeeee solid; padding: 10px; margin-bottom: 20px; position: relative; }
+.image-wrapper img { width: 100%; }
+.image-wrapper .title { text-align: center; font-size: 140%; display: block; margin-top: 20px; }
+.image-wrapper .toolbar {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: none;
+}
+
+.image-wrapper:hover .toolbar {
+    display: block;
+}
+
+.image-wrapper .title:before {
+    content: "Figure: ";
+}
+
+.table-wrapper {
+    clear: both;
+    margin: 40px 0;
+    position: relative;
+}
+
+.table-wrapper table {
+    clear: both;
+}
+
+.table-wrapper .title {
+    font-size: 140%;
+
+}
+
+.table-wrapper .title:before {
+    content: "Table: ";
+}
+
+.table-wrapper .toolbar {
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    display: none;
+}
+
+.table-wrapper:hover .toolbar {
+    display: block;
+}
+
+.toolbar .btn {
+    margin-right: 5px;
+}
+
+/*body {  font-size: 12px;  margin: 20px; }
+th {  background-color: #eeeeee; text-align: left; } td {   min-width: 70px; } td .failures {  font-weight: bold;  display: block; } td .variance {  font-size: 80%;  font-weight: normal; } td .length {  font-weight: bold;  display: block; } td .count {  float: right; } td .count:before {  content: '('; } td .count:after {  content: ')'; }
+tr:hover { background-color: #eeffff; }*/
+

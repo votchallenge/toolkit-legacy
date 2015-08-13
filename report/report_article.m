@@ -49,7 +49,7 @@ print_text('Generating article report'); print_indent(1);
 
 if master_legend
 
-    document.chapter('Trackers legend');
+    document.section('Trackers legend');
 
     % Using heuristic to generate tracker legend, 8 per row seems ok for
     % paper
@@ -98,7 +98,7 @@ tabledata = cat(1, experiments_ranking_data, overall_ranking_data)';
 ordering = repmat({'ascending'}, 1, numel(experiments) * 2 + 3);
 tabledata = highlight_best_rows(tabledata, ordering);
 
-document.chapter('Ranking');
+document.section('Ranking');
 
 document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
 
@@ -111,9 +111,9 @@ if ~isempty(spotlight)
     
     if ~isempty(highlight_index)
 
-        document.chapter('Hightlights for tracker %s');
+        document.section('Hightlights for tracker %s');
 
-        [spotlight_document, highlights] = report_ranking_spotlight(context, trackers, sequences, experiments, spotlight,  'uselabels', false, 'usepractical', true);
+        spotlight_document = report_ranking_spotlight(context, trackers, sequences, experiments, spotlight,  'uselabels', false, 'usepractical', true);
 
         document.link(spotlight_document.url, 'Detailed spotlight results');
 

@@ -55,7 +55,7 @@ print_text('Generating competition report'); print_indent(1);
 
 if master_legend
 
-    document.chapter('Trackers legend');
+    document.section('Trackers legend');
 
     % Using heuristic to generate tracker legend, 8 per row seems ok for
     % paper

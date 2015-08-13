@@ -23,11 +23,35 @@ else
     close_file = 0;
 end;
 
-for i = 1:2:length(varargin)
-    key = varargin{i};
-    value = varargin{i+1};
-    report = strrep(report, ['{{', key, '}}'], value);
-end 
+pS = strfind(report, '{{');
+pE = strfind(report, '}}');
+
+variables = struct(varargin{:});
+
+for i = 1:numel(pS)
+    s = pS(i);
+    e = min(pE(pE > s)); 
+    if isempty(e)
+        break;
+    end;
+
+    varname = strtrim(report(s+2:e-1));
+    varvalue = '';
+    
+    if isempty(varname)
+        continue;
+    end;
+    
+    if isfield(variables, varname)
+        varvalue = variables.(varname);
+    elseif varname(1) == '@'
+        varvalue = num2str(get_global_variable(varname(2:end), ''));
+    end;
+    
+    report = cat(2, report(1:s-1), varvalue, report(e+2:end));
+    pS = pS - (e - s + 2) + numel(varvalue);
+    pE = pE - (e - s + 2) + numel(varvalue);
+end
 
 fwrite(fid, report);
 
