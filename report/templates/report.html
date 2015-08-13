@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html><head>
-<title>{{title}}</title>
+<title>{{title}} (VOT toolkit report)</title>
 {{head}}
-<style>
-body {  font-size: 12px;  margin: 20px; }
-th {  background-color: #eeeeee; text-align: left; } td {   min-width: 70px; } td .failures {  font-weight: bold;  display: block; } td .variance {  font-size: 80%;  font-weight: normal; } td .length {  font-weight: bold;  display: block; } td .count {  float: right; } td .count:before {  content: '('; } td .count:after {  content: ')'; }
-tr:hover { background-color: #eeffff; }
-
-</style>
 </head><body>
+<div class="container">
 <h1>{{title}}</h1>
-<p>Generated on {{timestamp}}</p>
-
 {{body}}
-
+<footer>
+<p>Generated on {{timestamp}}</p>
+</footer>
+</div>
 </body>
 </html>

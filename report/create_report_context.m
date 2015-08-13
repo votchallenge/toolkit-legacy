@@ -9,6 +9,7 @@ function context = create_report_context(name, varargin)
 % - varargin[Title] (string): A human-friendly name of the report. May be more verbose than report name.
 % - varargin[FigureEPS] (boolean): Should the report also generate formaps in Encapsulated PostScript (for LaTeX).
 % - varargin[FigureRaw] (boolean): Should internal raw figures and data also be saved for future processing.
+% - varargin[Standalone] (boolean): If true (default), the JavaScript and CSS resources are copied to the report.
 % - varargin[Cache] (boolean): Should cache be used.
 %
 % Output:
@@ -19,6 +20,7 @@ function context = create_report_context(name, varargin)
 title = name;
 figure_eps = false;
 figure_raw = false;
+standalone = true;
 cache = false;
 
 for i = 1:2:length(varargin)
@@ -29,6 +31,8 @@ for i = 1:2:length(varargin)
             figure_eps = varargin{i+1};
         case 'figureraw'
             figure_raw = varargin{i+1};
+        case 'standalone'
+            standalone = varargin{i+1};
         case 'cache'
             cache = varargin{i+1};
         otherwise 
@@ -42,6 +46,7 @@ context.images = fullfile(context.root, 'images');
 context.raw = fullfile(context.root, 'raw');
 context.exporteps = figure_eps;
 context.exportraw = figure_raw;
+context.standalone = standalone;
 context.prefix = '';
 context.imagesurl = 'images';
 context.rawurl = 'raw';

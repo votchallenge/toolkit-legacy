@@ -80,7 +80,7 @@ function write_report_document(document)
     head_tokens = cell(numel(resources), 1);
     
     for i = 1:numel(resources)
-        url = sprintf('%s/%s/%s', 'resources', resources{i}.type, resources{i}.name);
+        url = resources{i}.url;
 
         switch resources{i}.type
             case 'js'
@@ -146,9 +146,9 @@ function insert_table(context, document, data, varargin)
 
     document.include('js', 'jquery.export.js');
 
-    fprintf(document.fid, '<div class="table export">');
+    fprintf(document.fid, '<div class="table-wrapper">');
     
-    matrix2html(data, document.fid, varargin{:});
+    matrix2html(data, document.fid, varargin{:}, 'class', 'table');
 
     fprintf(document.fid, '</div>');
 
@@ -156,13 +156,12 @@ end
 
 function include_resource(context, document, type, name)
 
-    resource_destination = fullfile(context.root, 'resources', type, name);
     resource_source = fullfile(get_global_variable('toolkit_path'), 'report', 'resources', type, name);
 
     if ~exist(resource_source, 'file')
         return;
     end;
-
+    
     metadata = struct('resources', struct());
 
     if exist(document.temporary_metadata, 'file')
@@ -171,56 +170,74 @@ function include_resource(context, document, type, name)
 
     resource_id = sprintf('%s_%s', type, name);
     resource_id = strrep(strrep(strrep(resource_id, '/', '_'), '.', '_'), '-', '_');
-    
-    if ~isfield(metadata.resources, resource_id)
-        if ~exist(resource_destination, 'file') || ...
-            file_newer_than(resource_source, resource_destination)
-            mkpath(fullfile(context.root, 'resources', type));
-            copyfile(resource_source, resource_destination);
-        end;
-        metadata.resources.(resource_id) = struct('type', type, 'name', name);
-        save(document.temporary_metadata, 'metadata');
-    end;
 
+        if ~isfield(metadata.resources, resource_id)
+            
+                
+        if context.standalone
+
+            resource_destination = fullfile(context.root, 'resources', type, name);
+
+            if ~exist(resource_destination, 'file') || ...
+                file_newer_than(resource_source, resource_destination)
+                mkpath(fullfile(context.root, 'resources', type));
+                copyfile(resource_source, resource_destination);
+            end;
+            resource_relative = relativepath(resource_destination, context.root);
+
+        else
+
+            resource_relative = relativepath(resource_source, context.root);
+
+        end  
+
+            if ispc()
+                resource_url = strrep(resource_relative, '\', '/');
+            else
+                resource_url = resource_relative;
+            end;
+            
+            metadata.resources.(resource_id) = struct('type', type, 'name', name, 'url', resource_url);
+            save(document.temporary_metadata, 'metadata');
+        end;
+
+
+    
 end
 
 function insert_figure(context, fid, handle, id, title)
 
-    fprintf(fid, '<div class="plot">\n');
+    fprintf(fid, '<div class="image-wrapper stacking" data-stacking="3">\n');
 
     export_figure(handle, fullfile(context.images, [context.prefix, id]), 'png', 'cache', context.cache);
 
-    fprintf(fid, ...
-        '<img src="%s/%s%s.png" alt="%s" /><span class="caption">%s</span>\n', ...
-        context.imagesurl, context.prefix, id, title, title);
+    data = [];
 
     if context.exporteps
-
-            export_figure(handle, fullfile(context.images, [context.prefix, id]), 'eps', 'cache', context.cache);
-            
-            fprintf(fid, '<a href="%s/%s%s.eps" class="export eps">EPS</a>', ...
-                context.imagesurl, context.prefix, id);
-
+        export_figure(handle, fullfile(context.images, [context.prefix, id]), 'eps', 'cache', context.cache);
+        data = [data, sprintf(' data-alternative-eps="%s/%s%s.eps"', context.imagesurl, context.prefix, id)];
     end;
-
 
     if context.exportraw
             
-            file = export_figure(handle, fullfile(context.raw, [context.prefix, id]), 'fig', 'cache', context.cache);
-            
-            % Hack : try to fix potential figure invisibility
-            try
-                f = load(file, '-mat');
-                n = fieldnames(f);
-                f.(n{1}).properties.Visible = 'on';
-                save(file, '-struct', 'f'); 
-            catch e
-                print_debug('Warning: unable to fix figure visibility: %s', e.message);
-            end;
+        file = export_figure(handle, fullfile(context.raw, [context.prefix, id]), 'fig', 'cache', context.cache);
+        
+        % Hack : try to fix potential figure invisibility
+        try
+            f = load(file, '-mat');
+            n = fieldnames(f);
+            f.(n{1}).properties.Visible = 'on';
+            save(file, '-struct', 'f'); 
+        catch e
+            print_debug('Warning: unable to fix figure visibility: %s', e.message);
+        end;
 
-            fprintf(fid, '<a href="%s/%s%s.fig" class="export eps">FIG</a>', ...
-                context.imagesurl, context.prefix, id);
+        data = [data, sprintf(' data-alternative-fig="%s/%s%s.fig"', context.imagesurl, context.prefix, id)];
     end;
+
+    fprintf(fid, ...
+        '<img src="%s/%s%s.png" alt="%s" %s /><div class="title">%s</div>\n', ...
+        context.imagesurl, context.prefix, id, title, data, title);
 
     fprintf(fid, '</div>\n');
     
