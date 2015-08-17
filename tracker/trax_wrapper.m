@@ -50,7 +50,13 @@ write_trajectory(initialization_file, initialization);
 output_file = fullfile(context.directory, 'output.txt');
 timing_file = fullfile(context.directory, 'timing.txt');
 
+debug = get_global_variable('trax_debug', false);
+
 arguments = '';
+
+if debug
+    arguments = [arguments, ' -d'];
+end;
 
 if (context.failure_overlap >= 0)
     arguments = [arguments, sprintf(' -f %.5f', context.failure_overlap)];
@@ -73,7 +79,6 @@ end
 
 % Hint to tracker that it should use trax
 arguments = [arguments, ' -e "TRAX=1"'];
-
 
 % If we are running Matlab tracker on Windows, we have to use TCP/IP
 % sockets

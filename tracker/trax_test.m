@@ -35,9 +35,15 @@ if exist(cache_file, 'file')
     end;
 end; 
 
+debug = get_global_variable('trax_debug', false);
+
 print_text('Testing TraX protocol support for tracker %s.', tracker.identifier);
 
 arguments = '-Q'; % Use query mode of traxclient
+
+if debug
+    arguments = [arguments, ' -d'];
+end;
 
 % Specify timeout period
 timeout = get_global_variable('trax_timeout', 30);
@@ -100,6 +106,14 @@ try
 
         supported = false;
     
+    end;
+
+    if debug
+        print_text('Printing client output:');
+        print_text('-------------------- Begin raw output ------------------------');
+        % This prevents printing of backspaces and such
+        disp(output(output > 31 | output == 10 | output == 13));
+        print_text('--------------------- End raw output -------------------------');
     end;
 
 catch e
