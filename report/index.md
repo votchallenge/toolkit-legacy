@@ -13,6 +13,7 @@ Module functions
 -   [report_challenge](report_challenge.m) - Generate an official challenge report
 -   [report_article](report_article.m) - Generate an article friendly report
 -   [report_ranking](report_ranking.m) - Generate a report based on A-R ranking
+-   [report_submission](report_submission.m) - Basic performance scores for given trackers
 -   [report_ranking_spotlight](report_ranking_spotlight.m) - Generate a spotlight report based on A-R ranking
 -   [report_failures](report_failures.m) - Generate a statistic overview of occurences of failures
 -   [report_difficulty](report_difficulty.m) - Generate a difficulty report for labels or sequences

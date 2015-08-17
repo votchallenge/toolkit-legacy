@@ -27,8 +27,8 @@ function workspace_submit(tracker, sequences, experiments, varargin)
         end
     end
 
-    print_text('Generating submission archive for tracker %s ...', tracker.identifier);
-
+    print_text('Prepraring archive for tracker %s ...', tracker.identifier);    
+    
     mkpath(directory);
 
     print_indent(1);
@@ -42,7 +42,7 @@ function workspace_submit(tracker, sequences, experiments, varargin)
         print_text('Error: Results are not complete, submission not valid, aborting.');
         return;
     end;
-
+    
     context.files{end+1} = write_manifest(tracker);
 
     tracker_performance_profile = fullfile(tracker.directory, 'performance.txt');
@@ -56,6 +56,16 @@ function workspace_submit(tracker, sequences, experiments, varargin)
 
     files = cellfun(@(f) relativepath(f, rootdir), context.files, 'UniformOutput', false);
 
+    print_indent(-1);
+    
+    print_text('Generating submission report ...');
+    
+    print_indent(1);
+    
+    report = report_submission(create_report_context(sprintf('submission_%s', tracker.identifier)), tracker, sequences, experiments);
+
+    print_indent(-1);
+    
     try    
         
         print_text('Generating results archive, compressing %d files ...', numel(files));
@@ -63,16 +73,25 @@ function workspace_submit(tracker, sequences, experiments, varargin)
         zip(resultfile, files, rootdir);
         
         print_text('Result pack stored to "%s"', resultfile);
+
+        print_text('');
+        print_text('***************************************************************************');
+        print_text('');
+        print_text('The submission material is now ready.');
+        print_text('You can find the archive with raw results in %s.', resultfile);
+        print_text('The report with basic results can be found in %s.', report.target_file);
+        print_text('You can copy the tables in the report to the supporting document of the submission.');
+        print_text('Submit the archive and the document using the online form.');
+        print_text('');
+        print_text('***************************************************************************');
+        print_text('');
         
     catch e
 
         print_text('Error: problem during creation of a result package: %s', e.message);
 
     end;
-
-    print_indent(-1);
-
-
+    
     print_text('Done.');
 
 end
