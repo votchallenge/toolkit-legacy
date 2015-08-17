@@ -88,7 +88,8 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
 
         frames = num2cell(accuracy, 1);
         sequence_overlaps = cellfun(@(frame) mean(frame(~isnan(frame))), frames);
-
+        sequence_overlaps(isnan(sequence_overlaps)) = 0;
+        
         failures(isnan(failures)) = mean(failures(~isnan(failures)));
 
         sequence_failures = failures';
