@@ -47,7 +47,11 @@ for i = 1:2:length(varargin)
         otherwise 
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
-end 
+end
+
+if numel(trackers) < 2
+    error('Ranking analysis requires two or more trackers.');
+end;
 
 document = create_document(context, 'challenge', 'title', 'VOT competition report');
 

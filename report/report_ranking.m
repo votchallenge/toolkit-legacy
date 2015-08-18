@@ -60,6 +60,10 @@ for i = 1:2:length(varargin)
     end
 end 
 
+if numel(trackers) < 2
+    error('Ranking analysis requires two or more trackers.');
+end;
+
 document = create_document(context, 'ranking', 'title', 'AR ranking');
 
 results = cell(length(experiments), 1);
