@@ -83,6 +83,10 @@
 #include <ctype.h>
 #include "mex.h"
 
+#ifdef HAVE_OCTAVE
+#include <stdint.h>
+#endif
+
 // Assume 32 bit array dimensions for Matlab 6.5:
 // See option "compatibleArrayDims" for MEX in Matlab >= 7.7.
 #ifndef mwSize
