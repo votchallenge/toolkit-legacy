@@ -49,18 +49,22 @@ while 1
 
             option = input('Selected tracker: ', 's');
 
-            if (option == 'q' || option == 'e')
-                break
+            switch option
+            case 'q'
+                break;
+            case 'e'
+                break;
+            otherwise
+
+                selected_tracker = int32(str2double(option));
+
+                if isempty(selected_tracker) || selected_tracker < 1 || selected_tracker > length(trackers)
+                    selected_tracker = [];
+                end;
+
+                continue;
+
             end;
-
-            selected_tracker = int32(str2double(option));
-
-            if isempty(selected_tracker) || selected_tracker < 1 || selected_tracker > length(trackers)
-                selected_tracker = [];
-            end;
-
-            continue;
-        
         end;
     end;
     
@@ -86,22 +90,23 @@ while 1
 
             option = input('Select experiment: ', 's');
 
-            if (option == 'q' || option == 'e')
-                break
-            end;
-            
-            if (option == 'b')
+            switch option
+            case 'q'
+                break;
+            case 'e'
+                break;
+            case 'b'
                 selected_experiment = [];
                 continue;
+            otherwise
+                selected_experiment = int32(str2double(option));
+
+                if isempty(selected_experiment) || selected_experiment < 1 || selected_experiment > length(experiments)
+                    selected_experiment = [];
+                end;
+
+                continue;
             end;
-
-            selected_experiment = int32(str2double(option));
-
-            if isempty(selected_experiment) || selected_experiment < 1 || selected_experiment > length(experiments)
-                selected_experiment = [];
-            end;
-
-            continue;
         end;
     end;
     
@@ -125,24 +130,24 @@ while 1
             print_indent(-1);
 
             option = input('Select sequence: ', 's');
-
-            if (option == 'q' || option == 'e')
-                break
-            end;
-            
-            if (option == 'b')
+            switch option
+            case 'q'
+                break;
+            case 'e'
+                break;
+            case 'b'
                 selected_sequence = [];
                 continue;
-            end;
+            otherwise
 
-            selected_sequence = int32(str2double(option));
+                selected_sequence = int32(str2double(option));
 
-            if isempty(selected_sequence) || selected_sequence < 1 || selected_sequence > length(sequences)
-                selected_sequence = [];
+                if isempty(selected_sequence) || selected_sequence < 1 || selected_sequence > length(sequences)
+                    selected_sequence = [];
+                end;
+                
+                continue;
             end;
-            
-            continue;
-        
         end;
 
     end;
