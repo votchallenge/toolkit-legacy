@@ -25,7 +25,8 @@ context = struct_merge(context, defaults);
 
 prepare_trial_data(context.directory, sequence, 1, context);
 
-groundtruth_file = fullfile(sequence.directory, sequence.file);
+groundtruth_file = fullfile(context.directory, char(floor(24*rand(1, 20)) + 65));
+write_trajectory(groundtruth_file, sequence.groundtruth);
 
 images_file = fullfile(context.directory, 'images.txt');
 
