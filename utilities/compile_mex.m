@@ -25,9 +25,11 @@ function [success] = compile_mex(name, files, includes, directory)
         datenum = file_description.datenum;
     end
 
-    if exist(name, 'file') == 3
+    mexname = fullfile(directory, sprintf('%s.%s', name, mexext));
 
-        function_timestamp = file_timestamp(which(name));
+    if exist(mexname, 'file') == 2
+
+        function_timestamp = file_timestamp(mexname);
 
         older = cellfun(@(x) file_timestamp(x) < function_timestamp, files, 'UniformOutput', true);
 
