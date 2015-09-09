@@ -1,7 +1,5 @@
 
 #include <stdio.h>
-#include <vector>
-#include <fstream>
 
 #include "mex.h"
 #include "region.h"
@@ -22,12 +20,12 @@ char* getString(const mxArray *arg) {
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
+    region_container** regions = NULL;
+
 	if( nrhs != 2 ) mexErrMsgTxt("Exactly one string input argument and one cell array argument required.");
 	if( nlhs != 0 ) mexErrMsgTxt("No output arguments required.");
 
 	char* path = getString(prhs[0]);
-
-	std::vector<region_container*> regions;
 
 	if (!mxIsCell(prhs[1]))
 		mexErrMsgTxt("Second argument must be a cell array");
@@ -37,6 +35,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	if ( MIN(mxGetM(prhs[1]), mxGetN(prhs[1])) != 1 )
 		mexErrMsgTxt("Cell array must be a vector");
 
+    regions = (region_container**) malloc(sizeof(region_container*) * length);
+
 	for (int i = 0; i < length; i++) {
 
 		mxArray* val = mxGetCell (prhs[1], i);
@@ -45,7 +45,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 		int l = MAX(mxGetM(val), mxGetN(val));
 
-		if (MIN(mxGetM(val), mxGetN(val)) == 1) { 
+		if (!mxIsEmpty(val) && MIN(mxGetM(val), mxGetN(val)) == 1) { 
 
 			if (l == 1) {
 
@@ -68,28 +68,29 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		}
 
 		if (region) {
-			regions.push_back(region);
+			regions[i] = region;
 		} else {
 			char message[128];
 			sprintf(message, "Not a valid region at position %d, skipping", i+1);
 			mexWarnMsgTxt(message);
+            regions[i] = region_create_special(-1);
 		}
 
 	}
 
-	std::ofstream ofs;
-	ofs.open (path, std::ofstream::out | std::ofstream::app);
+    FILE* fp = fopen(path, "w");
 
-	if (ofs.is_open()) {
+	if (fp != NULL) {
 
-    	for (int i = 0; i < regions.size(); i++) {
+    	for (int i = 0; i < length; i++) {
 
 			region_container* region = regions[i];
 
-			char * tmp = region_string(region);
+			char* tmp = region_string(region);
 
 			if (tmp) {
-				ofs << tmp << "\n";
+				fputs(tmp, fp);
+                fputc('\n', fp);
 				free(tmp);
 			}
 			
@@ -103,7 +104,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		mexErrMsgTxt("Unable to open file for writing.");
 	}
 
-	ofs.close();
+    if (regions)
+        free(regions);
+
+	fclose(fp);
 	free(path);
 }
 
