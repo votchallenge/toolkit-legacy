@@ -112,6 +112,8 @@ else
     library_var = 'LD_LIBRARY_PATH';
 end;
 
+error_message = [];
+
 % run the tracker
 old_directory = pwd;
 try
@@ -164,13 +166,23 @@ try
             print_text('--------------------- End raw output -------------------------');
         end;
     
+		error_message = 'Error during tracker execution.';
+	else
+
+		try
+
+			trajectory = read_trajectory(output_file);
+		
+			%time = csvread(timing_file) ./ 1000; % convert to seconds 
+			time = time / sequence.length;    
+
+		catch
+			
+			error_message = 'Error reading tracker result.';
+
+		end;
+
     end;
-
-    trajectory = read_trajectory(output_file);
-    
-    %time = csvread(timing_file) ./ 1000; % convert to seconds 
-	time = time / sequence.length;    
-
 catch e
 
 	% Reassign old library paths if necessary
@@ -184,13 +196,19 @@ end;
 cd(old_directory);
 rehash;
 
-if get_global_variable('cleanup', 1)
-    try
-        % clean-up temporary directory
-        delpath(context.directory);
-    catch
-        print_debug('WARNING: unable to remove directory %s', context.directory);
-    end
-end;
+if isempty(error_message)
+
+	if get_global_variable('cleanup', 1)
+		try
+		    % clean-up temporary directory
+		    delpath(context.directory);
+		catch
+		    print_debug('WARNING: unable to remove directory %s', context.directory);
+		end
+	end;
+
+else
+	error(error_message);
+end
 
 end
