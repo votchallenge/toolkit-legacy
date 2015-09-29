@@ -61,7 +61,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	region_container* p = NULL;
 
-	if( nrhs != 3 ) mexErrMsgTxt("Two vector and two integer arguments required.");
+	if( nrhs != 3 ) mexErrMsgTxt("One vector and two integer arguments required.");
 	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");
 
 	if (!MEX_TEST_VECTOR(0) || !MEX_TEST_DOUBLE(0)) mexErrMsgTxt("First argument must be a vector of type double");

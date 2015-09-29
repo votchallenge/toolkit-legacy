@@ -40,32 +40,37 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	for (int i = 0; i < length; i++) {
 
 		mxArray* val = mxGetCell (prhs[1], i);
-		double *d = (double*) mxGetPr(val);
+
 		region_container* region = NULL;
 
-		int l = MAX(mxGetM(val), mxGetN(val));
+        if (val) {
 
-		if (!mxIsEmpty(val) && MIN(mxGetM(val), mxGetN(val)) == 1) { 
+		    double *d = (double*) mxGetPr(val);
+		    int l = MAX(mxGetM(val), mxGetN(val));
 
-			if (l == 1) {
+		    if (!mxIsEmpty(val) && MIN(mxGetM(val), mxGetN(val)) == 1) { 
 
-				region = region_create_special(d[0]);
+			    if (l == 1) {
 
-			} else if (l == 4) {
+				    region = region_create_special(d[0]);
 
-				region = region_create_rectangle(d[0], d[1], d[2], d[3]);
+			    } else if (l == 4) {
 
-			} else if (l > 5 && l % 2 == 0) {
+				    region = region_create_rectangle(d[0], d[1], d[2], d[3]);
 
-				region = region_create_polygon(l / 2);
+			    } else if (l > 5 && l % 2 == 0) {
 
-				for (int j = 0; j < l / 2; j++) {
-					region->data.polygon.x[j] = d[j * 2];
-					region->data.polygon.y[j] = d[j * 2 + 1];
-				}
-			}
+				    region = region_create_polygon(l / 2);
 
-		}
+				    for (int j = 0; j < l / 2; j++) {
+					    region->data.polygon.x[j] = d[j * 2];
+					    region->data.polygon.y[j] = d[j * 2 + 1];
+				    }
+			    }
+
+		    }
+
+        }
 
 		if (region) {
 			regions[i] = region;
