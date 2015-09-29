@@ -34,7 +34,9 @@ variables = {'tracker', identifier};
 
 template_name = 'tracker.tpl';
 
-matlab = strcmp('y', lower(input('Is the tracker written in Matlab? Y/N [N]: ', 's')));
+if isempty(matlab)
+    matlab = strcmpi('y', input('Is the tracker written in Matlab? Y/N [N]: ', 's'));
+end;
 
 if matlab
 	template_name = 'tracker_matlab.tpl';	
