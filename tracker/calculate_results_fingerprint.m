@@ -43,7 +43,7 @@ function context = fingerprint_iterator(event, context)
                 event.sequence.name);
             
             [files, completed] = tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
-                'type', event.experiment.type, 'parameters', execution_parameters, 'scan', true);
+                'type', event.experiment.type, 'parameters', execution_parameters, 'scan', true, 'silent', true);
 
             dates = zeros(1, numel(files));
             

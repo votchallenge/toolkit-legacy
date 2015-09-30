@@ -31,12 +31,14 @@ function [files, completed] = tracker_evaluate(tracker, sequence, directory, var
     files = {};
     completed = true;
     cache = get_global_variable('cache', 0);
+    silent = false;
 
     for j=1:2:length(varargin)
         switch lower(varargin{j})
             case 'parameters', parameters = varargin{j+1};
             case 'type', type = varargin{j+1};
             case 'scan', scan = varargin{j+1};
+            case 'silent', silent = varargin{j+1};
             otherwise, error(['unrecognized argument ' varargin{j}]);
         end
     end
@@ -72,7 +74,9 @@ function [files, completed] = tracker_evaluate(tracker, sequence, directory, var
             end;
 
             if i == 4 && is_deterministic(sequence, 3, directory)
-                print_debug('Detected a deterministic tracker, skipping remaining trials.');
+                if ~silent
+                    print_debug('Detected a deterministic tracker, skipping remaining trials.');
+                end;
                 break;
             end;
 
