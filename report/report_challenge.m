@@ -77,7 +77,7 @@ if master_legend
 
 end;
 
-print_indent(1);
+print_text('Ranking report ...');print_indent(1);
 
 [ranking_document, ranks_scores] = report_ranking(context, trackers, sequences, experiments, ...
     'uselabels', true, 'usepractical', true, ...
@@ -85,10 +85,10 @@ print_indent(1);
 
 print_indent(-1);
 
-print_indent(1);
+print_text('Expected overlap report ...'); print_indent(1);
 
 [expected_overlap_document, expected_overlap_scores] = report_expected_overlap(context, trackers, sequences, experiments, ...
-    'uselabels', true, 'usepractical', true);
+    'uselabels', true, 'usepractical', true, 'hidelegend', master_legend);
 
 print_indent(-1);
 
@@ -137,23 +137,28 @@ switch lower(methodology)
     case {'vot2013', 'vot2014'}
         scores = ranks_scores;
         score_labels = {'Acc. Rank', 'Rob. Rank'};
+        score_sorting_partial = {'ascending', 'ascending'};
+        score_sorting_overall = 'ascending';
+        sort_direction = 'ascend';
         score_weights = [0.5, 0.5];
     case 'vot2015'
         scores = expected_overlap_scores;
         score_labels = {'Expected overlap'};
+        score_sorting_partial = {'descending'};
+        score_sorting_overall = 'descending';
+        sort_direction = 'descend';
         score_weights = 1;
     otherwise 
         error(['Unknown methodology ', methodology, '!']) ;
 end
-
 
 document.section('Overall ranking');
 
 N_scores = numel(score_labels);
 combined_scores = squeeze(mean(scores, 1));
 
-overall_scores = bsxfun(@prod, combined_scores, score_weights) ./ sum(score_weights);
-[~, order] = sort(overall_scores, 'ascend')  ;
+overall_scores = sum(combined_scores .* repmat(score_weights, numel(trackers), 1), 2) ./ sum(score_weights(:));
+[~, order] = sort(overall_scores, sort_direction)  ;
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
 
@@ -165,16 +170,14 @@ column_labels(2, :) = [score_labels(repmat(1:length(score_labels), 1, numel(expe
 
 experiments_ranking_data = zeros(N_scores * numel(experiments), numel(trackers));
 for i = 1:N_scores
-    experiments_ranking_data(1:i:end) = scores(:, :, i);
+    experiments_ranking_data(i:N_scores:end) = scores(:, :, i);
 end
 experiments_ranking_data = num2cell(experiments_ranking_data);
 
 overall_ranking_data = num2cell(overall_scores);
 
-tabledata = cat(1, experiments_ranking_data, overall_ranking_data)';
-ordering = repmat({'ascending'}, 1, numel(experiments) * N_scores + 1);
-
-tabledata = highlight_best_rows(tabledata, ordering);
+tabledata = cat(1, experiments_ranking_data, overall_ranking_data')';
+tabledata = highlight_best_rows(tabledata, cat(2, repmat(score_sorting_partial, 1, numel(experiments)), {score_sorting_overall}));
 
 document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
 
