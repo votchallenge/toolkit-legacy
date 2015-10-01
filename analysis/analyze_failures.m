@@ -1,4 +1,4 @@
-function [failure_histograms] = analyze_failures(experiment, trackers, sequences, varargin)
+function [failure_histograms] = analyze_failures(experiment, trackers, sequences)
 % analyze_failures Perform failure frequency analysis
 %
 % This function performs failure frequency analysis for a set of trackers
@@ -8,45 +8,15 @@ function [failure_histograms] = analyze_failures(experiment, trackers, sequences
 % - experiment (cell): A cell array of valid experiment structures.
 % - trackers (cell): A cell array of valid tracker descriptor structures.
 % - sequences (cell): A cell array of valid sequence descriptor structures.
-% - varargin[Cache] (string): Path to cache directory.
 %
 % Output:
 % - failure_histograms (cell): A cell array (one element for each experiment) of cell arrays (one for each sequence) of double matrices that contain per-frame failure frequencies for all trackers.   
 %
 
-    cache = fullfile(get_global_variable('directory'), 'cache');
-    
-    for i = 1:2:length(varargin)
-        switch lower(varargin{i})               
-            case 'cache'
-                cache = varargin{i+1};                   
-            otherwise 
-                error(['Unknown switch ', varargin{i},'!']) ;
-        end
-    end 
-
-
     repeat = experiment.parameters.repetitions;
 
     print_text('Failure analysis for experiment %s ...', experiment.name);
 
-    sequences_hash = md5hash(strjoin((cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
-    trackers_hash = md5hash(strjoin((cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
-    
-    mkpath(fullfile(cache, 'failures'));
-    
-    cache_file = fullfile(cache, 'failures', sprintf('%s_%s_%s.mat', experiment.name, trackers_hash, sequences_hash));
-
-    failure_histograms = [];
-	if exist(cache_file, 'file')         
-		load(cache_file);       
-	end;       
-    
-    if ~isempty(failure_histograms)
-        print_text('Loading failure analysis results from cache.');
-        return;
-    end; 
-    
     experiment_sequences = convert_sequences(sequences, experiment.converter);
         
     failure_histograms = cell(1, numel(experiment_sequences));
@@ -94,6 +64,3 @@ function [failure_histograms] = analyze_failures(experiment, trackers, sequences
         print_indent(-1);
         
     end;
-
-    save(cache_file, 'failure_histograms');
-    

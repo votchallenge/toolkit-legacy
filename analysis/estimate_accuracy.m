@@ -7,18 +7,21 @@ function [accuracy, frames] = estimate_accuracy(trajectory, sequence, varargin)
 % - trajectory (cell): A trajectory as a cell array of regions.
 % - sequence (cell or structure): Can be another trajectory or a valid sequence descriptor.
 % - varargin[Burnin] (integer): Number of frames that have to be ignored after the failure.
+% - varargin[IgnoreUnknown] (boolean): Ignore frames where the overlap is
+% unknown.
 %
 % Output:
 % - accuracy (double): Average overlap.
 % - frames (double vector): Per-frame overlaps.
 %
 
-
+ignore_unknown = true;
 burnin = 0;
 
 for j=1:2:length(varargin)
-    switch varargin{j}
+    switch lower(varargin{j})
         case 'burnin', burnin = max(0, varargin{j+1});
+        case 'ignoreunknown', ignore_unknown = varargin{j+1};
         otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
@@ -42,12 +45,20 @@ else
     
 end;
 
+if ~ignore_unknown
+    unknown = cellfun(@(r) numel(r) == 1 && r == 0, trajectory, 'UniformOutput', true);
+end;
+
 trajectory(mask) = {0};
 
 if isstruct(sequence)
     frames = calculate_overlap(trajectory, get_region(sequence, 1:sequence.length));
 else
     frames = calculate_overlap(trajectory, sequence);
+end;
+
+if ~ignore_unknown
+    frames(unknown) = 0;
 end;
 
 overlap = frames(~isnan(frames)); % filter-out illegal values

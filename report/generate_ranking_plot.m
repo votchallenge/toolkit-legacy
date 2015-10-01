@@ -88,8 +88,8 @@ function handle = generate_ranking_plot(trackers, accuracy, robustness, varargin
     if show_legend
         legend(plot_labels(available), 'Location', 'NorthWestOutside', 'interpreter', 'none', 'FontSize', 9); 
     end;
-    xlabel('Robustness rank'); set(gca,'XDir','Reverse');
-    ylabel('Accuracy rank'); set(gca,'YDir','Reverse');
+    xlabel('Robustness rank'); set(gca, 'XDir', 'Reverse');
+    ylabel('Accuracy rank'); set(gca, 'YDir', 'Reverse');
     xlim([1, plot_limit]); 
     ylim([1, plot_limit]);
     

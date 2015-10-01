@@ -65,6 +65,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
         end;
 
         if (size(trajectory, 1) < size(groundtruth, 1))
+            print_debug('Warning: Trajectory too short. Expanding with empty frames.');
             trajectory{end+1:length(groundtruth)} = 0;
         end;
 
@@ -77,10 +78,9 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
     end;
 
     frames = num2cell(accuracy, 1);
-    aggregated_overlap = cellfun(@(frame) mean(frame(~isnan(frame))), frames);
-    aggregated_overlap(isnan(aggregated_overlap)) = 0;
-    
-    failures(isnan(failures)) = mean(failures(~isnan(failures)));
+    aggregated_overlap = cellfun(@(frame) nanmean(frame), frames);
+
+    failures(isnan(failures)) = nanmean(failures);
     aggregated_failures = failures';
     
     save(cache_file, 'aggregated_overlap', 'aggregated_failures');

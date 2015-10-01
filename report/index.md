@@ -31,6 +31,7 @@ Module functions
 
 ### Utilities
 
+-   [report_cache](report_cache.m) - Cache proxy for report generation
 -   [create_table_cell](create_table_cell.m) - Create a complex table cell structure
 -   [highlight_best_rows](highlight_best_rows.m) - Adds highlight to the best three cells in a given
 -   [tight_subplots](tight_subplots.m) - Initializes a grid of axes
