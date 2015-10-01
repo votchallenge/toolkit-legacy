@@ -12,8 +12,7 @@ function [document] = report_challenge(context, experiments, trackers, sequences
 % - varargin[Methodology] (string): The methodology to use for final ranking.
 % - varargin[Speed] (boolean): Generate speed report.
 % - varargin[Failures] (boolean): Generate failures report.
-% - varargin[OrderingPlot] (boolean): Generate ordering plots.
-% - varargin[ARPlot] (boolean): Generate A-R plots.
+% - varargin[Difficulty] (boolean): Generate difficulty report.
 % - varargin[MasterLegend] (boolean): Use a single master legend instead of including it .
 %
 % Output:
