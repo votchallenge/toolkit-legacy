@@ -12,6 +12,7 @@ Module functions
 
 -    [estimate_accuracy](estimate_accuracy.m) - Calculate accuracy score
 -    [estimate_failures](estimate_failures.m) - Computes number of failures score
+-    [estimate_expected_overlap](estimate_expected_overlap.m) - Estimates expected average overlap for different sequence lengths
 
 ### Ranking
 
@@ -28,6 +29,7 @@ Module functions
 
 ### Other analyses
 
+-    [analyze_expected_overlap](analyze_expected_overlap.m) - Performs expected overlap analysis
 -    [analyze_failures](analyze_failures.m) - Perform failure frequency analysis
 
 

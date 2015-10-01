@@ -17,10 +17,12 @@ Module functions
 -   [report_ranking_spotlight](report_ranking_spotlight.m) - Generate a spotlight report based on A-R ranking
 -   [report_failures](report_failures.m) - Generate a statistic overview of occurences of failures
 -   [report_difficulty](report_difficulty.m) - Generate a difficulty report for labels or sequences
+-   [report_expected_overlap](report_expected_overlap.m) - Generate a report based on expected overlap
 -   [report_sequences_preview](report_sequences_preview.m) - Create an overview document for the given sequences
 
 ### Resources and graphs
 
+-   [generate_plot](generate_plot.m) - Generate an blank plot
 -   [generate_ar_plot](generate_ar_plot.m) - Generate an A-R plot
 -   [generate_ranking_plot](generate_ranking_plot.m) - Generate an A-R ranking plot
 -   [generate_ordering_plot](generate_ordering_plot.m) - Generate a per-selector ordering plot
