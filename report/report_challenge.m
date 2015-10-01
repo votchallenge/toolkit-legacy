@@ -9,39 +9,33 @@ function [document] = report_challenge(context, experiments, trackers, sequences
 % - trackers (cell): An array of tracker structures.
 % - sequences (cell): An array of sequence structures.
 % - experiments (cell): An array of experiment structures.
+% - varargin[Methodology] (string): The methodology to use for final ranking.
 % - varargin[Speed] (boolean): Generate speed report.
 % - varargin[Failures] (boolean): Generate failures report.
 % - varargin[OrderingPlot] (boolean): Generate ordering plots.
 % - varargin[ARPlot] (boolean): Generate A-R plots.
-% - varargin[CombineWeight] (double): Averaging factor between 0 and 1 for combining accuracy and robustness ranking.
 % - varargin[MasterLegend] (boolean): Use a single master legend instead of including it .
 %
 % Output:
 % - document (structure): Resulting document structure.
 %
 
-arplot = true;
-orderingplot = false;
-speed = true;
+implementation = true;
 failures = true;
 difficulty = true;
-ratio = 0.5;
 master_legend = true;
+methodology = 'vot2015';
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
-        case 'speed'
-            speed = varargin{i+1};
+        case 'implementation'
+            implementation = varargin{i+1};
         case 'failures'
             failures = varargin{i+1}; 
         case 'difficulty'
             difficulty = varargin{i+1};             
-        case 'arplot'
-            arplot = varargin{i+1};
-        case 'orderingplot'
-            orderingplot = varargin{i+1};
-        case 'combineweight'
-            ratio = varargin{i+1};
+        case 'methodology'
+            methodology = varargin{i+1};
         case 'masterlegend'
             master_legend = varargin{i+1};            
         otherwise 
@@ -50,8 +44,18 @@ for i = 1:2:length(varargin)
 end
 
 if numel(trackers) < 2
-    error('Ranking analysis requires two or more trackers.');
+    error('Challenge analysis requires two or more trackers.');
 end;
+
+switch lower(methodology)
+    case {'vot2013', 'vot2014'}
+        ranking_adaptation = 'mean';
+    case 'vot2015'
+        ranking_adaptation = 'best';
+    otherwise 
+        error(['Unknown methodology ', methodology, '!']) ;
+end
+
 
 document = create_document(context, 'challenge', 'title', 'VOT competition report');
 
@@ -74,68 +78,37 @@ if master_legend
 
 end;
 
-if speed
+print_indent(1);
 
-    print_text('Speed report ...'); print_indent(1);
-
-    [normalized, original] = analyze_speed(experiments, trackers, sequences, 'cache', context.cachedir);
-
-    averaged_normalized = squeeze(mean(mean(normalized, 3), 1));
-    averaged_original = squeeze(mean(mean(original, 3), 1));
-
-else
-    averaged_normalized = nan(1, numel(trackers));
-end
-
-% TODO: write detailed report (implementation and raw speed)
+[ranking_document, ranks_scores] = report_ranking(context, trackers, sequences, experiments, ...
+    'uselabels', true, 'usepractical', true, ...
+    'hidelegend', master_legend, 'adaptation', ranking_adaptation, 'average', 'weighted_mean');
 
 print_indent(-1);
 
-[ranking_document, ranks] = report_ranking(context, trackers, sequences, experiments, ...
-    'uselabels', true, 'usepractical', true, 'arplot', arplot, 'orderingplot', orderingplot, ...
-    'hidelegend', master_legend);
+print_indent(1);
+
+[expected_overlap_document, expected_overlap_scores] = report_expected_overlap(context, trackers, sequences, experiments, ...
+    'uselabels', true, 'usepractical', true);
 
 print_indent(-1);
 
-combined_ranks = squeeze(mean(ranks, 1));
+document.section('Index');
 
-overall_ranks = ratio * combined_ranks(:, 1) + (1 - ratio) * combined_ranks(:, 2);
-[~, order] = sort(overall_ranks,'ascend')  ;
+document.link(ranking_document.url, 'Ranking analysis');
 
-tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
+document.link(expected_overlap_document.url, 'Expected overlap analysis');
 
-column_labels = cell(2, 2 * numel(experiments) + 4);
+if implementation
 
-ranking_labels = {'Acc. Rank', 'Rob. Rank'};
-column_labels(1, :) = repmat({struct()}, 1, size(column_labels, 2));
-column_labels(1, 1:2:end-4) = cellfun(@(x) struct('text', x.name, 'columns', 2), experiments,'UniformOutput',false);
-column_labels{1, end-3} = struct('text', '', 'columns', 4);
-column_labels(2, :) = [ranking_labels(repmat(1:length(ranking_labels), 1, numel(experiments) + 1)), {'Rank', 'Speed'}];
+    print_text('Implementation report ...'); print_indent(1);
+    
+    implementation_document = report_implementation(context, trackers, sequences, experiments);
 
-experiments_ranking_data = zeros(2 * numel(experiments), numel(trackers));
-experiments_ranking_data(1:2:end) = ranks(:, :, 1);
-experiments_ranking_data(2:2:end) = ranks(:, :, 2);
-experiments_ranking_data = num2cell(experiments_ranking_data);
+    print_indent(-1);
 
-overall_ranking_data = num2cell(cat(2, combined_ranks, overall_ranks)');
-
-if speed
-    speed_data = num2cell(averaged_normalized);
-    tabledata = cat(1, experiments_ranking_data, overall_ranking_data, speed_data)';
-    ordering = [repmat({'ascending'}, 1, numel(experiments) * 2 + 3), 'descending'];
-else
-    tabledata = cat(1, experiments_ranking_data, overall_ranking_data)';
-    ordering = repmat({'ascending'}, 1, numel(experiments) * 2 + 3);
-    column_labels = column_labels(: ,1:end-1);
+    document.link(implementation_document.url, 'Implementation analysis');
 end
-
-tabledata = highlight_best_rows(tabledata, ordering);
-
-document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
-
-document.link(ranking_document.url, 'Detailed ranking results');
-
-document.section('Other analysis');
 
 if failures
 
@@ -161,6 +134,49 @@ if difficulty
 
 end;
 
-% TODO: speed analysis report
+switch lower(methodology)
+    case {'vot2013', 'vot2014'}
+        scores = ranks_scores;
+        score_labels = {'Acc. Rank', 'Rob. Rank'};
+        score_weights = [0.5, 0.5];
+    case 'vot2015'
+        scores = expected_overlap_scores;
+        score_labels = {'Expected overlap'};
+        score_weights = 1;
+    otherwise 
+        error(['Unknown methodology ', methodology, '!']) ;
+end
+
+
+document.section('Overall ranking');
+
+N_scores = numel(score_labels);
+combined_scores = squeeze(mean(scores, 1));
+
+overall_scores = bsxfun(@prod, combined_scores, score_weights) ./ sum(score_weights);
+[~, order] = sort(overall_scores, 'ascend')  ;
+
+tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
+
+column_labels = cell(2, N_scores * numel(experiments) + 1);
+
+column_labels(1, :) = repmat({struct()}, 1, size(column_labels, 2));
+column_labels(1, 1:N_scores:end-1) = cellfun(@(x) struct('text', x.name, 'columns', N_scores), experiments,'UniformOutput',false);
+column_labels(2, :) = [score_labels(repmat(1:length(score_labels), 1, numel(experiments))), {'Overall'}];
+
+experiments_ranking_data = zeros(N_scores * numel(experiments), numel(trackers));
+for i = 1:N_scores
+    experiments_ranking_data(1:i:end) = scores(:, :, i);
+end
+experiments_ranking_data = num2cell(experiments_ranking_data);
+
+overall_ranking_data = num2cell(overall_scores);
+
+tabledata = cat(1, experiments_ranking_data, overall_ranking_data)';
+ordering = repmat({'ascending'}, 1, numel(experiments) * N_scores + 1);
+
+tabledata = highlight_best_rows(tabledata, ordering);
+
+document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
 
 document.write();
