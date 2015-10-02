@@ -38,7 +38,7 @@ averaged_original = squeeze(mean(mean(speed.original, 3), 1));
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', false);
 
-column_labels = {'Normalized speed', 'Raw speed', 'Platform', 'Interpreter', 'TraX'};
+column_labels = {'Normalized speed', 'Raw speed', 'Platform', 'Interpreter', 'Deterministic', 'Complete', 'TraX'};
 
 tabledata = cell(numel(trackers), 5);
 
@@ -46,7 +46,15 @@ tabledata(:, 1) = num2cell(averaged_normalized);
 tabledata(:, 2) = num2cell(averaged_original);
 tabledata(:, 3) = cellfun(@get_platform, trackers, 'UniformOutput', false);
 tabledata(:, 4) = cellfun(@get_interpreter, trackers, 'UniformOutput', false);
-tabledata(:, 5) = cellfun(@(x) iff(x.trax, 'Yes', 'No'), trackers, 'UniformOutput', false);
+tabledata(:, 7) = cellfun(@(x) iff(x.trax, 'Yes', 'No'), trackers, 'UniformOutput', false);
+
+for t = 1:numel(trackers)
+    aggregated.completed = true;
+    aggregated.deterministic = true;
+    aggregated = iterate(experiments, trackers{t}, sequences, 'iterator', @aggregate_iterator, 'context', aggregated);
+    tabledata(t, 5) = iff(aggregated.deterministic, 'Yes', 'No');
+    tabledata(t, 6) = iff(aggregated.completed, 'Yes', 'No');
+end;
 
 tabledata(:, 1:2) = highlight_best_rows(tabledata(:, 1:2),  {'descend', 'descend'});
 
@@ -73,4 +81,39 @@ function interpreter = get_interpreter(tracker)
     else
         interpreter = '';
     end
+end
+
+function context = aggregate_iterator(event, context)
+
+    switch (event.type)
+        case 'experiment_enter'
+      
+        case 'experiment_exit'
+
+        case 'tracker_enter'
+            
+        case 'tracker_exit'
+
+        case 'sequence_enter'
+            
+            execution_parameters = struct();
+            if isfield(event.experiment, 'parameters')
+                execution_parameters = event.experiment.parameters;
+            end;
+            
+            sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
+                event.sequence.name);
+            
+            [~, metadata.completed] = tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
+                'type', event.experiment.type, 'parameters', execution_parameters, 'scan', true);
+
+            context.completed = context.completed && metadata.completed;
+            
+            % TODO: check if the sequence is not by any chance
+            % non-deterministic.
+            if isfield(metadata, 'deterministic')
+            	context.deterministic = context.deterministic && metadata.deterministic;
+            end
+    end;
+
 end

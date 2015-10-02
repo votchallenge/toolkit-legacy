@@ -1,4 +1,4 @@
-function [files, completed] = tracker_evaluate(tracker, sequence, directory, varargin)
+function [files, metadata] = tracker_evaluate(tracker, sequence, directory, varargin)
 % tracker_evaluate Evaluates a tracker on a given sequence for experiment
 %
 % The core function of experimental evaluation. This function can perform various 
@@ -29,7 +29,7 @@ function [files, completed] = tracker_evaluate(tracker, sequence, directory, var
     type = 'supervised';
     parameters = struct();
     files = {};
-    completed = true;
+    metadata.completed = true;
     cache = get_global_variable('cache', 0);
     silent = false;
 
@@ -55,7 +55,8 @@ function [files, completed] = tracker_evaluate(tracker, sequence, directory, var
 
         defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
         context = struct_merge(parameters, defaults);
-
+        metadata.deterministic = false;
+        
         time_file = fullfile(directory, sprintf('%s_time.txt', sequence.name));
 
         times = zeros(sequence.length, context.repetitions);
@@ -77,11 +78,12 @@ function [files, completed] = tracker_evaluate(tracker, sequence, directory, var
                 if ~silent
                     print_debug('Detected a deterministic tracker, skipping remaining trials.');
                 end;
+                metadata.deterministic = true;
                 break;
             end;
 
             if scan
-                completed = false;
+                metadata.completed = false;
                 continue;
             end;
 
@@ -110,13 +112,14 @@ function [files, completed] = tracker_evaluate(tracker, sequence, directory, var
         if exist(time_file, 'file')
             files{end+1} = time_file;
         else
-            completed = false;
+            metadata.completed = false;
         end;
 
     case 'chunked'
         
         defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1, 'chunk_length', 50);
         context = struct_merge(parameters, defaults);
+        metadata.deterministic = false;
         
         [chunks, chunk_offset] = sequence_fragment(sequence, context.chunk_length);
 
@@ -138,12 +141,15 @@ function [files, completed] = tracker_evaluate(tracker, sequence, directory, var
             end;
 
             if i == 4 && is_deterministic(sequence, 3, directory)
-                print_debug('Detected a deterministic tracker, skipping remaining trials.');
+                if ~silent
+                    print_debug('Detected a deterministic tracker, skipping remaining trials.');
+                end;
+                metadata.deterministic = true;
                 break;
             end;
 
             if scan
-                completed = false;
+                metadata.completed = false;
                 continue;
             end;
 
