@@ -17,18 +17,14 @@ function [document] = report_ranking_spotlight(context, trackers, sequences, exp
 % - document (structure): Resulting document structure.
 %
 
-uselabels = false;
 usepractical = false;
 
-average = get_global_variable('report_ranking_average', 'weighted_mean');
 alpha = get_global_variable('report_ranking_alpha', 0.05);
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
         case 'usepractical'
             usepractical = varargin{i+1};
-        case 'average'
-            average = varargin{i+1};
         case 'alpha'
             alpha = varargin{i+1}; 
         otherwise 
