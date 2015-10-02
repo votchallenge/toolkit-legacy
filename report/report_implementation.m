@@ -36,6 +36,8 @@ speed = report_cache(context, cache_identifier, @analyze_speed, experiments, tra
 averaged_normalized = squeeze(mean(mean(speed.normalized, 3), 1));
 averaged_original = squeeze(mean(mean(speed.original, 3), 1));
 
+print_indent(-1);
+
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', false);
 
 column_labels = {'Normalized speed', 'Raw speed', 'Platform', 'Interpreter', 'Deterministic', 'Complete', 'TraX'};
@@ -48,12 +50,14 @@ tabledata(:, 3) = cellfun(@get_platform, trackers, 'UniformOutput', false);
 tabledata(:, 4) = cellfun(@get_interpreter, trackers, 'UniformOutput', false);
 tabledata(:, 7) = cellfun(@(x) iff(x.trax, 'Yes', 'No'), trackers, 'UniformOutput', false);
 
+print_text('Gathering other information ...');
+
 for t = 1:numel(trackers)
     aggregated.completed = true;
     aggregated.deterministic = true;
     aggregated = iterate(experiments, trackers{t}, sequences, 'iterator', @aggregate_iterator, 'context', aggregated);
-    tabledata(t, 5) = iff(aggregated.deterministic, 'Yes', 'No');
-    tabledata(t, 6) = iff(aggregated.completed, 'Yes', 'No');
+    tabledata{t, 5} = iff(aggregated.deterministic, 'Yes', 'No');
+    tabledata{t, 6} = iff(aggregated.completed, 'Yes', 'No');
 end;
 
 tabledata(:, 1:2) = highlight_best_rows(tabledata(:, 1:2),  {'descend', 'descend'});
@@ -104,7 +108,7 @@ function context = aggregate_iterator(event, context)
             sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
                 event.sequence.name);
             
-            [~, metadata.completed] = tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
+            [~, metadata] = tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
                 'type', event.experiment.type, 'parameters', execution_parameters, 'scan', true);
 
             context.completed = context.completed && metadata.completed;

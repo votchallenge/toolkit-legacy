@@ -157,7 +157,7 @@ document.section('Overall ranking');
 N_scores = numel(score_labels);
 combined_scores = squeeze(mean(scores, 1));
 
-overall_scores = sum(combined_scores .* repmat(score_weights, numel(trackers), 1), 2) ./ sum(score_weights(:));
+overall_scores = sum(combined_scores(:) .* repmat(score_weights, numel(trackers), 1), 2) ./ sum(score_weights(:));
 [~, order] = sort(overall_scores, sort_direction)  ;
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);

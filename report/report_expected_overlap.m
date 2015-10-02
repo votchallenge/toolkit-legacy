@@ -76,12 +76,13 @@ for e = 1:length(experiments)
     plot([low, low], [1, 0], ':', 'Color', [0.6, 0.6, 0.6]);
     plot([high, high], [1, 0], ':', 'Color', [0.6, 0.6, 0.6]);
     
+    phandles = zeros(numel(trackers), 1);
     for t = 1:numel(trackers)
-        plot(results{e}.lengths, results{e}.curves{t}, 'Color', trackers{t}.style.color);
+        phandles(t) = plot(results{e}.lengths, results{e}.curves{t}, 'Color', trackers{t}.style.color);
     end;
     
     if ~hidelegend
-        legend(cellfun(@(x) x.label, trackers, 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
+        legend(phandles, cellfun(@(x) x.label, trackers, 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
     end;
 
     xlabel('Sequence length');
