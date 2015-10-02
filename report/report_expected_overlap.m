@@ -53,7 +53,7 @@ for e = 1:length(experiments)
     
     result = report_cache(context, cache_identifier, ...
         @analyze_expected_overlap, experiments{e}, trackers, ...
-        sequences, 'uselabels', uselabels, 'usepractical', usepractical);
+        sequences, 'uselabels', uselabels);
     results{e} = result;
   
     [~, peak, low, high] = estimate_evaluation_interval(sequences, range_threshold);
@@ -118,7 +118,7 @@ for e = 1:length(experiments)
         tracker = trackers{order(t)};
         plot([t, t], [0, ordered_scores(t)], ':', 'Color', [0.8, 0.8, 0.8]);
         if experiment_practical(t) > 0.001
-            draw_interval(t, ordered_scores(t), experiment_practical(t), experiment_practical(t), ':', 'Color', [0.6, 0.6, 0.6]);            
+            draw_interval(t, ordered_scores(t), experiment_practical(t), experiment_practical(t), 'Color', [0.6, 0.6, 0.6]);            
         end
         phandles(t) = plot(t, ordered_scores(t), tracker.style.symbol, 'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
     end;
@@ -129,8 +129,8 @@ for e = 1:length(experiments)
     
     xlabel('Order');
     ylabel('Average expected overlap');
-    xlim([1, numel(trackers)]); 
-    set(gca, 'XTick', 1:5:numel(trackers));
+    xlim([0.9, numel(trackers) + 0.1]); 
+    set(gca, 'XTick', 1:max(1, ceil(log(numel(trackers)))):numel(trackers));
     set(gca, 'XDir', 'Reverse');
     ylim([0, 1]);
     
