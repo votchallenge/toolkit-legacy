@@ -52,22 +52,23 @@ tabledata(:, 7) = cellfun(@(x) iff(x.trax, 'Yes', 'No'), trackers, 'UniformOutpu
 
 print_text('Gathering other information ...');
 
+
+
 for t = 1:numel(trackers)
+    cache_identifier = sprintf('result_analysis_%s_%s.mat', trackers{t}.identifiers, sequences_hash);
     aggregated.completed = true;
     aggregated.deterministic = true;
-    aggregated = iterate(experiments, trackers{t}, sequences, 'iterator', @aggregate_iterator, 'context', aggregated);
+    aggregated = report_cache(context, cache_identifier, @iterate, experiments, ...
+        trackers{t}, sequences, 'iterator', @aggregate_iterator, 'context', aggregated);
     tabledata{t, 5} = iff(aggregated.deterministic, 'Yes', 'No');
     tabledata{t, 6} = iff(aggregated.completed, 'Yes', 'No');
 end;
 
 tabledata(:, 1:2) = highlight_best_rows(tabledata(:, 1:2),  {'descend', 'descend'});
-
 document.table(tabledata, 'columnLabels', column_labels, 'rowLabels', tracker_labels);
-
 document.write();
 
 end
-
 
 function platform = get_platform(tracker)
 
