@@ -109,6 +109,7 @@ for e = 1:length(experiments)
     weights(low:high) = 1;
 
     experiment_scores = cellfun(@(x) sum(x(:) .* weights) / sum(weights), results{e}.curves, 'UniformOutput', true);
+    experiment_practical = cellfun(@(x) sum(x(:) .* weights) / sum(weights), results{e}.practical, 'UniformOutput', true);
 
     [ordered_scores, order] = sort(experiment_scores, 'descend');
 

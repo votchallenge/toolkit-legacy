@@ -1,4 +1,4 @@
-function [expected_overlaps, evaluated_lengths] = estimate_expected_overlap(tracker, experiment, sequences, varargin)
+function [expected_overlaps, evaluated_lengths, practical_difference] = estimate_expected_overlap(tracker, experiment, sequences, varargin)
 % estimate_expected_overlap Estimates expected average overlap for
 % different sequence lengths
 %
@@ -16,6 +16,8 @@ function [expected_overlaps, evaluated_lengths] = estimate_expected_overlap(trac
 % - expected_overlaps (vector): Expected overlaps for corresponding
 % lengths.
 % - evaluated_lengths (vector): A filtered array of lengths (removed duplicates). 
+% - practical_difference (vector): An estimate of the practical difference for
+% corresponding expected overlap.
 
 lengths = [];
 
@@ -28,9 +30,11 @@ end
 
 context.failures = {};
 context.overlaps = {};
+context.practical = {};
 context = iterate(experiment, tracker, sequences, 'iterator', @collect_segments, 'context', context);
 failures = context.failures;
 overlaps = context.overlaps;
+practical = context.practical;
 
 if isempty(lengths)
     maxlen = max(cellfun(@(x) numel(x), overlaps, 'UniformOutput', true));
@@ -46,6 +50,7 @@ fragments_count = sum(cellfun(@(x) numel(x) + 1, failures, 'UniformOutput', true
 fragments_length = max(lengths);
 
 fragments = nan(fragments_count, fragments_length);
+fpractical = nan(fragments_count, fragments_length);
 f = 1;
 for i = 1:numel(overlaps)
     % calculate number of failures and their positions in the trajectory
@@ -56,16 +61,21 @@ for i = 1:numel(overlaps)
         points = [1, points(points <= numel(overlaps{i}))];
         
         for j = 1:numel(points)-1;
-            o = overlaps{i}(points(j):points(j+1));
-            o(isnan(o)) = 0;
+            o = overlaps{i}(points(j):points(j+1)); o(isnan(o)) = 0;
             fragments(f, :) = 0;
             fragments(f, 1:min(numel(o), fragments_length)) = o;
+            
+            o = practical{i}(points(j):points(j+1)); o(isnan(o)) = 0;
+            fpractical(f, :) = 0;
+            fpractical(f, 1:min(numel(o), fragments_length)) = o;
+            
             f = f + 1;
         end;
 
-        o = overlaps{i}(points(end):end);
-        o(isnan(o)) = 0;
+        o = overlaps{i}(points(end):end); o(isnan(o)) = 0;
         fragments(f, 1:min(numel(o), fragments_length)) = o;
+        o = practical{i}(points(end):end); o(isnan(o)) = 0;
+        fpractical(f, 1:min(numel(o), fragments_length)) = o;
         f = f + 1;
     else
     % process also last part of the trajectory - segment without failure
@@ -85,6 +95,7 @@ end
 w = ones(size(fragments, 1), 1);
 
 expected_overlaps = zeros(numel(lengths), 1);
+practical_difference = zeros(numel(lengths), 1);
 for e = 1:numel(expected_overlaps)
     len = lengths(e);
     % do not calculate for Ns == 1: overlap on first frame is always NaN
@@ -97,6 +108,7 @@ for e = 1:numel(expected_overlaps)
     
     % for each len get a single number - average overlap
     expected_overlaps(e) = sum(mean(fragments(usable, 2:len), 2) .* w(usable)) ./ sum(w(usable));
+    practical_difference(e) = sum(mean(fpractical(usable, 2:len), 2) .* w(usable)) ./ sum(w(usable));
 end
 
 evaluated_lengths = lengths;
@@ -135,8 +147,16 @@ switch (event.type)
                     
                     [~, failures] = estimate_failures(trajectory, sequence);
 
+                    practical = get_frame_value(sequence, 'practical');
+                    
                     context.failures{end+1} = failures;
                     context.overlaps{end+1} = frames;
+                    
+                    if isempty(practical)
+                        context.practical{end+1} = zeros(sequence.length, 1);
+                    else
+                        context.practical{end+1} = practical;
+                    end
                     
                 end;
 
