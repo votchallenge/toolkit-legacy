@@ -8,6 +8,8 @@ function handle = generate_plot(varargin)
 % - varargin[Visible] (boolean): Is the figure visible on the display.
 % - varargin[Width] (double): Figure width hint.
 % - varargin[Height] (double): Figure height hint.
+% - varargin[Box] (boolean): Enable axis box
+% - varargin[Grid] (boolean): Enable axis grid
 % - varargin[Handle] (handle): Plot on existing figure handle.
 % - varargin (other): Forward parameters to axis settings.
 %
@@ -19,6 +21,8 @@ function handle = generate_plot(varargin)
     visible = false;    
     width = 4;
     height = 4;
+    axis_box = true;
+    axis_grid = true;
     handle = [];
     axis_settings = {};
     
@@ -32,6 +36,10 @@ function handle = generate_plot(varargin)
                 width = varargin{i+1};
             case 'height'
                 height = varargin{i+1};
+            case 'box'
+                axis_box = varargin{i+1};
+            case 'grid'
+                axis_grid = varargin{i+1};
             case 'handle'
                 handle = varargin{i+1};
             otherwise 
@@ -50,7 +58,13 @@ function handle = generate_plot(varargin)
         figure(handle);
     end;
 
-    hold on; box on; grid on;
+    hold on; 
+    if axis_box
+        box on; 
+    end;
+    if axis_grid
+        grid on;
+    end
     
     if ~isempty(plot_title)
         title(plot_title, 'interpreter', 'none'); 

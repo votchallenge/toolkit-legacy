@@ -100,7 +100,7 @@ for e = 1:length(experiments)
     plot_id = sprintf('expected_overlaps_%s', experiments{e}.name);
 
     handle = generate_plot('Visible', false, ...
-        'Title', plot_title);
+        'Title', plot_title, 'Grid', false);
     
     hold on;
     
@@ -113,19 +113,24 @@ for e = 1:length(experiments)
 
     [ordered_scores, order] = sort(experiment_scores, 'descend');
 
+    phandles = zeros(numel(trackers), 1);
     for t = 1:numel(order)
         tracker = trackers{order(t)};
-        plot(t, ordered_scores(t), tracker.style.symbol, 'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
+        plot([t, t], [0, ordered_scores(t)], ':', 'Color', [0.8, 0.8, 0.8]);
+        if experiment_practical(t) > 0.001
+            draw_interval(t, ordered_scores(t), experiment_practical(t), experiment_practical(t), ':', 'Color', [0.6, 0.6, 0.6]);            
+        end
+        phandles(t) = plot(t, ordered_scores(t), tracker.style.symbol, 'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
     end;
 
     if ~hidelegend
-        legend(cellfun(@(x) x.label, trackers(order), 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
+        legend(phandles, cellfun(@(x) x.label, trackers(order), 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
     end;
     
     xlabel('Order');
     ylabel('Average expected overlap');
     xlim([1, numel(trackers)]); 
-    set(gca, 'XTick', 1:numel(trackers));
+    set(gca, 'XTick', 1:5:numel(trackers));
     set(gca, 'XDir', 'Reverse');
     ylim([0, 1]);
     
@@ -160,6 +165,12 @@ gmm.p = p;
 [low, high] = find_range(p, threshold) ;
 [~, peak] = max(p);
 
+end
+
+function draw_interval(x, y, low, high, varargin) 
+    plot([x - 0.1, x + 0.1], [y, y] - low, varargin{:});
+    plot([x - 0.1, x + 0.1], [y, y] + high, varargin{:});
+    plot([x, x], [y - low, y + high], varargin{:});
 end
 
 function [low, high] = find_range(p, density)
