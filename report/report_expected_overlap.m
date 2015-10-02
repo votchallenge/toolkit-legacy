@@ -11,6 +11,7 @@ function [document, scores] = report_expected_overlap(context, trackers, sequenc
 % - varargin[UsePractical] (boolean): Use practical difference.
 % - varargin[UseLabels] (boolean): Rank according to labels (otherwise rank according to sequences).
 % - varargin[HideLegend] (boolean): Hide legend in plots.
+% - varargin[RangeThreshold] (double): Threshold used for range estimation.
 %
 % Output:
 % - document (structure): Resulting document structure.
@@ -20,6 +21,7 @@ function [document, scores] = report_expected_overlap(context, trackers, sequenc
 uselabels = get_global_variable('report_labels', true);
 usepractical = get_global_variable('report_ranking_practical', true);
 hidelegend = get_global_variable('report_legend_hide', false);
+range_threshold = 0.5;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
@@ -29,8 +31,10 @@ for i = 1:2:length(varargin)
             uselabels = varargin{i+1};
         case 'hidelegend'
             hidelegend = varargin{i+1};
+        case 'rangethreshold'
+            range_threshold = varargin{i+1};
         otherwise 
-            error(['Unknown switch ', varargin{i}, '!']) ;
+            error(['Unknown switch ', varargin{i}, '!']);
     end
 end 
 
@@ -52,6 +56,8 @@ for e = 1:length(experiments)
         sequences, 'uselabels', uselabels, 'usepractical', usepractical);
     results{e} = result;
   
+    [~, peak, low, high] = estimate_evaluation_interval(sequences, range_threshold);
+    
     for t = 1:numel(trackers)
         scores(e, t) = mean(results{e}.curves{t});
     end;
@@ -66,6 +72,10 @@ for e = 1:length(experiments)
     
     hold on;
 
+    plot([peak, peak], [1, 0], '--', 'Color', [0.6, 0.6, 0.6]);
+    plot([low, low], [1, 0], ':', 'Color', [0.6, 0.6, 0.6]);
+    plot([high, high], [1, 0], ':', 'Color', [0.6, 0.6, 0.6]);
+    
     for t = 1:numel(trackers)
         plot(results{e}.lengths, results{e}.curves{t}, 'Color', trackers{t}.style.color);
     end;
@@ -94,7 +104,9 @@ for e = 1:length(experiments)
     hold on;
     
     weights = ones(numel(results{e}.lengths(:)), 1);
-    
+    weights(:) = 0;
+    weights(low:high) = 1;
+
     experiment_scores = cellfun(@(x) sum(x(:) .* weights) / sum(weights), results{e}.curves, 'UniformOutput', true);
 
     [ordered_scores, order] = sort(experiment_scores, 'descend');
@@ -123,8 +135,67 @@ for e = 1:length(experiments)
     
     scores(e, :) = experiment_scores;
     
+    document.text('Scores calculated as an average over interval %d to %d', low, high);
+    
 end;
 
 document.write();
+
+end
+
+function [gmm, peak, low, high] = estimate_evaluation_interval(sequences, threshold)
+
+sequence_lengths = cellfun(@(x) x.length, sequences, 'UniformOutput', true);
+model = gmm_estimate(sequence_lengths); % estimate the pdf by KDE
+ 
+% tabulate the GMM from zero to max length
+x = 1:max(sequence_lengths) ;
+p = gmm_evaluate(model, x) ;
+p = p / sum(p); 
+gmm.x = x;
+gmm.p = p;
+
+[low, high] = find_range(p, threshold) ;
+[~, peak] = max(p);
+
+end
+
+function [low, high] = find_range(p, density)
+
+% find maximum on the KDE
+[~, x_max] = max(p);
+low = x_max ;
+high = x_max ;
+
+for i = 0:length(p)
+    x_lo_tmp = low - 1 ;
+    x_hi_tmp = high + 1 ;
+    
+    sw_lo = 0 ; sw_hi = 0 ; % boundary indicator
+    % clip
+    if x_lo_tmp <= 0 , x_lo_tmp = 1 ;  sw_lo = 1 ; end
+    if x_hi_tmp >= length(p), x_hi_tmp = length(p); sw_hi = 1; end
+    
+    % increase left or right boundary
+    if sw_lo==1 && sw_hi==1
+        low = x_lo_tmp ;
+        high = x_hi_tmp ;
+        break ;
+    elseif sw_lo==0 && sw_hi==0
+        if p(x_lo_tmp) > p(x_hi_tmp)
+            low = x_lo_tmp ;
+        else
+            high = x_hi_tmp ;
+        end
+    else
+        if sw_lo==0, low = x_lo_tmp ; else high = x_hi_tmp ; end
+    end
+    
+    % check the integral under the range
+    s_p = sum(p(low:high)) ;
+    if s_p >= density
+        return ;
+    end
+end            
 
 end
