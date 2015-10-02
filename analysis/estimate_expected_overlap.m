@@ -83,8 +83,10 @@ for i = 1:numel(overlaps)
             % tracker did not fail on this sequence and it is longer than
             % observed interval
             fragments(f, :) = overlaps{i}(1:fragments_length);
+            fpractical(f, :) = practical{i}(1:fragments_length);
         else
-            fragments(f, 1:numel(overlaps{i})) = overlaps{i};            
+            fragments(f, 1:numel(overlaps{i})) = overlaps{i};
+            fpractical(f, 1:numel(practical{i})) = practical{i};
         end
         f = f + 1;
     end
