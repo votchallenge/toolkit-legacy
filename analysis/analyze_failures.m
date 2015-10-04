@@ -50,7 +50,7 @@ function [failure_histograms] = analyze_failures(experiment, trackers, sequences
                 end;
                 
                 [~, failures] = estimate_failures(trajectory, experiment_sequences{s});
-                
+                failures = failures(failures <= experiment_sequences{s}.length);
                 failure_histogram(t, failures) = failure_histogram(t, failures) + 1;
 
             end;
