@@ -25,7 +25,7 @@ function [document, averaged_ranks] = report_ranking(context, trackers, sequence
 
 uselabels = get_global_variable('report_labels', true);
 usepractical = get_global_variable('report_ranking_practical', true);
-orderingplot = get_global_variable('report_ranking_ordering', false);
+orderingplot = get_global_variable('report_ranking_ordering', true);
 hidelegend = get_global_variable('report_legend_hide', false);
 arplot = get_global_variable('report_ranking_arplot', true);
 average = get_global_variable('report_ranking_average', 'weighted_mean');
