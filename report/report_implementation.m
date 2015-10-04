@@ -52,10 +52,8 @@ tabledata(:, 7) = cellfun(@(x) iff(x.trax, 'Yes', 'No'), trackers, 'UniformOutpu
 
 print_text('Gathering other information ...');
 
-
-
 for t = 1:numel(trackers)
-    cache_identifier = sprintf('result_analysis_%s_%s.mat', trackers{t}.identifiers, sequences_hash);
+    cache_identifier = sprintf('result_analysis_%s_%s.mat', trackers{t}.identifier, sequences_hash);
     aggregated.completed = true;
     aggregated.deterministic = true;
     aggregated = report_cache(context, cache_identifier, @iterate, experiments, ...
