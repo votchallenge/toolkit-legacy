@@ -141,6 +141,7 @@ switch lower(methodology)
         score_sorting_overall = 'ascending';
         sort_direction = 'ascend';
         score_weights = [0.5, 0.5];
+        score_format = '%.2f';
     case 'vot2015'
         scores = expected_overlap_scores;
         score_labels = {'Expected overlap'};
@@ -148,6 +149,7 @@ switch lower(methodology)
         score_sorting_overall = 'descending';
         sort_direction = 'descend';
         score_weights = 1;
+        score_format = '%.4f';
     otherwise 
         error(['Unknown methodology ', methodology, '!']) ;
 end
@@ -179,6 +181,6 @@ overall_ranking_data = num2cell(overall_scores);
 tabledata = cat(1, experiments_ranking_data, overall_ranking_data')';
 tabledata = highlight_best_rows(tabledata, cat(2, repmat(score_sorting_partial, 1, numel(experiments)), {score_sorting_overall}));
 
-document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
+document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order), 'format', score_format);
 
 document.write();
