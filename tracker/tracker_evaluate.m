@@ -42,7 +42,7 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
             otherwise, error(['unrecognized argument ' varargin{j}]);
         end
     end
-
+  
     mkpath(directory);
 
     % In case of scanning we enable chaching so that results do not get re-evaluated
@@ -50,6 +50,8 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
         cache = true;
     end;
 
+    check_deterministic = ~(scan && nargout < 2); % Ensure faster execution when we only want a list of files by ommiting determinisim check.
+    
     switch type
     case 'supervised'
 
@@ -61,7 +63,7 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
 
         times = zeros(sequence.length, context.repetitions);
 
-        if cache && exist(time_file, 'file')
+        if ~scan && cache && exist(time_file, 'file')
             times = csvread(time_file);
         end;
 
@@ -74,7 +76,7 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
                 continue;
             end;
 
-            if i == 4 && is_deterministic(sequence, 3, directory)
+            if check_deterministic && i == 4 && is_deterministic(sequence, 3, directory)
                 if ~silent
                     print_debug('Detected a deterministic tracker, skipping remaining trials.');
                 end;
@@ -127,7 +129,7 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
 
         times = zeros(sequence.length, context.repetitions);
 
-        if cache && exist(time_file, 'file')
+        if ~scan && cache && exist(time_file, 'file')
             times = csvread(time_file);
         end;
 
@@ -140,7 +142,7 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
                 continue;
             end;
 
-            if i == 4 && is_deterministic(sequence, 3, directory)
+            if check_deterministic && i == 4 && is_deterministic(sequence, 3, directory)
                 if ~silent
                     print_debug('Detected a deterministic tracker, skipping remaining trials.');
                 end;
