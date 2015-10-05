@@ -28,13 +28,20 @@ end
 
 fullpath = [filename, '.', format];
 
+if isa(handle, 'function_handle')
+    autoclose = true;
+    cache = true;
+else
+    autoclose = false;
+end
+
 if cache && exist(fullpath, 'file') 
     return;
 end;
 
-if ~isnumeric(handle)
-   handle = handle(); 
-end
+if isa(handle, 'function_handle')
+    handle = handle();
+end;
 
 switch lower(format)
     case 'fig'
@@ -53,6 +60,10 @@ switch lower(format)
     otherwise
         error('Unknown format');
 end;
+
+if autoclose
+    close(handle);
+end
 
 end
 
