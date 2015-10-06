@@ -59,8 +59,8 @@ for t = 1:numel(trackers)
     aggregated.deterministic = true;
     aggregated = report_cache(context, cache_identifier, @iterate, experiments, ...
         trackers{t}, sequences, 'iterator', @aggregate_iterator, 'context', aggregated);
-    tabledata{t, 5} = iff(aggregated.deterministic, 'Yes', 'No');
-    tabledata{t, 6} = iff(aggregated.completed, 'Yes', 'No');
+    tabledata{t, 6} = iff(aggregated.deterministic, 'Yes', 'No');
+    tabledata{t, 7} = iff(aggregated.completed, 'Yes', 'No');
 end;
 
 tabledata(:, 1:2) = highlight_best_rows(tabledata(:, 1:2),  {'descend', 'descend'});
@@ -89,7 +89,7 @@ end
 
 function envirionment = get_environment(tracker)
 
-    if isfield(tracker, 'metadata')
+    if isfield(tracker.metadata, 'environment')
         envirionment = tracker.metadata.environment;
     else
         envirionment = 'unknown';
