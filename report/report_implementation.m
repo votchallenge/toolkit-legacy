@@ -40,15 +40,16 @@ print_indent(-1);
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', false);
 
-column_labels = {'Normalized speed', 'Raw speed', 'Platform', 'Interpreter', 'Deterministic', 'Complete', 'TraX'};
+column_labels = {'Normalized speed', 'Raw speed', 'Platform', 'Interpreter', 'Environment', 'Deterministic', 'Complete', 'TraX'};
 
-tabledata = cell(numel(trackers), 5);
+tabledata = cell(numel(trackers), 8);
 
 tabledata(:, 1) = num2cell(averaged_normalized);
 tabledata(:, 2) = num2cell(averaged_original);
 tabledata(:, 3) = cellfun(@get_platform, trackers, 'UniformOutput', false);
 tabledata(:, 4) = cellfun(@get_interpreter, trackers, 'UniformOutput', false);
-tabledata(:, 7) = cellfun(@(x) iff(x.trax, 'Yes', 'No'), trackers, 'UniformOutput', false);
+tabledata(:, 5) = cellfun(@get_environment, trackers, 'UniformOutput', false);
+tabledata(:, 8) = cellfun(@(x) iff(x.trax, 'Yes', 'No'), trackers, 'UniformOutput', false);
 
 print_text('Gathering other information ...');
 
@@ -83,6 +84,15 @@ function interpreter = get_interpreter(tracker)
         interpreter = tracker.interpreter;
     else
         interpreter = '';
+    end
+end
+
+function envirionment = get_environment(tracker)
+
+    if isfield(tracker, 'metadata')
+        envirionment = tracker.metadata.environment;
+    else
+        envirionment = 'unknown';
     end
 end
 
