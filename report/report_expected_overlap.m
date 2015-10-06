@@ -19,7 +19,7 @@ function [document, scores] = report_expected_overlap(context, trackers, sequenc
 %
 
 uselabels = get_global_variable('report_labels', true);
-usepractical = get_global_variable('report_ranking_practical', true);
+usepractical = false;
 hidelegend = get_global_variable('report_legend_hide', false);
 range_threshold = 0.5;
 
