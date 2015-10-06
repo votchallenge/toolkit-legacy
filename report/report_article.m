@@ -88,18 +88,28 @@ switch lower(methodology)
     case {'vot2013', 'vot2014'}
         scores = ranks_scores;
         score_labels = {'Acc. Rank', 'Rob. Rank'};
+        score_sorting_partial = {'ascending', 'ascending'};
+        score_sorting_overall = 'ascending';
+        sort_direction = 'ascend';
         score_weights = [0.5, 0.5];
+        score_format = '%.2f';
     case 'vot2015'
         scores = expected_overlap_scores;
         score_labels = {'Expected overlap'};
+        score_sorting_partial = {'descending'};
+        score_sorting_overall = 'descending';
+        sort_direction = 'descend';
         score_weights = 1;
+        score_format = '%.4f';
+    otherwise 
+        error(['Unknown methodology ', methodology, '!']) ;
 end
 
 N_scores = numel(score_labels);
 combined_scores = squeeze(mean(scores, 1));
 
 overall_scores = bsxfun(@prod, combined_scores, score_weights) ./ sum(score_weights);
-[~, order] = sort(overall_scores, 'ascend')  ;
+[~, order] = sort(overall_scores, sort_direction);
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
 
@@ -117,13 +127,11 @@ experiments_ranking_data = num2cell(experiments_ranking_data);
 overall_ranking_data = num2cell(overall_scores);
 
 tabledata = cat(1, experiments_ranking_data, overall_ranking_data)';
-ordering = repmat({'ascending'}, 1, numel(experiments) * N_scores + 1);
-
-tabledata = highlight_best_rows(tabledata, ordering);
+tabledata = highlight_best_rows(tabledata, cat(2, repmat(score_sorting_partial, 1, numel(experiments)), {score_sorting_overall}));
 
 document.section('Ranking');
 
-document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
+document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order), 'format', score_format);
 
 document.link(ranking_document.url, 'Detailed ranking results');
 
