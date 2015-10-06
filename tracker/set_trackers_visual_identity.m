@@ -36,7 +36,7 @@ else
     colors = repmat(hsv(7), ceil(length(trackers) / 7), 1);
 end
 
-symbol = repmat({'o', 'x', '*', 'v', 'd', '+', '<', 'p', '>'}, 1, ceil(length(trackers) / 9));
+symbol = repmat({'o', 'x', '*', 'v', 'd', '+', '<', 'p', '>', 's', '^', 'h'}, 1, ceil(length(trackers) / 9));
 width = mod(1:length(trackers), 5) / 5 + 1.5;
 
 styled_trackers = cell(length(trackers), 1);
