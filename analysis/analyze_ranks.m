@@ -244,6 +244,9 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
 
 	print_indent(-1);  
 
+    average_accuracy(isnan(average_accuracy)) = 0;
+            
+    
 end
 
 function [ha, hr] = test_significance(A1, R1, A2, R2, alpha, practical)
@@ -273,7 +276,7 @@ function [ha, hr] = test_significance(A1, R1, A2, R2, alpha, practical)
     dif = dif(valid) ;
     if (length(dif) < 25)
         print_text('Warning: less than 25 samples when comparing trackers. Cannot reject hypothesis');
-        ha = 0;
+        ha = 1;
     else
         if (is_octave)
             try
