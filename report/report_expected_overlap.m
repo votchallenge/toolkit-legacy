@@ -144,6 +144,67 @@ for e = 1:length(experiments)
     
     document.text('Scores calculated as an average over interval %d to %d', low, high);
     
+    
+    experiments_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, experiments, 'UniformOutput', false)), '-'), 'Char', 'hex');
+    sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
+    trackers_hash = md5hash(strjoin(sort(cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
+
+    cache_identifier = sprintf('speed_%s_%s_%s.mat', experiments_hash, trackers_hash, sequences_hash);
+
+    speed = report_cache(context, cache_identifier, @analyze_speed, experiments, trackers, sequences, 'cache', context.cachedir);
+
+    averaged_normalized = squeeze(mean(mean(speed.normalized, 3), 1));
+    
+    plot_title = sprintf('Expected overlap scores vs. speed for %s', experiments{e}.name);
+    plot_id = sprintf('expected_overlaps_speed_%s', experiments{e}.name);
+    
+    handle = generate_plot('Visible', false, ...
+        'Title', plot_title, 'Grid', false);
+    
+    hold on;
+    
+    % In order to keep results in perspective we draw the speed in
+    % logarithmic scale. The middle line is fitted to point where EFO = 20
+    % (approximated real-time threshold).
+    
+    real_time_threshold = 20;
+    
+    speed_scaling_constant = -log(0.5) * real_time_threshold;
+    plot([real_time_threshold, real_time_threshold], [1, 0], '--', 'Color', [0.6, 0.6, 0.6]);
+    
+    phandles = zeros(numel(trackers), 1);
+    for t = 1:numel(trackers)
+        tracker = trackers{t};
+        
+%         phandles(t) = plot(exp(-speed_scaling_constant / averaged_normalized(t)), ...
+%             experiment_scores(t), tracker.style.symbol, ...
+%             'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
+        phandles(t) = plot(averaged_normalized(t), ...
+            experiment_scores(t), tracker.style.symbol, ...
+            'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
+
+    end;
+
+    if ~hidelegend
+        legend(phandles, cellfun(@(x) x.label, trackers, 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
+    end;
+    
+    xlabel('Normalized speed (EFO)');
+    ylabel('Average expected overlap');
+    
+    ylim([0, 1]);
+    set(gca, 'XScale', 'log');
+    xlim([0, ceil(max(averaged_normalized) / 100) * 100]);
+    %speed_ticks = real_time_threshold * 3.^(-2:2);
+    %set(gca, 'XTick', exp(-speed_scaling_constant ./ speed_ticks));
+    %set(gca, 'XTickLabel', cellfun(@(x) sprintf('%.0f', x), num2cell(speed_ticks), 'UniformOutput', false));
+    
+    hold off;
+    
+    document.figure(handle, plot_id, plot_title);
+    
+    close(handle);
+    
 end;
 
 document.write();
