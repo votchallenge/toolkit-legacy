@@ -88,7 +88,7 @@ print_indent(-1);
 print_text('Expected overlap report ...'); print_indent(1);
 
 [expected_overlap_document, expected_overlap_scores] = report_expected_overlap(context, trackers, sequences, experiments, ...
-    'uselabels', true, 'usepractical', true, 'hidelegend', master_legend);
+    'uselabels', true, 'usepractical', false, 'hidelegend', master_legend);
 
 print_indent(-1);
 

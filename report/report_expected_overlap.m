@@ -117,7 +117,7 @@ for e = 1:length(experiments)
     for t = 1:numel(order)
         tracker = trackers{order(t)};
         plot([t, t], [0, ordered_scores(t)], ':', 'Color', [0.8, 0.8, 0.8]);
-        if experiment_practical(t) > 0.001
+        if experiment_practical(t) > 0.001 && usepractical
             draw_interval(t, ordered_scores(t), experiment_practical(t), experiment_practical(t), 'Color', [0.6, 0.6, 0.6]);            
         end
         phandles(t) = plot(t, ordered_scores(t), tracker.style.symbol, 'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
