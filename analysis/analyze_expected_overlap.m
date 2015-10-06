@@ -78,7 +78,7 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
             estimate_expected_overlap(trackers{i}, experiment, experiment_sequences, 'Lengths', lengths);
         
         if ~isempty(cache_file)
-            save(cache_file, 'evaluated_lengths', 'expected_overlaps');
+            save(cache_file, 'evaluated_lengths', 'expected_overlaps', 'practical_difference');
         end
         
         result.curves{i} = expected_overlaps;
