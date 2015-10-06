@@ -105,7 +105,7 @@ for file = dir(fullfile(directory, '*.label'))'
     end;
 
     if size(data, 1) < sequence.length
-        data(end:sequence.length) = 0;
+        data(end+1:sequence.length) = 0;
     end;
     
     sequence.labels.names{end+1} = file.name(1:end-6);
