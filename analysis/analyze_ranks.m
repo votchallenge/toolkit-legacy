@@ -151,8 +151,8 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
     cacheA = cell(length(trackers), 1);
     cacheR = cell(length(trackers), 1);
     
-    HA = zeros(length(trackers)); % results of statistical testing
-    HR = zeros(length(trackers)); % results of statistical testing
+    HA = false(length(trackers)); % results of statistical testing
+    HR = false(length(trackers)); % results of statistical testing
 
     average_accuracy = nan(length(trackers), 1);
     average_failures = nan(length(trackers), 1);
@@ -184,6 +184,7 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
             available(t1) = false;
 			HA(t1, :) = true; HA(:, t1) = true;
 			HR(t1, :) = true; HR(:, t1) = true;
+            HA(t1, t1) = false; HR(t1, t1) = false;
             continue; 
         end
         
