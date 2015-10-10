@@ -20,6 +20,7 @@ function handle = generate_trackers_legend(trackers, varargin)
     width = [];
     height = [];
     handle = [];
+    sorted = false;
     
     columns = 1;
     rows = numel(trackers); 
@@ -39,6 +40,8 @@ function handle = generate_trackers_legend(trackers, varargin)
                 columns = varargin{i+1};
             case 'rows'
                 rows = varargin{i+1};
+            case 'sorted'
+                sorted = varargin{i+1};
             otherwise 
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
@@ -66,6 +69,12 @@ function handle = generate_trackers_legend(trackers, varargin)
 
     hold on; 
 
+    if sorted
+        labels = cellfun(@(x) lower(x.label), trackers, 'UniformOutput', false);
+        [~, order] = sort(labels);
+        trackers = trackers(order);
+    end
+    
     for t = 1:length(trackers)
 
         plot(X(t), Y(t), trackers{t}.style.symbol, 'Color', ...
