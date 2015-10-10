@@ -27,15 +27,15 @@ labels = {'first', 'second', 'third'};
 
 for i = 1:numel(columns)
 
-    values = cell2mat(tabledata(:, i));
-    usable = find(~isnan(values));
-
     switch lower(columns{i})
         case 'descending'
-
+            values = cell2mat(tabledata(:, i));
+            usable = find(~isnan(values));
             levels = sort(unique(values(usable)), 'descend');
 
         case 'ascending'
+            values = cell2mat(tabledata(:, i));
+            usable = find(~isnan(values));
             levels = sort(unique(values(usable)), 'ascend');
 
         otherwise
