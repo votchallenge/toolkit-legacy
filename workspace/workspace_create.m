@@ -134,6 +134,9 @@ generate_from_template(fullfile(directory, 'run_browse.m'), ...
 generate_from_template(fullfile(directory, 'run_analysis.m'), ...
     fullfile(templates_directory, 'run_analysis.tpl'), variables{:});
 
+generate_from_template(fullfile(directory, 'run_visualization.m'), ...
+    fullfile(templates_directory, 'run_visualization.tpl'), variables{:});
+
 
 native_dir = fullfile(get_global_variable('toolkit_path'), 'native');
 mkpath(native_dir);
