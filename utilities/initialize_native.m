@@ -108,7 +108,10 @@ else
   trax_hash = '';
 end;
 
-%rmpath(native_dir);
+% Remove the native directory from the path
+if exist('read_trajectory', 'file') == 3
+    rmpath(native_dir);
+end
 
 try 
     
@@ -172,7 +175,8 @@ else
     return;
 end
 
-if exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 2
+if exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 2 || ...
+    exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 3
     set_global_variable('trax_mex', fullfile(native_dir, 'mex'));
 else
     return;

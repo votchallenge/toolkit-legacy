@@ -59,12 +59,8 @@ for e = 1:length(experiments)
     result = report_cache(context, cache_identifier, @analyze_ranks, experiments{e}, trackers, ...
         sequences, 'labels', labels, 'usepractical', usepractical, ...
         'alpha', alpha, 'adaptation', adaptation);
-
-    if isfield(experiments{e}, 'labels') && uselabels
-        selector_labels = experiments{e}.labels;
-    else
-        selector_labels = cellfun(@(x) x.name, sequences, 'UniformOutput', 0);
-    end
+    
+    selector_labels = result.labels;
 
     median_accuracy = nanmedian(result.accuracy.values, 2);
     median_robustness = nanmedian(result.robustness.normalized, 2);
