@@ -16,7 +16,8 @@ function selectors = create_label_selectors(experiment, sequences, labels) %#ok<
         'title', label, ...
         'aggregate', @(experiment, tracker, sequences) ...
         aggregate_for_label(experiment, tracker, sequences, label), ...
-        'practical', @(sequences) practical_for_label(sequences, label), 'length', @(sequences) count_for_label(sequences, label)), ...
+        'practical', @(sequences) practical_for_label(sequences, label), ...
+        'length', @(sequences) count_for_label(sequences, label)), ...
         labels, 'UniformOutput', false);
 
 end
@@ -26,21 +27,26 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
     aggregated_overlap = [];
     aggregated_failures = [];
 
-    result_hash = calculate_results_fingerprint(tracker, experiment, sequences);
+    cache = get_global_variable('cache_selectors', true);
+    
+    if cache
+        result_hash = calculate_results_fingerprint(tracker, experiment, sequences);
+    
+        cache_directory = fullfile(get_global_variable('directory'), 'cache', 'selectors', tracker.identifier, experiment.name);
+        mkpath(cache_directory);
 
-    cache_directory = fullfile(get_global_variable('directory'), 'cache', 'selectors', tracker.identifier, experiment.name);
-    mkpath(cache_directory);
+        cache_file = fullfile(cache_directory, sprintf('label-%s-%s.mat', label, result_hash));
 
-    cache_file = fullfile(cache_directory, sprintf('label-%s-%s.mat', label, result_hash));
+        if exist(cache_file, 'file')
+            load(cache_file);
 
-    if exist(cache_file, 'file')
-        load(cache_file);
-
-        if ~isempty(aggregated_overlap) && ~isempty(aggregated_failures)
-            return;
+            if ~isempty(aggregated_overlap) && ~isempty(aggregated_failures)
+                return;
+            end;
         end;
-    end;
 
+    end;
+    
     repeat = experiment.parameters.repetitions;
     burnin = experiment.parameters.burnin;
 
@@ -103,7 +109,9 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
 
     end
 
-    save(cache_file, 'aggregated_overlap', 'aggregated_failures');
+    if cache
+        save(cache_file, 'aggregated_overlap', 'aggregated_failures');
+    end;
 
 end
 
