@@ -230,7 +230,7 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
             % If alpha is 0 then we disable the equivalence testing
             if alpha <= 0
             
-                ha = true; hr = true;
+                ha = true; hr = true; hp = 0;
                 
             else
                 
@@ -250,7 +250,7 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
     
 end
 
-function [ha, hr] = test_significance(A1, R1, A2, R2, alpha, practical)
+function [ha, hr, hp] = test_significance(A1, R1, A2, R2, alpha, practical)
 % test_significance Verify difference of A-R performance for two trackers
 %
 % Compare A-R performance of two trackers taking into account statistical
@@ -262,11 +262,14 @@ function [ha, hr] = test_significance(A1, R1, A2, R2, alpha, practical)
 % - A2 (double matrix): Per-frame accuracy for second tracker
 % - R2 (double matrix): Per-segment robustness for second tracker
 % - alpha (double): Confidence parameter
-% - practical (boolean): Take into account
+% - practical (boolean): Take into account practical difference for the
+% frames
 %
 % Output:
 % - ha (boolean): Is accuracy different
 % - hr (boolean): Is robustness different
+% - hp (number): Number of frames for which the practical difference test
+% was positive
 %
  
     % Testing accuracy significance
@@ -293,8 +296,11 @@ function [ha, hr] = test_significance(A1, R1, A2, R2, alpha, practical)
         end;
     end;               
 
+    hp = 0;
+    
     % Practical difference of accuracy
     if ~isempty(practical)
+        hp = sum(dif' < practical(valid));
         if abs(mean(dif' ./ practical(valid))) < 1
             ha = 0;
         end;
