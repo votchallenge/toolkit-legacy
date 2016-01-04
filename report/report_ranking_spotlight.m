@@ -10,7 +10,6 @@ function [document] = report_ranking_spotlight(context, trackers, sequences, exp
 % - experiments (cell): An array of experiment structures.
 % - spotlight (string): Identifier of a tracker in the input tracker set that will be spotlighted.
 % - varargin[UsePractical] (boolean): Use practical difference.
-% - varargin[UseLabels] (boolean): Rank according to labels (otherwise rank according to sequences).
 % - varargin[Average] (boolean): Averaging type.
 % - varargin[Alpha] (boolean): Statistical significance parameter.
 %
@@ -18,19 +17,14 @@ function [document] = report_ranking_spotlight(context, trackers, sequences, exp
 % - document (structure): Resulting document structure.
 %
 
-uselabels = false;
 usepractical = false;
-average = 'weighted_mean';
-alpha = 0.05;
+
+alpha = get_global_variable('report_ranking_alpha', 0.05);
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
         case 'usepractical'
             usepractical = varargin{i+1};
-        case 'uselabels'
-            uselabels = varargin{i+1};
-        case 'average'
-            average = varargin{i+1};
         case 'alpha'
             alpha = varargin{i+1}; 
         otherwise 
@@ -52,14 +46,14 @@ document = create_document(context, sprintf('ranking_spotlight_%s', spotlight_tr
 for e = 1:length(experiments)
 
     result = analyze_ranks(experiments{e}, trackers, ...
-        sequences, 'uselabels', uselabels, 'usepractical', usepractical, ...
-        'average', average, 'alpha', alpha, 'cache', context.cachedir);
+        sequences, 'usepractical', usepractical, ...
+        'alpha', alpha);
 
     document.section('Experiment %s', experiments{e}.name);
     
-    table = cell(numel(result.robustness.labels), 2);
+    table = cell(numel(result.labels), 2);
         
-    for i = 1:numel(result.robustness.labels)
+    for i = 1:numel(result.labels)
     
         [accuracy_description, accuracy_css] = categorize_order(result.accuracy.ranks(i, :), spotlight_index);
         [robustness_description, robustness_css] = categorize_order(result.robustness.ranks(i, :), spotlight_index);
@@ -69,7 +63,7 @@ for e = 1:length(experiments)
                         
     end
 
-    document.table(table, 'columnLabels', {'Accuracy', 'Robustness'}, 'rowLabels', result.robustness.labels');
+    document.table(table, 'columnLabels', {'Accuracy', 'Robustness'}, 'rowLabels', result.labels');
         
 end;
 

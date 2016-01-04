@@ -16,7 +16,8 @@ function selectors = create_label_selectors(experiment, sequences, labels) %#ok<
         'title', label, ...
         'aggregate', @(experiment, tracker, sequences) ...
         aggregate_for_label(experiment, tracker, sequences, label), ...
-        'practical', @(sequences) practical_for_label(sequences, label), 'length', @(sequences) count_for_label(sequences, label)), ...
+        'practical', @(sequences) practical_for_label(sequences, label), ...
+        'length', @(sequences) count_for_label(sequences, label)), ...
         labels, 'UniformOutput', false);
 
 end
@@ -26,21 +27,26 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
     aggregated_overlap = [];
     aggregated_failures = [];
 
-    result_hash = calculate_results_fingerprint(tracker, experiment, sequences);
+    cache = get_global_variable('cache_selectors', true);
+    
+    if cache
+        result_hash = calculate_results_fingerprint(tracker, experiment, sequences);
+    
+        cache_directory = fullfile(get_global_variable('directory'), 'cache', 'selectors', tracker.identifier, experiment.name);
+        mkpath(cache_directory);
 
-    cache_directory = fullfile(get_global_variable('directory'), 'cache', 'selectors', tracker.identifier, experiment.name);
-    mkpath(cache_directory);
+        cache_file = fullfile(cache_directory, sprintf('label-%s-%s.mat', label, result_hash));
 
-    cache_file = fullfile(cache_directory, sprintf('label-%s-%s.mat', label, result_hash));
+        if exist(cache_file, 'file')
+            load(cache_file);
 
-    if exist(cache_file, 'file')
-        load(cache_file);
-
-        if ~isempty(aggregated_overlap) && ~isempty(aggregated_failures)
-            return;
+            if ~isempty(aggregated_overlap) && ~isempty(aggregated_failures)
+                return;
+            end;
         end;
-    end;
 
+    end;
+    
     repeat = experiment.parameters.repetitions;
     burnin = experiment.parameters.burnin;
 
@@ -75,6 +81,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
             end;
 
             if (size(trajectory, 1) < size(groundtruth, 1))
+                print_debug('Warning: Trajectory too short. Expanding with empty frames.');
                 trajectory(end+1:length(groundtruth)) = {0};
             end;
 
@@ -87,26 +94,24 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
         end;
 
         frames = num2cell(accuracy, 1);
-        sequence_overlaps = cellfun(@(frame) mean(frame(~isnan(frame))), frames);
-        sequence_overlaps(isnan(sequence_overlaps)) = 0;
-        
-        failures(isnan(failures)) = mean(failures(~isnan(failures)));
+        sequence_overlaps = cellfun(@(frame) nanmean(frame), frames);
 
+        failures(isnan(failures)) = nanmean(failures);
         sequence_failures = failures';
 
         if ~isempty(sequence_overlaps)
-            aggregated_overlap = [aggregated_overlap, sequence_overlaps];
+            aggregated_overlap = [aggregated_overlap, sequence_overlaps]; %#ok<AGROW>
         end;
         
         if ~isempty(sequence_failures)
-            aggregated_failures = [aggregated_failures; sequence_failures];
+            aggregated_failures = [aggregated_failures; sequence_failures]; %#ok<AGROW>
         end;
 
     end
 
-	%average_failures = sum(average_failures);
-
-    save(cache_file, 'aggregated_overlap', 'aggregated_failures');
+    if cache
+        save(cache_file, 'aggregated_overlap', 'aggregated_failures');
+    end;
 
 end
 

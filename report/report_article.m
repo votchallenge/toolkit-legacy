@@ -9,9 +9,6 @@ function [document] = report_article(context, experiments, trackers, sequences, 
 % - trackers (cell): An array of tracker structures.
 % - sequences (cell): An array of sequence structures.
 % - experiments (cell): An array of experiment structures.
-% - varargin[OrderingPlot] (boolean): Generate ordering plots.
-% - varargin[ARPlot] (boolean): Generate A-R plots.
-% - varargin[CombineWeight] (double): Averaging factor between 0 and 1 for combining accuracy and robustness ranking.
 % - varargin[Spotlight] (string): Identifier of a tracker that is in the spotlight of the analysis.
 % - varargin[MasterLegend] (boolean): Use a single master legend instead of including it .
 %
@@ -19,24 +16,18 @@ function [document] = report_article(context, experiments, trackers, sequences, 
 % - document (structure): Resulting document structure.
 %
 
-arplot = true;
-orderingplot = false;
-ratio = 0.5;
 spotlight = [];
 master_legend = true;
+methodology = 'vot2015';
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
-        case 'arplot'
-            arplot = varargin{i+1};
-        case 'orderingplot'
-            orderingplot = varargin{i+1};
-        case 'combineweight'
-            ratio = varargin{i+1};
         case 'spotlight'
             spotlight = varargin{i+1};
         case 'masterlegend'
             master_legend = varargin{i+1};
+        case 'methodology'
+            methodology = varargin{i+1};
         otherwise 
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
@@ -45,6 +36,15 @@ end
 if numel(trackers) < 2
     error('Ranking analysis requires two or more trackers.');
 end;
+
+switch lower(methodology)
+    case {'vot2013', 'vot2014'}
+        ranking_adaptation = 'mean';
+    case 'vot2015'
+        ranking_adaptation = 'best';
+    otherwise 
+        error(['Unknown methodology ', methodology, '!']) ;
+end
 
 document = create_document(context, 'article', 'title', 'VOT article report');
 
@@ -69,43 +69,73 @@ end;
 
 print_text('Ranking report ...'); print_indent(1);
 
-[ranking_document, ranks] = report_ranking(context, trackers, sequences, experiments, ...
-    'uselabels', false, 'usepractical', true, 'tableformat', 'fragmented', ...
-    'tableorientation', 'selectors', ...
-    'arplot', arplot, 'orderingplot', orderingplot, 'hidelegend', master_legend);
+print_indent(1);
 
-combined_ranks = squeeze(mean(ranks, 1));
+[ranking_document, ranks_scores] = report_ranking(context, trackers, sequences, experiments, ...
+    'uselabels', false, 'usepractical', true, 'adaptation', ranking_adaptation, ...
+    'hidelegend', master_legend);
 
-overall_ranks = ratio * combined_ranks(:, 1) + (1 - ratio) * combined_ranks(:, 2);
-[~, order] = sort(overall_ranks,'ascend')  ;
+print_indent(-1);
+
+print_indent(1);
+
+[expected_overlap_document, expected_overlap_scores] = report_expected_overlap(context, trackers, sequences, experiments, ...
+    'uselabels', true, 'usepractical', true);
+
+print_indent(-1);
+
+switch lower(methodology)
+    case {'vot2013', 'vot2014'}
+        scores = ranks_scores;
+        score_labels = {'Acc. Rank', 'Rob. Rank'};
+        score_sorting_partial = {'ascending', 'ascending'};
+        score_sorting_overall = 'ascending';
+        sort_direction = 'ascend';
+        score_weights = [0.5, 0.5];
+        score_format = '%.2f';
+    case 'vot2015'
+        scores = expected_overlap_scores;
+        score_labels = {'Expected overlap'};
+        score_sorting_partial = {'descending'};
+        score_sorting_overall = 'descending';
+        sort_direction = 'descend';
+        score_weights = 1;
+        score_format = '%.4f';
+    otherwise 
+        error(['Unknown methodology ', methodology, '!']) ;
+end
+
+N_scores = numel(score_labels);
+combined_scores = squeeze(mean(scores, 1));
+
+overall_scores = bsxfun(@prod, combined_scores, score_weights) ./ sum(score_weights);
+[~, order] = sort(overall_scores, sort_direction);
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
 
-column_labels = cell(2, 2 * numel(experiments) + 3);
+column_labels = cell(2, N_scores * numel(experiments) + 1);
 
-ranking_labels = {'Acc. Rank', 'Rob. Rank'};
 column_labels(1, :) = repmat({struct()}, 1, size(column_labels, 2));
-column_labels(1, 1:2:end-4) = cellfun(@(x) struct('text', x.name, 'columns', 2), experiments,'UniformOutput',false);
-column_labels{1, end-3} = struct('text', '', 'columns', 4);
-column_labels(2, :) = [ranking_labels(repmat(1:length(ranking_labels), 1, numel(experiments) + 1)), {'Rank'}];
+column_labels(1, 1:N_scores:end-1) = cellfun(@(x) struct('text', x.name, 'columns', N_scores), experiments,'UniformOutput',false);
+column_labels(2, :) = [score_labels(repmat(1:length(score_labels), 1, numel(experiments))), {'Overall'}];
 
-experiments_ranking_data = zeros(2 * numel(experiments), numel(trackers));
-experiments_ranking_data(1:2:end) = ranks(:, :, 1);
-experiments_ranking_data(2:2:end) = ranks(:, :, 2);
+experiments_ranking_data = zeros(N_scores * numel(experiments), numel(trackers));
+for i = 1:N_scores
+    experiments_ranking_data(1:i:end) = scores(:, :, i);
+end
 experiments_ranking_data = num2cell(experiments_ranking_data);
-
-overall_ranking_data = num2cell(cat(2, combined_ranks, overall_ranks)');
+overall_ranking_data = num2cell(overall_scores);
 
 tabledata = cat(1, experiments_ranking_data, overall_ranking_data)';
-
-ordering = repmat({'ascending'}, 1, numel(experiments) * 2 + 3);
-tabledata = highlight_best_rows(tabledata, ordering);
+tabledata = highlight_best_rows(tabledata, cat(2, repmat(score_sorting_partial, 1, numel(experiments)), {score_sorting_overall}));
 
 document.section('Ranking');
 
-document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order));
+document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order), 'format', score_format);
 
 document.link(ranking_document.url, 'Detailed ranking results');
+
+document.link(expected_overlap_document.url, 'Detailed expected overlap results');
 
 if ~isempty(spotlight)
     print_text('WARNING: The spotlight feature is not complete and does not work as planned.');
@@ -116,11 +146,11 @@ if ~isempty(spotlight)
 
         document.section('Hightlights for tracker %s');
 
-        spotlight_document = report_ranking_spotlight(context, trackers, sequences, experiments, spotlight,  'uselabels', false, 'usepractical', true);
+        spotlight_document = report_ranking_spotlight(context, trackers, sequences, experiments, spotlight, 'usepractical', true);
 
         document.link(spotlight_document.url, 'Detailed spotlight results');
 
-        % TODO: hightlight for tracker
+        % TODO: hightlights for tracker
     end;
 
 end;

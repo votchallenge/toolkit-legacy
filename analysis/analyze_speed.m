@@ -1,4 +1,4 @@
-function [normalized, original] = analyze_speed(experiments, trackers, sequences, varargin)
+function result = analyze_speed(experiments, trackers, sequences, varargin)
 % analyze_speed Perform speed analysis
 %
 % Perform speed analysis on a set of experiments, trackers, and sequences. Returns 
@@ -8,42 +8,15 @@ function [normalized, original] = analyze_speed(experiments, trackers, sequences
 % - experiments (cell): A cell array of valid experiment structures.
 % - trackers (cell): A cell array of valid tracker descriptors.
 % - sequences (cell): A cell array of valid sequence descriptors.
-% - varargin[Cache] (string): Cache directory.
 %
 % Output:
-% - normalized (double matrix): Normalized speed.
-% - original (double matrix): Raw speed.
+% - result (struct):
+%     - normalized (double matrix): Normalized speed.
+%     - original (double matrix): Raw speed.
 %
 
-cache = fullfile(get_global_variable('directory'), 'cache');
-
-for i = 1:2:length(varargin)
-    switch lower(varargin{i})          
-        case 'cache'
-            cache = varargin{i+1};                   
-        otherwise 
-            error(['Unknown switch ', varargin{i},'!']) ;
-    end
-end 
-
-experiments_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, experiments, 'UniformOutput', false)), '-'), 'Char', 'hex');
-sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
-trackers_hash = md5hash(strjoin(sort(cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
-mkpath(fullfile(cache, 'speed'));
-
-cache_file = fullfile(cache, 'speed', sprintf('%s_%s_%s.mat', experiments_hash, trackers_hash, sequences_hash));
 
 print_text('Performing speed analysis ...');
-
-if exist(cache_file, 'file') 
-        normalized = [];
-        original = [];
-        load(cache_file);
-        if ~isempty(normalized) && ~isempty(original)   
-            print_text('Loading speed results from cache.');
-            return;
-        end;
-end;
     
 normalized = nan(length(experiments), length(trackers), length(sequences));
 original = nan(length(experiments), length(trackers), length(sequences));
@@ -51,11 +24,6 @@ original = nan(length(experiments), length(trackers), length(sequences));
 result = struct('normalized', normalized, 'original', original);
 
 result = iterate(experiments, trackers, sequences, 'iterator', @speed_iterator, 'context', result);
-
-normalized = result.normalized;
-original = result.original;
-
-save(cache_file, 'normalized', 'original');
 
 end
 
@@ -135,11 +103,12 @@ function context = speed_iterator(event, context)
 			end;
 
             valid = any(times > 0, 1) & ~isnan(reliability)';
-            average_speed = mean(times(:, valid), 1)';   
+            average_speed = mean(times(:, valid), 1)';
             average_original = mean(average_speed);
             
             if isfield(event.tracker, 'performance')           
-                average_normalized = mean(normalize_speed(average_speed, failures(valid), event.experiment.parameters.skip_initialize, event.tracker, event.sequence));
+                average_normalized = mean(normalize_speed(average_speed, ...
+                    failures(valid), event.experiment.parameters.skip_initialize, event.tracker, event.sequence));
             else
 				average_normalized = NaN;
                 print_debug('Warning: No performance profile for tracker %s.', event.tracker.identifier);

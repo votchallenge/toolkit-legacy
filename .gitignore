@@ -2,9 +2,10 @@
 /native/
 cache/
 sequences/
-tracker/examples/c/camshift
-tracker/examples/c/static
-tracker/examples/cpp/static
+tracker/examples/native/build
+tracker/examples/native/ncc
+tracker/examples/native/static_c
+tracker/examples/native/static_cpp
 configuration.m
 /tracker_*.m
 run_analysis.m

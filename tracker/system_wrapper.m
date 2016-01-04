@@ -61,20 +61,29 @@ while start < sequence.length
             Tr(2:min(first_failure - start + 1, size(Tr, 1)));
 
         trajectory(first_failure) = {2};
-        start = first_failure + context.skip_initialize;
-                
-        print_debug('INFO: Detected failure at frame %d.', first_failure);
         
-        if ~isempty(context.skip_labels)
-            for i = start:sequence.length
-                if isempty(intersect(get_labels(sequence, i), context.skip_labels))
-                    start = i;
-                    break;
-                end;                
-            end;
-        end;
+        if context.skip_initialize > 0
 
-        print_debug('INFO: Reinitializing at frame %d.', start);
+            start = first_failure + context.skip_initialize;
+
+            print_debug('INFO: Detected failure at frame %d.', first_failure);
+
+            if ~isempty(context.skip_labels)
+                for i = start:sequence.length
+                    if isempty(intersect(get_labels(sequence, i), context.skip_labels))
+                        start = i;
+                        break;
+                    end;                
+                end;
+            end;
+
+            print_debug('INFO: Reinitializing at frame %d.', start);
+        
+        else
+            
+            break;
+
+        end;
     else
         
         if size(Tr, 1) > 1

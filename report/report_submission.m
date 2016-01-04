@@ -14,12 +14,6 @@ function [document] = report_submission(context, trackers, sequences, experiment
 % Output:
 % - document (structure): Resulting document structure.
 
-measures_labels = {'Overlap', 'Failures', 'Speed'};
-context.measures = {@(trajectory, sequence, experiment, tracker) ...
-    estimate_accuracy(trajectory, sequence, 'burnin', experiment.parameters.burnin), ...
-    @(trajectory, sequence, experiment, tracker) estimate_failures(trajectory, sequence), ...
-    @estimate_speed};
-
 if ~iscell(trackers)
     trackers = {trackers};
 end;
@@ -41,8 +35,13 @@ for t = 1:numel(trackers)
     
     for i = 1:numel(experiments)
         
+        row_labels = [sequence_labels; 'Average'];
+        
+        data = context.scores{i}.data;
+        data(end+1, :) = sum(bsxfun(@times, context.scores{i}.data, context.scores{i}.sequence_lengths')) ./ sum(context.scores{i}.sequence_lengths); %#ok<AGROW>
+        
         document.subsection('Experiment %s', experiments{i}.name);
-        document.table(context.scores{i}, 'columnLabels', measures_labels, 'rowLabels', sequence_labels, 'title', 'Scores');
+        document.table(data, 'columnLabels', context.scores{i}.labels, 'rowLabels', row_labels, 'title', 'Scores');
         
     end
     
@@ -59,13 +58,30 @@ switch (event.type)
         
         print_text('Experiment %s', event.experiment.name);
         
+        context.experiment_sequences = convert_sequences(context.sequences, event.experiment.converter);
+        
         switch event.experiment.type
             case 'supervised'
                 defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
                 context.experiment_parameters = struct_merge(event.experiment.parameters, defaults);
-                context.scores{event.experiment_index} = nan(numel(context.sequences), numel(context.measures));
+                context.scores{event.experiment_index}.labels = {'Overlap', 'Failures', 'Speed'};
+                context.scores{event.experiment_index}.measures = {@(trajectory, sequence, experiment, tracker) ...
+                    estimate_accuracy(trajectory, sequence, 'burnin', experiment.parameters.burnin), ...
+                    @(trajectory, sequence, experiment, tracker) estimate_failures(trajectory, sequence), ...
+                    @estimate_speed};
+                context.scores{event.experiment_index}.data = nan(numel(context.sequences), 3);
+            case 'chunked'
+                defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
+                context.experiment_parameters = struct_merge(event.experiment.parameters, defaults);
+                context.scores{event.experiment_index}.labels = {'Overlap', 'Speed'};
+                context.scores{event.experiment_index}.measures = {@(trajectory, sequence, experiment, tracker) ...
+                    estimate_accuracy(trajectory, sequence, 'burnin', experiment.parameters.burnin, 'IgnoreUnknown', false), ...
+                    @estimate_speed};
+                context.scores{event.experiment_index}.data = nan(numel(context.sequences), 2);
             otherwise, error(['unrecognized type ' type]);
         end
+        
+        context.scores{event.experiment_index}.sequence_lengths = cellfun(@(x) x.length, context.experiment_sequences, 'UniformOutput', true);
         
         print_indent(1);
     case 'experiment_exit'
@@ -74,15 +90,17 @@ switch (event.type)
         
     case 'sequence_enter'
         
-        print_text('Sequence %s', event.sequence.name);
+        sequence = context.experiment_sequences{event.sequence_index};
+        
+        print_text('Sequence %s', sequence.name);
         
         sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
-            event.sequence.name);
+            sequence.name);
         
         switch event.experiment.type
-            case 'supervised'
+            case {'supervised', 'chunked'}
                 
-                scores = nan(context.experiment_parameters.repetitions, numel(context.measures));
+                scores = nan(context.experiment_parameters.repetitions, numel(context.scores{event.experiment_index}.measures));
                 
                 for i = 1:context.experiment_parameters.repetitions
                     
@@ -92,20 +110,20 @@ switch (event.type)
                         continue;
                     end;
                     
-                    if i == 4 && is_deterministic(event.sequence, 3, sequence_directory)
+                    if i == 4 && is_deterministic(sequence, 3, sequence_directory)
                         print_debug('Detected a deterministic tracker, skipping remaining trials.');
                         break;
                     end;
                     
                     trajectory = read_trajectory(result_file);
                     
-                    for m = 1:numel(context.measures)
-                        scores(i, m) = context.measures{m}(trajectory, event.sequence, event.experiment, event.tracker);
+                    for m = 1:numel(context.scores{event.experiment_index}.measures)
+                        scores(i, m) = context.scores{event.experiment_index}.measures{m}(trajectory, sequence, event.experiment, event.tracker);
                     end;
                     
                 end;
                 
-                context.scores{event.experiment_index}(event.sequence_index, :) = nanmean(scores, 1);
+                context.scores{event.experiment_index}.data(event.sequence_index, :) = nanmean(scores, 1);
                 
             otherwise, error(['unrecognized type ' type]);
         end

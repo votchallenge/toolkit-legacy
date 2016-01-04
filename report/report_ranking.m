@@ -10,12 +10,12 @@ function [document, averaged_ranks] = report_ranking(context, trackers, sequence
 % - experiments (cell): An array of experiment structures.
 % - varargin[UsePractical] (boolean): Use practical difference.
 % - varargin[UseLabels] (boolean): Rank according to labels (otherwise rank according to sequences).
-% - varargin[OrderingPlot] (boolean): Generate ordering plots.
-% - varargin[ARPlot] (boolean): Generate A-R plots.
-% - varargin[Average] (boolean): Averaging type.
-% - varargin[Alpha] (boolean): Statistical significance parameter.
-% - varargin[TableFormat] (boolean): Table format.
-% - varargin[TableOrientation] (boolean): Table orientation.
+% - varargin[Average] (string): How to compute average rank.
+%     - weighted_mean: Average ranks, average values by taking into account length
+%     - mean: Average ranks, average values
+%     - pooled: gather all frames and compute ranking on a single combined sequence
+% - varargin[Alpha] (double): Statistical significance parameter.
+% - varargin[Adaptation] (string): Statistical significance parameter.
 % - varargin[HideLegend] (boolean): Hide legend in plots.
 %
 % Output:
@@ -25,15 +25,15 @@ function [document, averaged_ranks] = report_ranking(context, trackers, sequence
 
 uselabels = get_global_variable('report_labels', true);
 usepractical = get_global_variable('report_ranking_practical', true);
-orderingplot = get_global_variable('report_ranking_ordering', false);
+orderingplot = get_global_variable('report_ranking_ordering', true);
 hidelegend = get_global_variable('report_legend_hide', false);
 arplot = get_global_variable('report_ranking_arplot', true);
 average = get_global_variable('report_ranking_average', 'weighted_mean');
 adaptation = get_global_variable('report_ranking_adaptation', 'mean');
 sensitivity = get_global_variable('report_ranking_sensitivity', 30);
-alpha = 0.05;
-table_format = 'accrob'; % joined, rankscores, accrob, fragmented
-table_orientation = 'trackers'; % trackers, selectors, trackerscores, selectorscores
+alpha = get_global_variable('report_ranking_alpha', 0.05);
+table_format = get_global_variable('report_ranking_table_format', 'accrob'); % joined, rankscores, accrob, fragmented
+table_orientation = get_global_variable('report_ranking_table_orientation', 'trackers'); % trackers, selectors, trackerscores, selectorscores
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
@@ -41,18 +41,12 @@ for i = 1:2:length(varargin)
             usepractical = varargin{i+1};
         case 'uselabels'
             uselabels = varargin{i+1};
-        case 'orderingplot'
-            orderingplot = varargin{i+1};
-        case 'arplot'
-            arplot = varargin{i+1};
         case 'average'
             average = varargin{i+1};
         case 'alpha'
-            alpha = varargin{i+1}; 
-        case 'tableformat'
-            table_format = varargin{i+1};
-        case 'tableorientation'
-            table_orientation = varargin{i+1};
+            alpha = varargin{i+1};
+        case 'adaptation'
+            adaptation = varargin{i+1};
         case 'hidelegend'
             hidelegend = varargin{i+1};
         otherwise 
@@ -64,20 +58,98 @@ if numel(trackers) < 2
     error('Ranking analysis requires two or more trackers.');
 end;
 
+if ~any(strcmp(average, {'mean', 'weighted_mean', 'pooled'}))         
+   error('Unknown averaging technique "%s"!', average);
+end
 document = create_document(context, 'ranking', 'title', 'AR ranking');
 
 results = cell(length(experiments), 1);
 averaged_ranks = nan(length(experiments), length(trackers), 2);
 
+trackers_hash = md5hash(strjoin((cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
+parameters_hash = md5hash(sprintf('%f-%d-%d-%s', alpha, uselabels, usepractical, adaptation));
+    
 for e = 1:length(experiments)
 
-    [result] = analyze_ranks(experiments{e}, trackers, ...
-        sequences, 'uselabels', uselabels, 'usepractical', usepractical, ...
-        'average', average, 'alpha', alpha, 'cache', context.cachedir, 'adaptation', adaptation);
+    labels = {};
+    
+    if uselabels && isfield(experiments{e}, 'labels')
+        labels = union(experiments{e}.labels, {'all'});        
+        sequences_hash = md5hash(strjoin(labels, '-'), 'Char', 'hex');
+    else
+        sequences_hash = md5hash(strjoin((cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
+    end;
+    
+    cache_identifier = sprintf('ranking_%s_%s_%s_%s', experiments{e}.name, trackers_hash, sequences_hash, parameters_hash);
+
+    result = report_cache(context, cache_identifier, @analyze_ranks, experiments{e}, trackers, ...
+        sequences, 'labels', labels, 'usepractical', usepractical, ...
+        'alpha', alpha, 'adaptation', adaptation);
+
+    if uselabels
+        % When using labels we have inserted a separate one for this
+        mask = strcmp('label_all', result.labels);
+        
+        result.accuracy.pooled_values = result.accuracy.values(mask, :);
+        result.robustness.pooled_values = result.robustness.values(mask, :);
+        result.robustness.pooled_normalized = result.robustness.normalized(mask, :);
+        result.accuracy.pooled_ranks = result.accuracy.ranks(mask, :);
+        result.robustness.pooled_ranks = result.robustness.ranks(mask, :);
+
+        % Now remove the 'all' label from results
+        result.accuracy.values = result.accuracy.values(~mask, :);
+        result.accuracy.ranks = result.accuracy.ranks(~mask, :);
+        result.robustness.values = result.robustness.values(~mask, :);
+        result.robustness.normalized = result.robustness.normalized(~mask, :);
+        result.robustness.ranks = result.robustness.ranks(~mask, :);
+        result.lengths = result.lengths(~mask);
+        result.labels = result.labels(~mask); 
+        
+    end
+    
+    result.accuracy.weighted_mean_ranks = nanmean(result.accuracy.ranks, 1);
+    result.robustness.weighted_mean_ranks = nanmean(result.robustness.ranks, 1);
+
+    usable = result.lengths > 0;
+    result.accuracy.weighted_mean_values = sum(result.accuracy.values(usable, :) ...
+        .* repmat(result.lengths(usable), 1, length(trackers)), 1) ./ sum(result.lengths(usable));
+    result.robustness.weighted_mean_values = sum(result.robustness.values(usable, :) ...
+        .* repmat(result.lengths(usable), 1, length(trackers)), 1) ./ sum(result.lengths(usable));
+    result.robustness.weighted_mean_normalized = sum(result.robustness.normalized(usable, :) ...
+        .* repmat(result.lengths(usable), 1, length(trackers)), 1) ./ sum(result.lengths(usable));
+
+    result.accuracy.mean_ranks = nanmean(result.accuracy.ranks, 1);
+    result.robustness.mean_ranks = nanmean(result.robustness.ranks, 1);
+
+    result.accuracy.mean_values = nanmean(result.accuracy.values, 1);
+    result.robustness.mean_values = nanmean(result.robustness.values, 1);
+    result.robustness.mean_normalized = nanmean(result.robustness.normalized, 1);   
+
     results{e} = result;
-  
-    averaged_ranks(e, :, 1) = result.accuracy.average_ranks;
-    averaged_ranks(e, :, 2) = result.robustness.average_ranks;    
+
+    switch average
+
+        case 'weighted_mean'
+            
+            averaged_ranks(e, :, 1) = result.accuracy.weighted_mean_ranks;
+            averaged_ranks(e, :, 2) = result.robustness.weighted_mean_ranks;
+
+        case 'mean'
+            
+            averaged_ranks(e, :, 1) = result.accuracy.mean_ranks;
+            averaged_ranks(e, :, 2) = result.robustness.mean_ranks;
+
+        case 'pool'
+
+            if uselabels
+                averaged_ranks(e, :, 1) = result.accuracy.pooled_ranks;
+                averaged_ranks(e, :, 2) = result.robustness.pooled_ranks;
+            else
+                averaged_ranks(e, :, 1) = result.accuracy.weighted_mean_ranks;
+                averaged_ranks(e, :, 2) = result.robustness.weighted_mean_ranks;
+            end
+    end
+    
 end;
 
 overall_ranks = squeeze(mean(averaged_ranks, 1)); % Averaged per-label and per-experiment
@@ -109,46 +181,62 @@ for e = 1:length(experiments)
     document.section('Experiment %s', experiments{e}.name);
 
     if arplot
-    
-        plot_title = sprintf('Ranking plot for experiment %s', experiments{e}.name);
-        plot_id = sprintf('rankingplot_%s', experiments{e}.name);
 
-        hf = generate_ranking_plot(trackers, squeeze(averaged_ranks(e, :, 1)), ...
-            squeeze(averaged_ranks(e, :, 2)), ...
-            'title', plot_title, 'limit', numel(trackers), 'legend', ~hidelegend);
+        generate_ar_and_rank_plot(document, sprintf('%s_mean', experiments{e}.name), ...
+            sprintf('experiment %s (mean)', experiments{e}.name), ...
+            trackers, results{e}.accuracy.mean_ranks, ...
+            results{e}.robustness.mean_ranks, ...
+            results{e}.accuracy.mean_values, ...
+            results{e}.robustness.mean_normalized, sensitivity, hidelegend);
+        
+        generate_ar_and_rank_plot(document, sprintf('%s_weighted_mean', experiments{e}.name), ...
+            sprintf('experiment %s (weighted_mean)', experiments{e}.name), ...
+            trackers, results{e}.accuracy.weighted_mean_ranks, ...
+            results{e}.robustness.weighted_mean_ranks, ...
+            results{e}.accuracy.weighted_mean_values, ...
+            results{e}.robustness.weighted_mean_normalized, sensitivity, hidelegend);
 
-        document.figure(hf, plot_id, plot_title);
-
-        close(hf);
-
-        plot_title = sprintf('AR plot for experiment %s', experiments{e}.name);
-        plot_id = sprintf('arplot_%s', experiments{e}.name);
-
-        hf = generate_ar_plot(trackers, results{e}.accuracy.average_value, ...
-            results{e}.robustness.average_normalized, ...
-            'title', plot_title, 'sensitivity', sensitivity, 'legend', ~hidelegend);
-
-        document.figure(hf, plot_id, plot_title);
-
-        close(hf);
-
+        if uselabels
+           
+            generate_ar_and_rank_plot(document, sprintf('%s_pooled', experiments{e}.name), ...
+            sprintf('experiment %s (pooled)', experiments{e}.name), ...
+            trackers, results{e}.accuracy.pooled_ranks, ...
+            results{e}.robustness.pooled_ranks, ...
+            results{e}.accuracy.pooled_values, ...
+            results{e}.robustness.pooled_normalized, sensitivity, hidelegend);
+            
+        end
+        
     end;
     
-    if isfield(experiments{e}, 'labels') && uselabels
-        selector_labels = experiments{e}.labels;
-    else
-        selector_labels = cellfun(@(x) x.name, sequences, 'UniformOutput', 0);
-    end
+    selector_labels = results{e}.labels;
 
     score_labels = {'A-Rank', 'R-Rank', 'Overlap', 'Failures'};
     score_sorting = {'ascending', 'ascending', 'descending', 'ascending'};
-    scores = cat(3, [results{e}.accuracy.ranks', results{e}.accuracy.average_ranks'], ...
-        [results{e}.robustness.ranks', results{e}.robustness.average_ranks'], ...
-        [results{e}.accuracy.value', results{e}.accuracy.average_value'], ...
-        [results{e}.robustness.value', results{e}.robustness.average_value']);
+    scores = cat(3, results{e}.accuracy.ranks', ...
+        results{e}.robustness.ranks', ...
+        results{e}.accuracy.values', ...
+        results{e}.robustness.values');
+    scores = cat(2, scores, cat(3, results{e}.accuracy.mean_ranks', ...
+        results{e}.robustness.mean_ranks', ...
+        results{e}.accuracy.mean_values', ...
+        results{e}.robustness.mean_values'));
+    scores = cat(2, scores, cat(3, results{e}.accuracy.weighted_mean_ranks', ...
+        results{e}.robustness.weighted_mean_ranks', ...
+        results{e}.accuracy.weighted_mean_values', ...
+        results{e}.robustness.weighted_mean_values'));
     
     table_selector_labels = selector_labels;
-    table_selector_labels{end+1} = create_table_cell('Overall', 'class', 'average'); %#ok<AGROW>
+    table_selector_labels{end+1} = create_table_cell('Mean', 'class', 'average'); %#ok<AGROW>
+    table_selector_labels{end+1} = create_table_cell('Weighted mean', 'class', 'average'); %#ok<AGROW>
+    
+    if uselabels
+        scores = cat(2, scores, cat(3, results{e}.accuracy.pooled_ranks', ...
+            results{e}.robustness.pooled_ranks', ...
+            results{e}.accuracy.pooled_values', ...
+            results{e}.robustness.pooled_values'));
+        table_selector_labels{end+1} = create_table_cell('Pooled', 'class', 'average'); %#ok<AGROW>
+    end
     
     switch table_format
         case 'joined'
@@ -176,7 +264,7 @@ for e = 1:length(experiments)
 
         close(h);
 
-        h = generate_ordering_plot(trackers, results{e}.accuracy.value, selector_labels, ...
+        h = generate_ordering_plot(trackers, results{e}.accuracy.values, selector_labels, ...
             'scope', [0, 1], 'type', 'Overall overlap', 'legend', ~hidelegend);
         document.figure(h, sprintf('ordering_overlap_%s', experiments{e}.name), ...
             'Orderings for overall overlap');    
@@ -224,7 +312,7 @@ for e = 1:length(experiments)
                 selector_labels{l}, experiments{e}.name);
             plot_id = sprintf('arplot_%s_%s', experiments{e}.name, selector_labels{l});
 
-            hf = generate_ar_plot(trackers, results{e}.accuracy.value(l, :), ...
+            hf = generate_ar_plot(trackers, results{e}.accuracy.values(l, :), ...
                 results{e}.robustness.normalized(l, :), ...
                 'title', plot_title, 'sensitivity', sensitivity, 'legend', ~hidelegend);
 
@@ -333,4 +421,32 @@ function print_scores_table(document, scores, score_sorting, score_labels, track
 
     document.table(table_data, 'columnLabels', column_labels, 'rowLabels', row_labels, 'title', title);
 
+end
+
+function generate_ar_and_rank_plot(document, identifier, title, trackers, ...
+    accuracy_ranks, robustness_ranks, accuracy_values, ...
+    robustness_values, sensitivity, hidelegend)
+
+    plot_title = sprintf('Ranking plot for %s', title);
+    plot_id = sprintf('rankingplot_%s', identifier);
+
+    hf = generate_ranking_plot(trackers, accuracy_ranks, ...
+        robustness_ranks, ...
+        'title', plot_title, 'limit', numel(trackers), 'legend', ~hidelegend);
+
+    document.figure(hf, plot_id, plot_title);
+
+    close(hf);
+
+    plot_title = sprintf('AR plot for %s', title);
+    plot_id = sprintf('arplot_%s', identifier);
+
+    hf = generate_ar_plot(trackers, accuracy_values, ...
+        robustness_values, ...
+        'title', plot_title, 'sensitivity', sensitivity, 'legend', ~hidelegend);
+
+    document.figure(hf, plot_id, plot_title);
+
+    close(hf);
+    
 end

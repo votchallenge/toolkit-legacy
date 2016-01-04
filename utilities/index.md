@@ -36,3 +36,8 @@ Module functions
 -   [initialize_native](initialize_native.m) - Initialize all native components
 -   [compile_mex](compile_mex.m) - Compile given source files to a MEX function
 
+### Mathematics
+
+-   [gmm_estimate](gmm_estimate.m) - Estimates a GMM on a set of points
+-   [gmm_evaluate](gmm_evaluate.m) - Evaluates the GMM for a set of points
+

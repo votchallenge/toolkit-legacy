@@ -111,6 +111,11 @@ else
   trax_hash = '';
 end;
 
+% Remove the native directory from the path
+if exist('read_trajectory', 'file') == 3
+    rmpath(native_dir);
+end
+
 try 
     
     remote_hash = urlread(trax_hash_url);
@@ -165,13 +170,16 @@ end
 
 delpath(tempdir);
 
+rehash;
+
 if exist(fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')), 'file') == 2
     set_global_variable('trax_client', fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')));
 else
     return;
 end
 
-if exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 2
+if exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 2 || ...
+    exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 3
     set_global_variable('trax_mex', fullfile(native_dir, 'mex'));
 else
     return;

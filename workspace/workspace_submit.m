@@ -124,11 +124,11 @@ function context = gather_iterator(event, context)
             sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
                 event.sequence.name);
             
-            [files, completed] = tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
+            [files, metadata] = tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
                 'type', event.experiment.type, 'parameters', execution_parameters, 'scan', true);
 
             context.files = [context.files, files];
-            context.completed = context.completed && completed;
+            context.completed = context.completed && metadata.completed;
     end;
 
 end

@@ -85,9 +85,9 @@ Module functions
 -   [sequence_reverse](sequence_reverse.m) - Returns a reversed sequence
 -   [sequence_skipping](sequence_skipping.m) - Returns sequence with skipped frames
 -   [sequence_transform_initialization](sequence_transform_initialization.m) - Returns sequence with transformed initialization
+-   [sequence_fragment](sequence_fragment.m) - Returns an array of subsequences
 
 ### Access
-
 
 -   [get_image](get_image.m) - Returns image path for the given sequence
 -   [get_region](get_region.m) - Returns region, or multiple regions for the given sequence

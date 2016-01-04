@@ -23,10 +23,17 @@ end
 switch lower(mode)
     case 'execute' 
         iterator = @execute_iterator;
+        context = [];
+    case 'makefile'
+        if ~isunix
+            error('Exporting to Makefile only supported on Unix-like systems.');
+        end;
+        iterator = @makefile_iterator;
+        context = struct('makefilename', 'Makefile');
     otherwise, error(['unrecognized mode ' mode]);
 end
 
-iterate(experiments, trackers, sequences, 'iterator', iterator);
+iterate(experiments, trackers, sequences, 'iterator', iterator, 'context', context);
 
 print_text('Done.');
 
@@ -73,4 +80,51 @@ function context = execute_iterator(event, context)
 
 end
 
+function context = makefile_iterator(event, context)
 
+    switch (event.type)
+        case 'enter'
+            
+            context.file = fopen(context.makefilename, 'w');
+
+        case 'exit'
+            
+            fclose(context.file);
+
+        case 'experiment_enter'
+            
+            print_text('Experiment %s', event.experiment.name);
+
+            print_indent(1);       
+        case 'experiment_exit'
+
+            print_indent(-1);
+
+        case 'tracker_enter'
+            
+            print_text('Tracker %s', event.tracker.identifier);
+
+            print_indent(1);  
+            
+        case 'tracker_exit'
+
+            print_indent(-1);
+            
+        case 'sequence_enter'
+            
+            print_text('Sequence %s', event.sequence.name);
+
+            execution_parameters = struct();
+            if isfield(event.experiment, 'parameters')
+                execution_parameters = event.experiment.parameters;
+            end;
+            
+            sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
+                event.sequence.name);
+
+            tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
+                'type', event.experiment.type, 'parameters', execution_parameters);
+
+    end;
+
+end

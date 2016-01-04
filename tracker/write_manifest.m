@@ -37,10 +37,11 @@ votversion = toolkit_version();
 fprintf(fid, 'toolkit.version=%d.%d\n', votversion.major, votversion.minor);
 fprintf(fid, 'tracker.identifier=%s\n', tracker.identifier);
 fprintf(fid, 'tracker.protocol=%s\n', protocol);
+fprintf(fid, 'tracker.interpreter=%s\n', tracker.interpreter);
 fprintf(fid, 'timestamp=%s\n', datestr(now, 31));
-fprintf(fid, 'platfrom=%s\n', platform_str);
-fprintf(fid, 'platfrom.maxsize=%f\n', platform_maxsize);
-fprintf(fid, 'platfrom.endian=%s\n', platform_endian);
+fprintf(fid, 'platform=%s\n', platform_str);
+fprintf(fid, 'platform.maxsize=%f\n', platform_maxsize);
+fprintf(fid, 'platform.endian=%s\n', platform_endian);
 fprintf(fid, 'environment=%s\n', environment);
 fprintf(fid, 'environment.version=%s\n', environment_version);
 

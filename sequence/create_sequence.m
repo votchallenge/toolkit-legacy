@@ -99,11 +99,15 @@ for file = dir(fullfile(directory, '*.label'))'
         continue
     end;
 
-    if size(data, 1) ~= sequence.length || size(data, 2) ~= 1
+    if size(data, 1) > sequence.length || size(data, 2) ~= 1
         print_debug('Label file does not have correct size');
         continue;
     end;
 
+    if size(data, 1) < sequence.length
+        data(end+1:sequence.length) = 0;
+    end;
+    
     sequence.labels.names{end+1} = file.name(1:end-6);
     labeldata = cat(2, labeldata, data > 0);
 

@@ -30,7 +30,9 @@ if (~iscell(T2))
     T2 = num2cell(T2, 2); 
 end 
 
-results = cell2mat(cellfun(@(r1, r2) region_overlap(r1, r2), T1, T2, 'UniformOutput', false));
+results = region_overlap(T1, T2);
+
+%results = cell2mat(cellfun(@(r1, r2) region_overlap(r1, r2), T1, T2, 'UniformOutput', false));
 
 overlap = results(:, 1);
 only1 = results(:, 2);

@@ -24,11 +24,17 @@ end
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
 
+sequences_hash = md5hash(strjoin((cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
+trackers_hash = md5hash(strjoin((cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
+
 for e = 1:numel(experiments)
 
     experiment = experiments{e};
 
-    histograms = analyze_failures(experiment, trackers, sequences, 'cache', context.cachedir);
+    cache_identifier = sprintf('failures_%s_%s_%s.mat', experiment.name, trackers_hash, sequences_hash);
+    
+    histograms = report_cache(context, cache_identifier, @analyze_failures, ...
+        experiment, trackers, sequences);
 
     document.subsection('Experiment %s', experiment.name);
 
