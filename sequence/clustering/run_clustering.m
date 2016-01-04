@@ -36,7 +36,7 @@ addpath(genpath('.')); addpath('../'); toolkit_path;
 % remove grayscale sequences and sequences with very small objects
 indexes = [];
 for i = 1:size(sequences, 2)
-    bbox = get_aa_region(sequences{i}, 1);
+    bbox = region_convert(get_region(sequences{i}, 1), 'rectangle');
 
     area = bbox(3)*bbox(4);
     

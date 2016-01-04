@@ -16,7 +16,7 @@ function [mean_val, var_val, frames] = attribute_blur(sequence)
         full_image_name = fullfile(sequence.directory, image_name);
         image = double(rgb2gray(imread(full_image_name)));
 
-        region = round(get_aa_region(sequence, i));
+        region = round(region_convert(get_region(sequence, i), 'rectangle'););
         
         if isnan(region(1))
             frames(i) = NaN;

@@ -6,7 +6,7 @@ for i = 1:sequence.length
     
    % image = rgb2gray(imread(get_image(sequence, i)));
     
-    region = get_aa_region(sequence, i);
+    region = region_convert(get_region(sequence, i), 'rectangle');
     if isnan(region)
         motion(i, :) = [NaN, NaN];
     else

@@ -53,7 +53,7 @@ function [] = visualize_clusters(config, sequences, clusters, performance_accumu
 
                     image_index = (i-1)*floor(sequences{sq}.length/num_img_per_seq) + 1;
                     image = get_image(sequences{sq}, image_index);
-                    gt = get_aa_region(sequences{sq}, image_index);
+                    gt = region_convert(get_region(sequences{sq}, image_index), 'rectangle');
                     imshow(image);
                     if (~isnan(gt(1)))
                         rectangle('Position',gt, 'LineWidth',1, 'EdgeColor','g');

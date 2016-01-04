@@ -8,7 +8,7 @@ b = 8;
 for i = 1:sequence.length
     
     image = round(rgb2hsv(imread(get_image(sequence, i))) .* 255);
-    region = get_aa_region(sequence, i);
+    region = region_convert(get_region(sequence, i), 'rectangle');;
     patch = cut_patch(image, region);
         
     if isnan(region(1))

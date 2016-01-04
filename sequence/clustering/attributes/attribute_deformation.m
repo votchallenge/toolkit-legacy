@@ -5,10 +5,10 @@ numOfCells = 8;
 frames = zeros(sequence.length, 1);
 
 image = rgb2gray(imread(get_image(sequence, 1)));
-patch = cut_patch(image, get_aa_region(sequence, 1));
+patch = cut_patch(image, region_convert(get_region(sequence, 1), 'rectangle'););
 
 
-bb = get_aa_region(sequence, 1);
+bb = region_convert(get_region(sequence, 1), 'rectangle');
 cellWidth = bb(3)/numOfCells;
 cellHeight = bb(4)/numOfCells;
 xPos = round([1 1+round(cellWidth):cellWidth:bb(3)-round(cellWidth)  bb(3)]);
@@ -31,9 +31,9 @@ yPosRelative = yPos./bb(4);
 
 for i = 2:sequence.length
     image = rgb2gray(imread(get_image(sequence, i)));
-    patch = cut_patch(image, get_aa_region(sequence, i));
+    patch = cut_patch(image, region_convert(get_region(sequence, i), 'rectangle'));
 
-    bb = get_aa_region(sequence, i);
+    bb = region_convert(get_region(sequence, i), 'rectangle');
     xPos = ceil(xPosRelative.*bb(3));
     yPos = ceil(yPosRelative.*bb(4));
 
