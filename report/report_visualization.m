@@ -1,4 +1,4 @@
-function report_visualization(context, trackers, sequences, experiments, varargin)
+function report_visualization(context, experiments, trackers, sequences, varargin)
 % report_visualization Basic visualization of performance for given trackers
 %
 % This function generates images with tracking results of given trackers along with a 
@@ -66,7 +66,7 @@ for i = 1:numel(sequences)
     print_text('Sequence %s', sequences{i}.name);
     
     for e = 1:numel(experiments)
-        seq_directory = fullfile(context.directory, experiments{e}.name, sequences{i}.name);
+        seq_directory = fullfile(context.visual_directory, experiments{e}.name, sequences{i}.name);
         mkpath(seq_directory);
         
         image_width = max([sequences{i}.width 480]);

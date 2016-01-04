@@ -22,6 +22,7 @@ figure_eps = false;
 figure_raw = false;
 standalone = true;
 cache = false;
+directory = fullfile(get_global_variable('directory'), 'visualization');
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
@@ -35,6 +36,8 @@ for i = 1:2:length(varargin)
             standalone = varargin{i+1};
         case 'cache'
             cache = varargin{i+1};
+        case 'visual_directory'
+            directory = varargin{j+1}; 
         otherwise 
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
@@ -52,6 +55,7 @@ context.imagesurl = 'images';
 context.rawurl = 'raw';
 context.title = title;
 context.cache = cache;
+context.visual_directory = directory;
 
 mkpath(context.root);
 mkpath(context.images);
