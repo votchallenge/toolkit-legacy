@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_motion_change(sequence)
+function [mean_val, var_val, frames] = attribute_motion_change(sequence)
 
 motion = zeros(sequence.length, 2);
 

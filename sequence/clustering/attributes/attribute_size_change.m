@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_size_change(sequence)
+function [mean_val, var_val, frames] = attribute_size_change(sequence)
 
 frames = zeros(sequence.length, 1);
 

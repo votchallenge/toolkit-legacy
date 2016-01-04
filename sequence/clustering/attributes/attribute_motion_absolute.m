@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_motion_absolute(sequence)
+function [mean_val, var_val, frames] = attribute_motion_absolute(sequence)
 
 motion = zeros(sequence.length,1);
 region = get_aa_region(sequence, 1);

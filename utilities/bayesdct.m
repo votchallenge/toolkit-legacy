@@ -1,4 +1,4 @@
-function measure = BayesDCT( X, W, lo, hi ) 
+function measure = bayesdct( X, W, lo, hi ) 
 % Evaluates Bayes-Entropy measure of focus of an image X
 % Input:
 %  X  ... grayscale image
@@ -10,7 +10,7 @@ function measure = BayesDCT( X, W, lo, hi )
 % Default values (from the paper cited below) :
 %  W = [8,8] ,  lo = 0 , hi = 6
 % Reference paper:
-%   M. Kristan, J. Perš, M. Perše, S. Kovaèiè. 
+%   M. Kristan, J. Perï¿½, M. Perï¿½e, S. Kovaï¿½iï¿½. 
 %   "A Bayes-Spectral-Entropy-Based Measure of Camera Focus Using 
 %   a Discrete Cosine Transform". Pattern Recognition Letters, 
 %   27(13): 1419-1580, October 2006.

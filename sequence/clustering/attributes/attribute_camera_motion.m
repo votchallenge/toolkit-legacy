@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_camera_motion(sequence)
+function [mean_val, var_val, frames] = attribute_camera_motion(sequence)
 
     patchSize = 9;
     maxFeatures = 1000;

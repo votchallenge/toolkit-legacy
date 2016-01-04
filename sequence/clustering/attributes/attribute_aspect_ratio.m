@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_aspect_ratio(sequence)
+function [mean_val, var_val, frames] = attribute_aspect_ratio(sequence)
 
 frames = zeros(sequence.length, 1);
 

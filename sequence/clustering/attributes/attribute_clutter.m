@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_clutter(sequence)
+function [mean_val, var_val, frames] = attribute_clutter(sequence)
 
 frames = zeros(sequence.length, 1);
 
@@ -40,14 +40,14 @@ for i = 1:sequence.length
     c3 = image(:, :, 3);
 
     P = [c1(mask), c2(mask), c3(mask)];
-    bghist = normalise(ndHistc(P, linspace(0,256,b+1), linspace(0,256,b+1), linspace(0,256,b+1)));
+    bghist = normalise(ndhistc(P, linspace(0,256,b+1), linspace(0,256,b+1), linspace(0,256,b+1)));
     
     c1 = patch(:, :, 1);
     c2 = patch(:, :, 2);
     c3 = patch(:, :, 3);
     
     P = [c1(:), c2(:), c3(:)];
-    fghist = normalise(ndHistc(P, linspace(0,256,b+1), linspace(0,256,b+1), linspace(0,256,b+1)));
+    fghist = normalise(ndhistc(P, linspace(0,256,b+1), linspace(0,256,b+1), linspace(0,256,b+1)));
     
     d = sqrt( 0.5*sum( (sqrt(fghist(:)) - sqrt(bghist(:))).^2 )  ) ;    %Hellinger distance
     

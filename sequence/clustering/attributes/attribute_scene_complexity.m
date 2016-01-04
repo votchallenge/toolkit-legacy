@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_scene_complexity(sequence)
+function [mean_val, var_val, frames] = attribute_scene_complexity(sequence)
 
 frames = zeros(sequence.length, 1);
 

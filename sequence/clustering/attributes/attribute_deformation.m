@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_deformation(sequence)
+function [mean_val, var_val, frames] = attribute_deformation(sequence)
 
 numOfCells = 8;
 

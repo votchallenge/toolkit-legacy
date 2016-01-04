@@ -1,4 +1,4 @@
-function [clustCent,data2cluster,cluster2dataCell] = MeanShiftCluster(dataPts,bandWidth,plotFlag);
+function [clustCent,data2cluster,cluster2dataCell] = meanshiftcluster(dataPts,bandWidth,plotFlag);
 %perform MeanShift Clustering of data using a flat kernel
 %
 % ---INPUT---

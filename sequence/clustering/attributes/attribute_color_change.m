@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_color_change(sequence)
+function [mean_val, var_val, frames] = attribute_color_change(sequence)
 
 frames = zeros(sequence.length, 1);
 

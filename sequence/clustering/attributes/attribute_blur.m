@@ -1,4 +1,4 @@
-function [mean_val, var_val, frames] = attr_blur(sequence)
+function [mean_val, var_val, frames] = attribute_blur(sequence)
 
     % For more details, please see this paper:
     %   M. Kristan, J. Perš, M. Perše, S. Kovaèiè. 
@@ -29,7 +29,7 @@ function [mean_val, var_val, frames] = attr_blur(sequence)
             % extract focusing image
             subImage = image( y1 : y2 , x1 : x2 );
             % evaluate focus measure 
-            frames(i) = BayesDCT( subImage, window, low_f, high_f );
+            frames(i) = bayesdct( subImage, window, low_f, high_f );
         end
     end
     mean_val = mean(frames(~isnan(frames)));
