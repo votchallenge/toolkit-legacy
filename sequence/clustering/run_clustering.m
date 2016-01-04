@@ -1,8 +1,8 @@
 %% set environment variables (sequence dir, result output dir, ...)
 config.result_base_dir = './clustering_results';
 
-config.result_directory = [ config.result_base_dir '/attr/'];
-config.result_directory_clusters_img = [ config.result_base_dir '/clusters_img/'];
+config.result_directory = [ config.result_base_dir '/attributes/'];
+config.result_directory_clusters_img = [ config.result_base_dir '/clusters_imgages/'];
 if ~exist(config.result_base_dir, 'dir') mkdir(config.result_base_dir); end;
 if ~exist(config.result_directory, 'dir') mkdir(config.result_directory); end;
 if ~exist(config.result_directory_clusters_img, 'dir') mkdir(config.result_directory_clusters_img); end;
@@ -11,9 +11,9 @@ if ~exist(config.result_directory_clusters_img, 'dir') mkdir(config.result_direc
 %files for each tracker, i.e. tracker_FoT.m, tracker_ASMS.m
 config.trackers_name = {'KCF'};
 
-config.attributes = {'attr_aspect_ratio', 'attr_clutter', 'attr_illumination_change', 'attr_size_change', ...
-              'attr_blur', 'attr_color_change', 'attr_motion_change', 'attr_camera_motion', ...
-              'attr_deformation', 'attr_scene_complexity', 'attr_motion_absolute'};
+config.attributes = {'attribute_aspect_ratio', 'attribute_clutter', 'attribute_illumination_change', 'attribute_size_change', ...
+              'attribute_blur', 'attribute_color_change', 'attribute_motion_change', 'attribute_camera_motion', ...
+              'attribute_deformation', 'attribute_scene_complexity', 'attribute_motion_absolute'};
 config.attributes_legend = {'AR', 'CL', 'IC', 'SC', 'BL', 'CC', 'MC', 'CM', 'DF', 'CO', 'MA'};
 
 config.sequence_selection_attr = [3 4 7 8];        % attributes that need to be uniformly represented in the final sequence selection
