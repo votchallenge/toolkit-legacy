@@ -200,7 +200,7 @@ function success = download_trax_source(trax_dir)
 % - success (boolean): True on success.
 %
 
-trax_url = get_global_variable('trax_url');
+trax_url = get_global_variable('trax_url','https://github.com/votchallenge/trax/archive/master.zip');
 
 if isempty(trax_url)
     success = false;
@@ -217,7 +217,7 @@ if ~exist(trax_header, 'file')
     try
         urlwrite(trax_url, bundle);
         unzip(bundle, working_directory);
-		delete(bundle);
+        delete(bundle);
         movefile(fullfile(working_directory, 'trax-master'), trax_dir);
         success = true;
     catch
