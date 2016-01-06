@@ -1,4 +1,17 @@
 function [mean_val, var_val, frames] = attribute_clutter(sequence)
+% attribute_clutter Computes the clutter attribute in the given seqeunce
+%
+% Clutter is the average of per-frame distances between two histograms: 
+% one extracted from within the ground truth bounding box and one from an enlarged 
+% area (by factor 1.5) outside of the bounding box.
+%
+% Input:
+% - sequence (struct): An array of sequence structures.
+%
+% Output:
+% - mean_val : mean value of the clutter for the sequence
+% - val_val  : variance of the clutter for the sequence
+% - frames   : the clutter for each frame
 
 frames = zeros(sequence.length, 1);
 

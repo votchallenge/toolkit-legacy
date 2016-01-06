@@ -1,4 +1,16 @@
 function [mean_val, var_val, frames] = attribute_illumination_change(sequence)
+% attribute_illumination_change Computes the illumination change attribute of the object in the given seqeunce
+%
+% Illumination change is defined as the average of the absolute differences 
+% between the object intensity in the first and remaining frames.
+%
+% Input:
+% - sequence (struct): An array of sequence structures.
+%
+% Output:
+% - mean_val : mean value of the illumination change of the object for the sequence
+% - val_val  : variance of the illumination change of the object for the sequence
+% - frames   : the illumination change of the object for each frame
 
 frames = zeros(sequence.length, 1);
 

@@ -12,7 +12,7 @@ function report_visualization(context, experiments, trackers, sequences, varargi
 % - sequences (cell): An array of sequence structures.
 %
 % Output:
-% - images in output directory defined in context
+% - images in output directory defined in context.visual_directory
 
 measures_labels = {'Overlap', 'Failures', 'Speed'};
 context.measures = {@(trajectory, sequence, experiment, tracker) ...

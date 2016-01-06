@@ -1,4 +1,15 @@
 function [mean_val, var_val, frames] = attribute_color_change(sequence)
+% attribute_color_change Computes the color change attribute of the object in the given seqeunce
+%
+% Object color change is defined as the change of the average hue value inside the bounding box.
+%
+% Input:
+% - sequence (struct): An array of sequence structures.
+%
+% Output:
+% - mean_val : mean value of the color change of the object for the sequence
+% - val_val  : variance of the color change of the object for the sequence
+% - frames   : the color change of the object for each frame
 
 frames = zeros(sequence.length, 1);
 

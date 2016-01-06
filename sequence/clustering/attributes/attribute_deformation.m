@@ -1,4 +1,17 @@
 function [mean_val, var_val, frames] = attribute_deformation(sequence)
+% attribute_deformation Computes the deformation attribute of the object in the given seqeunce
+%
+% Deformation is calculated by dividing the images into 8x8 grid of cells 
+% and computing the sum of squared differences of averaged pixel intensity 
+% over the cells in current and first frame.
+%
+% Input:
+% - sequence (struct): An array of sequence structures.
+%
+% Output:
+% - mean_val : mean value of the deformation of the object for the sequence
+% - val_val  : variance of the deformation of the object for the sequence
+% - frames   : the deformation of the object for each frame
 
 numOfCells = 8;
 

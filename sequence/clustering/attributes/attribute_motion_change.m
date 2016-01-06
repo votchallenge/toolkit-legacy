@@ -1,4 +1,16 @@
 function [mean_val, var_val, frames] = attribute_motion_change(sequence)
+% attribute_motion_change Computes the object motion attribute of the object in the given seqeunce
+%
+% Object motion is the average of absolute differences between ground 
+% truth center positions in consecutive frames.
+%
+% Input:
+% - sequence (struct): An array of sequence structures.
+%
+% Output:
+% - mean_val : mean value of the object motion of the object for the sequence
+% - val_val  : variance of the object motion of the object for the sequence
+% - frames   : the object motion of the object for each frame
 
 motion = zeros(sequence.length, 2);
 

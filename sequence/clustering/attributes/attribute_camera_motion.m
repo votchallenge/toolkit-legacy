@@ -1,4 +1,16 @@
 function [mean_val, var_val, frames] = attribute_camera_motion(sequence)
+% attribute_camera_motion Computes the camera motion attribute in the given seqeunce
+%
+% Camera motion is defined as the average of translation vector lengths 
+% estimated by key-point-based RANSAC between consecutive frames.
+%
+% Input:
+% - sequence (struct): An array of sequence structures.
+%
+% Output:
+% - mean_val : mean value of the camera motion for the sequence
+% - val_val  : variance of the camera motion for the sequence
+% - frames   : the camera motion for each frame (from t-1 to t)
 
     patchSize = 9;
     maxFeatures = 1000;

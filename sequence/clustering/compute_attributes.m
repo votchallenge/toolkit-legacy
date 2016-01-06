@@ -1,5 +1,17 @@
-function [] = compute_attributes(config, sequences);
-% Attribute computation
+function [] = compute_attributes(config, sequences)
+% compute_attributes Calculates automatic sequence attributes for given
+% sequences
+%
+% The function calculates all attributes set in config strut for all sequences 
+% if there are not already computed (and flag config.loadPrevious is set to 1)
+%
+% Input:
+% - config (structure): config structure
+% - sequence (structure): A valid sequence structure.
+%
+% Output: (computed attributes are store in local file system)
+% - none
+
     disp('Computing attributes, Processing sequences ...');
     numAttr = length(config.attributes);
     allTime = tic ;

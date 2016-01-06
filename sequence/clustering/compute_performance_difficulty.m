@@ -1,4 +1,25 @@
-function [performance_accumulated] = validate_clusters(experiments, sequences, trackers, clusters_ap, clusters_kmeans)
+function [performance_accumulated] = compute_performance_difficulty(experiments, sequences, trackers, clusters_ap, clusters_kmeans)
+% compute_performance_difficulty measures sequence difficulty as a averaged 
+% trackers performance using VOT methodology
+%
+% This function calculates the sequence difficulty from the results of the
+% trackers on the sequences using accuracy and robustness measures. These
+% two measures are quantized into ten levels. The quantized robustness was calculated by clipping 
+% the raw robustness at nine failures and the quantized accuracy was computed 
+% by 9 - floor(10*Phi), where Phi is the VOT accuracy. 
+% This function also print the inner-cluster performance variation, to
+% compare and validate affine propagation and k-means clustering quality.
+%
+% Input:
+% - experiments (cell): An array of experiment structures.
+% - sequences (cell): an array of sequence structures.
+% - trackers (struct): An array of tracker structures.
+% - clusters_ap (structure): clustering structure of affine propagation clustering alg.
+% - clusters_kmeans (structure): clustering structure of k-means clustering alg.
+% 
+% Output:
+% - performance_accumulated (matrix #sequences x 2): average quantized robustness and accuracy for each sequence (row-wise)
+%
 
     performance_score = zeros(length(sequences), size(trackers,1)*2); 
 

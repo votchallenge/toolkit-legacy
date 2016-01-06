@@ -1,5 +1,12 @@
 function [patch] = cut_patch(image, region)
-% assume axis-align bbox
+% cut_patch extract smaller patch defined by region from an image
+%
+% Input:
+% - image (matrix): n-dimensional WxH image
+% - region (vector): axis-align bounding box defined as [top_left_x top_left_y width height]
+%
+% Output: (computed attributes are store in local file system)
+% - patch (matrix): n-dimensional widthxheight image region
 
 region = round(region);
 

@@ -1,30 +1,51 @@
-function [] = sequence_selection(config, sequences, feature_vectors_scaled, clusters_ap, performance_accumulated)
-% N_all ... number of all sequences for clustering
-% M ... number of desired sequences
-% ------------------------------------------------------------------
-% 1) Apply sequence clustering from automatically calculated attributes (without occlusion attribute) using the AP and Hamming distance.
-% 2) We get K clusters and each cluster contains N_k sequences. We need to get a dataset of M sequences that 
-%    are proportionally sampled from the clusters as follows.
-% 3) Compute the final maximal number of sequences that are allowed to be sampled from each cluster as floor(N_k*M/N_all).
-% 4) Initialize the dataset by taking the hardest sequence from each cluster.
-% 5) Compute the average attribute vector of the selected sequences. Normalize this vector so that it sums to 1 
-%    -- we'll call this a ballence vector. This gives for each attribute a value between 0 and 1 indicating how much of the 
-%    particular attribute is present in the selected dataset.
-% 6) Identify the attribute that is least represented in the selected set of sequences (find minimum on the ballance vector). 
-%    Actually there may be several equally poorly presented attributes. I would use the following equation. Let h = [h1 h2 h3] 
-%    be the ballence vector. Modify the vector by h/h_max, where h_max is the most presented attribute. Then select all attributes 
-%    that give 1 from the following relation  h<(h_min+0.1/5) -- the hysteresis of +0.1/5 gives 10% of uniform 
-%    distribution for 5 classes -- if you get strange behavior, use lower value than 0.1.
-% 7) Among all remaining sequences in all clusters identify the sequences that contain the missing identified 
-%    attributes (ignore the clusters whose final number of sampled sequences has been reached, of course).
-% 8) From the set of sequences from step (7) select the sequence with the highest level of difficulty and add it to the new dataset.
-% 9) Go back to step 5 and continue until you reach a dataset with M sequences.
+function [] = sequence_selection(config, sequences, feature_vectors_scaled, clusters_struct, performance_accumulated)
+% sequence_selection Algorithm for automatic sequence sampling from
+% clusters using greedy approach (taking the most difficult sequences)
+%
+% Description of the algorithm:
+%   Prerequisites:
+%       1) Apply sequence clustering from automatically calculated attributes 
+%          (without occlusion attribute) using the AP and Hamming distance.
+%       2) We get K clusters and each cluster contains N_k sequences. We need to get a 
+%          dataset of M sequences that are proportionally sampled from the clusters as follows.
+%       3) Compute the final maximal number of sequences that are allowed 
+%          to be sampled from each cluster as floor(N_k*M/N_all).
+%   Init:
+%       4) Initialize the dataset by taking the hardest sequence from each cluster.
+%   Main loop:
+%       5) Compute the average attribute vector of the selected sequences. Normalize this vector so that it sums to 1 
+%          (denote this as a balance vector). This gives for each attribute a value between 0 and 1 indicating how much of the 
+%          particular attribute is present in the selected dataset.
+%       6) Identify the attribute that is least represented in the selected set of sequences (find minimum on the ballance vector). 
+%          There may be several equally poorly presented attributes. Use the following equation, let h = [h1 h2 h3] 
+%          be the ballence vector. Modify the vector by h/h_max, where h_max is the most presented attribute and then select all attributes 
+%          that give 1 from the following relation  h<(h_min+0.1/nc) -- the hysteresis of +0.1/nc gives 10% of uniform 
+%          distribution for nc classes (nc = number of attributes used for sampling -- config.sequence_selection_attr)
+%       7) Among all remaining sequences in all clusters identify the sequences that contain the missing identified 
+%          attributes (ignore the clusters whose final number of sampled sequences has been reached).
+%       8) From the set of sequences from step (7) select the sequence with the highest level of difficulty and add it to the new dataset.
+%       9) Go back to step 5 and continue until you reach a dataset with M sequences.
+%
+%
+% Input:
+% - config (structure): config structure 
+% - sequences (cell): an array of sequence structures.
+% - feature_vectors_scaled (matrix #sequences x #num_attributes): feature vector for each sequence (row-wise)
+% - clusters_struct (structure): clustering structure from compute_clusters
+%                                function (clusters_ap was used for VOT)
+% - performance_accumulated (matrix #sequences x 2): average quantized robustness and accuracy for each sequence (row-wise)
+%
+% Output:
+% - 'final_selection.txt' file with the selected sequences in the directory
+%    specified in the config.result_base_dir variable
+% - (optional if config.show_visualization == 1) 'cluster-selection_*.png' visualization of the selected
+%    sequences in the config.result_directory_clusters_img directory
 
 %% prefix removal for freq. used var.
     sequence_selection_attr = config.sequence_selection_attr;
     attributes_legend = config.attributes_legend;
-    exemplars = clusters_ap.exemplars;
-    cluster_map = clusters_ap.cluster_map;
+    exemplars = clusters_struct.exemplars;
+    cluster_map = clusters_struct.cluster_map;
 
 %% ADD OCCLUSION ATTRIBUTE - used in the VOT2015 sequence selection, occlusion was manually labeled
 %     fileID = fopen('list_output_occlusion_20_30_40.txt');
@@ -51,8 +72,8 @@ function [] = sequence_selection(config, sequences, feature_vectors_scaled, clus
     % sequence_selection_attr = [CM, IC, MC, SC, O]    ... attributes that we are trying to ballance in the dataset
 
     % 1..3
-    N_all = size(sequences, 2);
-    M = min([config.num_selected_sequences  size(sequences,2)]);
+    N_all = size(sequences, 2);     %number of all sequences for clustering
+    M = min([config.num_selected_sequences  size(sequences,2)]); % number of desired sequences
     num_clusters = size(exemplars, 2);
 
     clusters_sampling_count = zeros(num_clusters, 1);
@@ -124,6 +145,7 @@ function [] = sequence_selection(config, sequences, feature_vectors_scaled, clus
         % 8 
         cluster_seq_perf = sum(performance_accumulated(min_seq_idxs(max_sw_idxs),:),2);
         [~, I] = sort(cluster_seq_perf, 'descend');
+        %TODO: if multiple sequence have the same difficulty take random one
         add_seq_id = min_seq_idxs(max_sw_idxs(I(1)));
 
         selection.sequences_id(end+1) = add_seq_id;

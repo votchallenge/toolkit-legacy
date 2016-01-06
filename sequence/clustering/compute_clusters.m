@@ -1,4 +1,31 @@
 function [clusters_ap, clusters_kmeans] = compute_clusters(config, sequences, similarity, feature_vectors);
+% compute_clusters clusters the sequences based on feature vectors using
+% two methods (affine propagation and k-means)
+%
+% The function compute clusters based on sequence similarity defined by the
+% feature vector. Two unsupervised clustering algorithms are used, affine
+% propagation and k-means. The number of clusters for k-means is set to be
+% the same as for affine propagation. Number of clusters for affine
+% propagation is controled by the config.ap_clustering_factor variable. The
+% config.ap_clustering_factor should be set such that small pertubation of
+% this variable does not change the number of clusters (significantly).
+%
+% Input:
+% - config (structure): config structure
+% - sequence (structure): A valid sequence structure.
+% - similarity (matrix): similarity between every pair of the sequence feature vector
+% - feature_vectors (matrix): feature vector for each sequence
+%
+% Output:
+% - clusters_ap (structure): clustering of the affine propagation method
+% - clusters_kmeans (structure): clustering of the k-mean method
+%   
+%   clusters structure:
+%        cluster_map(vector): assignment of each sequence to some exemplar
+%        exemplars(vector): representants of the clusters
+%        clusters_id(cell vector): ids of sequences for each cluster 
+%
+
 %affine propagation
     p = config.ap_clustering_factor*mean(similarity(:));  % effects number of clusters
     clusters_ap.cluster_map = apcluster(similarity, p);

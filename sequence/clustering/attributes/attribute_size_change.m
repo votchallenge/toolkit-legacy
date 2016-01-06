@@ -1,4 +1,17 @@
 function [mean_val, var_val, frames] = attribute_size_change(sequence)
+% attribute_size_change Computes the object size change attribute of the object in the given seqeunce
+%
+% Object size change is the relative change in the object scale between
+% current frame and first frame.
+%
+% Input:
+% - sequence (struct): An array of sequence structures.
+%
+% Output:
+% - mean_val : range of scale change computed as 
+%              0.9percentil - 0.1percentil of scale changes from all frames
+% - val_val  : variance of the size change of the object for the sequence
+% - frames   : the size change of the object for each frame
 
 frames = zeros(sequence.length, 1);
 
