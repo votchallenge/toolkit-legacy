@@ -20,11 +20,13 @@ function [sequences, experiments] = workspace_load(varargin)
 %
 
 force = false;
+directory = pwd();
 
 args = varargin;
 for j=1:2:length(args)
     switch lower(varargin{j})
-        case 'force', force = args{j+1};         
+        case 'directory', directory = args{j+1};
+        case 'force', force = args{j+1};     
         otherwise, error(['unrecognized argument ' args{j}]);
     end
 end
@@ -53,7 +55,7 @@ else
 
 end;
 
-configuration_file = fullfile(pwd(), 'configuration.m');
+configuration_file = fullfile(directory, 'configuration.m');
 
 if ~exist(configuration_file, 'file')
     error('Directory is probably not a VOT workspace. Please run workspace_create first.');
@@ -62,7 +64,7 @@ end;
 % Some defaults
 set_global_variable('toolkit_path', fileparts(fileparts(mfilename('fullpath'))));
 set_global_variable('indent', 0);
-set_global_variable('directory', pwd());
+set_global_variable('directory', directory);
 set_global_variable('debug', 0);
 set_global_variable('cache', 1);
 set_global_variable('bundle', []);
@@ -74,17 +76,21 @@ set_global_variable('trax_client', []);
 set_global_variable('trax_timeout', 30);
 set_global_variable('matlab_startup_model', [923.5042, -4.2525]);
 
-print_text('Initializing VOT environment ...');
+print_text('Initializing VOT workspace ...');
 
-global_configuration = get_global_variable('select_configuration', 'configuration');
+configuration_script = get_global_variable('select_configuration', 'configuration');
+
+if ~strcmp(directory, pwd())
+    addpath(directory);
+end;
 
 try
-	environment_configuration = str2func(global_configuration);
+	environment_configuration = str2func(configuration_script);
     environment_configuration();
 catch e
-    if exist(global_configuration) ~= 2 %#ok<EXIST>
+    if exist(configuration_script) ~= 2 %#ok<EXIST>
         print_debug('Global configuration file does not exist. Using defaults.', ...
-            global_configuration);
+            configuration_script);
     else
         error(e);
     end; 
@@ -110,7 +116,7 @@ else
 
     experiments = stack_configuration();
 
-    sequences_directory = fullfile(get_global_variable('directory'), 'sequences');
+    sequences_directory = fullfile(get_global_variable('workspace_path'), 'sequences');
 
     print_text('Loading sequences ...');
 
