@@ -119,25 +119,39 @@ bool get_region_code(char* str, region_type& type) {
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	region_type format;
-	region_container* p;
-	region_container* c;
+	region_container* p = NULL;
+	region_container* c = NULL;
+
+	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");
+
+	if( nrhs == 1 ) {
+		char* raw = get_string(prhs[0]);
+
+		region_parse(raw, &c);
+		free(raw);
+
+		if (!c)
+			mexErrMsgTxt("Not a valid region string");
+
+		plhs[0] = region_to_array(c);
+		return;
+	}
 
 	if( nrhs != 2 ) mexErrMsgTxt("Two vector arguments (region and format) required.");
-	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");
 
 	if (mxGetClassID(prhs[0]) != mxDOUBLE_CLASS)
 		mexErrMsgTxt("First input argument must be of type double");
 
 	if ( mxGetNumberOfDimensions(prhs[0]) > 2 || mxGetM(prhs[0]) > 1 ) mexErrMsgTxt("First input argument must be a vector");
 
-    char* codestr = get_string(prhs[1]);
+	char* codestr = get_string(prhs[1]);
 
 	if (!get_region_code(codestr, format)) {
-        free(codestr);
+		free(codestr);
 		mexErrMsgTxt("Not a valid format");
-    }
+	}
 
-    free(codestr);
+	free(codestr);
 
 	p = array_to_region(prhs[0]);
 
@@ -151,7 +165,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		mexErrMsgTxt("Unable to convert region");
 	}
 
-    plhs[0] = region_to_array(c);
+  plhs[0] = region_to_array(c);
 
 	if (c) region_release(&c);
 	if (p) region_release(&p);
