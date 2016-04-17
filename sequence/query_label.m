@@ -1,4 +1,4 @@
-function [indices] = query_label(sequence, label)
+function [indices] = query_label(sequence, label, subset)
 % query_label Find label in sequence
 %
 % The function returns indices of all frames that contain the specified label.
@@ -6,9 +6,16 @@ function [indices] = query_label(sequence, label)
 % Input:
 % - sequence (structure): A valid sequence structure.
 % - label (string): Name of the label.
+% - subset (vector): A set of frame numbers or a binary mask to be used
+% when looking for a label. Frame indices will be returned relative to that
+% subset of frames.
 %
 % Output:
 % - indices (integer): A vector of indices of frames that contain the given label.
+
+if nargin < 3
+   subset = true(sequence.length, 1); 
+end
 
 if strcmp(label, 'all')
     indices = 1:sequence.length;
@@ -25,6 +32,6 @@ label_index = find(strcmp(sequence.labels.names, label), 1);
 if isempty(label_index)
     indices = [];
 else
-    indices = find(sequence.labels.data(:, label_index));
+    indices = find(sequence.labels.data(subset, label_index));
 end;
 

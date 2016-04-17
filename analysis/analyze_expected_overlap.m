@@ -18,7 +18,7 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
 %     - lengths: lengths for which the expected overlap was evaluated
 %
 
-    labels = {};
+    labels = {'all'};
     lengths = [];
     cache = fullfile(get_global_variable('directory'), 'cache');
     
@@ -81,24 +81,9 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
             continue;
         end;
         
-        if ~isempty(labels)
-            % Generate weights for each label depending on presence of
-            % label in sequence
-            weights = ones(numel(experiment_sequences), numel(labels));
-            
-            for j = 1:numel(labels)
-                for s = 1:numel(experiment_sequences)
-                    weights(s, j) = numel(query_label(experiment_sequences{s}, ...
-                        labels{j})) / experiment_sequences{s}.length;
-                end
-            end;
-        else
-            weights = ones(numel(experiment_sequences), 1);
-        end
-
         [expected_overlaps, evaluated_lengths, practical_difference] = ...
             estimate_expected_overlap(trackers{i}, experiment, experiment_sequences, ...
-            'Lengths', lengths, 'Weights', weights);
+            'Lengths', lengths, 'Labels', labels);
 
         if ~isempty(cache_file)
             save(cache_file, 'evaluated_lengths', 'expected_overlaps', 'practical_difference');

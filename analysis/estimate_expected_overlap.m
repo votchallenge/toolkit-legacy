@@ -12,11 +12,9 @@ function [expected_overlaps, evaluated_lengths, practical_difference] = estimate
 % - varargin[Lengths] (vector): A vector of sequence lengths for which the
 % overlap should be evaluated.
 % - varargin[Weights] (vector): A vector of per-sequence weigths that indicate
-% how much does each sequence contribute to the estimate. Can also be a
-% matrix, the number of columns is in this case the number of different
-% weighting schemes. The functon will in this case return expected_overlaps
-% and practical_difference in form of matrices with the number of columns
-% corresponding to the number of weighting schemes.
+% how much does each sequence contributes to the estimate.
+% - varargin[Labels] (cell): A set of labels for which to perform
+% calculation. If not set then only 'all' is used.
 %
 % Output:
 % - expected_overlaps (vector): Expected overlaps for corresponding
@@ -27,11 +25,13 @@ function [expected_overlaps, evaluated_lengths, practical_difference] = estimate
 
 lengths = [];
 weights = ones(numel(sequences), 1);
+labels = {'all'};
 
 for j=1:2:length(varargin)
     switch lower(varargin{j})
         case 'lengths', lengths = varargin{j+1};
         case 'weights', weights = varargin{j+1};
+        case 'labels', labels = varargin{j+1};
         otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
@@ -59,22 +59,24 @@ skipping = experiment.parameters.skip_initialize;
 fragments_count = sum(cellfun(@(x) numel(x) + 1, failures, 'UniformOutput', true));
 fragments_length = max(lengths);
 
-reweightings = size(weights, 2);
+label_count = numel(labels);
 
 if isempty(segments)
-    expected_overlaps = zeros(0, reweightings);
-    practical_difference = zeros(0, reweightings);
+    expected_overlaps = zeros(0, label_count);
+    practical_difference = zeros(0, label_count);
     evaluated_lengths = [];
     return;
 end
 
-expected_overlaps = zeros(numel(lengths), reweightings);
-practical_difference = zeros(numel(lengths), reweightings);
+expected_overlaps = zeros(numel(lengths), label_count);
+practical_difference = zeros(numel(lengths), label_count);
 
-for v = 1:reweightings
+for l = 1:label_count
     
-    segment_weights = weights(context.sources, v)' ./ occurences(context.sources);
+    sequence_weights = weights(context.sources)' ./ occurences(context.sources);
 
+    label = labels{l};
+    
     fragments = nan(fragments_count, fragments_length);
     fpractical = nan(fragments_count, fragments_length);
     fweights = nan(fragments_count, 1);
@@ -96,7 +98,10 @@ for v = 1:reweightings
                 fpractical(f, :) = 0;
                 fpractical(f, 1:min(numel(o), fragments_length)) = o;
 
-                fweights(f) = segment_weights(i);
+                w = numel(query_label(sequences{context.sources(i)}, label, points(j):points(j+1))) ...
+                    / (points(j+1) - points(j));
+                
+                fweights(f) = sequence_weights(i) * w;
 
                 f = f + 1;
             end;
@@ -106,7 +111,10 @@ for v = 1:reweightings
             o = practical{i}(points(end):end); o(isnan(o)) = 0;
             fpractical(f, 1:min(numel(o), fragments_length)) = o;
 
-            fweights(f) = segment_weights(i);
+            w = numel(query_label(sequences{context.sources(i)}, label, points(end):length(segments{i}))) ...
+                / (sequences{context.sources(i)}.length - points(end));
+
+            fweights(f) = sequence_weights(i) * w;
 
             f = f + 1;
         else
@@ -116,11 +124,18 @@ for v = 1:reweightings
                 % observed interval
                 fragments(f, :) = segments{i}(1:fragments_length);
                 fpractical(f, :) = practical{i}(1:fragments_length);
+                
+                w = numel(query_label(sequences{context.sources(i)}, label, 1:fragments_length)) ...
+                    / fragments_length;
             else
                 fragments(f, 1:numel(segments{i})) = segments{i};
                 fpractical(f, 1:numel(practical{i})) = practical{i};
+                
+                w = numel(query_label(sequences{context.sources(i)}, label)) ...
+                    / sequences{context.sources(i)}.length;
             end
-            fweights(f) = segment_weights(i);
+                        
+            fweights(f) = sequence_weights(i) * w;
             f = f + 1;
         end
     end
@@ -129,15 +144,15 @@ for v = 1:reweightings
         len = lengths(e);
         % do not calculate for Ns == 1: overlap on first frame is always NaN
         if len == 1
-            expected_overlaps(e, v) = 1;
+            expected_overlaps(e, l) = 1;
             continue;
         end
 
         usable = ~isnan(fragments(:, len));
 
         % for each len get a single number - average overlap
-        expected_overlaps(e, v) = sum(mean(fragments(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
-        practical_difference(e, v) = sum(mean(fpractical(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
+        expected_overlaps(e, l) = sum(mean(fragments(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
+        practical_difference(e, l) = sum(mean(fpractical(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
         
     end
 
