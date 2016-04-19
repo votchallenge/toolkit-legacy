@@ -30,7 +30,7 @@ for i = 1:2:length(varargin)
         case 'uselabels'
             uselabels = varargin{i+1};
         case 'hidelegend'
-            hidelegend = varargin{i+1};ciccc
+            hidelegend = varargin{i+1};
         case 'rangethreshold'
             range_threshold = varargin{i+1};
         otherwise 
