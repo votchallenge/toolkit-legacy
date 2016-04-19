@@ -98,11 +98,11 @@ for l = 1:label_count
                 fpractical(f, :) = 0;
                 fpractical(f, 1:min(numel(o), fragments_length)) = o;
 
-                w = numel(query_label(sequences{context.sources(i)}, label, points(j):points(j+1))) ...
-                    / (points(j+1) - points(j));
+                w = numel(query_label(sequences{context.sources(i)}, label, points(j):(points(j+1)))) ...
+                    / (points(j+1) - points(j) + 1);
                 
                 fweights(f) = sequence_weights(i) * w;
-
+                
                 f = f + 1;
             end;
 
@@ -112,10 +112,10 @@ for l = 1:label_count
             fpractical(f, 1:min(numel(o), fragments_length)) = o;
 
             w = numel(query_label(sequences{context.sources(i)}, label, points(end):length(segments{i}))) ...
-                / (sequences{context.sources(i)}.length - points(end));
+                / (sequences{context.sources(i)}.length - points(end) + 1);
 
             fweights(f) = sequence_weights(i) * w;
-
+            
             f = f + 1;
         else
         % process also last part of the trajectory - segment without failure
@@ -134,7 +134,7 @@ for l = 1:label_count
                 w = numel(query_label(sequences{context.sources(i)}, label)) ...
                     / sequences{context.sources(i)}.length;
             end
-                        
+
             fweights(f) = sequence_weights(i) * w;
             f = f + 1;
         end

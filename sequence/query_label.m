@@ -18,7 +18,11 @@ if nargin < 3
 end
 
 if strcmp(label, 'all')
-    indices = 1:sequence.length;
+    if nargin < 3
+        indices = 1:sequence.length;
+    else
+        indices = 1:numel(subset);
+    end;
     return;
 end;
 
