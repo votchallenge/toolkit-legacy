@@ -9,6 +9,10 @@ function [accuracy, frames] = estimate_accuracy(trajectory, sequence, varargin)
 % - varargin[Burnin] (integer): Number of frames that have to be ignored after the failure.
 % - varargin[IgnoreUnknown] (boolean): Ignore frames where the overlap is
 % unknown.
+% - varargin[BindWithin] (boolean or vector): Bind the overlap calculation to the region
+% within the image. If the sequence variable is a sequence structure then a boolean value
+% is sufficient to establishe bounding region. Otherwise a bounding region has to be specified
+% manually.
 %
 % Output:
 % - accuracy (double): Average overlap.
@@ -17,11 +21,13 @@ function [accuracy, frames] = estimate_accuracy(trajectory, sequence, varargin)
 
 ignore_unknown = true;
 burnin = 0;
+bind_within = get_global_variable('bounded_overlap', true);
 
 for j=1:2:length(varargin)
     switch lower(varargin{j})
         case 'burnin', burnin = max(0, varargin{j+1});
         case 'ignoreunknown', ignore_unknown = varargin{j+1};
+        case 'bindwithin', bind_within = varargin{j+1};
         otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
@@ -51,10 +57,20 @@ end;
 
 trajectory(mask) = {0};
 
-if isstruct(sequence)
-    frames = calculate_overlap(trajectory, get_region(sequence, 1:sequence.length));
+if islogical(bind_within)
+    if bind_within && isstruct(sequence)
+        bounds = [sequence.width, sequence.height] - 1;
+    else
+        bounds = [];
+    end;
 else
-    frames = calculate_overlap(trajectory, sequence);
+    bounds = bind_within;
+end;
+
+if isstruct(sequence)
+    frames = calculate_overlap(trajectory, get_region(sequence, 1:sequence.length), bounds);
+else
+    frames = calculate_overlap(trajectory, sequence, bounds);
 end;
 
 if ~ignore_unknown

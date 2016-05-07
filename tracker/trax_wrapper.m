@@ -14,12 +14,13 @@ function [trajectory, time] = trax_wrapper(tracker, sequence, context)
 % - time: Elapsed time in seconds. In case of fake execution mode the function returns the working directory.
 
 trax_executable = get_global_variable('trax_client', '');
+bind_within = get_global_variable('bounded_overlap', true);
 
 if isempty(trax_executable)
     error('TraX support not available');
 end;
 
-defaults = struct('directory', tempname, 'skip_labels', {{}}, 'skip_initialize', 1, 'failure_overlap',  -1);
+defaults = struct('directory', tempname, 'skip_labels', {{}}, 'skip_initialize', 1, 'failure_overlap', -1);
 
 context = struct_merge(context, defaults);
 
@@ -101,6 +102,7 @@ library_path = '';
 
 % in case when we only want to know runtime command for testing
 if isfield(context, 'fake') && context.fake
+    % TODO: also has to export environement variables
     trajectory = command;
     time = context.directory;
     return;
@@ -144,6 +146,12 @@ try
 		    setenv(library_var, getenv('PATH'));
         end;
 
+        if bind_within
+            setenv('TRAX_BOUNDED_OVERLAP', 'true');
+        else
+            setenv('TRAX_BOUNDED_OVERLAP', 'false');
+        end
+        
 		if verLessThan('matlab', '7.14.0')
 		    tic;
 		    [status, output] = system(command);
@@ -190,6 +198,8 @@ catch e
 		setenv(library_var, library_path);
 	end;
 
+    setenv('TRAX_BOUNDED_OVERLAP');
+    
     print_debug('ERROR: Exception thrown "%s".', e.message);
 end;
 

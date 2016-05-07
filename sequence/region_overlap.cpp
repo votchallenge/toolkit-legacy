@@ -4,8 +4,49 @@
 #include "mex.h"
 #include "region.h"
 
+region_bounds get_bounds(const mxArray * input) {
+    
+    region_bounds bounds;
+
+    if (!mxIsDouble(input)) {
+        mexErrMsgTxt("Bounds has to be an array of doubles");
+    }
+
+	double *r = (double*)mxGetPr(input);
+    int l = MAX(mxGetN(input), mxGetM(input));
+
+    if (l == 4) {
+        
+        bounds.left = r[0];
+        bounds.top = r[1];
+        bounds.right = r[2];
+        bounds.bottom = r[3];
+   
+    } else if (l == 2) {
+        
+        bounds.left = 0;
+        bounds.top = 0;
+        bounds.right = r[0];
+        bounds.bottom = r[1];
+   
+    } else if (l == 0) {
+        
+        bounds = region_no_bounds;
+   
+    } else {
+        mexErrMsgTxt("Bounds can only be formulated as [left, top, right, bottom] or [width, height] or []");
+    }
+    
+    return bounds;
+    
+}
+
 region_container* get_polygon(const mxArray * input) {
     
+    if (!mxIsDouble(input)) {
+        mexErrMsgTxt("Polygon has to be an array of doubles");
+    }
+
     region_container* p = NULL;
 	double *r = (double*)mxGetPr(input);
     int l = MAX(mxGetN(input), mxGetM(input));
@@ -39,7 +80,7 @@ region_container* get_polygon(const mxArray * input) {
     
 }
 
-region_overlap compute_overlap(const mxArray* r1, const mxArray* r2) {
+region_overlap compute_overlap(const mxArray* r1, const mxArray* r2, region_bounds bounds) {
 
 	region_container* p1;
 	region_container* p2;
@@ -49,10 +90,10 @@ region_overlap compute_overlap(const mxArray* r1, const mxArray* r2) {
 
     // TODO: accept integer for special frames
     if (mxGetClassID(r1) != mxDOUBLE_CLASS)
-	    mexErrMsgTxt("All input arguments must be of type double");
+	    mexErrMsgTxt("Region input arguments must be of type double");
 
     if (mxGetClassID(r2) != mxDOUBLE_CLASS)
-	    mexErrMsgTxt("All input arguments must be of type double");
+	    mexErrMsgTxt("Region input arguments must be of type double");
 
     p1 = get_polygon(r1);
     p2 = get_polygon(r2);
@@ -61,7 +102,7 @@ region_overlap compute_overlap(const mxArray* r1, const mxArray* r2) {
 
     if (p1 != NULL && p2 != NULL) {
 
-        overlap = region_compute_overlap(p1, p2);
+        overlap = region_compute_overlap(p1, p2, bounds);
 	   
     } else {
 
@@ -77,8 +118,14 @@ region_overlap compute_overlap(const mxArray* r1, const mxArray* r2) {
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-	if( nrhs != 2 ) mexErrMsgTxt("Two vector or cell arguments (regions) required.");
+	if( nrhs < 2 || nrhs > 3 ) mexErrMsgTxt("Two vector or cell arguments (regions) required (plus an optional argument with bounds).");
 	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");
+
+    region_bounds bounds = region_no_bounds;
+
+    if (nrhs > 2) {
+        bounds =  get_bounds(prhs[2]);
+    }
 
     if (mxIsCell(prhs[0]) && mxIsCell(prhs[1])) {
 	
@@ -97,7 +144,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             mxArray* r1 = mxGetCell (prhs[0], i);
             mxArray* r2 = mxGetCell (prhs[1], i);
 
-            region_overlap overlap = compute_overlap(r1, r2);
+            region_overlap overlap = compute_overlap(r1, r2, bounds);
 
             if (overlap.overlap < 0) {
                 result[i] = mxGetNaN();
@@ -116,7 +163,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         plhs[0] = mxCreateDoubleMatrix(1, 3, mxREAL);
         double *result = (double*) mxGetPr(plhs[0]);
                 
-        region_overlap overlap = compute_overlap(prhs[0], prhs[1]);
+        region_overlap overlap = compute_overlap(prhs[0], prhs[1], bounds);
         if (overlap.overlap < 0) {
             result[0] = mxGetNaN();
             result[1] = mxGetNaN();
