@@ -29,6 +29,21 @@ print_text('');
 print_text('***************************************************************************');
 print_text('');
 
+if ~tracker.trax
+    print_text('***************************************************************************');
+    print_text('');
+    print_text('                       * DEPRECATION WARNING * ');
+    print_text('');
+    print_text('You are using an outdated mechanism for communication between the tracker');
+    print_text('and the VOT toolkit. Starting with the next version of the toolkit the ');
+    print_text('support for this mechanism will be removed completely. We recommend that');
+    print_text('you switch to TraX protocol before that time to avoid any problems and to');
+    print_text('help us with testing of the protocol.');
+    print_text('');
+    print_text('***************************************************************************');
+    print_text('');
+end;
+
 while 1
     print_text('Choose action:');
     print_indent(1);
