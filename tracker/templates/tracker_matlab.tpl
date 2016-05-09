@@ -11,7 +11,8 @@ tracker_label = [];
 % tracker implementation.
 %
 % Please customize the line below by substituting the first argument with the name of the
-% script of your tracker and also provide the path (or multiple paths) where the tracker sources
+% script (not the .m file but just the name of the script as you would use it in within Matlab)
+% of your tracker and also provide the path (or multiple paths) where the tracker sources
 % are found as the elements of the cell array (second argument).
 tracker_command = generate_matlab_command('<TODO: set script name>', {'<TODO: set script path>'});
 
