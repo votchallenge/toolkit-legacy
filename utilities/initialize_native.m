@@ -185,6 +185,12 @@ else
     return;
 end
 
+if exist(fullfile(native_dir, 'python'), 'dir') == 7 
+    set_global_variable('trax_python', fullfile(native_dir, 'python'));
+else
+    return;
+end
+
 success = true;
 
 end
@@ -232,5 +238,11 @@ else
     print_debug('TraX source code already present.');
     success = true;
 end;
+
+if success
+    if exist(fullfile(trax_dir, 'python'), 'dir') == 7 
+        set_global_variable('trax_python', fullfile(trax_dir, 'python'));
+    end 
+end
 
 end
