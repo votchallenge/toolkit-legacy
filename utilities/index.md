@@ -40,8 +40,8 @@ Module functions
 -   [strjoin](strjoin.m) - Joins multiple strings
 -   [strxcmp](strxcmp.m) - Advanced substring comparison
 
-### Mathematics
+### Mathematics and statistics
 
 -   [gmm_estimate](gmm_estimate.m) - Estimates a GMM on a set of points
 -   [gmm_evaluate](gmm_evaluate.m) - Evaluates the GMM for a set of points
-
+-   apcluster - Computers clusters on data using affinity propagation
