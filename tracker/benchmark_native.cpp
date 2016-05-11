@@ -131,15 +131,15 @@ char* getString(const mxArray *arg) {
 
 int getOperationIndex(char* operation) {
     
-    int opreation = 0;
-
     if (strcmp(operation, "convolution") == 0) {
         return 1;
     }
     
     if (strcmp(operation, "maxfilter") == 0) {
         return 2;
-    }   
+    }
+
+    return 0;
 }
 
 
