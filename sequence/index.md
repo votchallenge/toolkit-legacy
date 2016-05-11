@@ -48,7 +48,6 @@ structure contains the following fields:
 Most of the values in the descriptor are determined from the content of
 the sequence directory.
 
-
 Trajectory format
 -----------------
 
@@ -117,5 +116,9 @@ sequences.
 -   region_convert - A MEX function that converts between different region formats
 -   region_mask - A MEX function that converts a region to a binary mask
 
+Submodules
+----------
+
+-   [clustering](clustering/) - Sequence clustering code
 
 

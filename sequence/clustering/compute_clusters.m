@@ -30,13 +30,13 @@ function [clusters_ap, clusters_kmeans] = compute_clusters(config, sequences, si
     p = config.ap_clustering_factor*mean(similarity(:));  % effects number of clusters
     clusters_ap.cluster_map = apcluster(similarity, p);
     clusters_ap.exemplars = unique(clusters_ap.cluster_map)';
-    disp(['Number of AP clusters: ' num2str(length(clusters_ap.exemplars))]);
+    print_text('Number of AP clusters: %d', length(clusters_ap.exemplars));
 
     %k-means
     numClusters = length(clusters_ap.exemplars);
     clusters_kmeans.cluster_map = kmeans(feature_vectors, numClusters);
     clusters_kmeans.exemplars = unique(clusters_kmeans.cluster_map)';
-    disp(['Number of k-means clusters: ' num2str(numClusters)]);
+    print_text('Number of k-means clusters: %d', numClusters);
 
     clusters_ap.clusters_id = cell(length(clusters_ap.exemplars), 1);
     clusters_kmeans.clusters_id = cell(length(clusters_ap.exemplars), 1);

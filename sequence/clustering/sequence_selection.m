@@ -59,7 +59,7 @@ function [] = sequence_selection(config, sequences, feature_vectors_scaled, clus
 %         if ~isempty(id)
 %             occlusion_feat(end+1,1) = O{2}(id);
 %         else
-%             fprintf('missing seq %s \n', sequences{i}.name);
+%             print_text('Missing seqence %s \n', sequences{i}.name);
 %         end
 %     end
 % 

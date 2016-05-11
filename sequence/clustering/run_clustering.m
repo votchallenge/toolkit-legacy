@@ -48,9 +48,9 @@ function [] = run_clustering()
     if ~exist(config.result_directory, 'dir') mkdir(config.result_directory); end;
     if ~exist(config.result_directory_clusters_img, 'dir') mkdir(config.result_directory_clusters_img); end;
 
-    %names of the trackers that will be used to verify clusters, require config
-    %files for each tracker, i.e. tracker_FoT.m, tracker_ASMS.m
-    %NOTE: used only if the config.validate_by_trackers flag is set to 1
+    % names of the trackers that will be used to verify clusters, require config
+    % files for each tracker, i.e. tracker_FoT.m, tracker_ASMS.m
+    % NOTE: used only if the config.validate_by_trackers flag is set to 1
     config.trackers_name = {'KCF'}; 
 
     %names of attributes that should be computed, note that each name have
@@ -92,10 +92,10 @@ function [] = run_clustering()
         area = bbox(3)*bbox(4);
 
         if area <= 400
-            fprintf('REMOVE: SMALL AREA (%.0f px^2) in seq %s\n', area, sequences{i}.name);
+            print_text('REMOVE: object area too small (%.0f px^2) in sequence %s\n', area, sequences{i}.name);
         end
         if sequences{i}.grayscale == 1
-            fprintf('REMOVE: GRAYSCALE SEQ %s\n', sequences{i}.name);
+            print_text('REMOVE: grayscale sequence %s\n', sequences{i}.name);
         end
 
         if sequences{i}.grayscale == 0 && area > 400;
@@ -116,7 +116,7 @@ function [] = run_clustering()
 
     %% perform clustering
     %load attributes, normalize feature vectors, compute distances one-to-all
-    [similarity, sequences, feature_vectors, feature_vectors_realval] = compute_featurevect(config, sequences);
+    [similarity, sequences, feature_vectors, feature_vectors_realval] = compute_features(config, sequences);
 
     %affine propagation + clustering methods
     [clusters_ap, clusters_kmeans] = compute_clusters(config, sequences, similarity, feature_vectors);

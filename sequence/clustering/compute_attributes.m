@@ -12,11 +12,14 @@ function [] = compute_attributes(config, sequences)
 % Output: (computed attributes are store in local file system)
 % - none
 
-    disp('Computing attributes, Processing sequences ...');
+    print_text('Computing attributes, Processing sequences ...');
     numAttr = length(config.attributes);
-    allTime = tic ;
+    allTime = tic;
+
+    print_indent(1);
+
     for i = 1:length(sequences)
-      disp([num2str(i) '/' num2str(length(sequences)) ' - ' sequences{i}.name]);
+      print_text('%d / %d - %s', i, length(sequences), sequences{i}.name);
 
       mean_file = fullfile(config.result_directory, sprintf('%s.mean', sequences{i}.name));
       var_file = fullfile(config.result_directory, sprintf('%s.var', sequences{i}.name));
@@ -48,19 +51,24 @@ function [] = compute_attributes(config, sequences)
           frames = zeros(numAttr, sequences{i}.length);
       end
 
-
+      print_indent(1);
       tic
       for j = start_attr_index:numAttr
-        disp(['        ' num2str(j) '/' num2str(numAttr) ' - ' config.attributes{j}]);
+        print_text('%d / %d - %s', j, numAttr, config.attributes{j});
         attrfnc = str2func(config.attributes{j});
         [means(j) vars(j) frames(j, :)] = attrfnc(sequences{i});
       end
       toc
 
+      print_indent(-1);
+
       csvwrite(mean_file, means);
       csvwrite(var_file, vars);
       csvwrite(frames_file, frames);
     end;
+
+    print_indent(-1);
+
     t = toc(allTime);
-    disp(['Attributes computation finnished in ' num2str(t) 's']);
+    print_text('Attributes computation finnished in %.2f s', t);
 end

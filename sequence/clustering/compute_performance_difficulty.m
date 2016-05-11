@@ -45,8 +45,8 @@ function [performance_accumulated] = compute_performance_difficulty(experiments,
         c_kmeans_vars(i,:) = var(performance_accumulated(clusters_kmeans.clusters_id{i},:));
     end
 
-    fprintf('Affine propagation clustering - inner cluster perf. variation (robustness/accuracy) : %.02f/%.02f\n', mean(c_ap_vars, 1));
-    fprintf('K-means clustering            - inner cluster perf. variation (robustness/accuracy) : %.02f/%.02f\n', mean(c_kmeans_vars, 1));
+    print_text('Affine propagation clustering - inner cluster perf. variation (robustness/accuracy) : %.02f/%.02f\n', mean(c_ap_vars, 1));
+    print_text('K-means clustering            - inner cluster perf. variation (robustness/accuracy) : %.02f/%.02f\n', mean(c_kmeans_vars, 1));
 end
 
 function [scores] = calculate_scores(tracker, sequences, result_directory)

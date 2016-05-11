@@ -1,6 +1,5 @@
-function [similarity, sequences, feature_vectors_scaled, feature_vector_realval] = compute_featurevect(config, sequences)
-% compute_featurevect Calculates feature vectors for each
-% sequence using the attributes computed by the compute_attributes function
+function [similarity, sequences, feature_vectors_scaled, feature_vector_realval] = compute_features(config, sequences)
+% compute_features Calculates feature vectors for each sequence using the sequence attributes
 %
 % The function calculates feature representation of each sequence from 
 % the computed attributes using the mean_val values as the attribute value for sequence. 
@@ -54,7 +53,8 @@ function [similarity, sequences, feature_vectors_scaled, feature_vector_realval]
 
     if config.hamming_features == 1
         num_cls = 2;
-        fprintf('Attributes entropy over all sequences : ');
+        print_text('Attributes entropy over all sequences : ');
+        print_indent(1);
         for i = 1:size(feature_vectors_scaled,2)
             feature_vectors_scaled(:,i) = kmeans( feature_vectors_scaled(:,i), num_cls ) - 1;
 
@@ -72,9 +72,9 @@ function [similarity, sequences, feature_vectors_scaled, feature_vector_realval]
             if max(feature_vectors_scaled(:,i)) > 1
                 feature_vectors_scaled(:,i) = feature_vectors_scaled(:,i)./(num_cls-1);
             end
-            fprintf('%s(%.02f) ', config.attributes_legend{i}, entropy(feature_vectors_scaled(:,i)));
+            print_text(' - %s (%.02f)', config.attributes_legend{i}, entropy(feature_vectors_scaled(:,i)));
         end
-        fprintf('\n');
+        print_indent(-1);
     end
 
     lambda = 1;
