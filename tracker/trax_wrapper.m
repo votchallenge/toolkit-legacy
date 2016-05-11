@@ -167,14 +167,15 @@ try
         print_debug('WARNING: System command has not exited normally.');
 
         if ~isempty(output)
-            print_text('Printing command line output:');
-            print_text('-------------------- Begin raw output ------------------------');
-            % This prevents printing of backspaces and such
-            disp(output(output > 31 | output == 10 | output == 13));
-            print_text('--------------------- End raw output -------------------------');
+            print_debug('Writing TraX client output to a log file.');
+            fid = fopen(fullfile(context.directory, 'trax.log'), 'w');            
+            fprintf(fid, '%s', output);
+            fclose(fid);
         end;
     
-		error_message = 'Error during tracker execution.';
+        logdir = generate_crash_report(tracker, context);
+        
+		error_message = sprintf('Error during tracker execution. Report written to "%s"', logdir);
 	else
 
 		try

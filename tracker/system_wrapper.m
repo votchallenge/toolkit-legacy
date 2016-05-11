@@ -217,15 +217,16 @@ if (n_frames ~= (sequence.length-start) + 1)
     print_debug('WARNING: Tracker did not produce a valid trajectory file.');
     
     if ~isempty(output)
-        print_text('Printing command line output:');
-        print_text('-------------------- Begin raw output ------------------------');
-        % This prevents printing of backspaces and such
-        disp(output(output > 31 | output == 10 | output == 13));
-        print_text('--------------------- End raw output -------------------------');
+        print_debug('Writing tracker output to a log file.');
+        fid = fopen(fullfile(context.directory, 'runtime.log'), 'w');            
+        fprintf(fid, '%s', output);
+        fclose(fid);
     end;
+
+    logdir = generate_crash_report(tracker, context);
     
     if isempty(trajectory)
-        error('No result produced by tracker. Stopping.');
+        error('No result produced by tracker. Report written to "%s"', logdir);
     else
         error('The number of frames is not the same as in groundtruth. Stopping.');
     end;
