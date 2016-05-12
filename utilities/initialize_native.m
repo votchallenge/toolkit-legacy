@@ -58,9 +58,19 @@ success = success && compile_mex('md5hash', {fullfile(toolkit_path, 'utilities',
 success = success && compile_mex('ndhistc', {fullfile(toolkit_path, 'utilities', 'ndhistc.c')}, ...
     {}, output_path);
 
+trax_mex_path = fullfile(output_path, 'mex');
+mkpath(trax_mex_path);
+
+success = success && compile_mex('traxserver', {fullfile(trax_path, 'matlab', 'traxserver.cpp'), ...
+    fullfile(trax_path, 'lib', 'trax.c'), fullfile(trax_path, 'lib', 'region.c'), fullfile(trax_path, 'lib', 'strmap.c'), ...
+    fullfile(trax_path, 'lib', 'message.c')}, ...
+    {fullfile(trax_path, 'lib')}, trax_mex_path);
+
 if ~success
     error('Unable to compile all native resources.');
 end;
+
+set_global_variable('trax_mex', trax_mex_path);
 
 end
 
