@@ -118,7 +118,7 @@ sequences.
 
 Submodules
 ----------
-
+ 
 -   [clustering](clustering/) - Sequence clustering code
 
 

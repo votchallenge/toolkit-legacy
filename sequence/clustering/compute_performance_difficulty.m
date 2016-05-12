@@ -1,6 +1,5 @@
 function [performance_accumulated] = compute_performance_difficulty(experiments, sequences, trackers, clusters_ap, clusters_kmeans)
-% compute_performance_difficulty measures sequence difficulty as a averaged 
-% trackers performance using VOT methodology
+% compute_performance_difficulty Measures sequence difficulty as a averaged trackers performance
 %
 % This function calculates the sequence difficulty from the results of the
 % trackers on the sequences using accuracy and robustness measures. These

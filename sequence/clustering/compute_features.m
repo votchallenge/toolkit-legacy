@@ -3,18 +3,19 @@ function [similarity, sequences, feature_vectors_scaled, feature_vector_realval]
 %
 % The function calculates feature representation of each sequence from 
 % the computed attributes using the mean_val values as the attribute value for sequence. 
+% Computed attributes are stored on local file system.
 %
 % Input:
 % - config (structure): config structure
 % - sequence (structure): A valid sequence structure.
 %
-% Output: (computed attributes are store in local file system)
+% Output:
 % - similarity (matrix): similarity between all pairs of sequences
 % - sequences (structure): modified structure of sequences where the
-%       sequences that does not have attributes computed are removed
+%   sequences that does not have attributes computed are removed
 % - feature_vector_scaled (matrix): feature vector for each sequence
-%       (row-wise). If config.hamming_features is set to 1, feature_vector_scaled is binary
-%       representation of the feature_vector_realval (clustered to 2 classes) otherwise feature_vector_scaled = feature_vector_realval
+%   (row-wise). If config.hamming_features is set to 1, feature_vector_scaled is binary
+%   representation of the feature_vector_realval (clustered to 2 classes) otherwise feature_vector_scaled = feature_vector_realval
 % - feature_vector_realval (matrix): (0,1) scaled feature vector
 
     ready = true(length(sequences), 1);

@@ -2,8 +2,8 @@ function [mean_val, var_val, frames] = attribute_aspect_ratio(sequence)
 % attribute_aspect_ratio Computes the aspect ratio change attribute for the object in the given seqeunce
 %
 % Aspect ratio change is defined as the average of per-frame aspect ratio changes. 
-% The aspect ratio change at frame $t$ is calculated as the ratio of the bounding box width 
-% and height in frame $t$ divided by the ratio of the bounding box width and height in the first frame.
+% The aspect ratio change at frame `t` is calculated as the ratio of the bounding box width 
+% and height in frame `t` divided by the ratio of the bounding box width and height in the first frame.
 %
 % Input:
 % - sequence (struct): An array of sequence structures.

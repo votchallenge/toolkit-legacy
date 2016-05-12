@@ -6,21 +6,18 @@ function [] = run_clustering()
 % presented in a valid form in the workspace (i.e. "sequence" directory with the list.txt
 % file containing names of all sequences).
 %
-%   setup of the parameters for clustering:
-%       %% init
-%           - initialize toolkit path and load current workspace 
-%           (global variables, sequences and experiments based on configuration.m file),
-%           note that experiment stack need to be set to 'clustering' in configuration.m if trackers are 
-%           used to estimate sequence difficulty during sequence selection process.
-%       %% set environment variables
-%           - sets config structure which contains all parameters for the
-%           automatic sequence selection algorithm. 
-%           - individual parameters are described and commented in this
-%           section and are set to default values that were used in the
-%           automatic sequence selection used for VOT2015.
-%       %% Preprocess sequences
-%           - removes sequences with small objects (initial area <= 400) and
-%           grayscale images
+% Setup of the parameters for clustering:
+% - initialize toolkit path and load current workspace 
+%   (global variables, sequences and experiments based on configuration.m file),
+%   note that experiment stack need to be set to 'clustering' in configuration.m if trackers are 
+%   used to estimate sequence difficulty during sequence selection process.
+% - sets config structure which contains all parameters for the
+%   automatic sequence selection algorithm. 
+% - individual parameters are described and commented in this
+%   section and are set to default values that were used in the
+%   automatic sequence selection used for VOT2015.
+% - removes sequences with small objects (initial area <= 400) and
+%   grayscale images
 %
 % Input:
 % - dataset of the sequences to be processed in the valid VOT format in the
@@ -30,7 +27,7 @@ function [] = run_clustering()
 %
 % Output:
 % - 'final_selection.txt' file with the selected sequences in the directory
-%    specified in the config.result_base_dir variable
+%   specified in the config.result_base_dir variable
 
 
     %% init

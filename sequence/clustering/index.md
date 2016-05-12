@@ -12,7 +12,7 @@ Module functions
 
 -    [run_clustering](run_clustering.m) - Perform the automatic sequence clustering procedure in the current workspace
 -    [compute_attributes](compute_attributes.m) - Calculates automatic sequence attributes for given sequences
--    [compute_performance_difficulty](compute_performance_difficulty.m) -
+-    [compute_performance_difficulty](compute_performance_difficulty.m) - Measures sequence difficulty as a averaged trackers performance
 -    [compute_clusters](compute_clusters.m) - Clusters the sequences based on feature vectors
 -    [compute_features](compute_features.m) - Calculates feature vectors for each sequence from their attributes 
 -    [sequence_selection](sequence_selection.m) - Algorithm for automatic sequence sampling from clusters using greedy approach

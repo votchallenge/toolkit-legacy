@@ -20,10 +20,10 @@ function [clusters_ap, clusters_kmeans] = compute_clusters(config, sequences, si
 % - clusters_ap (structure): clustering of the affine propagation method
 % - clusters_kmeans (structure): clustering of the k-mean method
 %   
-%   clusters structure:
-%        cluster_map(vector): assignment of each sequence to some exemplar
-%        exemplars(vector): representants of the clusters
-%        clusters_id(cell vector): ids of sequences for each cluster 
+% Clusters structure:
+% - cluster_map (vector): assignment of each sequence to some exemplar
+% - exemplars (vector): representants of the clusters
+% - clusters_id (cell vector): ids of sequences for each cluster 
 %
 
 %affine propagation

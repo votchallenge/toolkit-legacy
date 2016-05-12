@@ -2,10 +2,9 @@ function [mean_val, var_val, frames] = attribute_blur(sequence)
 % attribute_blur Computes the blur attribute in the given seqeunce
 %
 % Image blur attribute was measured by the Bayes-spectral-entropy camera focus measure
-% For more details, please see this paper:
-%   M. Kristan, J. Perš, M. Perše, S. Kovacic. 
-%   "A Bayes-Spectral-Entropy-Based Measure of Camera Focus Using 
-%   a Discrete Cosine Transform". Pattern Recognition Letters, 
+% For more details, please see this paper: M. Kristan, J. Perš, M. Perše, S. Kovacic. 
+% "A Bayes-Spectral-Entropy-Based Measure of Camera Focus Using 
+% a Discrete Cosine Transform". Pattern Recognition Letters, 
 %
 % Input:
 % - sequence (struct): An array of sequence structures.

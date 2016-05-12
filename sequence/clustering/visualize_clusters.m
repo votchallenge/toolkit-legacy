@@ -1,6 +1,7 @@
 function [] = visualize_clusters(config, sequences, clusters, performance_accumulated, feature_vectors_scaled)
-% visualize_clusters Saves sequences per cluster in a text file and 
-% visualizes the sequences for individual clusters with object previews and save them as images.
+% visualize_clusters Saves sequences per cluster in a text file. 
+% 
+% Saves sequences per cluster in a text file and visualizes the sequences for individual clusters with object previews and save them as images.
 %
 % This function 1) saves for each cluster a list of sequences that
 % belong to that cluster and their difficulty and feature vectors. 
@@ -18,9 +19,9 @@ function [] = visualize_clusters(config, sequences, clusters, performance_accumu
 % 
 % Output:
 % - 'all_clusters.txt' file with the clusters, sequences and their difficulty and feature vectors
-%     for each cluster in the directory specified in the config.result_base_dir variable
+%   for each cluster in the directory specified in the config.result_base_dir variable
 % - (optional if config.show_visualization == 1) 'cluster-XX_*.png' visualization of the sequences 
-%     for each cluster saved in the directory defined by config.result_directory_clusters_img variable
+%   for each cluster saved in the directory defined by config.result_directory_clusters_img variable
 %
 
     exemplars_vis = clusters.exemplars;
