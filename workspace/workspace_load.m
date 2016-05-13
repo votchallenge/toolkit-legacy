@@ -70,7 +70,7 @@ set_global_variable('cache', 1);
 set_global_variable('bundle', []);
 set_global_variable('cleanup', 1);
 set_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
-set_global_variable('trax_url', 'https://github.com/lukacu/trax/archive/master.zip');
+set_global_variable('trax_url', 'https://github.com/votchallenge/trax/archive/master.zip');
 set_global_variable('trax_mex', []);
 set_global_variable('trax_client', []);
 set_global_variable('trax_timeout', 30);
