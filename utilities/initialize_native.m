@@ -90,97 +90,133 @@ function success = download_native(native_dir)
 
 success = false;
 
-if ispc()
-    ostype = 'windows';
-elseif ismac()
-    ostype = 'mac';
-else
-    ostype = 'linux';
+timestamp_file = fullfile(native_dir, 'timestamp.txt');
+
+update_interval = get_global_variable('native_update_interval', 0.1);
+
+current_timestamp = datenum(clock());
+previous_timestamp = 0;
+
+fd = fopen(timestamp_file, 'r');
+if fd > 0
+    previous_timestamp = fscanf(fd, '%f');
+    fclose(fd);
 end
 
-if ~isempty(strfind(computer('arch'), '64'))
-    arch = '64';
-else
-    arch = '32';
-end;
+if current_timestamp > previous_timestamp + update_interval
 
-native_url = get_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
-tempdir = tempname;
+    if ispc()
+        ostype = 'windows';
+    elseif ismac()
+        ostype = 'mac';
+    else
+        ostype = 'linux';
+    end
 
-trax_hash_url = sprintf('%strax-%s%s.md5', native_url, ostype, arch);
-trax_bundle_url = sprintf('%strax-%s%s.zip', native_url, ostype, arch);
-trax_hash_file = fullfile(native_dir, 'trax.md5');
-
-vot_hash_url = sprintf('%svot-%s%s.md5', native_url, ostype, arch);
-vot_bundle_url = sprintf('%svot-%s%s.zip', native_url, ostype, arch);
-vot_hash_file = fullfile(native_dir, 'vot.md5');
-
-if exist(trax_hash_file, 'file') == 2
-  trax_hash = fileread(trax_hash_file);
-else
-  trax_hash = '';
-end;
-
-% Remove the native directory from the path
-if exist('read_trajectory', 'file') == 3
-    rmpath(native_dir);
-end
-
-try 
-    
-    remote_hash = urlread(trax_hash_url);
-    if ~strcmp(trax_hash, remote_hash)
-
-        mkpath(tempdir);
-        
-        try 
-            print_debug('Downloading from %s.', trax_bundle_url);
-            urlwrite(trax_bundle_url, fullfile(tempdir, 'trax.zip'));
-            unzip(fullfile(tempdir, 'trax.zip'), native_dir);
-            delete(fullfile(tempdir, 'trax.zip'));
-            fd = fopen(trax_hash_file, 'w'); fprintf(fd, '%s', remote_hash); fclose(fd);
-        catch
-            print_debug('Error downloading %s.', trax_bundle_url);
-        end
-        
+    if ~isempty(strfind(computer('arch'), '64'))
+        arch = '64';
+    else
+        arch = '32';
     end;
 
-catch 
-    print_debug('Error downloading %s.', trax_hash_url);
-end
+    native_url = get_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
+    tempdir = tempname;
 
-if exist(vot_hash_file, 'file') == 2
-  vot_hash = fileread(vot_hash_file);
-else
-  vot_hash = '';
-end;
+    version = toolkit_version();
 
-try 
-    
-    remote_hash = urlread(vot_hash_url);
-    if ~strcmp(vot_hash, remote_hash)
+    try 
+        snapshot = [urlread(sprintf('%srelease_%d_%d.id', native_url, version.major, version.minor)), '/'];
+    catch 
+        % legacy builds
+        snapshot = '';
+    end
 
-        mkpath(tempdir);
-        
-        try 
-            print_debug('Downloading from %s.', vot_bundle_url);
-            urlwrite(vot_bundle_url, fullfile(tempdir, 'vot.zip'));
-            unzip(fullfile(tempdir, 'vot.zip'), native_dir);
-            delete(fullfile(tempdir, 'vot.zip'));
-            fd = fopen(vot_hash_file, 'w'); fprintf(fd, '%s', remote_hash); fclose(fd);
-        catch
-            print_debug('Error downloading %s.', vot_bundle_url);
-        end
+    trax_hash_url = sprintf('%s%strax-%s%s.md5', native_url, snapshot, ostype, arch);
+    trax_bundle_url = sprintf('%s%strax-%s%s.zip', native_url, snapshot, ostype, arch);
+    trax_hash_file = fullfile(native_dir, 'trax.md5');
 
+    vot_hash_url = sprintf('%s%svot-%s%s.md5', native_url, snapshot, ostype, arch);
+    vot_bundle_url = sprintf('%s%svot-%s%s.zip', native_url, snapshot, ostype, arch);
+    vot_hash_file = fullfile(native_dir, 'vot.md5');
+
+    if exist(trax_hash_file, 'file') == 2
+      trax_hash = fileread(trax_hash_file);
+    else
+      trax_hash = '';
     end;
 
-catch
-    print_debug('Error downloading %s.', vot_hash_url);
-end
+    % Remove the native directory from the path
+    if exist('read_trajectory', 'file') == 3
+        rmpath(native_dir);
+    end
 
-delpath(tempdir);
+    updated = true;
 
-rehash;
+    try 
+        
+        remote_hash = urlread(trax_hash_url);
+        if ~strcmp(trax_hash, remote_hash)
+
+            mkpath(tempdir);
+            
+            try 
+                print_debug('Downloading from %s.', trax_bundle_url);
+                urlwrite(trax_bundle_url, fullfile(tempdir, 'trax.zip'));
+                unzip(fullfile(tempdir, 'trax.zip'), native_dir);
+                delete(fullfile(tempdir, 'trax.zip'));
+                fd = fopen(trax_hash_file, 'w'); fprintf(fd, '%s', remote_hash); fclose(fd);
+            catch
+                print_debug('Error downloading %s.', trax_bundle_url);
+                updated = false;
+            end
+            
+        end;
+
+    catch 
+        print_debug('Error downloading %s.', trax_hash_url);
+        updated = false;
+    end
+
+    if exist(vot_hash_file, 'file') == 2
+      vot_hash = fileread(vot_hash_file);
+    else
+      vot_hash = '';
+    end;
+
+    try 
+        
+        remote_hash = urlread(vot_hash_url);
+        if ~strcmp(vot_hash, remote_hash)
+
+            mkpath(tempdir);
+            
+            try 
+                print_debug('Downloading from %s.', vot_bundle_url);
+                urlwrite(vot_bundle_url, fullfile(tempdir, 'vot.zip'));
+                unzip(fullfile(tempdir, 'vot.zip'), native_dir);
+                delete(fullfile(tempdir, 'vot.zip'));
+                fd = fopen(vot_hash_file, 'w'); fprintf(fd, '%s', remote_hash); fclose(fd);
+            catch
+                print_debug('Error downloading %s.', vot_bundle_url);
+                updated = false;
+            end
+
+        end;
+
+    catch
+        print_debug('Error downloading %s.', vot_hash_url);
+        updated = false;
+    end
+
+    delpath(tempdir);
+
+    rehash;
+
+    if updated
+        fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
+    end;
+end;
+
 
 if exist(fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')), 'file') == 2
     set_global_variable('trax_client', fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')));
