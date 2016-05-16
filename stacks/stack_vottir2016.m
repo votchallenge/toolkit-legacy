@@ -1,4 +1,4 @@
-function experiments = stack_vottir2015()
+function experiments = stack_vottir2016()
 
 set_global_variable('bundle', 'https://liu.box.com/shared/static/yjbd38x42gkvovdidk2je01n0ymk2842.zip');
 
