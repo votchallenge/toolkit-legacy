@@ -5,7 +5,7 @@ set_global_variable('bundle', 'https://liu.box.com/shared/static/yjbd38x42gkvovd
 baseline.name = 'baseline';
 baseline.converter = [];
 baseline.type = 'supervised';
-baseline.labels = {'camera_motion', 'dynamics_change', 'occlusion', 'size','motion', 'empty'};
+baseline.labels = {'camera_motion', 'dynamics_change', 'occlusion', 'size_change', 'motion_change', 'empty'};
                
 baseline.parameters.repetitions = 15;
 baseline.parameters.burnin = 10;
