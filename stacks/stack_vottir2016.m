@@ -1,6 +1,6 @@
 function experiments = stack_vottir2015()
 
-set_global_variable('bundle', 'http://www.cvl.isy.liu.se/research/datasets/ltir/version1.0/ltir_v1_0_8bit.zip');
+set_global_variable('bundle', 'https://liu.box.com/shared/static/yjbd38x42gkvovdidk2je01n0ymk2842.zip');
 
 baseline.name = 'baseline';
 baseline.converter = [];
