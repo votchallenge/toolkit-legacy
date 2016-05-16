@@ -94,6 +94,22 @@ else
         tracker_label = sprintf('%s (%s)', tracker_label, num2str(version));
     end;
 
+    if isempty(tracker_interpreter)
+        % Additional precaution for Matlab trackers (because they have
+        % to be executed differently on Windows and are prettly slow)
+        % Detect if a tracker is executed using Matlab
+        % and set the interpreter value correctly
+        if ispc()
+            matlab_executable = fullfile(matlabroot, 'bin', 'matlab.exe');
+        else
+            matlab_executable = fullfile(matlabroot, 'bin', 'matlab');
+        end
+        
+        if ~isempty(strfind(lower(tracker_command), lower(matlab_executable)))
+            tracker_interpreter = 'matlab';
+        end
+    end
+    
 	tracker = struct('identifier', identifier, 'command', tracker_command, ...
 		    'directory', result_directory, 'linkpath', {tracker_linkpath}, ...
 		    'label', tracker_label, 'interpreter', tracker_interpreter, ...

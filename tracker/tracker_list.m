@@ -17,49 +17,67 @@ function [trackers] = tracker_list(varargin)
 % Output:
 % - trackers: A cell array of new tracker structures.
 
-identifiers = {};
+    identifiers = {};
 
-for j = 1:nargin
-    
-    %check if the first argument is a file, if so it is a 
-    %text file containing a list of tracker names, ignore directories
-    %(since the results folder migtht be on the path)
-    if exist(fullfile(pwd(), varargin{j}), 'file') == 2
+    for j = 1:nargin
+        
+        %check if the first argument is a file, if so it is a 
+        %text file containing a list of tracker names, ignore directories
+        %(since the results folder migtht be on the path)
+        if file_exist(fullfile(pwd(), varargin{j}))
 
-        ids = readfile(fullfile(pwd(), varargin{j}), 'Delimiter', ',');
+            ids = readfile(fullfile(pwd(), varargin{j}), 'Delimiter', ',');
 
-        identifiers = [identifiers; ids(:)]; %#ok<AGROW>
+            identifiers = [identifiers; ids(:)]; %#ok<AGROW>
 
-    else
+        else
 
-        % if the argument is not a file name, but it is still a string ...
-        if ischar(varargin{j})
-            identifiers = [identifiers; varargin(j)]; %#ok<AGROW>
+            % if the argument is not a file name, but it is still a string ...
+            if ischar(varargin{j})
+                identifiers = [identifiers; varargin(j)]; %#ok<AGROW>
+            end;
+
         end;
+        
+    end;
+
+    % remove the duplicate identifiers
+    if is_octave
+        identifiers = unique(identifiers);
+        print_debug('Warning: Tracker order is not preserved due to Octave limitations.')
+    else
+        identifiers = unique(identifiers, 'stable');
+    end;
+
+    trackers = cell(size(identifiers, 1), 1);
+
+    for i = 1:size(identifiers, 1)
+        tracker_identifier = strtrim(identifiers{i});
+
+        if isempty(tracker_identifier)
+            break;
+        end
+
+        trackers{i} = tracker_load(tracker_identifier);
 
     end;
-    
-end;
 
-% remove the duplicate identifiers
-if is_octave
-    identifiers = unique(identifiers);
-    print_debug('Warning: Tracker order is not preserved due to Octave limitations.')
-else
-    identifiers = unique(identifiers, 'stable');
-end;
+    trackers = set_trackers_visual_identity(trackers);
 
-trackers = cell(size(identifiers, 1), 1);
+end
 
-for i = 1:size(identifiers, 1)
-    tracker_identifier = strtrim(identifiers{i});
+% Matlab exist function is very flexible but also confuses script names for
+% real files, therefore "ncc" will be considered a file if a file "ncc.m" exists
+% in Matlab path. This can be problematic in our scenario. Therefore this function
+% approaches the problem in a plain C way.
+function status = file_exist(file_path)
 
-    if isempty(tracker_identifier)
-        break;
-    end
+    fd = fopen(file_path, 'r');
 
-    trackers{i} = tracker_load(tracker_identifier);
+    status = fd > 0;
 
-end;
+    if (fd > 0)
+        fclose(fd);
+    end;
+end
 
-trackers = set_trackers_visual_identity(trackers);

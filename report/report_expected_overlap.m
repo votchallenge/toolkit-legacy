@@ -49,102 +49,137 @@ sequences_hash = md5hash(strjoin((cellfun(@(x) x.name, sequences, 'UniformOutput
 
 for e = 1:length(experiments)
 
-    cache_identifier = sprintf('expected_overlap_%s_%s_%s_%s', experiments{e}.name, trackers_hash, sequences_hash, parameters_hash);
+    cache_identifier = sprintf('expected_overlap_%s_%s_%s_%s', experiments{e}.name, ...
+        trackers_hash, sequences_hash, parameters_hash);
+    
+    if uselabels
+        labels = cat(2, {'all'}, experiments{e}.labels);
+    else
+        labels = {'all'};
+    end;
     
     result = report_cache(context, cache_identifier, ...
         @analyze_expected_overlap, experiments{e}, trackers, ...
-        sequences, 'uselabels', uselabels);
+        sequences, 'labels', labels);
+
     results{e} = result;
   
     [~, peak, low, high] = estimate_evaluation_interval(sequences, range_threshold);
-    
-    for t = 1:numel(trackers)
-        scores(e, t) = mean(results{e}.curves{t});
-    end;
-    
-    document.section('Experiment %s', experiments{e}.name);
-    
-    plot_title = sprintf('Expected overlap curvers for %s', experiments{e}.name);
-    plot_id = sprintf('expected_overlap_curves_%s', experiments{e}.name);
-
-    handle = generate_plot('Visible', false, ...
-        'Title', plot_title, 'Width', 8);
-    
-    hold on;
-
-    plot([peak, peak], [1, 0], '--', 'Color', [0.6, 0.6, 0.6]);
-    plot([low, low], [1, 0], ':', 'Color', [0.6, 0.6, 0.6]);
-    plot([high, high], [1, 0], ':', 'Color', [0.6, 0.6, 0.6]);
-    
-    phandles = zeros(numel(trackers), 1);
-    for t = 1:numel(trackers)
-        phandles(t) = plot(results{e}.lengths, results{e}.curves{t}, 'Color', trackers{t}.style.color);
-    end;
-    
-    if ~hidelegend
-        legend(phandles, cellfun(@(x) x.label, trackers, 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
-    end;
-
-    xlabel('Sequence length');
-    ylabel('Expected overlap');
-    xlim([1, max(results{e}.lengths(:))]); 
-    ylim([0, 1]);
-
-    hold off;
-    
-    document.figure(handle, plot_id, plot_title);
-    
-    close(handle);
-    
-    plot_title = sprintf('Expected overlap scores for %s', experiments{e}.name);
-    plot_id = sprintf('expected_overlaps_%s', experiments{e}.name);
-
-    handle = generate_plot('Visible', false, ...
-        'Title', plot_title, 'Grid', false);
-    
-    hold on;
-    
+%     
+%     for t = 1:numel(trackers)
+%         scores(e, t) = mean(results{e}.curves{t});
+%     end;
+%     
     weights = ones(numel(results{e}.lengths(:)), 1);
     weights(:) = 0;
     weights(low:high) = 1;
 
-    experiment_scores = cellfun(@(x) sum(x(:) .* weights) / sum(weights), results{e}.curves, 'UniformOutput', true);
-    experiment_practical = cellfun(@(x) sum(x(:) .* weights) / sum(weights), results{e}.practical, 'UniformOutput', true);
+    document.section('Experiment %s', experiments{e}.name);
+    
+    experiment_scores = zeros(numel(trackers), numel(labels));
+    experiment_practical = zeros(numel(trackers), numel(labels));
 
-    [ordered_scores, order] = sort(experiment_scores, 'descend');
+    for p = 1:numel(labels)
 
-    phandles = zeros(numel(trackers), 1);
-    for t = 1:numel(order)
-        tracker = trackers{order(t)};
-        plot([t, t], [0, ordered_scores(t)], ':', 'Color', [0.8, 0.8, 0.8]);
-        if experiment_practical(t) > 0.001 && usepractical
-            draw_interval(t, ordered_scores(t), experiment_practical(t), experiment_practical(t), 'Color', [0.6, 0.6, 0.6]);            
-        end
-        phandles(t) = plot(t, ordered_scores(t), tracker.style.symbol, 'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
+        valid =  cellfun(@(x) numel(x) > 0, results{e}.curves, 'UniformOutput', true)';
+        
+        if p == 1
+            plot_title = sprintf('Expected overlap curves for %s', experiments{e}.name);
+            plot_id = sprintf('expected_overlap_curves_%s', experiments{e}.name);
+        else
+            plot_title = sprintf('Expected overlap curves for %s (%s)', experiments{e}.name, labels{p});
+            plot_id = sprintf('expected_overlap_curves_%s_%s', experiments{e}.name, labels{p});
+            document.subsection('Label %s', labels{p});
+        end;
+        
+        handle = generate_plot('Visible', false, ...
+            'Title', plot_title, 'Width', 8);
+
+        hold on;
+
+        plot([peak, peak], [1, 0], '--', 'Color', [0.6, 0.6, 0.6]);
+        plot([low, low], [1, 0], ':', 'Color', [0.6, 0.6, 0.6]);
+        plot([high, high], [1, 0], ':', 'Color', [0.6, 0.6, 0.6]);
+
+        phandles = zeros(numel(trackers), 1);
+        for t = find(valid)
+            phandles(t) = plot(results{e}.lengths, results{e}.curves{t}(:, p), 'Color', trackers{t}.style.color);
+        end;
+
+        if ~hidelegend
+            legend(phandles(valid), cellfun(@(x) x.label, trackers(valid), 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
+        end;
+
+        xlabel('Sequence length');
+        ylabel('Expected overlap');
+        xlim([1, max(results{e}.lengths(:))]); 
+        ylim([0, 1]);
+
+        hold off;
+
+        document.figure(handle, plot_id, plot_title);
+
+        close(handle);
+
+        plot_title = sprintf('Expected overlap scores for %s', experiments{e}.name);
+        plot_id = sprintf('expected_overlaps_%s_%s', experiments{e}.name, labels{p});
+
+        handle = generate_plot('Visible', false, ...
+            'Title', plot_title, 'Grid', false);
+
+        hold on;
+
+
+        experiment_scores(valid, p) = cellfun(@(x) sum(x(~isnan(x(:, p)), p) .* weights(~isnan(x(:, p)))) / sum(weights(~isnan(x(:, p)))), results{e}.curves(valid), 'UniformOutput', true);
+        experiment_practical(valid, p) = cellfun(@(x) sum(x(~isnan(x(:, p)), p) .* weights(~isnan(x(:, p)))) / sum(weights(~isnan(x(:, p)))), results{e}.practical(valid), 'UniformOutput', true);
+
+        [ordered_scores, order] = sort(experiment_scores(:, p), 'descend');
+
+        phandles = zeros(numel(trackers), 1);
+        for t = 1:numel(order)
+            tracker = trackers{order(t)};
+            plot([t, t], [0, ordered_scores(t)], ':', 'Color', [0.8, 0.8, 0.8]);
+            if experiment_practical(t) > 0.001 && usepractical
+                draw_interval(t, ordered_scores(t), experiment_practical(t), experiment_practical(t), 'Color', [0.6, 0.6, 0.6]);            
+            end
+            phandles(t) = plot(t, ordered_scores(t), tracker.style.symbol, 'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
+        end;
+
+        if ~hidelegend
+            legend(phandles, cellfun(@(x) x.label, trackers(order), 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
+        end;
+
+        xlabel('Order');
+        ylabel('Average expected overlap');
+        xlim([0.9, numel(trackers) + 0.1]); 
+        set(gca, 'XTick', 1:max(1, ceil(log(numel(trackers)))):numel(trackers));
+        set(gca, 'XDir', 'Reverse');
+        ylim([0, 1]);
+
+        hold off;
+
+        document.figure(handle, plot_id, plot_title);
+
+        close(handle);
     end;
 
-    if ~hidelegend
-        legend(phandles, cellfun(@(x) x.label, trackers(order), 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
-    end;
-    
-    xlabel('Order');
-    ylabel('Average expected overlap');
-    xlim([0.9, numel(trackers) + 0.1]); 
-    set(gca, 'XTick', 1:max(1, ceil(log(numel(trackers)))):numel(trackers));
-    set(gca, 'XDir', 'Reverse');
-    ylim([0, 1]);
-    
-    hold off;
-    
-    document.figure(handle, plot_id, plot_title);
-    
-    close(handle);
-    
-    scores(e, :) = experiment_scores;
-    
+    document.subsection('Overview');
     document.text('Scores calculated as an average over interval %d to %d', low, high);
+
+    if uselabels
     
+        h = generate_ordering_plot(trackers, experiment_scores(:, 2:end)' , labels(2:end), ...
+            'flip', false, 'legend', ~hidelegend, 'scope', [0, 1]);
+            document.figure(h, sprintf('ordering_expected_overlap_%s', experiments{e}.name), ...
+            'Ordering plot for expected overlap');
+
+        close(h);
+        
+    end
     
+    scores(e, valid) = experiment_scores(valid, 1)';
+
+
     experiments_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, experiments, 'UniformOutput', false)), '-'), 'Char', 'hex');
     sequences_hash = md5hash(strjoin(sort(cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
     trackers_hash = md5hash(strjoin(sort(cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
@@ -154,28 +189,28 @@ for e = 1:length(experiments)
     speed = report_cache(context, cache_identifier, @analyze_speed, experiments, trackers, sequences, 'cache', context.cachedir);
 
     averaged_normalized = squeeze(mean(mean(speed.normalized, 3), 1));
-    
+
     plot_title = sprintf('Expected overlap scores vs. speed for %s', experiments{e}.name);
     plot_id = sprintf('expected_overlaps_speed_%s', experiments{e}.name);
-    
+
     handle = generate_plot('Visible', false, ...
         'Title', plot_title, 'Grid', false);
-    
+
     hold on;
-    
+
     % In order to keep results in perspective we draw the speed in
     % logarithmic scale. The middle line is fitted to point where EFO = 20
     % (approximated real-time threshold).
-    
+
     real_time_threshold = 20;
-    
+
     speed_scaling_constant = -log(0.5) * real_time_threshold;
     plot([real_time_threshold, real_time_threshold], [1, 0], '--', 'Color', [0.6, 0.6, 0.6]);
-    
+
     phandles = zeros(numel(trackers), 1);
     for t = 1:numel(trackers)
         tracker = trackers{t};
-        
+
 %         phandles(t) = plot(exp(-speed_scaling_constant / averaged_normalized(t)), ...
 %             experiment_scores(t), tracker.style.symbol, ...
 %             'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
@@ -188,23 +223,23 @@ for e = 1:length(experiments)
     if ~hidelegend
         legend(phandles, cellfun(@(x) x.label, trackers, 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
     end;
-    
+
     xlabel('Normalized speed (EFO)');
     ylabel('Average expected overlap');
-    
+
     ylim([0, 1]);
     set(gca, 'XScale', 'log');
     xlim([0, ceil(max(averaged_normalized) / 100) * 100]);
     %speed_ticks = real_time_threshold * 3.^(-2:2);
     %set(gca, 'XTick', exp(-speed_scaling_constant ./ speed_ticks));
     %set(gca, 'XTickLabel', cellfun(@(x) sprintf('%.0f', x), num2cell(speed_ticks), 'UniformOutput', false));
-    
+
     hold off;
-    
+
     document.figure(handle, plot_id, plot_title);
-    
+
     close(handle);
-    
+       
 end;
 
 document.write();

@@ -28,16 +28,20 @@ Module functions
 -   [is_octave](is_octave.m) - Test if in GNU/Octave or Matlab
 -   [iterate](iterate.m) - Iterates over experiment, tracker and sequence triplets
 -   [iff](iff.m) - A simulation of inline conditional statement
--   [md5hash](md5hash.m) - Calculate 128 bit MD5 checksum
 -   [struct_merge](struct_merge.m) - Merges a from structure to another in a recursive manner
--   [strjoin](strjoin.m) - Joins multiple strings
 -   [format_interval](format_interval.m) - Format a time interval
 -   [patch_operation](patch_operation.m) - Performs a point-wise operation with two unequal matrices
 -   [initialize_native](initialize_native.m) - Initialize all native components
 -   [compile_mex](compile_mex.m) - Compile given source files to a MEX function
 
-### Mathematics
+### Strings
+
+-   [md5hash](md5hash.m) - Calculate 128 bit MD5 checksum
+-   [strjoin](strjoin.m) - Joins multiple strings
+-   [strxcmp](strxcmp.m) - Advanced substring comparison
+
+### Mathematics and statistics
 
 -   [gmm_estimate](gmm_estimate.m) - Estimates a GMM on a set of points
 -   [gmm_evaluate](gmm_evaluate.m) - Evaluates the GMM for a set of points
-
+-   apcluster - Computers clusters on data using affinity propagation

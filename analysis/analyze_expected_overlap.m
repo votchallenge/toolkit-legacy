@@ -7,7 +7,7 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
 % - experiment (structure): A valid experiment structures.
 % - trackers (cell): A cell array of valid tracker descriptor structures.
 % - sequences (cell): A cell array of valid sequence descriptor structures.
-% - varargin[UseLabels] (boolean): Perform per-label 
+% - varargin[Labels] (cell): An array of label names to be considered.
 % - varargin[Lengths] (vector): Lengths for which to evaluated expected overlap.
 % - varargin[Cache] (string): Cache directory.
 %
@@ -18,14 +18,14 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
 %     - lengths: lengths for which the expected overlap was evaluated
 %
 
-    uselabels = true;
+    labels = {'all'};
     lengths = [];
     cache = fullfile(get_global_variable('directory'), 'cache');
     
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
-            case 'uselabels'
-                uselabels = varargin{i+1};
+            case 'labels'
+                labels = varargin{i+1};
             case 'lengths'
                 lengths = varargin{i+1};
             case 'cache'
@@ -34,6 +34,10 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
     end 
+    
+    if ~strcmp(experiment.type, 'supervised')
+        error('Ranking analysis can only be used in supervised experiment scenario.');
+    end;
     
     print_text('Expected overlap analysis for experiment %s ...', experiment.name);
 
@@ -52,18 +56,21 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
     result.practical = cell(numel(trackers), 1);
     lengths_hash = md5hash(lengths);
     
+    labels_hash = md5hash(strjoin(labels, ';'));
+    
     for i = 1:numel(trackers)
         
         print_text('Tracker %s', trackers{i}.identifier);
         
         sequences_hash = calculate_results_fingerprint(trackers{i}, experiment, experiment_sequences);
         
-        cache_file = fullfile(cache, 'expected_overlap', sprintf('%s_%s_%s_%s.mat',  trackers{i}.identifier, experiment.name, sequences_hash, lengths_hash));
+        cache_file = fullfile(cache, 'expected_overlap', sprintf('%s_%s_%s_%s_%s.mat', ...
+            trackers{i}.identifier, experiment.name, sequences_hash, lengths_hash, labels_hash));
 
         expected_overlaps = [];
         evaluated_lengths = [];
         practical_difference = [];
-        if exist(cache_file, 'file')         
+        if exist(cache_file, 'file')
             load(cache_file);       
         end;    
 
@@ -75,8 +82,9 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
         end;
         
         [expected_overlaps, evaluated_lengths, practical_difference] = ...
-            estimate_expected_overlap(trackers{i}, experiment, experiment_sequences, 'Lengths', lengths);
-        
+            estimate_expected_overlap(trackers{i}, experiment, experiment_sequences, ...
+            'Lengths', lengths, 'Labels', labels);
+
         if ~isempty(cache_file)
             save(cache_file, 'evaluated_lengths', 'expected_overlaps', 'practical_difference');
         end

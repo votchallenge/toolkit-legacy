@@ -89,7 +89,8 @@ General utility functions for trackers.
 -   [valid_identifier](valid_identifier.m) - Verifies tracker identifier
 -   [write_manifest](write_manifest.m) - Write a manifest file for the tracker
 -   [benchmark_hardware](benchmark_hardware.m) - Perform a simple benchmark
--   [generate_matlab_command](generate_matlab_command.m) - Generate command line for Matlab tracker
+-   [generate_matlab_command](generate_matlab_command.m) - Generate command line for Matlab trackers
+-   [generate_python_command](generate_python_command.m) - Generate command line for Python trackers
 -   [trax_test](trax_test.m) - Test support for TraX protocol
 -   benchmark_native - A MEX function that performs several native benchmarks
 

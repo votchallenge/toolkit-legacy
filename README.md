@@ -11,16 +11,19 @@ Developers
 ----------
 
 * Luka Čehovin (lead developer)
-* Georg Nebehay
 * Tomáš Vojíř
 
 Contributors
 ------------
 
+* Georg Nebehay
 * Heng Cherkeng
 * Stefan Duffner
 * Mario Maresca
 * Klaus Haag
+* Alessio Dore
+* Alan Torres
+* Alan Lukežič
 
 License
 -------

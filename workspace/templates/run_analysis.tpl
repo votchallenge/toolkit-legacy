@@ -15,4 +15,4 @@ context = create_report_context('report_{{stack}}_{{tracker}}');
 report_article(context, experiments, trackers, sequences, 'spotlight', '{{tracker}}'); % This report is more suitable for results included in a paper
 
 % report_challenge(context, experiments, trackers, sequences); % Use this report for official challenge report
-
+% report_visualization(context, experiments, trackers, sequences);  % Use this report to generate images of visual (bounding box) results of trackers

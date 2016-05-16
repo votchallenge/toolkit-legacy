@@ -15,6 +15,8 @@ function [trajectory, time] = system_wrapper(tracker, sequence, context)
 
 defaults = struct('directory', tempname, 'skip_labels', {{}}, 'skip_initialize', 1, 'failure_overlap',  -1);
 
+bind_within = get_global_variable('bounded_overlap', true);
+
 context = struct_merge(context, defaults);
 
 start = 1;
@@ -25,6 +27,12 @@ total_frames = 0;
 trajectory = cell(sequence.length, 1);
 
 trajectory(:) = {0};
+
+if bind_within
+    bounds = [sequence.width, sequence.height] - 1;
+else
+    bounds = [];
+end;
 
 while start < sequence.length
 
@@ -46,7 +54,7 @@ while start < sequence.length
     total_time = total_time + Tm * size(Tr, 1);
     total_frames = total_frames + size(Tr, 1);
 
-    overlap = calculate_overlap(Tr, get_region(sequence, start:sequence.length));
+    overlap = calculate_overlap(Tr, get_region(sequence, start:sequence.length), bounds);
 
     failures = find(overlap' <= context.failure_overlap | ~isfinite(overlap'));
     failures = failures(failures > 1);
@@ -209,15 +217,16 @@ if (n_frames ~= (sequence.length-start) + 1)
     print_debug('WARNING: Tracker did not produce a valid trajectory file.');
     
     if ~isempty(output)
-        print_text('Printing command line output:');
-        print_text('-------------------- Begin raw output ------------------------');
-        % This prevents printing of backspaces and such
-        disp(output(output > 31 | output == 10 | output == 13));
-        print_text('--------------------- End raw output -------------------------');
+        print_debug('Writing tracker output to a log file.');
+        fid = fopen(fullfile(context.directory, 'runtime.log'), 'w');            
+        fprintf(fid, '%s', output);
+        fclose(fid);
     end;
+
+    logdir = generate_crash_report(tracker, context);
     
     if isempty(trajectory)
-        error('No result produced by tracker. Stopping.');
+        error('No result produced by tracker. Report written to "%s"', logdir);
     else
         error('The number of frames is not the same as in groundtruth. Stopping.');
     end;

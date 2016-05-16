@@ -11,6 +11,10 @@ function [expected_overlaps, evaluated_lengths, practical_difference] = estimate
 % - sequences (cell): An array of valid sequence descriptors.
 % - varargin[Lengths] (vector): A vector of sequence lengths for which the
 % overlap should be evaluated.
+% - varargin[Weights] (vector): A vector of per-sequence weigths that indicate
+% how much does each sequence contributes to the estimate.
+% - varargin[Labels] (cell): A set of labels for which to perform
+% calculation. If not set then only 'all' is used.
 %
 % Output:
 % - expected_overlaps (vector): Expected overlaps for corresponding
@@ -20,10 +24,14 @@ function [expected_overlaps, evaluated_lengths, practical_difference] = estimate
 % corresponding expected overlap.
 
 lengths = [];
+weights = ones(numel(sequences), 1);
+labels = {'all'};
 
 for j=1:2:length(varargin)
     switch lower(varargin{j})
         case 'lengths', lengths = varargin{j+1};
+        case 'weights', weights = varargin{j+1};
+        case 'labels', labels = varargin{j+1};
         otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
@@ -34,13 +42,12 @@ context.practical = {};
 context.sources = [];
 context = iterate(experiment, tracker, sequences, 'iterator', @collect_segments, 'context', context);
 failures = context.failures;
-overlaps = context.overlaps;
+segments = context.overlaps;
 practical = context.practical;
 occurences = hist(context.sources, max(context.sources));
-weights = 1 ./ occurences(context.sources);
 
 if isempty(lengths)
-    maxlen = max(cellfun(@(x) numel(x), overlaps, 'UniformOutput', true));
+    maxlen = max(cellfun(@(x) numel(x), segments, 'UniformOutput', true));
     lengths = 1:maxlen;
 end
 
@@ -52,74 +59,103 @@ skipping = experiment.parameters.skip_initialize;
 fragments_count = sum(cellfun(@(x) numel(x) + 1, failures, 'UniformOutput', true));
 fragments_length = max(lengths);
 
-fragments = nan(fragments_count, fragments_length);
-fpractical = nan(fragments_count, fragments_length);
-fweights = nan(fragments_count, 1);
-f = 1;
-for i = 1:numel(overlaps)
-    % calculate number of failures and their positions in the trajectory
-    F = numel(failures{i});
-    if F > 0
-        % add first part of the trajectory to the fragment list
-        points = failures{i}' + skipping;
-        points = [1, points(points <= numel(overlaps{i}))];
-        
-        for j = 1:numel(points)-1;
-            o = overlaps{i}(points(j):points(j+1)); o(isnan(o)) = 0;
-            fragments(f, :) = 0;
-            fragments(f, 1:min(numel(o), fragments_length)) = o;
-            
-            o = practical{i}(points(j):points(j+1)); o(isnan(o)) = 0;
-            fpractical(f, :) = 0;
-            fpractical(f, 1:min(numel(o), fragments_length)) = o;
-            
-            fweights(f) = weights(i);
-            
-            f = f + 1;
-        end;
+label_count = numel(labels);
 
-        o = overlaps{i}(points(end):end); o(isnan(o)) = 0;
-        fragments(f, 1:min(numel(o), fragments_length)) = o;
-        o = practical{i}(points(end):end); o(isnan(o)) = 0;
-        fpractical(f, 1:min(numel(o), fragments_length)) = o;
-        
-        fweights(f) = weights(i);
-        
-        f = f + 1;
-    else
-    % process also last part of the trajectory - segment without failure
-        if numel(overlaps{i}) >= fragments_length
-            % tracker did not fail on this sequence and it is longer than
-            % observed interval
-            fragments(f, :) = overlaps{i}(1:fragments_length);
-            fpractical(f, :) = practical{i}(1:fragments_length);
-        else
-            fragments(f, 1:numel(overlaps{i})) = overlaps{i};
-            fpractical(f, 1:numel(practical{i})) = practical{i};
-        end
-        fweights(f) = weights(i);
-        f = f + 1;
-    end
+if isempty(segments)
+    expected_overlaps = zeros(0, label_count);
+    practical_difference = zeros(0, label_count);
+    evaluated_lengths = [];
+    return;
 end
 
-% w is vector of weights (can be used in per-visual property calculation)
-% if weights are not given - use equal weights
+expected_overlaps = zeros(numel(lengths), label_count);
+practical_difference = zeros(numel(lengths), label_count);
 
-expected_overlaps = zeros(numel(lengths), 1);
-practical_difference = zeros(numel(lengths), 1);
-for e = 1:numel(expected_overlaps)
-    len = lengths(e);
-    % do not calculate for Ns == 1: overlap on first frame is always NaN
-    if len == 1
-        expected_overlaps(e) = 1;
-        continue;
+for l = 1:label_count
+    
+    sequence_weights = weights(context.sources)' ./ occurences(context.sources);
+
+    label = labels{l};
+    
+    fragments = nan(fragments_count, fragments_length);
+    fpractical = nan(fragments_count, fragments_length);
+    fweights = nan(fragments_count, 1);
+    f = 1;
+    for i = 1:numel(segments)
+        % calculate number of failures and their positions in the trajectory
+        F = numel(failures{i});
+        if F > 0
+            % add first part of the trajectory to the fragment list
+            points = failures{i}' + skipping;
+            points = [1, points(points <= numel(segments{i}))];
+
+            for j = 1:numel(points)-1;
+                o = segments{i}(points(j):points(j+1)); o(isnan(o)) = 0;
+                fragments(f, :) = 0;
+                fragments(f, 1:min(numel(o), fragments_length)) = o;
+
+                o = practical{i}(points(j):points(j+1)); o(isnan(o)) = 0;
+                fpractical(f, :) = 0;
+                fpractical(f, 1:min(numel(o), fragments_length)) = o;
+
+                w = numel(query_label(sequences{context.sources(i)}, label, points(j):(points(j+1)))) ...
+                    / (points(j+1) - points(j) + 1);
+                
+                fweights(f) = sequence_weights(i) * w;
+                
+                f = f + 1;
+            end;
+
+            o = segments{i}(points(end):end); o(isnan(o)) = 0;
+            fragments(f, 1:min(numel(o), fragments_length)) = o;
+            o = practical{i}(points(end):end); o(isnan(o)) = 0;
+            fpractical(f, 1:min(numel(o), fragments_length)) = o;
+
+            w = numel(query_label(sequences{context.sources(i)}, label, points(end):length(segments{i}))) ...
+                / (sequences{context.sources(i)}.length - points(end) + 1);
+
+            fweights(f) = sequence_weights(i) * w;
+            
+            f = f + 1;
+        else
+        % process also last part of the trajectory - segment without failure
+            if numel(segments{i}) >= fragments_length
+                % tracker did not fail on this sequence and it is longer than
+                % observed interval
+                fragments(f, :) = segments{i}(1:fragments_length);
+                fpractical(f, :) = practical{i}(1:fragments_length);
+                
+                w = numel(query_label(sequences{context.sources(i)}, label, 1:fragments_length)) ...
+                    / fragments_length;
+            else
+                fragments(f, 1:numel(segments{i})) = segments{i};
+                fpractical(f, 1:numel(practical{i})) = practical{i};
+                
+                w = numel(query_label(sequences{context.sources(i)}, label)) ...
+                    / sequences{context.sources(i)}.length;
+            end
+
+            fweights(f) = sequence_weights(i) * w;
+            f = f + 1;
+        end
     end
 
-    usable = ~isnan(fragments(:, len));
-    
-    % for each len get a single number - average overlap
-    expected_overlaps(e) = sum(mean(fragments(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
-    practical_difference(e) = sum(mean(fpractical(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
+    for e = 1:size(expected_overlaps, 1)
+        len = lengths(e);
+        % do not calculate for Ns == 1: overlap on first frame is always NaN
+        if len == 1
+            expected_overlaps(e, l) = 1;
+            continue;
+        end
+
+        usable = ~isnan(fragments(:, len));
+
+        % for each len get a single number - average overlap
+        expected_overlaps(e, l) = sum(mean(fragments(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
+        practical_difference(e, l) = sum(mean(fpractical(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
+        
+    end
+
 end
 
 evaluated_lengths = lengths;

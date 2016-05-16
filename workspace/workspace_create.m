@@ -36,7 +36,8 @@ stacks = {};
 files = dir(fullfile(fileparts(script_directory), 'stacks'));
 
 for i = 1:length(files)
-    if ~files(i).isdir && strncmp(files(i).name, 'stack_', 6)
+    if ~files(i).isdir && strxcmp(files(i).name, 'stack_', 'prefix') ...
+            && strxcmp(files(i).name, '.m', 'suffix')
         stacks{end+1} = files(i).name(7:end-2); %#ok<AGROW>
     end;
 end
@@ -133,7 +134,6 @@ generate_from_template(fullfile(directory, 'run_browse.m'), ...
 
 generate_from_template(fullfile(directory, 'run_analysis.m'), ...
     fullfile(templates_directory, 'run_analysis.tpl'), variables{:});
-
 
 native_dir = fullfile(get_global_variable('toolkit_path'), 'native');
 mkpath(native_dir);

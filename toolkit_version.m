@@ -8,6 +8,6 @@ function version = toolkit_version()
 %     - major (integer): Major version of the toolkit
 %     - minor (integer): Minor version of the toolkit
 
-version = struct('major', 3, 'minor', 2);
+version = struct('major', 4, 'minor', 0);
 
 
