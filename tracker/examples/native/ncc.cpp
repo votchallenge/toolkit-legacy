@@ -145,7 +145,7 @@ int main( int argc, char** argv) {
 
         cv::Rect rect = tracker.track(image);
 
-        vot.report(tracker.track(image));
+        vot.report(rect);
 
     }
 
