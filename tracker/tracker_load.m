@@ -77,7 +77,7 @@ if configuration_found || ~identifier_valid
 else
 
 	tracker_metadata = struct();
-	tracker_label = identifier;
+	tracker_label = [];
 	tracker_interpreter = [];
 	tracker_linkpath = {};
 	tracker_trax = [];
@@ -86,14 +86,14 @@ else
 	tracker_configuration = str2func(['tracker_' , family_identifier]);
 	tracker_configuration();
 
-    if ischar(tracker_label)
-        tracker_label = strtrim(tracker_label);
+    if isempty(tracker_label) || ~ischar(tracker_label)
+        if ~isempty(version)
+            tracker_label = sprintf('%s (%s)', tracker_label, num2str(version));
+        else
+            tracker_label = identifier;
+        end;
     end;
     
-    if ~isempty(version)
-        tracker_label = sprintf('%s (%s)', tracker_label, num2str(version));
-    end;
-
     if isempty(tracker_interpreter)
         % Additional precaution for Matlab trackers (because they have
         % to be executed differently on Windows and are prettly slow)
