@@ -15,6 +15,7 @@ function [trajectory, time] = trax_wrapper(tracker, sequence, context)
 
 trax_executable = get_global_variable('trax_client', '');
 bind_within = get_global_variable('bounded_overlap', true);
+legacy_rasterization = get_global_variable('legacy_rasterization', false);
 
 if isempty(trax_executable)
     error('TraX support not available (client binary not found)');
@@ -152,6 +153,12 @@ try
             setenv('TRAX_BOUNDED_OVERLAP', 'false');
         end
         
+        if legacy_rasterization
+            setenv('TRAX_REGION_LEGACY', 'true');
+        else
+            setenv('TRAX_REGION_LEGACY', 'false');
+        end
+        
 		if verLessThan('matlab', '7.14.0')
 		    tic;
 		    [status, output] = system(command);
@@ -200,6 +207,7 @@ catch e
 	end;
 
     setenv('TRAX_BOUNDED_OVERLAP');
+    setenv('TRAX_REGION_LEGACY');
     
     print_text('ERROR: Exception thrown "%s".', e.message);
 end;

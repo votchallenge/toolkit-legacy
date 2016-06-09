@@ -1,6 +1,7 @@
 function experiments = stack_vot2014()
 
 set_global_variable('bundle', 'http://box.vicos.si/vot/vot2014.zip');
+set_global_variable('legacy_rasterization', true);
 
 baseline.name = 'baseline';
 baseline.converter = [];

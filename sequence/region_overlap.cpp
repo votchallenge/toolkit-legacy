@@ -1,8 +1,15 @@
 
 #include <stdio.h>
+#include <string.h>
 
 #include "mex.h"
 #include "region.h"
+
+#if defined(__OS2__) || defined(__WINDOWS__) || defined(WIN32) || defined(WIN64) || defined(_MSC_VER) 
+#define strcmpi _strcmpi
+#else
+#define strcmpi strcasecmp
+#endif
 
 region_bounds get_bounds(const mxArray * input) {
     
@@ -116,15 +123,37 @@ region_overlap compute_overlap(const mxArray* r1, const mxArray* r2, region_boun
     return overlap;
 }
 
+char* get_string(const mxArray *arg) {
+
+	if (mxGetM(arg) != 1)
+		mexErrMsgTxt("Must be an array of chars");
+
+    int l = (int) mxGetN(arg);
+
+    char* cstr = (char *) malloc(sizeof(char) * (l + 1));
+    
+    mxGetString(arg, cstr, (l + 1));
+
+    return cstr;
+}
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-	if( nrhs < 2 || nrhs > 3 ) mexErrMsgTxt("Two vector or cell arguments (regions) required (plus an optional argument with bounds).");
+	if( nrhs < 2 ) mexErrMsgTxt("Two vector or cell arguments (regions) required (plus an optional argument with bounds).");
 	if( nlhs != 1 ) mexErrMsgTxt("Exactly one output argument required.");
 
     region_bounds bounds = region_no_bounds;
 
     if (nrhs > 2) {
         bounds =  get_bounds(prhs[2]);
+    }
+
+    region_clear_flags(REGION_LEGACY_RASTERIZATION);
+    if (nrhs > 3) {
+	    char* codestr = get_string(prhs[3]);
+	    if (strcmpi(codestr, "legacy") == 0) 
+		    region_set_flags(REGION_LEGACY_RASTERIZATION);
+	    free(codestr);
     }
 
     if (mxIsCell(prhs[0]) && mxIsCell(prhs[1])) {

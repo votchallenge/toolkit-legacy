@@ -29,17 +29,13 @@ region_container* array_to_region(const mxArray * input) {
         
     } else if (l == 4) {
         
-        p = region_create_polygon(4);
-        
-        p->data.polygon.x[0] = r[0];
-        p->data.polygon.x[1] = r[0] + r[2];
-        p->data.polygon.x[2] = r[0] + r[2];
-        p->data.polygon.x[3] = r[0];
+        region_container* t = NULL;
 
-        p->data.polygon.y[0] = r[1];
-        p->data.polygon.y[1] = r[1];
-        p->data.polygon.y[2] = r[1] + r[3];
-        p->data.polygon.y[3] = r[1] + r[3];
+        t = region_create_rectangle(r[0], r[1], r[2], r[3]);
+        
+        p = region_convert(t, POLYGON);
+   
+        region_release(&t);
    
     } if (l == 1) {
         

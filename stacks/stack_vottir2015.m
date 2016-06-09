@@ -1,6 +1,7 @@
 function experiments = stack_vottir2015()
 
 set_global_variable('bundle', 'http://www.cvl.isy.liu.se/research/datasets/ltir/version1.0/ltir_v1_0_8bit.zip');
+set_global_variable('legacy_rasterization', true);
 
 baseline.name = 'baseline';
 baseline.converter = [];

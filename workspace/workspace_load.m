@@ -75,6 +75,7 @@ set_global_variable('trax_mex', []);
 set_global_variable('trax_client', []);
 set_global_variable('trax_timeout', 30);
 set_global_variable('matlab_startup_model', [923.5042, -4.2525]);
+set_global_variable('legacy_rasterization', false);
 
 print_text('Initializing VOT workspace ...');
 

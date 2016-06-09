@@ -31,10 +31,16 @@ if (~iscell(T2))
 end 
 
 if nargin < 3
-    results = region_overlap(T1, T2);
-else
-    results = region_overlap(T1, T2, bounds);
+    bounds = [];
 end
+
+if get_global_variable('legacy_rasterization', true)
+    mode = 'legacy';
+else
+    mode = 'default';
+end;
+
+results = region_overlap(T1, T2, bounds, mode);
 
 %results = cell2mat(cellfun(@(r1, r2) region_overlap(r1, r2), T1, T2, 'UniformOutput', false));
 

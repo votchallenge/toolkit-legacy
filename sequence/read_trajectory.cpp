@@ -66,6 +66,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 		}
 
+        free(line_buffer);
+
 		plhs[0] = mxCreateCellMatrix((int)regions.size(), 1);
 
 		for (int i = 0; i < regions.size(); i++) {
