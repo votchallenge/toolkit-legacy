@@ -196,7 +196,7 @@ catch e
 		setenv(library_var, library_path);
 	end;
 
-    print_debug('ERROR: Exception thrown "%s".', e.message);
+    print_text('ERROR: Exception thrown "%s".', e.message);
 end;
 
 cd(old_directory);

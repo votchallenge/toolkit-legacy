@@ -17,7 +17,7 @@ trax_executable = get_global_variable('trax_client', '');
 bind_within = get_global_variable('bounded_overlap', true);
 
 if isempty(trax_executable)
-    error('TraX support not available');
+    error('TraX support not available (client binary not found)');
 end;
 
 defaults = struct('directory', tempname, 'skip_labels', {{}}, 'skip_initialize', 1, 'failure_overlap', -1);
@@ -201,7 +201,7 @@ catch e
 
     setenv('TRAX_BOUNDED_OVERLAP');
     
-    print_debug('ERROR: Exception thrown "%s".', e.message);
+    print_text('ERROR: Exception thrown "%s".', e.message);
 end;
 
 cd(old_directory);

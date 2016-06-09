@@ -14,7 +14,7 @@ function [supported] = trax_test(tracker)
 trax_executable = get_global_variable('trax_client', '');
 
 if isempty(trax_executable)
-    error('TraX support not available');
+    error('TraX support not available (client binary not found)');
 end;
 
 % Check if the result of the test is already cached
@@ -23,6 +23,9 @@ cache = fullfile(get_global_variable('directory'), 'cache', 'trax');
 
 tracker_hash = md5hash(sprintf('%s-%s-%s', tracker.command, tracker.interpreter, strjoin(tracker.linkpath, '-')));
     
+directory = fullfile(get_global_variable('directory'), 'logs', tracker.identifier, datestr(now, 30));
+
+mkpath(directory);
 mkpath(cache);
     
 cache_file = fullfile(cache, sprintf('trax_%s_%s.mat', tracker.identifier, tracker_hash));
@@ -74,10 +77,13 @@ else
     library_var = 'LD_LIBRARY_PATH';
 end;
 
+old_directory = pwd;
 try
-
     print_debug(['INFO: Executing "', command, '".']);
 
+    cleanup = onCleanup(@() cd(old_directory) ); % Set default path recovery handle
+    cd(directory);
+    
     % Save library paths
     library_path = getenv(library_var);
 
@@ -108,13 +114,6 @@ try
     
     end;
 
-    if debug
-        print_text('Printing client output:');
-        print_text('-------------------- Begin raw output ------------------------');
-        % This prevents printing of backspaces and such
-        disp(output(output > 31 | output == 10 | output == 13));
-        print_text('--------------------- End raw output -------------------------');
-    end;
 
 catch e
 
@@ -123,15 +122,28 @@ catch e
 		setenv(library_var, library_path);
 	end;
 
-    print_debug('ERROR: Exception thrown "%s".', e.message);
+    print_text('ERROR: Exception thrown "%s".', e.message);
 end;
 
-save(cache_file, 'supported', 'status', 'output');
+cd(old_directory);
+rehash;
 
 if supported
+    % Only cache if support is detected
+    save(cache_file, 'supported', 'status');
+    try
+        % clean-up temporary directory
+        delpath(directory);
+    catch
+        print_debug('WARNING: unable to remove directory %s', directory);
+    end
     print_text('TraX support is present.');
 else
-	print_text('TraX support is not present.');
+    print_debug('Writing TraX client output to a log file.');
+    fid = fopen(fullfile(directory, 'trax.log'), 'w');            
+    fprintf(fid, '%s', output);
+    fclose(fid);
+	print_text('TraX support was not detected. Debug information saved to directory %s', directory);
 end
 
 end

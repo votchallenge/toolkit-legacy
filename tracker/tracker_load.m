@@ -117,6 +117,20 @@ else
         
     if isempty(tracker_trax)
         tracker_trax = trax_test(tracker);
+        if ~tracker_trax
+            print_text('');
+            print_text('***************************************************************************');
+            print_text('');
+            print_text('Warning: TraX protocol was not detected using automatic test.');
+            print_text('This means that the tracker either does not support the protocol or there');
+            print_text('was the error in the configuration. In the first case please set tracker_trax');
+            print_text('variable to false in your tracker description file to manually disable testing.');
+            print_text('In the second case investigate the error logs to determine the cause of the.');
+            print_text('error.');
+            print_text('');
+            print_text('***************************************************************************');
+            print_text('');
+        end;
     end;
         
 	if tracker_trax
@@ -128,7 +142,7 @@ else
 		tracker.trax = true;
         tracker.trax_parameters = tracker_trax_parameters;
 		%tracker.linkpath{end+1} = fullfile(matlabroot, 'bin', lower(computer('arch')));
-	else
+    else
 		tracker.run = @system_wrapper;
 		tracker.trax = false;
 	end;
