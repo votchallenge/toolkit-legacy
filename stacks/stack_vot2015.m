@@ -1,5 +1,8 @@
 function experiments = stack_vot2015()
 
+% Temporary error until we get the legacy mode set up
+error('This version of the toolkit is not compatible with this stack. Please use vot2015-final version of the toolkit.');
+
 set_global_variable('bundle', 'http://box.vicos.si/vot/vot2015.zip');
 set_global_variable('legacy_rasterization', true);
 
