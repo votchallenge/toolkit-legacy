@@ -1,10 +1,8 @@
 function experiments = stack_vottir2015()
 
-% Temporary error until we get the legacy mode set up
-error('This version of the toolkit is not compatible with this stack. Please use vot2015-final version of the toolkit.');
-
 set_global_variable('bundle', 'http://www.cvl.isy.liu.se/research/datasets/ltir/version1.0/ltir_v1_0_8bit.zip');
 set_global_variable('legacy_rasterization', true);
+set_global_variable('bounded_overlap', false);
 
 baseline.name = 'baseline';
 baseline.converter = [];

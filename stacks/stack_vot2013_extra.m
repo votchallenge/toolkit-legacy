@@ -2,6 +2,7 @@ function experiments = stack_vot2013_extra()
 
 set_global_variable('bundle', 'http://box.vicos.si/vot/vot2013.zip');
 set_global_variable('legacy_rasterization', true);
+set_global_variable('bounded_overlap', false);
 
 basic_experiments = stack_vot2013();
 
