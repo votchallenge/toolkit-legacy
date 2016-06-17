@@ -172,6 +172,8 @@ if current_timestamp > previous_timestamp + update_interval
             
         end;
 
+        set_global_variable('native_component_trax', remote_hash);
+
     catch 
         print_debug('Error downloading %s.', trax_hash_url);
         updated = false;
@@ -202,6 +204,8 @@ if current_timestamp > previous_timestamp + update_interval
             end
 
         end;
+
+        set_global_variable('native_component_vot', remote_hash);
 
     catch
         print_debug('Error downloading %s.', vot_hash_url);

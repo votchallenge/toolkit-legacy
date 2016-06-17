@@ -7,7 +7,9 @@ function version = toolkit_version()
 % - version (structure): Structure containing version information.
 %     - major (integer): Major version of the toolkit
 %     - minor (integer): Minor version of the toolkit
+%     - patch (integer): Patch version of the toolkit
 
 version = struct('major', 4, 'minor', 0);
 
+% BUILD VERSION PLACEHOLDER %
 
