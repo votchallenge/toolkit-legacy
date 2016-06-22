@@ -39,6 +39,8 @@ Module functions
 -   [md5hash](md5hash.m) - Calculate 128 bit MD5 checksum
 -   [strjoin](strjoin.m) - Joins multiple strings
 -   [strxcmp](strxcmp.m) - Advanced substring comparison
+-   [json_encode](json_encode.m) - Encodes object to JSON string
+-   [json_decode](json_decode.m) - Parses JSON string to an object
 
 ### Mathematics and statistics
 
