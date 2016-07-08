@@ -166,7 +166,7 @@ for e = 1:length(experiments)
     document.subsection('Overview');
     document.text('Scores calculated as an average over interval %d to %d', low, high);
 
-    if uselabels
+    if uselabels && numel(labels) > 1
     
         h = generate_ordering_plot(trackers, experiment_scores(:, 2:end)' , labels(2:end), ...
             'flip', false, 'legend', ~hidelegend, 'scope', [0, 1]);
