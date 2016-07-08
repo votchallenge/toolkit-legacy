@@ -5,6 +5,7 @@ function adapted = adapted_ranks(ranks, different, mode)
 %
 % The function looks for sets of entities that are considered equal according to the `different` matrix and adapts their ranks
 % in one of the following ways:
+% - none: no adaptation, keep the original ranks.
 % - mean: a mean rank of a set is assigned to all trackers in the set.
 % - median: a median rank of a set is assigned to all trackers in the set.
 % - best: a minimum rank in a set is assigned to all trackers in the set.
@@ -20,7 +21,9 @@ function adapted = adapted_ranks(ranks, different, mode)
 adapted = zeros(1, length(ranks)) ;
 
 switch mode
-
+	case 'none'
+        adapted = ranks;
+    
 	case 'mean'
 
 		for tracker = 1:length(ranks)
