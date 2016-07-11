@@ -172,9 +172,9 @@ if current_timestamp > previous_timestamp + update_interval
             
         end;
 
-        set_global_variable('native_component_trax', remote_hash);
+        set_global_variable('native_component_trax', remote_hash(remote_hash ~= sprintf('\n')));
 
-    catch 
+    catch
         print_debug('Error downloading %s.', trax_hash_url);
         updated = false;
     end
@@ -205,7 +205,7 @@ if current_timestamp > previous_timestamp + update_interval
 
         end;
 
-        set_global_variable('native_component_vot', remote_hash);
+        set_global_variable('native_component_vot', remote_hash(remote_hash ~= sprintf('\n')));
 
     catch
         print_debug('Error downloading %s.', vot_hash_url);

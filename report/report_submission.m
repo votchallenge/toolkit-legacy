@@ -61,7 +61,7 @@ switch (event.type)
         context.experiment_sequences = convert_sequences(context.sequences, event.experiment.converter);
         
         switch event.experiment.type
-            case 'supervised'
+            case {'supervised', 'unsupervised'}
                 defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
                 context.experiment_parameters = struct_merge(event.experiment.parameters, defaults);
                 context.scores{event.experiment_index}.labels = {'Overlap', 'Failures', 'Speed'};

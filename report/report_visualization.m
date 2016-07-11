@@ -176,7 +176,7 @@ switch (event.type)
             event.sequence.name);
         
         switch event.experiment.type
-            case 'supervised'
+            case {'supervised', 'unsupervised'}
                 
                 scores = nan(context.experiment_parameters.repetitions, numel(context.measures));
                 

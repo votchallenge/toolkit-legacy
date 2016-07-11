@@ -22,6 +22,8 @@ if isempty(tokens)
     return;
 end;
 
+tokens = tokens(:)';
+
 if numel(tokens) == 1
     joined = tokens{1};
     return;

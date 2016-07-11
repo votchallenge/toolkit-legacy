@@ -49,7 +49,7 @@ end;
 switch lower(methodology)
     case {'vot2013', 'vot2014'}
         ranking_adaptation = 'mean';
-    case 'vot2015'
+    case {'vot2015', 'vot2016'}
         ranking_adaptation = 'best';
     otherwise 
         error(['Unknown methodology ', methodology, '!']) ;

@@ -22,7 +22,6 @@ figure_eps = false;
 figure_raw = false;
 standalone = true;
 cache = false;
-directory = fullfile(get_global_variable('directory'), 'visualization');
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
@@ -45,17 +44,20 @@ end
 context.root = fullfile(get_global_variable('directory'), 'reports', name);
 context.images = fullfile(context.root, 'images');
 context.raw = fullfile(context.root, 'raw');
+context.data = fullfile(context.root, 'data');
 context.exporteps = figure_eps;
 context.exportraw = figure_raw;
 context.standalone = standalone;
 context.prefix = '';
 context.imagesurl = 'images';
 context.rawurl = 'raw';
+context.dataurl = 'data';
 context.title = title;
 context.cache = cache;
 
 mkpath(context.root);
 mkpath(context.images);
+mkpath(context.data);
 mkpath(context.raw);
 
 context.cachedir = fullfile(context.root, 'cache');
