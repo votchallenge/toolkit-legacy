@@ -95,7 +95,7 @@ function matrix2html(matrix, filename, varargin)
         fprintf(fid, '<thead>');
         for i = 1 : size(head, 1)
             fprintf(fid, '<tr>');
-            cellfun(@(x) fprintf(fid, x), head(i, ~skip(i, :)), 'UniformOutput', true);
+            cellfun(@(x) fwrite(fid, x), head(i, ~skip(i, :)), 'UniformOutput', true);
             fprintf(fid, '</tr>');
         end;    
         fprintf(fid, '</thead>');
@@ -106,7 +106,7 @@ function matrix2html(matrix, filename, varargin)
     fprintf(fid, '<tbody>');
     for i = 1 : size(body, 1)
         fprintf(fid, '<tr>');
-        cellfun(@(x) fprintf(fid, x), body(i, ~skip(i, :)), 'UniformOutput', true);
+        cellfun(@(x) fwrite(fid, x), body(i, ~skip(i, :)), 'UniformOutput', true);
         fprintf(fid, '</tr>');
     end;
     fprintf(fid, '</tbody>');
