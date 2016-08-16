@@ -27,14 +27,13 @@ function [success] = compile_mex(name, files, includes, directory)
 
     mexname = fullfile(directory, sprintf('%s.%s', name, mexext));
 
-    if exist(mexname, 'file') == 2
+    if exist(mexname, 'file') == 2 || exist(mexname, 'file') == 3
 
         function_timestamp = file_timestamp(mexname);
 
         older = cellfun(@(x) file_timestamp(x) < function_timestamp, files, 'UniformOutput', true);
 
         if all(older)
-        
             success = true;
             return;
         end;
@@ -62,7 +61,13 @@ function [success] = compile_mex(name, files, includes, directory)
 
         if is_octave() 
 
-            mkoctfile('-mex', '-o', name, includes{:}, files{:}, arguments{:});
+            [out, status] = mkoctfile('-mex', '-o', name, includes{:}, files{:}, arguments{:});
+
+            if status
+                print_text('ERROR: Unable to compile MEX function.');
+                success = false;
+                return;
+            end;
 
         else
 

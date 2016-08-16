@@ -41,7 +41,10 @@
 ============================================================*/
 
 #include "mex.h"
+
+#ifndef HAVE_OCTAVE
 #include "matrix.h"
+#endif
 
 int* vnDim2vnMul (const int*vnDim, const int nDim);
 int vCoord2iAddr (const int*vCoord, const int*vnMul, const int nDim);
