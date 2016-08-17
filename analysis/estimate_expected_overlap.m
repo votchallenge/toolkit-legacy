@@ -74,7 +74,8 @@ practical_difference = zeros(numel(lengths), label_count);
 for l = 1:label_count
     
     sequence_weights = weights(context.sources(:));
-    sequence_weights = sequence_weights(:)' ./ occurences(context.sources(:));
+    frequency = occurences(context.sources(:));
+    sequence_weights = sequence_weights(:) ./ frequency(:);
 
     label = labels{l};
     
