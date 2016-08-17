@@ -1,11 +1,37 @@
 function [result] = analyze_average_expected_overlap(experiment, trackers, sequences, varargin)
+% analyze_average_expected_overlap Performs expected overlap analysis and
+% averaging
+%
+% Performs expected overlap analysis for a given experiment on a set
+% trackers and sequences and then averages the results on an interval based
+% on lenghts of sequences.
+%
+% Input:
+% - experiment (structure): A valid experiment structure.
+% - trackers (cell): A cell array of valid tracker descriptor structures.
+% - sequences (cell): A cell array of valid sequence descriptor structures.
+% - varargin[Labels] (cell): An array of label names to be considered.
+% - varargin[Aggregation] (string): Aggregation method, either pooled or mean
+% - varargin[RangeThreshold] (number): Range threshold used to determine averaging interval.
+%
+% Output:
+% - result (structure): A structure with the following fields
+%     - scores: Expected average overlap scores for trackers and labels
+%     - low: Low value of used interval
+%     - high: High value of used interval
+%     - peak: Estimated center-of-mass value of sequence lengths
+%
 
 range_threshold = 0.5;
+
+aggregation = 'mean';
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 
         case 'labels'
             labels = varargin{i+1};
+        case 'aggregation'
+            aggregation = varargin{i+1};
         case 'rangethreshold'
             range_threshold = varargin{i+1};
         otherwise 
@@ -15,7 +41,7 @@ end
 
 experiment_sequences = convert_sequences(sequences, experiment.converter);
 
-expected_overlap = analyze_expected_overlap(experiment, trackers, sequences, 'labels', labels);
+expected_overlap = analyze_expected_overlap(experiment, trackers, sequences, 'labels', labels, 'Aggregation', aggregation);
 
 [~, peak, low, high] = estimate_evaluation_interval(experiment_sequences, range_threshold);
 
