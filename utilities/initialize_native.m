@@ -63,7 +63,7 @@ mkpath(trax_mex_path);
 
 success = success && compile_mex('traxserver', {fullfile(trax_path, 'matlab', 'traxserver.cpp'), ...
     fullfile(trax_path, 'lib', 'trax.c'), fullfile(trax_path, 'lib', 'region.c'), fullfile(trax_path, 'lib', 'strmap.c'), ...
-    fullfile(trax_path, 'lib', 'message.c')}, ...
+    fullfile(trax_path, 'lib', 'message.c'), fullfile(trax_path, 'lib', 'base64.c')}, ...
     {fullfile(trax_path, 'lib')}, trax_mex_path);
 
 if ~success
@@ -172,9 +172,9 @@ if current_timestamp > previous_timestamp + update_interval
             
         end;
 
-        set_global_variable('native_component_trax', remote_hash);
+        set_global_variable('native_component_trax', remote_hash(remote_hash ~= sprintf('\n')));
 
-    catch 
+    catch
         print_debug('Error downloading %s.', trax_hash_url);
         updated = false;
     end
@@ -205,7 +205,7 @@ if current_timestamp > previous_timestamp + update_interval
 
         end;
 
-        set_global_variable('native_component_vot', remote_hash);
+        set_global_variable('native_component_vot', remote_hash(remote_hash ~= sprintf('\n')));
 
     catch
         print_debug('Error downloading %s.', vot_hash_url);

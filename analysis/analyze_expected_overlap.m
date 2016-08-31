@@ -1,14 +1,15 @@
 function [result] = analyze_expected_overlap(experiment, trackers, sequences, varargin)
-% analyze_expected_overlap Performs expected overlap analysis
+% analyze_expected_overlap Performs expected average overlap analysis
 %
-% Performs expected overlap analysis for a given experiment on a set trackers and sequences.
+% Performs expected average overlap analysis for a given experiment on a set trackers and sequences.
 %
 % Input:
-% - experiment (structure): A valid experiment structures.
+% - experiment (structure): A valid experiment structure.
 % - trackers (cell): A cell array of valid tracker descriptor structures.
 % - sequences (cell): A cell array of valid sequence descriptor structures.
 % - varargin[Labels] (cell): An array of label names to be considered.
 % - varargin[Lengths] (vector): Lengths for which to evaluated expected overlap.
+% - varargin[Aggregation] (string): Aggregation method, either pooled or mean
 % - varargin[Cache] (string): Cache directory.
 %
 % Output:
@@ -21,13 +22,16 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
     labels = {'all'};
     lengths = [];
     cache = fullfile(get_global_variable('directory'), 'cache');
-    
+    aggregation = 'mean';    
+
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
             case 'labels'
                 labels = varargin{i+1};
             case 'lengths'
                 lengths = varargin{i+1};
+            case 'aggregation'
+                aggregation = varargin{i+1};
             case 'cache'
                 cache = varargin{i+1};   
             otherwise 
@@ -58,14 +62,16 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
     
     labels_hash = md5hash(strjoin(labels, ';'));
     
+    parameters_hash = md5hash(sprintf('%s', aggregation));
+
     for i = 1:numel(trackers)
         
         print_text('Tracker %s', trackers{i}.identifier);
         
         sequences_hash = calculate_results_fingerprint(trackers{i}, experiment, experiment_sequences);
         
-        cache_file = fullfile(cache, 'expected_overlap', sprintf('%s_%s_%s_%s_%s.mat', ...
-            trackers{i}.identifier, experiment.name, sequences_hash, lengths_hash, labels_hash));
+        cache_file = fullfile(cache, 'expected_overlap', sprintf('%s_%s_%s_%s_%s_%s.mat', ...
+            trackers{i}.identifier, experiment.name, sequences_hash, lengths_hash, labels_hash, parameters_hash));
 
         expected_overlaps = [];
         evaluated_lengths = [];
@@ -81,9 +87,31 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
             continue;
         end;
         
-        [expected_overlaps, evaluated_lengths, practical_difference] = ...
-            estimate_expected_overlap(trackers{i}, experiment, experiment_sequences, ...
-            'Lengths', lengths, 'Labels', labels);
+        switch lower(aggregation)
+        case 'pooled'
+
+            [expected_overlaps, evaluated_lengths, practical_difference] = ...
+                estimate_expected_overlap(trackers{i}, experiment, experiment_sequences, ...
+                'Lengths', lengths, 'Labels', labels);
+
+        case 'mean'
+            maxlen = max(cellfun(@(x) x.length, sequences, 'UniformOutput', true));
+            lengths = 1:maxlen;
+            accumulator = nan(numel(lengths), numel(labels), numel(sequences));
+
+            for j = 1:numel(sequences)
+                accumulator(:, :, j) = estimate_expected_overlap(trackers{i}, experiment, sequences(j), 'Lengths', lengths, 'Labels', labels);
+            end;
+
+            expected_overlaps = nanmean(accumulator, 3);
+            evaluated_lengths = lengths;
+            practical_difference = zeros(size(expected_overlaps)); % TODO
+
+        otherwise
+            error('Illegal aggregation mode');
+        end;
+
+
 
         if ~isempty(cache_file)
             save(cache_file, 'evaluated_lengths', 'expected_overlaps', 'practical_difference');

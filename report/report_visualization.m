@@ -12,7 +12,7 @@ function report_visualization(context, experiments, trackers, sequences, varargi
 % - sequences (cell): An array of sequence structures.
 %
 % Output:
-% - images in output directory defined in context.visual_directory
+% - images in output directory defined in context.root
 
 measures_labels = {'Overlap', 'Failures', 'Speed'};
 context.measures = {@(trajectory, sequence, experiment, tracker) ...
@@ -66,7 +66,7 @@ for i = 1:numel(sequences)
     print_text('Sequence %s', sequences{i}.name);
     
     for e = 1:numel(experiments)
-        seq_directory = fullfile(context.visual_directory, experiments{e}.name, sequences{i}.name);
+        seq_directory = fullfile(context.root, experiments{e}.name, sequences{i}.name);
         mkpath(seq_directory);
         
         image_width = max([sequences{i}.width 480]);
@@ -176,7 +176,7 @@ switch (event.type)
             event.sequence.name);
         
         switch event.experiment.type
-            case 'supervised'
+            case {'supervised', 'unsupervised'}
                 
                 scores = nan(context.experiment_parameters.repetitions, numel(context.measures));
                 

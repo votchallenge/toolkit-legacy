@@ -99,7 +99,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     plhs[0] = mxCreateLogicalMatrix(height, width);
     char *result = (char*) mxGetData(plhs[0]);
             
-    region_mask(p, result, width, height);
+    region_get_mask(p, result, width, height);
     
     if (p) region_release(&p);
 

@@ -1,5 +1,5 @@
-function data = readfile(filename, varargin)
-% readfile Parse a file to a cell array
+function data = parsefile(filename, varargin)
+% parsefile Parse a file to a cell array
 %
 % A general purpose function that parses a file into a cell array of
 % elements based on a delimiter string and a parser function.

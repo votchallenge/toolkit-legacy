@@ -73,7 +73,9 @@ practical_difference = zeros(numel(lengths), label_count);
 
 for l = 1:label_count
     
-    sequence_weights = weights(context.sources)' ./ occurences(context.sources);
+    sequence_weights = weights(context.sources(:));
+    frequency = occurences(context.sources(:));
+    sequence_weights = sequence_weights(:) ./ frequency(:);
 
     label = labels{l};
     
@@ -150,6 +152,10 @@ for l = 1:label_count
 
         usable = ~isnan(fragments(:, len));
 
+        if ~any(usable)
+            continue;
+        end;
+        
         % for each len get a single number - average overlap
         expected_overlaps(e, l) = sum(mean(fragments(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
         practical_difference(e, l) = sum(mean(fpractical(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));

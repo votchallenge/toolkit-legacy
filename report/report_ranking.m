@@ -63,6 +63,9 @@ if ~any(strcmp(average, {'mean', 'weighted_mean', 'pooled'}))
 end
 document = create_document(context, 'ranking', 'title', 'AR ranking');
 
+% Filter out all experiments that are not of type "supervised"
+experiments = experiments(cellfun(@(e) strcmp(e.type, 'supervised'), experiments, 'UniformOutput', true));
+
 results = cell(length(experiments), 1);
 averaged_ranks = nan(length(experiments), length(trackers), 2);
 

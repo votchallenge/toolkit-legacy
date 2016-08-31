@@ -26,7 +26,7 @@ function [trackers] = tracker_list(varargin)
         %(since the results folder migtht be on the path)
         if file_exist(fullfile(pwd(), varargin{j}))
 
-            ids = readfile(fullfile(pwd(), varargin{j}), 'Delimiter', ',');
+            ids = parsefile(fullfile(pwd(), varargin{j}), 'Delimiter', ',');
 
             identifiers = [identifiers; ids(:)]; %#ok<AGROW>
 

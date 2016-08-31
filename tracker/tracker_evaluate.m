@@ -53,12 +53,12 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
     check_deterministic = ~(scan && nargout < 2); % Ensure faster execution when we only want a list of files by ommiting determinisim check.
     
     switch type
-    case 'supervised'
+    case {'supervised', 'unsupervised'}
 
         defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap', -1);
         context = struct_merge(parameters, defaults);
         metadata.deterministic = false;
-        
+
         time_file = fullfile(directory, sprintf('%s_time.txt', sequence.name));
 
         times = zeros(sequence.length, context.repetitions);

@@ -59,6 +59,8 @@ document.link = @(url, text, varargin) insert_link(document, url, sprintf(text, 
 
 document.figure = @(handle, id, title) insert_figure(context, document.fid, handle, id, title);
 
+document.script = @(script) insert_script(document, script);
+
 document.include('css', 'bootstrap.css');
 document.include('css', 'report.css');
 document.include('js', 'jquery.js');
@@ -133,6 +135,12 @@ end
 function insert_link(document, url, text)
 
     fprintf(document.fid, '<a href="%s">%s</a>', url, text);
+
+end
+
+function insert_script(document, script)
+
+    fprintf(document.fid, '<script type="text/javascript">%s</script>', script);
 
 end
 

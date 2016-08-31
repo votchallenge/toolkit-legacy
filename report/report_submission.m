@@ -61,7 +61,7 @@ switch (event.type)
         context.experiment_sequences = convert_sequences(context.sequences, event.experiment.converter);
         
         switch event.experiment.type
-            case 'supervised'
+            case {'supervised'}
                 defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
                 context.experiment_parameters = struct_merge(event.experiment.parameters, defaults);
                 context.scores{event.experiment_index}.labels = {'Overlap', 'Failures', 'Speed'};
@@ -70,7 +70,7 @@ switch (event.type)
                     @(trajectory, sequence, experiment, tracker) estimate_failures(trajectory, sequence), ...
                     @estimate_speed};
                 context.scores{event.experiment_index}.data = nan(numel(context.sequences), 3);
-            case 'chunked'
+            case {'chunked', 'unsupervised'}
                 defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
                 context.experiment_parameters = struct_merge(event.experiment.parameters, defaults);
                 context.scores{event.experiment_index}.labels = {'Overlap', 'Speed'};
@@ -98,7 +98,7 @@ switch (event.type)
             sequence.name);
         
         switch event.experiment.type
-            case {'supervised', 'chunked'}
+            case {'supervised', 'unsupervised', 'chunked'}
                 
                 scores = nan(context.experiment_parameters.repetitions, numel(context.scores{event.experiment_index}.measures));
                 
@@ -140,6 +140,8 @@ directory = fullfile(tracker.directory, experiment.name, ...
 times_file = fullfile(directory, sprintf('%s_time.txt', sequence.name));
 
 times = csvread(times_file);
+
+times = times(:, ~all(times == 0 | isnan(times), 1));
 
 speed = 1 / nanmean(times(:), 1);
 

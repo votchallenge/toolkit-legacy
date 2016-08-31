@@ -71,10 +71,10 @@ function [state, location] = ncc_initialize(I, region, varargin)
             round(region(2) + region(4)) - round(region(2))]);
     end;
 
-    x1 = max(0, region(1));
-    y1 = max(0, region(2));
-    x2 = min(width-1, region(1) + region(3) - 1);
-    y2 = min(height-1, region(2) + region(4) - 1);
+    x1 = max(1, region(1));
+    y1 = max(1, region(2));
+    x2 = min(width-2, region(1) + region(3) - 1);
+    y2 = min(height-2, region(2) + region(4) - 1);
 
     template = gray((y1:y2)+1, (x1:x2)+1);
 
@@ -92,10 +92,10 @@ function [state, location] = ncc_update(state, I, varargin)
 
     [height, width] = size(gray);
 
-    x1 = max(0, round(state.position(1) - state.window / 2));
-    y1 = max(0, round(state.position(2) - state.window / 2));
-    x2 = min(width-1, round(state.position(1) + state.window / 2));
-    y2 = min(height-1, round(state.position(2) + state.window / 2));
+    x1 = max(1, round(state.position(1) - state.window / 2));
+    y1 = max(1, round(state.position(2) - state.window / 2));
+    x2 = min(width-2, round(state.position(1) + state.window / 2));
+    y2 = min(height-2, round(state.position(2) + state.window / 2));
 
     region = gray((y1:y2)+1, (x1:x2)+1);
 

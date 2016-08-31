@@ -8,7 +8,7 @@ Module functions
 
 ### Files
 
--   [readfile](readfile.m) - Parse a file to a cell array
+-   [parsefile](parsefile.m) - Parse a file to a cell array
 -   [readstruct](readstruct.m) - Read a key-value file to a structure
 -   [writestruct](writestruct.m) - Store a structure to file
 -   [file_newer_than](file_newer_than.m) - Test if the first file is newer than the second file
@@ -16,6 +16,7 @@ Module functions
 -   [delpath](delpath.m) - Deletes the file or directory recursively
 -   [mkpath](mkpath.m) - Creates a directory path
 -   [relativepath](relativepath.m) - Returns the relative path from an root path to the target path
+-   [filewrite](filewrite.m) - Write a string to a file
 
 ### Figures
 
@@ -39,6 +40,8 @@ Module functions
 -   [md5hash](md5hash.m) - Calculate 128 bit MD5 checksum
 -   [strjoin](strjoin.m) - Joins multiple strings
 -   [strxcmp](strxcmp.m) - Advanced substring comparison
+-   [json_encode](json_encode.m) - Encodes object to JSON string
+-   [json_decode](json_decode.m) - Parses JSON string to an object
 
 ### Mathematics and statistics
 
