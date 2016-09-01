@@ -47,16 +47,16 @@ def convert_region(region, to):
         if isinstance(region, Rectangle):
             return copy.copy(region)
         elif isinstance(region, Polygon):
-            top = sys.float_info.min
-            bottom = sys.float_info.max
-            left = sys.float_info.min
-            right = sys.float_info.max
+            top = sys.float_info.max
+            bottom = sys.float_info.min
+            left = sys.float_info.max
+            right = sys.float_info.min
 
             for point in region.points: 
                 top = min(top, point.y)
                 bottom = max(bottom, point.y)
-                left = min(left, point.y)
-                right = max(right, point.y)
+                left = min(left, point.x)
+                right = max(right, point.x)
 
             return Rectangle(left, top, right - left, bottom - top)
 
