@@ -196,7 +196,11 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
         % F1 ... fragments (rows) x repeats (columns) of raw failure count.
         
         % Average accuracy is average over valid frames (non NaN).
-        average_accuracy(t1) = mean(O1(valid_frames));
+	if all(valid_frames == 0)
+		average_accuracy(t1) = 0;
+	else
+		average_accuracy(t1) = mean(O1(valid_frames));
+	end;
         
         % Average failures are sum of failures in fragments averaged over
         % repetitions
