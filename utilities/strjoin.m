@@ -11,6 +11,9 @@ function joined = strjoin(tokens, delimiter)
 % - joined (string): Joined string.
 %
 
+if nargin < 2
+    delimiter = ' ';
+end;
 
 if ~iscell(tokens)
     joined = tokens;
@@ -18,7 +21,7 @@ if ~iscell(tokens)
 end;
 
 if isempty(tokens)
-    joined = [];
+    joined = '';
     return;
 end;
 
