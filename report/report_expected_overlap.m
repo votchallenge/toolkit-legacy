@@ -1,4 +1,4 @@
-function [document] = report_expected_overlap(context, trackers, sequences, experiments, varargin)
+function [document, expected_overlap_scores] = report_expected_overlap(context, trackers, sequences, experiments, varargin)
 % report_ranking Generate a report based on expected overlap
 %
 % Performs expected overlap analysis and generates a report based on the results.
@@ -15,7 +15,7 @@ function [document] = report_expected_overlap(context, trackers, sequences, expe
 %
 % Output:
 % - document (structure): Resulting document structure.
-%
+% - expected_overlap_scores (matrix): Averaged scores for entire set.
 
 uselabels = get_global_variable('report_labels', true);
 usepractical = false;
@@ -45,6 +45,8 @@ experiments = experiments(cellfun(@(e) strcmp(e.type, 'supervised'), experiments
 trackers_hash = md5hash(strjoin((cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
 parameters_hash = md5hash(sprintf('%d-%d', uselabels, usepractical));
 sequences_hash = md5hash(strjoin((cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
+
+expected_overlap_scores = zeros(numel(experiments), numel(trackers), 1);
 
 for e = 1:length(experiments)
 
@@ -163,6 +165,8 @@ for e = 1:length(experiments)
         close(h);
     
     end
+    
+    expected_overlap_scores(e, :, 1) = result_scores.scores(:, 1);
     
 end;
 

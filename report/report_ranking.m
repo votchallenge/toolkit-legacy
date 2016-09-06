@@ -113,13 +113,13 @@ for e = 1:length(experiments)
     result.accuracy.weighted_mean_ranks = nanmean(result.accuracy.ranks, 1);
     result.robustness.weighted_mean_ranks = nanmean(result.robustness.ranks, 1);
 
-    usable = result.lengths > 0;
-    result.accuracy.weighted_mean_values = sum(result.accuracy.values(usable, :) ...
-        .* repmat(result.lengths(usable), 1, length(trackers)), 1) ./ sum(result.lengths(usable));
-    result.robustness.weighted_mean_values = sum(result.robustness.values(usable, :) ...
-        .* repmat(result.lengths(usable), 1, length(trackers)), 1) ./ sum(result.lengths(usable));
-    result.robustness.weighted_mean_normalized = sum(result.robustness.normalized(usable, :) ...
-        .* repmat(result.lengths(usable), 1, length(trackers)), 1) ./ sum(result.lengths(usable));
+    useable = result.lengths > 0;
+    result.accuracy.weighted_mean_values = sum(result.accuracy.values(useable, :) ...
+        .* repmat(result.lengths(useable), 1, length(trackers)), 1) ./ sum(result.lengths(useable));
+    result.robustness.weighted_mean_values = sum(result.robustness.values(useable, :) ...
+        .* repmat(result.lengths(useable), 1, length(trackers)), 1) ./ sum(result.lengths(useable));
+    result.robustness.weighted_mean_normalized = sum(result.robustness.normalized(useable, :) ...
+        .* repmat(result.lengths(useable), 1, length(trackers)), 1) ./ sum(result.lengths(useable));
 
     result.accuracy.mean_ranks = nanmean(result.accuracy.ranks, 1);
     result.robustness.mean_ranks = nanmean(result.robustness.ranks, 1);
