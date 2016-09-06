@@ -14,13 +14,11 @@ baseline.parameters.failure_overlap = 0;
 
 unsupervised.name = 'unsupervised';
 unsupervised.converter = [];
-unsupervised.type = 'supervised';
+unsupervised.type = 'unsupervised';
 unsupervised.labels = {'camera_motion', 'illum_change', 'occlusion', 'size_change', 'motion_change', 'empty'};
 
 unsupervised.parameters.repetitions = 1;
 unsupervised.parameters.burnin = 0;
-unsupervised.parameters.skip_initialize = 0;
-unsupervised.parameters.failure_overlap = -1;
 
 experiments = {baseline, unsupervised};
 

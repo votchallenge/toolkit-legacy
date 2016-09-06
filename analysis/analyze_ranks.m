@@ -52,7 +52,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
     end;
     
     if experiment.parameters.repetitions < 5
-        print_text('The experiment specifies less than 5 repetitions. Not valid for statistical consideration.');
+        error('The experiment specifies less than 5 repetitions. Not valid for statistical consideration.');
     end
     
     if experiment.parameters.repetitions < 15

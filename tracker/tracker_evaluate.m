@@ -59,6 +59,10 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
         context = struct_merge(parameters, defaults);
         metadata.deterministic = false;
 
+        if strcmp(type, 'unsupervised')
+            context.failure_overlap = -1;
+        end;
+
         time_file = fullfile(directory, sprintf('%s_time.txt', sequence.name));
 
         times = zeros(sequence.length, context.repetitions);
