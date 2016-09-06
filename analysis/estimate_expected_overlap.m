@@ -44,7 +44,11 @@ context = iterate(experiment, tracker, sequences, 'iterator', @collect_segments,
 failures = context.failures;
 segments = context.overlaps;
 practical = context.practical;
-occurences = hist(context.sources, max(context.sources));
+if isempty(context.practical)
+  occurences = 0;
+else
+  occurences = hist(context.sources, max(context.sources));
+end
 
 if isempty(lengths)
     maxlen = max(cellfun(@(x) numel(x), segments, 'UniformOutput', true));
