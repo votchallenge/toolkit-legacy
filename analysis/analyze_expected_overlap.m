@@ -70,8 +70,9 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
         
         sequences_hash = calculate_results_fingerprint(trackers{i}, experiment, experiment_sequences);
         
-        cache_file = fullfile(cache, 'expected_overlap', sprintf('%s_%s_%s_%s_%s_%s.mat', ...
-            trackers{i}.identifier, experiment.name, sequences_hash, lengths_hash, labels_hash, parameters_hash));
+        hash_hash = md5sum( strjoin({sequences_hash, lengths_hash, labels_hash, parameters_hash}), true);
+        cache_file = fullfile(cache, 'expected_overlap', sprintf('%s_%s_%s.mat', ...
+            trackers{i}.identifier, experiment.name, hash_hash));
 
         expected_overlaps = [];
         evaluated_lengths = [];
@@ -100,7 +101,12 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
             accumulator = nan(numel(lengths), numel(labels), numel(sequences));
 
             for j = 1:numel(sequences)
-                accumulator(:, :, j) = estimate_expected_overlap(trackers{i}, experiment, sequences(j), 'Lengths', lengths, 'Labels', labels);
+                overlap = estimate_expected_overlap(trackers{i}, experiment, sequences(j), 'Lengths', lengths, 'Labels', labels);
+                if (size(overlap,1) == 0)
+                  accumulator(:, :, j) = NaN;
+                else
+                  accumulator(:, :, j) = overlap;
+                end;
             end;
 
             expected_overlaps = nanmean(accumulator, 3);
