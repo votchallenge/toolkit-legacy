@@ -131,6 +131,8 @@ if current_timestamp > previous_timestamp + update_interval
         snapshot = '';
     end
 
+    snapshot = strtrim(snapshot); % Remove trailing whitespace/newline
+
     trax_hash_url = sprintf('%s%strax-%s%s.md5', native_url, snapshot, ostype, arch);
     trax_bundle_url = sprintf('%s%strax-%s%s.zip', native_url, snapshot, ostype, arch);
     trax_hash_file = fullfile(native_dir, 'trax.md5');
