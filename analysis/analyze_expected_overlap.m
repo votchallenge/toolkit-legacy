@@ -70,7 +70,7 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
         
         sequences_hash = calculate_results_fingerprint(trackers{i}, experiment, experiment_sequences);
         
-        hash_hash = md5sum( strjoin({sequences_hash, lengths_hash, labels_hash, parameters_hash}), true);
+        hash_hash = md5hash( strjoin({sequences_hash, lengths_hash, labels_hash, parameters_hash}) );
         cache_file = fullfile(cache, 'expected_overlap', sprintf('%s_%s_%s.mat', ...
             trackers{i}.identifier, experiment.name, hash_hash));
 
