@@ -117,7 +117,7 @@ else
 
     experiments = stack_configuration();
 
-    sequences_directory = fullfile(get_global_variable('workspace_path'), 'sequences');
+    sequences_directory = fullfile(get_global_variable('data_path'), experiment_stack);
 
     print_text('Loading sequences ...');
 

@@ -1,0 +1,9 @@
+protocols:
+  vot2016-python-test:
+    environment:
+      build: .
+    dataset:
+      resources:
+        vot2016:
+          hash: b9cdeec76044a015a90177234b838bd10cf6bb2882ec4347a7b5cf30e3e4a5ac
+          url:  http://box.vicos.si/vot/vot2016.zip
