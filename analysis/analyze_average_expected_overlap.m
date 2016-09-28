@@ -24,7 +24,7 @@ function [result] = analyze_average_expected_overlap(experiment, trackers, seque
 
 range_threshold = 0.5;
 
-aggregation = 'mean';
+aggregation = 'pooled';
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i}) 

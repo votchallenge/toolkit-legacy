@@ -22,7 +22,7 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
     labels = {'all'};
     lengths = [];
     cache = fullfile(get_global_variable('directory'), 'cache');
-    aggregation = 'mean';    
+    aggregation = 'pooled';    
 
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
