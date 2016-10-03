@@ -113,11 +113,28 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
             evaluated_lengths = lengths;
             practical_difference = zeros(size(expected_overlaps)); % TODO
 
+        case 'wmean'
+            maxlen = max(cellfun(@(x) x.length, sequences, 'UniformOutput', true));
+            lengths = 1:maxlen;
+            accumulator = nan(numel(lengths), numel(labels), numel(sequences));
+
+            for j = 1:numel(sequences)
+                overlap = estimate_expected_overlap(trackers{i}, experiment, sequences(j), 'Lengths', lengths, 'Labels', labels);
+                if (size(overlap,1) == 0)
+                  accumulator(:, :, j) = NaN;
+                else
+                  accumulator(:, :, j) = overlap;
+                end;
+            end;
+
+			weights = cellfun(@(x) x.length, sequences, 'UniformOutput', true);
+            expected_overlaps = nansum(accumulator .* repmat(reshape(weights, [1, 1, numel(sequences)]), [numel(lengths), numel(labels), 1]), 3) ./ sum(weights);
+            evaluated_lengths = lengths;
+            practical_difference = zeros(size(expected_overlaps)); % TODO
+
         otherwise
             error('Illegal aggregation mode');
         end;
-
-
 
         if ~isempty(cache_file)
             save(cache_file, 'evaluated_lengths', 'expected_overlaps', 'practical_difference');
