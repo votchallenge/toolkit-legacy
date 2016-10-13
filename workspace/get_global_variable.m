@@ -5,6 +5,9 @@ function value = get_global_variable(name, default)
 % does not exist in the storage an optional default value is returned. If
 % the default value does not exist then an empty matrix is returned.
 %
+% If no argument is given then a structure with all global variables is
+% returned.
+%
 % Input:
 % - name (string): Name of the variable.
 % - default (any): Optional default value.
@@ -15,6 +18,11 @@ function value = get_global_variable(name, default)
 
 
 global global_variables;
+
+if nargin < 1
+   value = global_variables; 
+   return;
+end
 
 if ~exist('default', 'var')
     default = [];

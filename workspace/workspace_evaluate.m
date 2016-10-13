@@ -9,15 +9,24 @@ function workspace_evaluate(trackers, sequences, experiments, varargin)
 % - sequences (cell or structure): Array of sequence structures.
 % - experiments (cell or structure): Array of experiment structures.
 % - varargin[Mode] (string, optional): Evaluation mode, at the moment only 'execute' mode is supported.
+% - varargin[Variables] (struct, optional): Additional global variables to
+% be merged with (override) the existing ones.
 %
 
 mode = 'execute';
+variables = [];
 
 for j=1:2:length(varargin)
     switch lower(varargin{j})
-        case 'mode', mode = varargin{j+1};      
+        case 'mode', mode = varargin{j+1};
+        case 'variables', variables = varargin{j+1};
         otherwise, error(['unrecognized argument ' varargin{j}]);
     end
+end
+
+if isstruct(variables)
+    print_debug('Setting additional global variables');
+    set_global_variable(variables); 
 end
 
 switch lower(mode)
