@@ -1,22 +1,22 @@
 function [files, metadata] = tracker_evaluate(tracker, sequence, directory, varargin)
 % tracker_evaluate Evaluates a tracker on a given sequence for experiment
 %
-% The core function of experimental evaluation. This function can perform various 
-% types of experiments or result gathering. The data is stored to the specified 
+% The core function of experimental evaluation. This function can perform various
+% types of experiments or result gathering. The data is stored to the specified
 % directory.
 %
 % Experiment types:
-% - supervised: Repeats running a tracker on a given sequence for a number of 
-%   times, taking into account its potential deterministic nature and 
+% - supervised: Repeats running a tracker on a given sequence for a number of
+%   times, taking into account its potential deterministic nature and
 %   various properties of experiments.
 %
 % Input:
 % - tracker (struct): Tracker structure.
 % - sequence (struct): Sequence structure.
 % - directory (string): Directory where the results are saved.
-% - varargin[Type] (string): Execution context structure. This structure contains 
+% - varargin[Type] (string): Execution context structure. This structure contains
 %   parameters of the execution.
-% - varargin[Parameters] (struct): Execution parameters structure. This structure contains 
+% - varargin[Parameters] (struct): Execution parameters structure. This structure contains
 %   parameters of the execution.
 % - varargin[Scan] (boolean): Do not evaluate the tracker but simply scan the directory
 %   for files that are generated and return their list.
@@ -42,7 +42,7 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
             otherwise, error(['unrecognized argument ' varargin{j}]);
         end
     end
-  
+
     mkpath(directory);
 
     % In case of scanning we enable chaching so that results do not get re-evaluated
@@ -51,7 +51,7 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
     end;
 
     check_deterministic = ~(scan && nargout < 2); % Ensure faster execution when we only want a list of files by ommiting determinisim check.
-    
+
     switch type
     case {'supervised', 'unsupervised'}
 
@@ -71,7 +71,13 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
             times = csvread(time_file);
         end;
 
-        for i = 1:context.repetitions
+		r = context.repetitions;
+
+		if isfield(tracker, 'metadata') && isfield(tracker.metadata, 'deterministic') && tracker.metadata.deterministic
+			r = 1;
+		end
+
+        for i = 1:r
 
             result_file = fullfile(directory, sprintf('%s_%03d.txt', sequence.name, i));
 
@@ -98,17 +104,17 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
             print_text('Repetition %d', i);
 
             context.repetition = i;
-                    
-            [trajectory, time] = tracker.run(tracker, sequence, context);        
-            
+
+            [trajectory, time] = tracker.run(tracker, sequence, context);
+
             print_indent(-1);
 
-            if numel(time) ~= sequence.length   
+            if numel(time) ~= sequence.length
                 times(:, i) = mean(time);
             else
                 times(:, i) = time;
             end
-            
+
             if ~isempty(trajectory)
                 write_trajectory(result_file, trajectory);
 		        csvwrite(time_file, times);
@@ -122,11 +128,11 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
         end;
 
     case 'chunked'
-        
+
         defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1, 'chunk_length', 50);
         context = struct_merge(parameters, defaults);
         metadata.deterministic = false;
-        
+
         [chunks, chunk_offset] = sequence_fragment(sequence, context.chunk_length);
 
         time_file = fullfile(directory, sprintf('%s_time.txt', sequence.name));
@@ -164,27 +170,27 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
             print_text('Repetition %d', i);
 
             context.repetition = i;
-            
+
             trajectory = cell(sequence.length, 1);
             time = zeros(sequence.length, 1);
-            
+
             for c = 1:numel(chunks)
-            
-                [chunk_trajectory, chunk_time] = tracker.run(tracker, chunks{c}, context);        
-            
+
+                [chunk_trajectory, chunk_time] = tracker.run(tracker, chunks{c}, context);
+
                 trajectory(chunk_offset(c):chunk_offset(c)+numel(chunk_trajectory)-1) = chunk_trajectory;
                 time(chunk_offset(c):chunk_offset(c)+numel(chunk_trajectory)-1) = chunk_time;
-                
+
             end;
-            
+
             print_indent(-1);
 
-            if numel(time) ~= sequence.length   
+            if numel(time) ~= sequence.length
                 times(:, i) = mean(time);
             else
                 times(:, i) = time;
             end
-            
+
             if ~isempty(trajectory)
                 write_trajectory(result_file, trajectory);
 		        csvwrite(time_file, times);
