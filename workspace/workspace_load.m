@@ -1,12 +1,12 @@
 function [sequences, experiments] = workspace_load(varargin)
-% workspace_load Initializes the current workspace 
+% workspace_load Initializes the current workspace
 %
 % This function initializes the current workspace by reading sequences and
 % experiments as well as initializing global variables. It also checks if native
 % resources have to be downloaded or compiled.
 %
 % To make loading faster when running the script multiple times, it checks if
-% sequences and experiments variables exist in the workspace and if they are 
+% sequences and experiments variables exist in the workspace and if they are
 % cell arrays and just reuses them. No further check is performed so this may
 % lead to problems when switching workspaces. Clear the workspace or use 'Force'
 % argument to avoid issues with cached data.
@@ -26,27 +26,26 @@ args = varargin;
 for j=1:2:length(args)
     switch lower(varargin{j})
         case 'directory', directory = args{j+1};
-        case 'force', force = args{j+1};     
+        case 'force', force = args{j+1};
         otherwise, error(['unrecognized argument ' args{j}]);
     end
 end
 
 if ~force
 
-    try 
-        
-        % Attempts to load variables from the workspace namespace to save 
+    try
+
+        % Attempts to load variables from the workspace namespace to save
         % some time
         sequences = evalin('base', 'sequences');
-        experiments = evalin('base', 'experiments');
-        
+
         % Are variables correts at a glance ...
-        cached = iscell(sequences) && iscell(experiments);
-        
-    catch 
-        
+        cached = iscell(sequences)
+
+    catch
+
         cached = false;
-        
+
     end
 
 else
@@ -94,7 +93,7 @@ catch e
             configuration_script);
     else
         error(e);
-    end; 
+    end;
 end;
 
 native_dir = fullfile(get_global_variable('toolkit_path'), 'native');
@@ -103,19 +102,19 @@ rmpath(native_dir); rehash; % Try to avoid locked files on Windows
 initialize_native(native_dir);
 addpath(native_dir);
 
+experiment_stack = get_global_variable('stack', 'vot2013');
+
+if exist(['stack_', experiment_stack]) ~= 2 %#ok<EXIST>
+    error('Experiment stack %s not available.', experiment_stack);
+end;
+
+stack_configuration = str2func(['stack_', experiment_stack]);
+
+experiments = stack_configuration();
+
 if cached
-    print_debug('Skipping loading experiments and sequences');
+    print_debug('Skipping loading sequence data (using cached structures)');
 else
-    
-    experiment_stack = get_global_variable('stack', 'vot2013');
-
-    if exist(['stack_', experiment_stack]) ~= 2 %#ok<EXIST>
-        error('Experiment stack %s not available.', experiment_stack);
-    end;
-
-    stack_configuration = str2func(['stack_', experiment_stack]);
-
-    experiments = stack_configuration();
 
     sequences_directory = fullfile(get_global_variable('workspace_path'), 'sequences');
 
