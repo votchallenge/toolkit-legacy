@@ -14,18 +14,14 @@ RUN echo "pkg install -forge -auto image" | octave
 RUN echo "pkg install -forge -auto io" | octave
 RUN echo "pkg install -forge -auto statistics" | octave
 
+# Install python
+RUN sudo apt-get install -y python
+
 # Add VOT-toolkit
-ADD . /vot-toolkit
-RUN echo "addpath ('/vot-toolkit');" >> ~/.octaverc
-
-# Setup test Workspace & downloads TraX precompiled files
-WORKDIR /test_workspace
-# (This is hackish. We should have a script to do this without user input)
-RUN (echo "toolkit_path;set_global_variable('native_download',false);workspace_create"; \
-     echo 1; echo test; echo N) | octave
+COPY . /vot-toolkit
 # Compile Trax
-RUN cd /vot-toolkit/native/trax && mkdir build && cd build \
-     && cmake .. && make  && make install
+# RUN cd /vot-toolkit/native/trax && mkdir build && cd build && cmake .. && make  && make install
 
-# Define default command.
-CMD ["/bin/bash"]
+# Define default entrypoint: Run test
+WORKDIR /vot-toolkit/test_tracker
+ENTRYPOINT octave run_test.m

@@ -43,8 +43,8 @@ if ~tracker.trax
     print_text('***************************************************************************');
     print_text('');
 end;
-
-while 1
+  interactive = get_global_variable('interactive', 0);
+  if interactive
     print_text('Choose action:');
     print_indent(1);
 
@@ -65,7 +65,9 @@ while 1
     print_indent(-1);
 
     option = input('Choose action: ', 's');
-
+  else
+    option = get_global_variable('test_option', 'b');
+  end
     switch option
     case 'a'
         current_sequence = select_sequence(sequences);       
@@ -82,8 +84,11 @@ while 1
             print_text('Once the tracker is working as expected (generates the output.txt), delete the directory.');
         end;
     case 'b'
-        current_sequence = select_sequence(sequences);       
-        
+        if (interactive)
+          current_sequence = select_sequence(sequences);       
+        else
+          current_sequence = get_global_variable('test_sequence', 1);
+        end
         if ~isempty(current_sequence)
 
             print_text('Sequence "%s"', sequences{current_sequence}.name);
@@ -92,26 +97,15 @@ while 1
             performance.time = performance.time + mean(time) * sequences{current_sequence}.length;
 
             performance.frames = performance.frames + sequences{current_sequence}.length;
+            perf_estimate(performance, tracker, sequences)
         end;        
     case 'c'
         if ~isempty(trajectory) && current_sequence > 0 && current_sequence <= length(sequences)
             visualize_sequence(sequences{current_sequence}, trajectory);
         end;
     case 't'
-        if performance.frames > 0
-
-            fps = performance.frames / performance.time;
-            
-            if tracker.trax
-                estimate = estimate_completion_time(sequences, 'fps', fps, 'failures', 0);
-            else
-                estimate = estimate_completion_time(sequences, 'fps', fps);
-            end
-
-            print_text('Based on the current estimate (fps = %.2f), the completion time for %d sequences is %s', fps, length(sequences), format_interval(estimate));
-            
-        end;   
-	case 'd'
+      perf_estimate(performance, tracker, sequences)
+    case 'd'
         set_global_variable('debug', ~get_global_variable('debug', 0));
     case 'e'
         break;
@@ -120,9 +114,21 @@ while 1
 
     end;
     
-end;
 
 end
+
+function perf_estimate (performance, tracker, sequences)
+  if performance.frames > 0
+    fps = performance.frames / performance.time;
+    if tracker.trax
+        estimate = estimate_completion_time(sequences, 'fps', fps, 'failures', 0);
+    else
+        estimate = estimate_completion_time(sequences, 'fps', fps);
+    end
+    print_text('Based on the current estimate (fps = %.2f), the completion time for %d sequences is %s', fps, length(sequences), format_interval(estimate));
+  end;   
+end
+
 
 function launcher_script = generate_launcher_script(tracker, command, directory)
 
