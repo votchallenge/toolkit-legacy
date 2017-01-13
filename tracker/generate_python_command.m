@@ -38,6 +38,7 @@ if isempty(python_exec)
     for i = 1:numel(system_paths)
         if exist(fullfile(system_paths{i}, exec_name), 'file') == 2
             python_exec = fullfile(system_paths{i}, exec_name);
+	    break;
         end
     end
 
