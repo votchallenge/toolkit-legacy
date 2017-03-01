@@ -221,12 +221,15 @@ if current_timestamp > previous_timestamp + update_interval
     if updated
         fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
     end;
+else
+    print_debug('Skipping updating native (last update on %s)', datestr(previous_timestamp));
 end;
 
 
 if exist(fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')), 'file') == 2
     set_global_variable('trax_client', fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')));
 else
+    print_debug('Cannot find traxclient.exe');
     return;
 end
 
@@ -234,12 +237,14 @@ if exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 2 || .
     exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 3
     set_global_variable('trax_mex', fullfile(native_dir, 'mex'));
 else
+    print_debug('Cannot find traxserver.%s', mexext);
     return;
 end
 
 if exist(fullfile(native_dir, 'python'), 'dir') == 7 
     set_global_variable('trax_python', fullfile(native_dir, 'python'));
 else
+    print_debug('Cannot find python/');
     return;
 end
 
