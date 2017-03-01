@@ -116,7 +116,7 @@ if cached
     print_debug('Skipping loading sequence data (using cached structures)');
 else
 
-    sequences_directory = fullfile(get_global_variable('workspace_path'), 'sequences');
+    sequences_directory = get_global_variable('sequences_path', fullfile(get_global_variable('workspace_path'), 'sequences'));
 
     print_text('Loading sequences ...');
 
