@@ -35,19 +35,19 @@ print_text('Compiling native files ...');
 success = true;
 
 success = success && compile_mex('region_overlap', {fullfile(toolkit_path, 'sequence', 'region_overlap.cpp'), ...
-    fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
 
 success = success && compile_mex('region_mask', {fullfile(toolkit_path, 'sequence', 'region_mask.cpp'), ...
-    fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
 
 success = success && compile_mex('region_convert', {fullfile(toolkit_path, 'sequence', 'region_convert.cpp'), ...
-    fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
 
 success = success && compile_mex('read_trajectory', {fullfile(toolkit_path, 'sequence', 'read_trajectory.cpp'), ...
-    fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
 
 success = success && compile_mex('write_trajectory', {fullfile(toolkit_path, 'sequence', 'write_trajectory.cpp'), ...
-    fullfile(trax_path, 'lib', 'region.c')}, {fullfile(trax_path, 'lib')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
 
 success = success && compile_mex('benchmark_native', {fullfile(toolkit_path, 'tracker', 'benchmark_native.cpp')}, ...
     {}, output_path);
@@ -61,10 +61,10 @@ success = success && compile_mex('ndhistc', {fullfile(toolkit_path, 'utilities',
 trax_mex_path = fullfile(output_path, 'mex');
 mkpath(trax_mex_path);
 
-success = success && compile_mex('traxserver', {fullfile(trax_path, 'matlab', 'traxserver.cpp'), ...
-    fullfile(trax_path, 'lib', 'trax.c'), fullfile(trax_path, 'lib', 'region.c'), fullfile(trax_path, 'lib', 'strmap.c'), ...
-    fullfile(trax_path, 'lib', 'message.c'), fullfile(trax_path, 'lib', 'base64.c')}, ...
-    {fullfile(trax_path, 'lib')}, trax_mex_path);
+success = success && compile_mex('traxserver', {fullfile(trax_path, 'support', 'matlab', 'traxserver.cpp'), ...
+    fullfile(trax_path, 'src', 'trax.c'), fullfile(trax_path, 'src', 'region.c'), fullfile(trax_path, 'src', 'strmap.c'), ...
+    fullfile(trax_path, 'src', 'message.c'), fullfile(trax_path, 'src', 'base64.c')}, ...
+    {fullfile(trax_path, 'src')}, trax_mex_path);
 
 if ~success
     error('Unable to compile all native resources.');
@@ -221,12 +221,15 @@ if current_timestamp > previous_timestamp + update_interval
     if updated
         fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
     end;
+else
+    print_debug('Skipping updating native (last update on %s)', datestr(previous_timestamp));
 end;
 
 
 if exist(fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')), 'file') == 2
     set_global_variable('trax_client', fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')));
 else
+    print_debug('Cannot find traxclient.exe');
     return;
 end
 
@@ -234,12 +237,14 @@ if exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 2 || .
     exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 3
     set_global_variable('trax_mex', fullfile(native_dir, 'mex'));
 else
+    print_debug('Cannot find traxserver.%s', mexext);
     return;
 end
 
 if exist(fullfile(native_dir, 'python'), 'dir') == 7 
     set_global_variable('trax_python', fullfile(native_dir, 'python'));
 else
+    print_debug('Cannot find python/');
     return;
 end
 
@@ -268,7 +273,7 @@ if isempty(trax_url)
     return;
 end;
 
-trax_header = fullfile(trax_dir, 'lib', 'trax.h');
+trax_header = fullfile(trax_dir, 'src', 'trax.h');
 
 if ~exist(trax_header, 'file')
     print_text('Downloading TraX source from "%s". Please wait ...', trax_url);
