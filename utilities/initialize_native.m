@@ -34,20 +34,22 @@ print_text('Compiling native files ...');
 
 success = true;
 
+include_paths = {fullfile(trax_path, 'src'), fullfile(trax_path, 'include')};
+
 success = success && compile_mex('region_overlap', {fullfile(toolkit_path, 'sequence', 'region_overlap.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('region_mask', {fullfile(toolkit_path, 'sequence', 'region_mask.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('region_convert', {fullfile(toolkit_path, 'sequence', 'region_convert.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('read_trajectory', {fullfile(toolkit_path, 'sequence', 'read_trajectory.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('write_trajectory', {fullfile(toolkit_path, 'sequence', 'write_trajectory.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('benchmark_native', {fullfile(toolkit_path, 'tracker', 'benchmark_native.cpp')}, ...
     {}, output_path);
@@ -64,7 +66,7 @@ mkpath(trax_mex_path);
 success = success && compile_mex('traxserver', {fullfile(trax_path, 'support', 'matlab', 'traxserver.cpp'), ...
     fullfile(trax_path, 'src', 'trax.c'), fullfile(trax_path, 'src', 'region.c'), fullfile(trax_path, 'src', 'strmap.c'), ...
     fullfile(trax_path, 'src', 'message.c'), fullfile(trax_path, 'src', 'base64.c')}, ...
-    {fullfile(trax_path, 'src')}, trax_mex_path);
+    include_paths, trax_mex_path);
 
 if ~success
     error('Unable to compile all native resources.');
@@ -284,7 +286,8 @@ if ~exist(trax_header, 'file')
         urlwrite(trax_url, bundle);
         unzip(bundle, working_directory);
         delete(bundle);
-        movefile(fullfile(working_directory, 'trax-master'), trax_dir);
+        copyfile(fullfile(working_directory, 'trax-master'), trax_dir);
+        delpath(working_directory);
         success = true;
     catch
         print_text('Unable to retrieve TraX source code.');
