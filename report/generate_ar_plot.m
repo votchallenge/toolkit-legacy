@@ -49,7 +49,7 @@ function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
             case 'handle'
                 handle = varargin{i+1};
             case 'legend'
-                show_legend = varargin{i+1};                    
+                show_legend = varargin{i+1};      
             otherwise 
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
@@ -63,14 +63,24 @@ function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
         height = 4;
     end
 
+    if ~isempty(handle) && ishandle(handle)
+        if strcmp(get(handle, 'type'),'figure')
+            figure(handle);
+        elseif strcmp(get(handle, 'type'),'axes')
+            axes(handle);
+        else
+            handle = [];
+        end
+    else
+        handle = [];
+    end
+    
     if isempty(handle)
         if ~visible
             handle = figure('Visible', 'off');
         else
             handle = figure();
         end
-    else
-        figure(handle);
     end;
 
     hold on; box on; grid on;
@@ -115,8 +125,10 @@ function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
     xlim([0, 1]); 
     ylim([0, 1]);
 
-    set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
-
+    if strcmp(get(handle, 'type'),'figure')
+        set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
+    end;
+    
     hold off;
     
 end

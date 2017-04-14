@@ -18,16 +18,16 @@ fragments = cell(numel(fragment_offset)-1, 1);
 for f = 1:numel(fragment_offset)-1
     indices = fragment_offset(f):fragment_offset(f+1)-1;
     fragments{f} = sequence;
-    
+
     fragments{f}.groundtruth = sequence.groundtruth(indices, :);
     fragments{f}.indices = sequence.indices(indices);
-    fragments{f}.labels.names = sequence.labels.names;
-    fragments{f}.labels.data = sequence.labels.data(indices, :);
+    fragments{f}.tags.names = sequence.tags.names;
+    fragments{f}.tags.data = sequence.tags.data(indices, :);
     fragments{f}.values.names = sequence.values.names;
     fragments{f}.values.data = sequence.values.data(indices, :);
     fragments{f}.images = sequence.images(indices);
     fragments{f}.length = length(indices);
-    
+
 end;
 
 fragment_offset = fragment_offset(1:end-1);

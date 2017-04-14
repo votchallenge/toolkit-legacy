@@ -21,7 +21,7 @@ if isempty(trax_executable)
     error('TraX support not available (client binary not found)');
 end;
 
-defaults = struct('directory', tempname, 'skip_labels', {{}}, 'skip_initialize', 1, 'failure_overlap', -1);
+defaults = struct('directory', tempname, 'skip_tags', {{}}, 'skip_initialize', 1, 'failure_overlap', -1);
 
 context = struct_merge(context, defaults);
 
@@ -39,12 +39,12 @@ initialization_file = fullfile(context.directory, 'initialization.txt');
 initialization = cell(sequence.length, 1);
 
 for index = 1:sequence.length
-    
-    if ~isempty(intersect(get_labels(sequence, index), context.skip_labels))
+
+    if ~isempty(intersect(sequence_get_tags(sequence, index), context.skip_tags))
         initialization{index} = 0;
     else
         initialization{index} = sequence.initialize(sequence, index, context);
-    end; 
+    end;
 
 end
 
@@ -124,7 +124,7 @@ try
     print_debug(['INFO: Executing "', command, '" in "', context.directory, '".']);
 
     cleanup = onCleanup(@() cd(old_directory) ); % Set default path recovery handle
-    
+
     cd(context.directory);
 
     if is_octave()
@@ -152,13 +152,13 @@ try
         else
             setenv('TRAX_BOUNDED_OVERLAP', 'false');
         end
-        
+
         if legacy_rasterization
             setenv('TRAX_REGION_LEGACY', 'true');
         else
             setenv('TRAX_REGION_LEGACY', 'false');
         end
-        
+
 		if verLessThan('matlab', '7.14.0')
 		    tic;
 		    [status, output] = system(command);
@@ -169,31 +169,31 @@ try
 		    time = toc;
 		end;
     end;
-        
-    if status ~= 0 
+
+    if status ~= 0
         print_debug('WARNING: System command has not exited normally.');
 
         if ~isempty(output)
             print_debug('Writing TraX client output to a log file.');
-            fid = fopen(fullfile(context.directory, 'trax.log'), 'w');            
+            fid = fopen(fullfile(context.directory, 'trax.log'), 'w');
             fprintf(fid, '%s', output);
             fclose(fid);
         end;
-    
+
         logdir = generate_crash_report(tracker, context);
-        
+
 		error_message = sprintf('Error during tracker execution. Report written to "%s"', logdir);
 	else
 
 		try
 
 			trajectory = read_trajectory(output_file);
-		
-			%time = csvread(timing_file) ./ 1000; % convert to seconds 
-			time = time / sequence.length;    
+
+			%time = csvread(timing_file) ./ 1000; % convert to seconds
+			time = time / sequence.length;
 
 		catch
-			
+
 			error_message = 'Error reading tracker result.';
 
 		end;
@@ -208,7 +208,7 @@ catch e
 
     setenv('TRAX_BOUNDED_OVERLAP');
     setenv('TRAX_REGION_LEGACY');
-    
+
     print_text('ERROR: Exception thrown "%s".', e.message);
 end;
 

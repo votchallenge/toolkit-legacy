@@ -24,8 +24,8 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
 %
     plot_title = [];
     normalized = 0;
-    width = 9;
-    height = max(3, numel(trackers) / 3);
+    width = 3;
+    height = max(3, numel(criteria) / 3);
     scope = [1, numel(trackers)];
     type = 'Rank';
     flip = 0;
@@ -74,17 +74,31 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
 
     hold on; grid on; box on;
 
+    phandles = zeros(1, length(trackers));
+    
     if ~normalized
     
         for t = 1:length(trackers)
 
             x = values(:, t);
 
-            plot(x, 1:length(criteria), [trackers{t}.style.symbol, '--'], ...
-                'Color', trackers{t}.style.color, 'MarkerSize', 10,  'LineWidth', trackers{t}.style.width);
+            c = rgb2hsv(trackers{t}.style.color); c(2) = 0.3;
+            c = hsv2rgb(c);
+            
+            plot(x, 1:length(criteria), '--', ...
+                'Color', c, 'LineWidth', trackers{t}.style.width);
 
         end;
 
+        for t = 1:length(trackers)
+
+            x = values(:, t);
+
+            phandles(t) = plot(x, 1:length(criteria), trackers{t}.style.symbol, ...
+                'Color', trackers{t}.style.color, 'MarkerSize', 10,  'LineWidth', trackers{t}.style.width);
+
+        end;
+        
         if ~isempty(plot_title)
             title(plot_title,'interpreter','none');
         end;
@@ -94,7 +108,7 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
 
             x = mod(find(I' == t)-1, length(trackers))+1;
 
-            plot(x, 1:length(criteria), [trackers{t}.style.symbol, '--'], ...
+            phandles(t) = plot(x, 1:length(criteria), [trackers{t}.style.symbol, '--'], ...
                 'Color', trackers{t}.style.color, 'MarkerSize', 10,  'LineWidth', trackers{t}.style.width);
 
         end;
@@ -106,7 +120,7 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
     
     plot_labels = cellfun(@(tracker) tracker.label, trackers, 'UniformOutput', 0);
     if show_legend
-        legend(plot_labels, 'Location', 'NorthEastOutside', 'interpreter', 'none'); 
+        legend(phandles, plot_labels, 'Location', 'NorthEastOutside', 'interpreter', 'none'); 
     end;
     xlabel(type); 
     set(gca,'ytick', 1:numel(criteria),'yticklabel', criteria, 'YDir','Reverse', 'ylim', [0.9, numel(criteria)+0.1]);

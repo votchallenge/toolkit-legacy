@@ -16,7 +16,7 @@ Module functions
 -   [report_submission](report_submission.m) - Basic performance scores for given trackers
 -   [report_ranking_spotlight](report_ranking_spotlight.m) - Generate a spotlight report based on A-R ranking
 -   [report_failures](report_failures.m) - Generate a statistic overview of occurences of failures
--   [report_difficulty](report_difficulty.m) - Generate a difficulty report for labels or sequences
+-   [report_difficulty](report_difficulty.m) - Generate a difficulty report for tags or sequences
 -   [report_expected_overlap](report_expected_overlap.m) - Generate a report based on expected overlap
 -   [report_sequences_preview](report_sequences_preview.m) - Create an overview document for the given sequences
 -   [report_implementation](report_implementation.m) - Generate an overview of tracker implementations

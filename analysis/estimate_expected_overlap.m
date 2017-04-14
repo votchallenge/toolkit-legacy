@@ -13,25 +13,25 @@ function [expected_overlaps, evaluated_lengths, practical_difference] = estimate
 % overlap should be evaluated.
 % - varargin[Weights] (vector): A vector of per-sequence weigths that indicate
 % how much does each sequence contributes to the estimate.
-% - varargin[Labels] (cell): A set of labels for which to perform
+% - varargin[Tags] (cell): A set of tags for which to perform
 % calculation. If not set then only 'all' is used.
 %
 % Output:
 % - expected_overlaps (vector): Expected overlaps for corresponding
 % lengths.
-% - evaluated_lengths (vector): A filtered array of lengths (removed duplicates). 
+% - evaluated_lengths (vector): A filtered array of lengths (removed duplicates).
 % - practical_difference (vector): An estimate of the practical difference for
 % corresponding expected overlap.
 
 lengths = [];
 weights = ones(numel(sequences), 1);
-labels = {'all'};
+tags = {'all'};
 
 for j=1:2:length(varargin)
     switch lower(varargin{j})
         case 'lengths', lengths = varargin{j+1};
         case 'weights', weights = varargin{j+1};
-        case 'labels', labels = varargin{j+1};
+        case 'tags', tags = varargin{j+1};
         otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
@@ -44,11 +44,12 @@ context = iterate(experiment, tracker, sequences, 'iterator', @collect_segments,
 failures = context.failures;
 segments = context.overlaps;
 practical = context.practical;
-if isempty(context.practical)
-  occurences = 0;
-else
-  occurences = hist(context.sources, max(context.sources));
-end
+occurences = hist(context.sources, max(context.sources));
+% if isempty(context.practical)
+%   occurences = 0;
+% else
+%   occurences = hist(context.sources, max(context.sources));
+% end
 
 if isempty(lengths)
     maxlen = max(cellfun(@(x) numel(x), segments, 'UniformOutput', true));
@@ -63,26 +64,26 @@ skipping = experiment.parameters.skip_initialize;
 fragments_count = sum(cellfun(@(x) numel(x) + 1, failures, 'UniformOutput', true));
 fragments_length = max(lengths);
 
-label_count = numel(labels);
+tag_count = numel(tags);
 
 if isempty(segments)
-    expected_overlaps = zeros(0, label_count);
-    practical_difference = zeros(0, label_count);
+    expected_overlaps = zeros(0, tag_count);
+    practical_difference = zeros(0, tag_count);
     evaluated_lengths = [];
     return;
 end
 
-expected_overlaps = zeros(numel(lengths), label_count);
-practical_difference = zeros(numel(lengths), label_count);
+expected_overlaps = zeros(numel(lengths), tag_count);
+practical_difference = zeros(numel(lengths), tag_count);
 
-for l = 1:label_count
-    
+for l = 1:tag_count
+
     sequence_weights = weights(context.sources(:));
     frequency = occurences(context.sources(:));
     sequence_weights = sequence_weights(:) ./ frequency(:);
 
-    label = labels{l};
-    
+    tag = tags{l};
+
     fragments = nan(fragments_count, fragments_length);
     fpractical = nan(fragments_count, fragments_length);
     fweights = nan(fragments_count, 1);
@@ -104,11 +105,11 @@ for l = 1:label_count
                 fpractical(f, :) = 0;
                 fpractical(f, 1:min(numel(o), fragments_length)) = o;
 
-                w = numel(query_label(sequences{context.sources(i)}, label, points(j):(points(j+1)))) ...
+                w = numel(sequence_query_tag(sequences{context.sources(i)}, tag, points(j):(points(j+1)))) ...
                     / (points(j+1) - points(j) + 1);
-                
+
                 fweights(f) = sequence_weights(i) * w;
-                
+
                 f = f + 1;
             end;
 
@@ -117,11 +118,11 @@ for l = 1:label_count
             o = practical{i}(points(end):end); o(isnan(o)) = 0;
             fpractical(f, 1:min(numel(o), fragments_length)) = o;
 
-            w = numel(query_label(sequences{context.sources(i)}, label, points(end):length(segments{i}))) ...
+            w = numel(sequence_query_tag(sequences{context.sources(i)}, tag, points(end):length(segments{i}))) ...
                 / (sequences{context.sources(i)}.length - points(end) + 1);
 
             fweights(f) = sequence_weights(i) * w;
-            
+
             f = f + 1;
         else
         % process also last part of the trajectory - segment without failure
@@ -130,14 +131,14 @@ for l = 1:label_count
                 % observed interval
                 fragments(f, :) = segments{i}(1:fragments_length);
                 fpractical(f, :) = practical{i}(1:fragments_length);
-                
-                w = numel(query_label(sequences{context.sources(i)}, label, 1:fragments_length)) ...
+
+                w = numel(sequence_query_tag(sequences{context.sources(i)}, tag, 1:fragments_length)) ...
                     / fragments_length;
             else
                 fragments(f, 1:numel(segments{i})) = segments{i};
                 fpractical(f, 1:numel(practical{i})) = practical{i};
-                
-                w = numel(query_label(sequences{context.sources(i)}, label)) ...
+
+                w = numel(sequence_query_tag(sequences{context.sources(i)}, tag)) ...
                     / sequences{context.sources(i)}.length;
             end
 
@@ -159,11 +160,11 @@ for l = 1:label_count
         if ~any(usable)
             continue;
         end;
-        
+
         % for each len get a single number - average overlap
         expected_overlaps(e, l) = sum(mean(fragments(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
         practical_difference(e, l) = sum(mean(fpractical(usable, 2:len), 2) .* fweights(usable)) ./ sum(fweights(usable));
-        
+
     end
 
 end
@@ -175,52 +176,52 @@ end
 function context = collect_segments(event, context)
 
 switch (event.type)
-        
+
     case 'sequence_enter'
-        
+
         sequence = event.sequence;
 
         sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
             sequence.name);
-        
+
         switch event.experiment.type
             case 'supervised'
-                
+
                 for i = 1:event.experiment.parameters.repetitions
-                    
+
                     result_file = fullfile(sequence_directory, sprintf('%s_%03d.txt', event.sequence.name, i));
 
                     if i == 4 && is_deterministic(sequence, 3, sequence_directory)
                         break;
                     end;
-                    
+
                     if ~exist(result_file, 'file')
                         continue;
                     end;
-                    
+
                     trajectory = read_trajectory(result_file);
-                    
+
                     [~, frames] = estimate_accuracy(trajectory, sequence);
-                    
+
                     [~, failures] = estimate_failures(trajectory, sequence);
 
                     practical = get_frame_value(sequence, 'practical');
-                    
+
                     context.failures{end+1} = failures(failures <= sequence.length);
                     context.overlaps{end+1} = frames;
                     context.sources(end+1) = event.sequence_index;
-                    
+
                     if isempty(practical)
                         context.practical{end+1} = zeros(sequence.length, 1);
                     else
                         context.practical{end+1} = practical;
                     end
-                    
+
                 end;
 
             otherwise, error(['unrecognized type ' type]);
         end
-        
+
 end;
 
 end

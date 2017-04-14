@@ -17,8 +17,8 @@ function [document] = report_implementation(context, trackers, sequences, experi
 document = create_document(context, 'implementation', 'title', 'Implementational details');
 
 for i = 1:2:length(varargin)
-    switch lower(varargin{i})         
-        otherwise 
+    switch lower(varargin{i})
+        otherwise
             error(['Unknown switch ', varargin{i},'!']) ;
     end
 end
@@ -100,28 +100,28 @@ function context = aggregate_iterator(event, context)
 
     switch (event.type)
         case 'experiment_enter'
-      
+
         case 'experiment_exit'
 
         case 'tracker_enter'
-            
+
         case 'tracker_exit'
 
         case 'sequence_enter'
-            
+
             execution_parameters = struct();
             if isfield(event.experiment, 'parameters')
                 execution_parameters = event.experiment.parameters;
             end;
-            
+
             sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
                 event.sequence.name);
-            
+
             [~, metadata] = tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
                 'type', event.experiment.type, 'parameters', execution_parameters, 'scan', true);
 
             context.completed = context.completed && metadata.completed;
-            
+
             % TODO: check if the sequence is not by any chance
             % non-deterministic.
             if isfield(metadata, 'deterministic')

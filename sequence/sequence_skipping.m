@@ -25,8 +25,8 @@ indices = indices(mask > 0 & mask < (keep + 1));
 
 skipped_sequence.groundtruth = sequence.groundtruth(indices, :);
 skipped_sequence.indices = sequence.indices(indices, :);
-skipped_sequence.labels.names = sequence.labels.names;
-skipped_sequence.labels.data = sequence.labels.data(indices, :);
+skipped_sequence.tags.names = sequence.tags.names;
+skipped_sequence.tags.data = sequence.tags.data(indices, :);
 skipped_sequence.values.names = sequence.values.names;
 skipped_sequence.values.data = sequence.values.data(indices, :);
 

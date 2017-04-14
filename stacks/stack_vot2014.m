@@ -7,7 +7,7 @@ set_global_variable('bounded_overlap', false);
 baseline.name = 'baseline';
 baseline.converter = [];
 baseline.type = 'supervised';
-baseline.labels = {'camera_motion', 'illum_change', 'occlusion', 'size_change', ...
+baseline.tags = {'camera_motion', 'illum_change', 'occlusion', 'size_change', ...
     'motion_change', 'empty'};
 baseline.parameters.repetitions = 15;
 baseline.parameters.burnin = 10;
@@ -18,7 +18,7 @@ region_noise.name = 'region_noise';
 region_noise.converter = @(sequence) sequence_transform_initialization(...
     sequence, @noisy_transform);
 region_noise.type = 'supervised';
-region_noise.labels = {'camera_motion', 'illum_change', 'occlusion', 'size_change', ...
+region_noise.tags = {'camera_motion', 'illum_change', 'occlusion', 'size_change', ...
     'motion_change', 'empty'};
 region_noise.parameters.repetitions = 15;
 region_noise.parameters.burnin = 10;
@@ -35,8 +35,8 @@ function [transform] = noisy_transform(sequence, index, context)
 
     scale = 0.9 + rand(1, 2) * 0.2;
     move = bounds(3:4) .* (0.1 - rand(1, 2) * 0.2);
-    rotate = 0.1 - rand(1) * 0.2; 
-    
+    rotate = 0.1 - rand(1) * 0.2;
+
     transform = [scale(1) * cos(rotate),  -sin(rotate), move(1); ...
          sin(rotate), scale(2) * cos(rotate), move(2); 0, 0, 1];
 

@@ -48,14 +48,24 @@ function handle = generate_plot(varargin)
         end
     end 
 
+    if ~isempty(handle) && ishandle(handle)
+        if strcmp(get(handle, 'type'),'figure')
+            figure(handle);
+        elseif strcmp(get(handle, 'type'),'axes')
+            axes(handle);
+        else
+            handle = [];
+        end
+    else
+        handle = [];
+    end
+    
     if isempty(handle)
         if ~visible
             handle = figure('Visible', 'off');
         else
             handle = figure();
         end
-    else
-        figure(handle);
     end;
 
     hold on; 
@@ -74,8 +84,10 @@ function handle = generate_plot(varargin)
         set(gca, axis_settings{:});
     end;
     
-    set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
-
+    if strcmp(get(handle, 'type'),'figure')
+        set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
+    end;
+    
     hold off;
     
 end

@@ -18,8 +18,8 @@ Module functions
 
 -    [compare_trackers](compare_trackers.m) - Compares two trackers in terms of accuracy and robustness
 -    [adapted_ranks](adapted_ranks.m) - Performs rank adaptation on a set of ranks
--    [analyze_ranks](analyze_ranks.m) - Performs ranking analysis on per-sequence or per-label basis
--    [create_label_selectors](create_label_selectors.m) - Create per-label selectors
+-    [analyze_ranks](analyze_ranks.m) - Performs ranking analysis on per-sequence or per-tag basis
+-    [create_tag_selectors](create_tag_selectors.m) - Create per-tag selectors
 -    [create_sequence_selectors](create_sequence_selectors.m) - Create per-sequence selectors
 
 ### Speed

@@ -1,41 +1,41 @@
-function selectors = create_label_selectors(experiment, sequences, labels) %#ok<INUSL>
-% create_label_selectors Create per-label selector
+function selectors = create_tag_selectors(experiment, sequences, tags) %#ok<INUSL>
+% create_tag_selectors Create per-tag selector
 %
-% Create a set of selectors for a set of labels upon a set of sequences.
+% Create a set of selectors for a set of tags upon a set of sequences.
 %
 % Input:
 % - experiment (structure): A valid experiment descriptor.
 % - sequences (cell): A cell array of valid sequence descriptors.
-% - labels (cell): A cell array of label names.
+% - tags (cell): A cell array of tag names.
 %
 % Output:
-% - selectors (cell): A cell array of selector structures, one for each label.
+% - selectors (cell): A cell array of selector structures, one for each tag.
 %
 
-    selectors = cellfun(@(label) struct('name', sprintf('label_%s', label), ...
-        'title', label, ...
+    selectors = cellfun(@(tag) struct('name', sprintf('tag_%s', tag), ...
+        'title', tag, ...
         'aggregate', @(experiment, tracker, sequences) ...
-        aggregate_for_label(experiment, tracker, sequences, label), ...
-        'practical', @(sequences) practical_for_label(sequences, label), ...
-        'length', @(sequences) count_for_label(sequences, label)), ...
-        labels, 'UniformOutput', false);
+        aggregate_for_tag(experiment, tracker, sequences, tag), ...
+        'practical', @(sequences) practical_for_tag(sequences, tag), ...
+        'length', @(sequences) count_for_tag(sequences, tag)), ...
+        tags, 'UniformOutput', false);
 
 end
 
-function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experiment, tracker, sequences, label)
+function [aggregated_overlap, aggregated_failures] = aggregate_for_tag(experiment, tracker, sequences, tag)
 
     aggregated_overlap = [];
     aggregated_failures = [];
 
     cache = get_global_variable('cache_selectors', true);
-    
+
     if cache
         result_hash = calculate_results_fingerprint(tracker, experiment, sequences);
-    
+
         cache_directory = fullfile(get_global_variable('directory'), 'cache', 'selectors', tracker.identifier, experiment.name);
         mkpath(cache_directory);
 
-        cache_file = fullfile(cache_directory, sprintf('label-%s-%s.mat', label, result_hash));
+        cache_file = fullfile(cache_directory, sprintf('tag-%s-%s.mat', tag, result_hash));
 
         if exist(cache_file, 'file')
             load(cache_file);
@@ -46,7 +46,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
         end;
 
     end;
-    
+
     repeat = experiment.parameters.repetitions;
     burnin = experiment.parameters.burnin;
 
@@ -57,12 +57,12 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
 
     for s = 1:length(sequences)
 
-        filter = query_label(sequences{s}, label);
+        filter = sequence_query_tag(sequences{s}, tag);
 
         if isempty(filter) || ~any(filter)
             continue;
         end;
-        
+
         groundtruth = sequences{s}.groundtruth;
 
         directory = fullfile(tracker.directory, experiment.name, sequences{s}.name);
@@ -74,7 +74,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
 
             result_file = fullfile(directory, sprintf('%s_%03d.txt', sequences{s}.name, j));
 
-            try 
+            try
                 trajectory = read_trajectory(result_file);
             catch
                 continue;
@@ -102,7 +102,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
         if ~isempty(sequence_overlaps)
             aggregated_overlap = [aggregated_overlap, sequence_overlaps]; %#ok<AGROW>
         end;
-        
+
         if ~isempty(sequence_failures)
             aggregated_failures = [aggregated_failures; sequence_failures]; %#ok<AGROW>
         end;
@@ -115,46 +115,46 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_label(experim
 
 end
 
-function [count, partial] = count_for_label(sequences, label)
+function [count, partial] = count_for_tag(sequences, tag)
 
 	count = 0;
 
     partial = zeros(1, length(sequences));
-    
+
     for s = 1:length(sequences)
 
-        filter = query_label(sequences{s}, label);
+        filter = sequence_query_tag(sequences{s}, tag);
 
         if isempty(filter)
             continue;
         end;
-        
+
 		count = count + numel(filter);
 
         partial(s) = numel(filter);
-        
+
     end
 end
 
 
-function practical = practical_for_label(sequences, label)
+function practical = practical_for_tag(sequences, tag)
 
     practical = [];
 
     for s = 1:length(sequences)
 
-        filter = query_label(sequences{s}, label);
+        filter = sequence_query_tag(sequences{s}, tag);
 
         if isempty(filter)
             continue;
         end;
-        
+
         p = get_frame_value(sequences{s}, 'practical', filter);
 
         if ~isempty(p)
             practical = [practical; p]; %#ok<AGROW>
         end;
-        
+
     end;
 
 end

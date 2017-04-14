@@ -7,8 +7,8 @@ set_global_variable('bounded_overlap', false);
 baseline.name = 'baseline';
 baseline.converter = [];
 baseline.type = 'supervised';
-baseline.labels = {'camera_motion', 'illum_change', 'occlusion', 'size','motion', 'empty'};
-               
+baseline.tags = {'camera_motion', 'illum_change', 'occlusion', 'size','motion', 'empty'};
+
 baseline.parameters.repetitions = 15;
 baseline.parameters.burnin = 10;
 baseline.parameters.skip_initialize = 5;

@@ -1,7 +1,7 @@
 function report_visualization(context, experiments, trackers, sequences, varargin)
 % report_visualization Basic visualization of performance for given trackers
 %
-% This function generates images with tracking results of given trackers along with a 
+% This function generates images with tracking results of given trackers along with a
 % performance scores. This can be used to examine tracker failures or to
 % visually compare multiple trackers.
 %
@@ -14,7 +14,7 @@ function report_visualization(context, experiments, trackers, sequences, varargi
 % Output:
 % - images in output directory defined in context.root
 
-measures_labels = {'Overlap', 'Failures', 'Speed'};
+measures_tags = {'Overlap', 'Failures', 'Speed'};
 context.measures = {@(trajectory, sequence, experiment, tracker) ...
     estimate_accuracy(trajectory, sequence, 'burnin', experiment.parameters.burnin), ...
     @(trajectory, sequence, experiment, tracker) estimate_failures(trajectory, sequence), ...
@@ -29,12 +29,12 @@ results.trackers_trajectories = cell(numel(trackers), 1);
 
 for t = 1:numel(trackers)
     tracker = trackers{t};
-    
+
     context.sequences = sequences;
     context.scores = cell(numel(experiments), 1);
     context.scores_frames = cell(numel(experiments), 1);
     context.trajectories = cell(numel(experiments), 1);
-    
+
     context = iterate(experiments, tracker, sequences, 'iterator', @evaluate_iterator, 'context', context);
 
     results.trackers_scores{t} = context.scores_frames;
@@ -62,18 +62,18 @@ gt_style.width = 3;
 print_indent(1);
 
 for i = 1:numel(sequences)
-    
+
     print_text('Sequence %s', sequences{i}.name);
-    
+
     for e = 1:numel(experiments)
         seq_directory = fullfile(context.root, experiments{e}.name, sequences{i}.name);
         mkpath(seq_directory);
-        
+
         image_width = max([sequences{i}.width 480]);
         image_height = max([sequences{i}.height   sequences{i}.height*image_width/sequences{i}.width]);
-        
+
         for f = 1:sequences{i}.length
-            
+
             image_handle = figure('Visible', 'off');
             imshow(imread(get_image(sequences{i}, f)));
             hold on;
@@ -86,37 +86,37 @@ for i = 1:numel(sequences)
                     acc = results.trackers_scores{t}{e}{i, index_score_acc}(f);
                     if isnan(acc) acc = 0; end
                 end
-                
+
                 acc_avg = nanmean(results.trackers_scores{t}{e}{i, index_score_acc}(1:f));
                 if isnan(acc_avg)
                     acc_avg = 0;
                 end
-                
+
                 if valid || f == 1
-                    trackers_styled{t}.label = sprintf('%s (%.02f), total(%d, %.02f)', trackers{t}.label, ...
+                    trackers_styled{t}.tag = sprintf('%s (%.02f), total(%d, %.02f)', trackers{t}.tag, ...
                         acc, sum(results.trackers_scores{t}{e}{i, index_score_rob}(:) <= f), ...
                         acc_avg);
                     trackers_styled{t}.style.font_color = [0, 0, 0];
                     trackers_styled{t}.style.font_bold = false;
                 else
-                    trackers_styled{t}.label = sprintf('%s (0.00), total(%d, %.02f)', trackers{t}.label, ...
+                    trackers_styled{t}.tag = sprintf('%s (0.00), total(%d, %.02f)', trackers{t}.tag, ...
                         sum(results.trackers_scores{t}{e}{i, index_score_rob}(:) <= f), acc_avg);
                     trackers_styled{t}.style.font_color = [0.77, 0, 0];
                     trackers_styled{t}.style.font_bold = true;
                 end
-                
+
             end
-            
+
             plot_polygon(sequences{i}.groundtruth{f}, gt_style);
             hold off;
             set(image_handle, 'PaperUnits', 'inches', 'PaperPosition', [0 0 image_width/75, image_height/75], 'PaperSize', [image_width/75 image_height/75]);
-            
+
             legend_handle = generate_tracker_legend_stats(trackers_styled, 'visible', false, 'columns', 2, 'rows', ceil(numel(trackers)/2), 'width', image_width/75);
-            
+
             print( image_handle, '-djpeg', '-r75', [fullfile(seq_directory, sprintf('%08d-img', f)), '.jpg']);
             print( legend_handle, '-djpeg', '-r75', [fullfile(seq_directory, sprintf('%08d-legend', f)), '.jpg']);
-            
-            
+
+
             %montage_command = sprintf('montage -tile 1x2 -geometry +0+1 "%s" "%s" "%s"; rm %s; rm %s', ...
             %                    fullfile(seq_directory, sprintf('%08d-img.jpg', f)), ...
             %                    fullfile(seq_directory, sprintf('%08d-legend.jpg', f)), ...
@@ -124,12 +124,12 @@ for i = 1:numel(sequences)
             %                    fullfile(seq_directory, sprintf('%08d-img.jpg', f)), ...
             %                    fullfile(seq_directory, sprintf('%08d-legend.jpg', f)));
             %system(montage_command);
-            
+
             close(image_handle);
             close(legend_handle);
         end
 
-       
+
     end
 end
 
@@ -141,72 +141,72 @@ function context = evaluate_iterator(event, context)
 
 switch (event.type)
     case 'experiment_enter'
-        
+
         print_text('Experiment %s', event.experiment.name);
-        
+
         switch event.experiment.type
             case 'supervised'
-                defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
+                defaults = struct('repetitions', 15, 'skip_tags', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
                 context.experiment_parameters = struct_merge(event.experiment.parameters, defaults);
                 context.scores{event.experiment_index} = nan(numel(context.sequences), numel(context.measures));
                 context.scores_frames{event.experiment_index} = cell(numel(context.sequences), numel(context.measures));
                 context.trajectories{event.experiment_index} = cell(numel(context.sequences), 1);
             otherwise, error(['unrecognized type ' type]);
         end
-        
+
         print_indent(1);
     case 'experiment_exit'
-        
+
         print_indent(-1);
-        
+
     case 'tracker_enter'
-        
-        print_text('Tracker %s', event.tracker.label);
+
+        print_text('Tracker %s', event.tracker.tag);
         print_indent(1);
-        
+
     case 'tracker_exit'
-        
+
         print_indent(-1);
-        
+
     case 'sequence_enter'
-        
+
         print_text('Sequence %s', event.sequence.name);
-        
+
         sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
             event.sequence.name);
-        
+
         switch event.experiment.type
             case {'supervised', 'unsupervised'}
-                
+
                 scores = nan(context.experiment_parameters.repetitions, numel(context.measures));
-                
+
                 % Take only the first results files (assuming deterministic behaviour)
                 for i = 1:1 %context.experiment_parameters.repetitions
-                    
+
                     result_file = fullfile(sequence_directory, sprintf('%s_%03d.txt', event.sequence.name, i));
-                    
+
                     if ~exist(result_file, 'file')
                         continue;
                     end;
-                    
+
                     if i == 4 && is_deterministic(event.sequence, 3, sequence_directory)
                         print_debug('Detected a deterministic tracker, skipping remaining trials.');
                         break;
                     end;
-                    
+
                     context.trajectories{event.experiment_index}{event.sequence_index} = read_trajectory(result_file);
-                    
+
                     for m = 1:numel(context.measures)
                         [scores(i, m), context.scores_frames{event.experiment_index}{event.sequence_index, m}] = context.measures{m}(context.trajectories{event.experiment_index}{event.sequence_index}, event.sequence, event.experiment, event.tracker);
                     end;
-                    
+
                 end;
-                
+
                 context.scores{event.experiment_index}(event.sequence_index, :) = nanmean(scores, 1);
-                
+
             otherwise, error(['unrecognized type ' type]);
         end
-        
+
 end;
 
 end
@@ -237,7 +237,7 @@ end
 
 if numel(tracker_polygon) == 4
     rectangle('Position',tracker_polygon, 'LineWidth', 2, 'EdgeColor', style.color);
-    plot(tracker_polygon(1) + tracker_polygon(3)/2, tracker_polygon(2) + tracker_polygon(4)/2, ... 
+    plot(tracker_polygon(1) + tracker_polygon(3)/2, tracker_polygon(2) + tracker_polygon(4)/2, ...
         style.symbol, 'Color', style.color, 'MarkerSize', 15, 'LineWidth', style.width);
 else
     for i = 3:2:numel(tracker_polygon)
@@ -251,7 +251,7 @@ else
 
     plot(cog(1), cog(2), style.symbol, 'Color', style.color, 'MarkerSize', 15, 'LineWidth', style.width);
 end
-    
+
 end
 
 
@@ -260,40 +260,40 @@ function handle = generate_tracker_legend_stats(trackers, varargin)
     width = [];
     height = [];
     handle = [];
-    
+
     columns = 1;
-    rows = numel(trackers); 
+    rows = numel(trackers);
     visible = false;
 
     for i = 1:2:length(varargin)
-        switch lower(varargin{i})   
+        switch lower(varargin{i})
             case 'width'
                 width = varargin{i+1};
             case 'height'
                 height = varargin{i+1};
             case 'visible'
-                visible = varargin{i+1};                
+                visible = varargin{i+1};
             case 'handle'
                 handle = varargin{i+1};
             case 'columns'
                 columns = varargin{i+1};
             case 'rows'
                 rows = varargin{i+1};
-            otherwise 
+            otherwise
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
-    end 
+    end
 
     if isempty(width)
         width = columns;
     end
-    
+
     if isempty(height)
         height = rows / 10;
     end
-    
+
     [Y, X] = meshgrid(1:rows, 1:columns);
-   
+
     if isempty(handle)
         if ~visible
             handle = figure('Visible', 'off');
@@ -304,7 +304,7 @@ function handle = generate_tracker_legend_stats(trackers, varargin)
         figure(handle);
     end;
 
-    hold on; 
+    hold on;
 
     for t = 1:length(trackers)
 
@@ -316,20 +316,20 @@ function handle = generate_tracker_legend_stats(trackers, varargin)
         else
             font_color = [0, 0, 0];
         end;
-        
+
         if isfield(trackers{t}.style, 'font_bold')
             font_bold = trackers{t}.style.font_bold;
         else
             font_bold = false;
         end;
-        
+
         args = {'Interpreter', 'none', 'Color', font_color};
-        
+
         if font_bold
            args(end+1:end+2) = {'FontWeight', 'bold'};
         end
 
-        text(X(t) + 0.1, Y(t), trackers{t}.label, args{:});
+        text(X(t) + 0.1, Y(t), trackers{t}.tag, args{:});
 
     end;
 

@@ -36,11 +36,11 @@ for i = 1:2:length(varargin)
         case 'dummy'
             dummy = varargin{i+1};
         case 'start'
-            start = varargin{i+1};                
-        otherwise 
+            start = varargin{i+1};
+        otherwise
             error(['Unknown switch ', varargin{i},'!']) ;
     end
-end 
+end
 
 sequence = struct('name', name, 'directory', directory, ...
         'mask', mask, 'length', 0, ...
@@ -57,7 +57,7 @@ while true
 
     if ~exist(fullfile(sequence.directory, image_name), 'file')
         if dummy && sequence.length > 0 && sequence.length <= numel(sequence.groundtruth)
-            sequence.images{sequence.length + 1} = sequence.images{1};          
+            sequence.images{sequence.length + 1} = sequence.images{1};
         else
             break;
         end;
@@ -87,10 +87,13 @@ sequence.width = width;
 sequence.height = height;
 sequence.channels = channels;
 
-sequence.labels.names = {};
-labeldata = false(sequence.length, 0);
+sequence.tags.names = {};
+tagdata = false(sequence.length, 0);
 
-for file = dir(fullfile(directory, '*.label'))'
+% Supporting legacy suffix
+tagfiles = [dir(fullfile(directory, '*.label'))', dir(fullfile(directory, '*.tag'))'];
+
+for file = tagfiles
 
     try
         data = csvread(fullfile(directory, file.name));
@@ -100,20 +103,20 @@ for file = dir(fullfile(directory, '*.label'))'
     end;
 
     if size(data, 1) > sequence.length || size(data, 2) ~= 1
-        print_debug('Label file does not have correct size');
+        print_debug('Tag file does not have correct size');
         continue;
     end;
 
     if size(data, 1) < sequence.length
         data(end+1:sequence.length) = 0;
     end;
-    
-    sequence.labels.names{end+1} = file.name(1:end-6);
-    labeldata = cat(2, labeldata, data > 0);
+
+    sequence.tags.names{end+1} = file.name(1:end-6);
+    tagdata = cat(2, tagdata, data > 0);
 
 end;
 
-sequence.labels.data = labeldata;
+sequence.tags.data = tagdata;
 
 sequence.values.names = {};
 valuesdata = false(sequence.length, 0);

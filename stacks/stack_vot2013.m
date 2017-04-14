@@ -7,7 +7,7 @@ set_global_variable('bounded_overlap', false);
 baseline.name = 'baseline';
 baseline.converter = [];
 baseline.type = 'supervised';
-baseline.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
+baseline.tags = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
 baseline.parameters.repetitions = 15;
 baseline.parameters.burnin = 10;
@@ -18,7 +18,7 @@ region_noise.name = 'region_noise';
 region_noise.converter = @(sequence) sequence_transform_initialization(...
     sequence, @noisy_transform, 'rectangle');
 region_noise.type = 'supervised';
-region_noise.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
+region_noise.tags = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
 region_noise.parameters.repetitions = 15;
 region_noise.parameters.burnin = 10;
@@ -28,7 +28,7 @@ region_noise.parameters.failure_overlap = 0;
 grayscale.name = 'grayscale';
 grayscale.converter = 'sequence_grayscale';
 grayscale.type = 'supervised';
-grayscale.labels = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
+grayscale.tags = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
     'motion', 'empty'};
 grayscale.parameters.repetitions = 15;
 grayscale.parameters.burnin = 10;

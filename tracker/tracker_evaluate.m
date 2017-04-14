@@ -55,7 +55,7 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
     switch type
     case {'supervised', 'unsupervised'}
 
-        defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap', -1);
+        defaults = struct('repetitions', 15, 'skip_tags', {{}}, 'skip_initialize', 0, 'failure_overlap', -1);
         context = struct_merge(parameters, defaults);
         metadata.deterministic = false;
 
@@ -129,7 +129,7 @@ function [files, metadata] = tracker_evaluate(tracker, sequence, directory, vara
 
     case 'chunked'
 
-        defaults = struct('repetitions', 15, 'skip_labels', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1, 'chunk_length', 50);
+        defaults = struct('repetitions', 15, 'skip_tags', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1, 'chunk_length', 50);
         context = struct_merge(parameters, defaults);
         metadata.deterministic = false;
 

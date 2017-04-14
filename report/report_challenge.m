@@ -1,7 +1,7 @@
 function [document] = report_challenge(context, experiments, trackers, sequences, varargin)
 % report_challenge Generate an official challenge report
 %
-% Generate a per-label A-R ranking analysis report as well as some additional analysis that is
+% Generate a per-tag A-R ranking analysis report as well as some additional analysis that is
 % used to obtain challenge results.
 %
 % Input:
@@ -30,14 +30,14 @@ for i = 1:2:length(varargin)
         case 'implementation'
             implementation = varargin{i+1};
         case 'failures'
-            failures = varargin{i+1}; 
+            failures = varargin{i+1};
         case 'difficulty'
-            difficulty = varargin{i+1};             
+            difficulty = varargin{i+1};
         case 'methodology'
             methodology = varargin{i+1};
         case 'masterlegend'
-            master_legend = varargin{i+1};            
-        otherwise 
+            master_legend = varargin{i+1};
+        otherwise
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
 end
@@ -51,7 +51,7 @@ switch lower(methodology)
         ranking_adaptation = 'mean';
     case {'vot2015', 'vot2016'}
         ranking_adaptation = 'best';
-    otherwise 
+    otherwise
         error(['Unknown methodology ', methodology, '!']) ;
 end
 
@@ -80,7 +80,7 @@ end;
 print_text('Ranking report ...');print_indent(1);
 
 [ranking_document, ranks_scores] = report_ranking(context, trackers, sequences, experiments, ...
-    'uselabels', true, 'usepractical', true, ...
+    'usetags', true, 'usepractical', true, ...
     'hidelegend', master_legend, 'adaptation', ranking_adaptation, 'average', 'weighted_mean');
 
 print_indent(-1);
@@ -88,7 +88,7 @@ print_indent(-1);
 print_text('Expected overlap report ...'); print_indent(1);
 
 [expected_overlap_document, expected_overlap_scores] = report_expected_overlap(context, trackers, sequences, experiments, ...
-    'uselabels', true, 'usepractical', false, 'hidelegend', master_legend);
+    'usetags', true, 'usepractical', false, 'hidelegend', master_legend);
 
 print_indent(-1);
 
@@ -101,7 +101,7 @@ document.link(expected_overlap_document.url, 'Expected overlap analysis');
 if implementation
 
     print_text('Implementation report ...'); print_indent(1);
-    
+
     implementation_document = report_implementation(context, trackers, sequences, experiments);
 
     print_indent(-1);
@@ -125,7 +125,7 @@ if difficulty
 
     print_text('Difficulty report ...'); print_indent(1);
 
-    difficulty_document = report_difficulty(context, trackers, sequences, experiments, 'uselabels', true, 'usepractical', true);
+    difficulty_document = report_difficulty(context, trackers, sequences, experiments, 'usetags', true, 'usepractical', true);
 
     print_indent(-1);
 
@@ -136,7 +136,7 @@ end;
 switch lower(methodology)
     case {'vot2013', 'vot2014'}
         scores = ranks_scores;
-        score_labels = {'Acc. Rank', 'Rob. Rank'};
+        score_tags = {'Acc. Rank', 'Rob. Rank'};
         score_sorting_partial = {'ascending', 'ascending'};
         score_sorting_overall = 'ascending';
         sort_direction = 'ascend';
@@ -144,19 +144,19 @@ switch lower(methodology)
         score_format = '%.2f';
     case 'vot2015'
         scores = expected_overlap_scores;
-        score_labels = {'Expected overlap'};
+        score_tags = {'Expected overlap'};
         score_sorting_partial = {'descending'};
         score_sorting_overall = 'descending';
         sort_direction = 'descend';
         score_weights = 1;
         score_format = '%.4f';
-    otherwise 
+    otherwise
         error(['Unknown methodology ', methodology, '!']) ;
 end
 
 document.section('Overall ranking');
 
-N_scores = numel(score_labels);
+N_scores = numel(score_tags);
 combined_scores = squeeze(mean(scores, 1));
 
 overall_scores = sum(combined_scores(:) .* repmat(score_weights, numel(trackers), 1), 2) ./ sum(score_weights(:));
@@ -168,7 +168,7 @@ column_labels = cell(2, N_scores * numel(experiments) + 1);
 
 column_labels(1, :) = repmat({struct()}, 1, size(column_labels, 2));
 column_labels(1, 1:N_scores:end-1) = cellfun(@(x) struct('text', x.name, 'columns', N_scores), experiments,'UniformOutput',false);
-column_labels(2, :) = [score_labels(repmat(1:length(score_labels), 1, numel(experiments))), {'Overall'}];
+column_labels(2, :) = [score_tags(repmat(1:length(score_tags), 1, numel(experiments))), {'Overall'}];
 
 experiments_ranking_data = zeros(N_scores * numel(experiments), numel(trackers));
 for i = 1:N_scores
