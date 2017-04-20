@@ -41,6 +41,12 @@ function [success] = compile_mex(name, files, includes, directory)
 
     arguments = {};
 
+    if is_octave()
+       arguments{end+1} = '-DOCTAVE'; 
+    else
+        arguments{end+1} = '-lut';
+    end
+
     if nargin < 3
         includes = cell(0);
     end

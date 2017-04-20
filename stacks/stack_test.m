@@ -12,7 +12,19 @@ baseline.parameters.burnin = 10;
 baseline.parameters.skip_initialize = 5;
 baseline.parameters.failure_overlap = 0;
 
-experiments = {baseline};
+realtime.name = 'realtime';
+realtime.converter = [];
+realtime.type = 'realtime';
+realtime.tags = {'camera_motion', 'illum_change', 'occlusion', 'size', ...
+    'motion', 'empty'};
+realtime.parameters.repetitions = 5;
+realtime.parameters.burnin = 10;
+realtime.parameters.skip_initialize = 5;
+realtime.parameters.failure_overlap = 0;
+realtime.parameters.fps_override = true;
+realtime.parameters.fps_default = 20;
+
+experiments = {baseline, realtime};
 
 end
 

@@ -74,44 +74,39 @@ while 1
     end;
     drawnow;
     try
-	%k = waitforbuttonpress;
-	[x y c] = ginput(1);
+        [~, ~, c] = ginput(1);
     catch
         break
     end
-    %if (k == 1)
-        %c = get(hf, 'currentcharacter');
-        try
-            if c == ' ' || c == 'f' || uint8(c) == 29
-                i = i + 1;
-                if i > sequence.length
-                    i = sequence.length;
-                end;
-            elseif c == 'd' || uint8(c) == 28
-                i = i - 1;
-                if i < 1
-                    i = 1;
-                end;
-            elseif c == 'g' || uint8(c) == 30
-                i = i + 10;
-                if i > sequence.length
-                    i = sequence.length;
-                end;
-            elseif c == 's' || uint8(c) == 31
-                i = i - 10;
-                if i < 1
-                    i = 1;
-                end;
-            elseif c == 'q' || c == -1
-                break;
-            else
-                disp(uint8(c));
-            end
-        catch e
-            print_text('Error %s', e.message);
+    try
+        if c == ' ' || c == 'f' || uint8(c) == 29
+            i = i + 1;
+            if i > sequence.length
+                i = sequence.length;
+            end;
+        elseif c == 'd' || uint8(c) == 28
+            i = i - 1;
+            if i < 1
+                i = 1;
+            end;
+        elseif c == 'g' || uint8(c) == 30
+            i = i + 10;
+            if i > sequence.length
+                i = sequence.length;
+            end;
+        elseif c == 's' || uint8(c) == 31
+            i = i - 10;
+            if i < 1
+                i = 1;
+            end;
+        elseif c == 'q' || c == -1
+            break;
+        else
+            disp(uint8(c));
         end
-        %set(hf, 'currentcharacter', '?');
-    %end;
+    catch e
+        print_text('Error %s', e.message);
+    end
 
 end;
 

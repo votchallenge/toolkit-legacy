@@ -20,4 +20,3 @@ tracker_interpreter = 'matlab';
 
 % tracker_linkpath = {}; % A cell array of custom library directories used by the tracker executable (optional)
 
-% tracker_trax = false; % Uncomment to manually disable TraX protocol testing

@@ -26,12 +26,6 @@ else
     environment = 'matlab';
 end;
 
-if tracker.trax
-    protocol = 'trax';
-else
-    protocol = 'file';
-end;
-
 environment_version = version();
 
 fid = fopen(manifest, 'w');
@@ -45,7 +39,6 @@ end;
 fprintf(fid, 'toolkit.mex.hash=%s\n', get_global_variable('native_component_vot', 'unknown'));
 fprintf(fid, 'toolkit.trax.hash=%s\n', get_global_variable('native_component_trax', 'unknown'));
 fprintf(fid, 'tracker.identifier=%s\n', tracker.identifier);
-fprintf(fid, 'tracker.protocol=%s\n', protocol);
 fprintf(fid, 'tracker.interpreter=%s\n', tracker.interpreter);
 fprintf(fid, 'timestamp=%s\n', datestr(now, 31));
 fprintf(fid, 'platform=%s\n', platform_str);

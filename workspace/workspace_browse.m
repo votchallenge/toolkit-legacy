@@ -186,7 +186,8 @@ while 1
     visualize_sequence(sequences{selected_sequence}, trajectories{:});
     
     selected_tracker = [];
-    
+    selected_sequence = [];
+    selected_experiment = [];
 end;
 
 

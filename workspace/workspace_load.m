@@ -13,6 +13,8 @@ function [sequences, experiments] = workspace_load(varargin)
 %
 % Input:
 % - varargin[Force] (boolean): Force reloading the sequences and experiments.
+% - varargin[Directory] (string): Set the directory of the workspace (otherwise
+%   current directory is used.
 %
 % Output:
 % - sequences (cell): Array of sequence structures.
@@ -40,7 +42,7 @@ if ~force
         sequences = evalin('base', 'sequences');
 
         % Are variables correts at a glance ...
-        cached = iscell(sequences)
+        cached = iscell(sequences);
 
     catch
 
@@ -69,7 +71,6 @@ set_global_variable('cache', 1);
 set_global_variable('bundle', []);
 set_global_variable('cleanup', 1);
 set_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
-set_global_variable('trax_url', 'https://github.com/votchallenge/trax/archive/master.zip');
 set_global_variable('trax_mex', []);
 set_global_variable('trax_client', []);
 set_global_variable('trax_timeout', 30);
