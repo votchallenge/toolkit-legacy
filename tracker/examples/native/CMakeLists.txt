@@ -2,19 +2,18 @@ PROJECT(static)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # Try to find TraX header and library ...
-FIND_FILE(TRAX_HEADER NAMES trax.h PATHS ../../../native)
-IF (EXISTS ${TRAX_HEADER})
-    GET_FILENAME_COMPONENT(TRAX_DIR ${TRAX_HEADER} DIRECTORY)
-    ADD_DEFINITIONS(-DTRAX) # Added to enable TraX protocol support
-    LINK_DIRECTORIES(${TRAX_DIR}) # Add library directory
-    INCLUDE_DIRECTORIES(${TRAX_DIR}) # Add includes directory
-ENDIF()
+FIND_PACKAGE(trax REQUIRED COMPONENTS core)
+LINK_DIRECTORIES(${TRAX_LIBRARY_DIRS})
+LINK_LIBRARIES(${TRAX_LIBRARIES})
+INCLUDE_DIRECTORIES(AFTER ${TRAX_INCLUDE_DIRS})
 
 ADD_EXECUTABLE(static_c static.c) # Generate executable for C tracker
 ADD_EXECUTABLE(static_cpp static.cpp) # Generate executable for C++ tracker
 
-IF (EXISTS ${TRAX_HEADER})
-    TARGET_LINK_LIBRARIES(static_c trax) # Link with trax library
-    TARGET_LINK_LIBRARIES(static_cpp trax) # Link with trax library
-ENDIF()
+FIND_PACKAGE(OpenCV)
 
+IF (OpenCV_FOUND)
+ADD_EXECUTABLE(ncc ncc.cpp) # Generate executable for C tracker
+INCLUDE_DIRECTORIES(AFTER ${OpenCV_INCLUDE_DIRS})
+TARGET_LINK_LIBRARIES(ncc ${OpenCV_LIBS}) # Link with trax library
+ENDIF()

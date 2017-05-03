@@ -3,17 +3,17 @@
  * This header file contains C functions that can be used to quickly integrate
  * VOT challenge support into your C or C++ tracker.
  *
- * Copyright (c) 2015, VOT Committee
+ * Copyright (c) 2017, VOT Committee
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: 
+ * modification, are permitted provided that the following conditions are met:
 
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer. 
+ *    list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution. 
+ *    and/or other materials provided with the distribution.
 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -25,9 +25,9 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those
- * of the authors and should not be interpreted as representing official policies, 
+ * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  */
 
@@ -40,77 +40,9 @@
 #include <ctype.h>
 #include <assert.h>
 
+#include <trax.h>
+
 #define VOT_READ_BUFFER 2024
-
-// Newer compilers support interactive checks for headers, otherwise we have to enable TraX support manually
-#ifdef __has_include
-#  if __has_include("trax.h")
-#    include <trax.h>
-#    define VOT_TRAX
-#  endif
-#else
-#  ifdef TRAX
-#    include <trax.h>
-#    define VOT_TRAX
-#  endif
-#endif
-
-// Alternative getline implementation for Windows compatibility
-size_t _getline(char **lineptr, size_t *n, FILE *stream) {
-
-    char *bufptr = NULL;
-    char *p = bufptr;
-    size_t size;
-    int c;
-
-    if (lineptr == NULL) {
-    	return -1;
-    }
-
-    if (stream == NULL) {
-    	return -1;
-    }
-
-    if (n == NULL) {
-    	return -1;
-    }
-
-    bufptr = *lineptr;
-    size = *n;
-
-    c = fgetc(stream);
-    if (c == EOF) {
-    	return -1;
-    }
-    if (bufptr == NULL) {
-    	bufptr = (char *) malloc(128);
-    	if (bufptr == NULL) {
-    		return -1;
-    	}
-    	size = 128;
-    }
-    p = bufptr;
-    while(c != EOF) {
-    	if ((p - bufptr) > (size - 1)) {
-    		size = size + 128;
-    		bufptr = (char *) realloc(bufptr, size);
-    		if (bufptr == NULL) {
-    			return -1;
-    		}
-    	}
-    	*p++ = c;
-    	if (c == '\n') {
-    		break;
-    	}
-    	c = fgetc(stream);
-    }
-
-    *p++ = '\0';
-    *lineptr = bufptr;
-    *n = size;
-
-    return p - bufptr - 1;
-}
 
 // Define VOT_OPENCV after including OpenCV core header to enable better OpenCV support
 #ifdef __OPENCV_CORE_HPP__
@@ -204,95 +136,6 @@ vot_region* vot_region_copy(const vot_region* region) {
 
 #endif
 
-vot_region* _parse_region(char* buffer) {
-
-    int i;
-    float* numbers = (float*) malloc(sizeof(float) * (strlen(buffer) / 2));
-	char* pch = strtok(buffer, ",");
-
-    for (i = 0; ; i++) {
-        if (!pch) break;
-        numbers[i] = (float) atof(pch); 
-		pch = strtok(NULL, ",");
-    }
-
-    vot_region* region;
-
-#ifdef VOT_POLYGON
-    {
-        // Check if region is actually a rectangle and convert it
-        if (i == 4) {
-
-            region = vot_region_create(4);
-
-			region->count = 4;
-
-			region->x[0] = numbers[0];
-			region->x[1] = numbers[0] + numbers[2];
-			region->x[2] = numbers[0] + numbers[2];
-			region->x[3] = numbers[0];
-
-			region->y[0] = numbers[1];
-			region->y[1] = numbers[1];
-			region->y[2] = numbers[1] + numbers[3];
-			region->y[3] = numbers[1] + numbers[3];
-
-
-        } else {
-            int count = i / 2;
-            assert(count >= 3);
-
-            region = vot_region_create(count);
-
-            for (i = 0; i < count; i++) {
-                region->x[i] = numbers[i*2];
-                region->y[i] = numbers[i*2+1];
-            }
-
-            region->count = count;
-        }
-    }
-#else
-    {
-        assert(i > 3);
-
-        region = vot_region_create();
-
-        // Check if the input region is actually a polygon and convert it
-        if (i > 6) {
-            int j;
-		    float top = FLT_MAX;
-		    float bottom = FLT_MIN;
-		    float left = FLT_MAX;
-		    float right = FLT_MIN;
-
-		    for (j = 0; j < i / 2; j++) {
-			    top = MIN(top, numbers[j * 2 + 1]);
-			    bottom = MAX(bottom, numbers[j * 2 + 1]);
-			    left = MIN(left, numbers[j * 2]);
-			    right = MAX(right, numbers[j * 2]);
-		    }
-
-	        region->x = left;
-	        region->y = top;
-	        region->width = right - left;
-	        region->height = bottom - top;
-
-        } else {
-            region = vot_region_create();
-            region->x = numbers[0];
-            region->y = numbers[1];
-            region->width = numbers[2];
-            region->height = numbers[3];
-        }
-    }
-#endif
-
-    free(numbers);
-
-    return region;
-}
-
 #ifdef __cplusplus
 
 #include <string>
@@ -321,7 +164,7 @@ public:
     }
 
     void set(int i, float x, float y) { assert(i >= 0 && i < _region->count); _region->x[i] = x; _region->y[i] = y; }
-    float get_x(int i) const { assert(i >= 0 && i < _region->count); return _region->x[i]; } 
+    float get_x(int i) const { assert(i >= 0 && i < _region->count); return _region->x[i]; }
     float get_y(int i) const { assert(i >= 0 && i < _region->count); return _region->y[i]; }
     int count() const { return _region->count; }
 
@@ -474,14 +317,14 @@ void operator>> (const cv::Rect& rectangle, VOTRegion &source) {
 class VOT {
 public:
     VOT() {
-        _region = vot_initialize(); 
+        _region = vot_initialize();
     }
 
     ~VOT() {
         vot_quit();
     }
 
-    const VOTRegion region() { 
+    const VOTRegion region() {
         return VOTRegion(_region);
     }
 
@@ -531,8 +374,6 @@ private:
     // List of results
     vot_region** _vot_result;
 
-#ifdef VOT_TRAX
-
     trax_handle* _trax_handle;
     char _trax_image_buffer[VOT_READ_BUFFER];
 
@@ -567,7 +408,6 @@ trax_region* _region_to_trax(const vot_region* region) {
 }
 
 #endif
-#endif
 
 #ifdef __cplusplus
 
@@ -583,7 +423,7 @@ trax_region* _region_to_trax(const vot_region* region) {
 
 
 /**
- * Reads the input data and initializes all structures. Returns the initial 
+ * Reads the input data and initializes all structures. Returns the initial
  * position of the object as specified in the input data. This function should
  * be called at the beginning of the program.
  */
@@ -596,145 +436,59 @@ vot_region* VOT_PREFIX(vot_initialize)() {
     _vot_sequence_position = 0;
     _vot_sequence_size = 0;
 
-#ifdef VOT_TRAX
-    if (getenv("TRAX")) {
-        trax_configuration config;
-        trax_image* _trax_image = NULL;
-        trax_region* _trax_region = NULL;
-        _trax_handle = NULL;
-        int response;
+    trax_configuration config;
+    trax_image* _trax_image = NULL;
+    trax_region* _trax_region = NULL;
+    _trax_handle = NULL;
+    int response;
+    #ifdef VOT_POLYGON
+    int region_format = TRAX_REGION_POLYGON;
+    #else
+    int region_format = TRAX_REGION_RECTANGLE;
+    #endif
 
-        #ifdef VOT_POLYGON
-        config.format_region = TRAX_REGION_POLYGON;
-        #else
-        config.format_region = TRAX_REGION_RECTANGLE;
-        #endif
-        config.format_image = TRAX_IMAGE_PATH;
-        _trax_handle = trax_server_setup(config, NULL);
+    trax_metadata* metadata = trax_metadata_create(region_format, TRAX_IMAGE_PATH, NULL, NULL, NULL);
 
-        response = trax_server_wait(_trax_handle, &_trax_image, &_trax_region, NULL);
+    _trax_handle = trax_server_setup(metadata, trax_no_log);
 
-        assert(response == TRAX_INITIALIZE);
+    trax_metadata_release(&metadata);
 
-        strcpy(_trax_image_buffer, trax_image_get_path(_trax_image));
+    response = trax_server_wait(_trax_handle, &_trax_image, &_trax_region, NULL);
 
-        trax_server_reply(_trax_handle, _trax_region, NULL);
+    assert(response == TRAX_INITIALIZE);
 
-        vot_region* region = _trax_to_region(_trax_region);
+    strcpy(_trax_image_buffer, trax_image_get_path(_trax_image));
 
-        trax_region_release(&_trax_region);
-        trax_image_release(&_trax_image);
-        
-        return region;
-    }
-#endif
+    trax_server_reply(_trax_handle, _trax_region, NULL);
 
-    inputfile = fopen("region.txt", "r");
-    imagesfile = fopen("images.txt", "r");
+    vot_region* region = _trax_to_region(_trax_region);
 
-    if (!inputfile) {
-        fprintf(stderr, "Initial region file (region.txt) not available. Stopping.\n");
-        exit(-1);
-    }
-
-    if (!imagesfile) {
-        fprintf(stderr, "Image list file (images.txt) not available. Stopping.\n");
-        exit(-1);
-    }
-
-    int linelen;
-    size_t linesiz = sizeof(char) * VOT_READ_BUFFER;
-    char* linebuf = (char*) malloc(sizeof(char) * VOT_READ_BUFFER);
-    
-    _getline(&linebuf, &linesiz, inputfile);
-    vot_region* region = _parse_region(linebuf);
-
-    fclose(inputfile);
-
-    j = 32;
-    _vot_sequence = (char**) malloc(sizeof(char*) * j);
-
-    while (1) {
-
-        if ((linelen = _getline(&linebuf, &linesiz, imagesfile))<1)
-            break;
-
-        if ((linebuf)[linelen - 1] == '\n') {
-            (linebuf)[linelen - 1] = '\0';
-        }
-
-        if (_vot_sequence_size == j) {
-            j += 32;
-            _vot_sequence = (char**) realloc(_vot_sequence, sizeof(char*) * j);
-        }
-
-        _vot_sequence[_vot_sequence_size] = (char *) malloc(sizeof(char) * (strlen(linebuf) + 1));
-
-        strcpy(_vot_sequence[_vot_sequence_size], linebuf);
-
-        _vot_sequence_size++;
-    }
-
-    free(linebuf);
-
-    _vot_result = (vot_region**) malloc(sizeof(vot_region*) * _vot_sequence_size);
+    trax_region_release(&_trax_region);
+    trax_image_release(&_trax_image);
 
     return region;
+
 }
 
 /**
- * Stores results to the result file and frees memory. This function should be 
+ * Stores results to the result file and frees memory. This function should be
  * called at the end of the tracking program.
  */
 void VOT_PREFIX(vot_quit)() {
 
-    int i;
-
-#ifdef VOT_TRAX
     if (_trax_handle) {
         trax_cleanup(&_trax_handle);
         return;
     }
-#endif
-
-    FILE *outputfile = fopen("output.txt", "w");
-
-    for (i = 0; i < _vot_sequence_position; i++) {
-#ifdef VOT_POLYGON
-        {
-            int j;
-            fprintf(outputfile, "%f,%f", _vot_result[i]->x[0], _vot_result[i]->y[0]); 
-            for (j = 1; j < _vot_result[i]->count; j++)
-                fprintf(outputfile, ",%f,%f", _vot_result[i]->x[j], _vot_result[i]->y[j]); 
-            fprintf(outputfile, "\n"); 
-        }
-#else
-        fprintf(outputfile, "%f,%f,%f,%f\n", _vot_result[i]->x, _vot_result[i]->y, _vot_result[i]->width, _vot_result[i]->height); 
-#endif
-        vot_region_release(&(_vot_result[i]));
-    }
-
-    fclose(outputfile);
-
-    if (_vot_sequence) {
-        for (i = 0; i < _vot_sequence_size; i++)
-            free(_vot_sequence[i]);
-
-        free(_vot_sequence);
-    }
-
-    if (_vot_result)
-        free(_vot_result);
 
 }
 
 /**
- * Returns the file name of the current frame. This function does not advance 
+ * Returns the file name of the current frame. This function does not advance
  * the current position.
  */
 const char* VOT_PREFIX(vot_frame)() {
 
-#ifdef VOT_TRAX
     if (_trax_handle) {
         int response;
         trax_image* _trax_image = NULL;
@@ -758,13 +512,6 @@ const char* VOT_PREFIX(vot_frame)() {
         return _trax_image_buffer;
 
     }
-#endif
-
-    if (_vot_sequence_position >= _vot_sequence_size)
-        return NULL;
-
-    return _vot_sequence[_vot_sequence_position];
-
 }
 
 /**
@@ -773,32 +520,19 @@ const char* VOT_PREFIX(vot_frame)() {
  */
 void VOT_PREFIX(vot_report)(vot_region* region) {
 
-#ifdef VOT_TRAX
     if (_trax_handle) {
         trax_region* _trax_region = _region_to_trax(region);
         trax_server_reply(_trax_handle, _trax_region, NULL);
         trax_region_release(&_trax_region);
         return;
     }
-#endif
 
-    if (_vot_sequence_position >= _vot_sequence_size)
-        return;
-        
-    _vot_result[_vot_sequence_position] = vot_region_copy(region);
-    _vot_sequence_position++;
 }
 
 int VOT_PREFIX(vot_end)() {
 
-#ifdef VOT_TRAX
     return 0;
-#endif
 
-    if (_vot_sequence_position >= _vot_sequence_size)
-        return 1;
-        
-    return 0;
 }
 
 #endif
