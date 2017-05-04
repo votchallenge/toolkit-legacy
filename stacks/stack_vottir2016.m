@@ -1,6 +1,6 @@
 function experiments = stack_vottir2016()
 
-set_global_variable('bundle', 'https://liu.box.com/shared/static/yjbd38x42gkvovdidk2je01n0ymk2842.zip');
+set_global_variable('bundle', 'http://data.votchallenge.net/vot2016/vot-tir2016.zip');
 
 baseline.name = 'baseline';
 baseline.converter = [];
