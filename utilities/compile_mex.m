@@ -1,7 +1,7 @@
-function [success] = compile_mex(name, files, includes, directory)
+function [success] = compile_mex(name, files, includes, directory, varargin)
 % compile_mex Compile given source files to a MEX function
 %
-% Compiles or recompiles given source files to a MEX function taking 
+% Compiles or recompiles given source files to a MEX function taking
 % into account source files timestamps. Also works in Octave by switching
 % to mkoctfile command.
 %
@@ -42,7 +42,7 @@ function [success] = compile_mex(name, files, includes, directory)
     arguments = {};
 
     if is_octave()
-       arguments{end+1} = '-DOCTAVE'; 
+       arguments{end+1} = '-DOCTAVE';
     else
         arguments{end+1} = '-lut';
     end
@@ -65,9 +65,9 @@ function [success] = compile_mex(name, files, includes, directory)
             cd(directory)
         end;
 
-        if is_octave() 
+        if is_octave()
 
-            [out, status] = mkoctfile('-mex', '-o', name, includes{:}, files{:}, arguments{:});
+            [out, status] = mkoctfile('-mex', '-o', name, varargin{:}, includes{:}, files{:}, arguments{:});
 
             if status
                 print_text('ERROR: Unable to compile MEX function.');
@@ -77,7 +77,7 @@ function [success] = compile_mex(name, files, includes, directory)
 
         else
 
-            mex('-output', name, includes{:}, files{:}, arguments{:});
+            mex('-output', name, varargin{:}, includes{:}, files{:}, arguments{:});
 
         end
 
@@ -92,5 +92,5 @@ function [success] = compile_mex(name, files, includes, directory)
         success = false;
 
     end
-    
+
 end
