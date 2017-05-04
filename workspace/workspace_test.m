@@ -10,7 +10,7 @@ function workspace_test(tracker, sequences, varargin)
 % - sequences (cell or structure): Array of sequence structures.
 %
 
-if isempty(sequences) 
+if isempty(sequences)
     error('No sequence provided');
 end
 
@@ -26,14 +26,20 @@ print_text('********************************************************************
 print_text('');
 
 debug_state = get_global_variable('trax_debug', false);
-set_global_variable('trax_debug', true); 
-set_global_variable('trax_debug_console', true); 
+set_global_variable('trax_debug', true);
+set_global_variable('trax_debug_console', true);
+
+if ~is_octave()
+use_gui = get_global_variable('gui', true);    
+else
+use_gui = get_global_variable('gui', usejava('awt'));
+end;
 
 try
-   
+
     while 1
 
-        current_sequence = select_sequence(sequences);       
+        current_sequence = select_sequence(sequences);
 
         if ~isempty(current_sequence)
 
@@ -42,9 +48,10 @@ try
             data.figure = 1;
             data.sequence = sequences{current_sequence};
             data.index = 1;
+			data.gui = use_gui;
 
             tracker_run(tracker, @callback, data);
-            
+
         else
             break;
         end;
@@ -73,30 +80,43 @@ function [image, region, properties, data] = callback(state, data)
 		return;
 	end;
 
-    image_path = get_image(data.sequence, data.index);
-    hf = sfigure(data.figure);
-	set(hf, 'Name', sprintf('%s (%d / %d)', data.sequence.name, data.index, data.sequence.length), 'NumberTitle', 'off');
-    imshow(imread(image_path));
-    hold on;
-    draw_region(get_region(data.sequence, data.index), [1 0 0], 2);
-    draw_region(state.region, [0 1 0], 1);
-    hold off;
-    drawnow;
-    try
-        [~, ~, c] = ginput(1);
-    catch
-        c = -1;
-    end
-    try
-        if c == ' ' || c == 'f' || uint8(c) == 29
-            
-        elseif c == 'q' || c == -1
-            return;
-        end
-    catch e
-        print_text('Error %s', e.message);
-    end
-    
+	if data.gui
+
+		image_path = get_image(data.sequence, data.index);
+		hf = sfigure(data.figure);
+		set(hf, 'Name', sprintf('%s (%d / %d)', data.sequence.name, data.index, data.sequence.length), 'NumberTitle', 'off');
+		imshow(imread(image_path));
+		hold on;
+		draw_region(get_region(data.sequence, data.index), [1 0 0], 2);
+		draw_region(state.region, [0 1 0], 1);
+		hold off;
+		drawnow;
+		try
+		    [~, ~, c] = ginput(1);
+		catch
+		    c = -1;
+		end
+		try
+		    if c == ' ' || c == 'f' || uint8(c) == 29
+
+		    elseif c == 'q' || c == -1
+		        print_text('Quitting.');
+		        return;
+		    end
+		catch e
+		    print_text('Error %s', e.message);
+		end
+
+	else
+
+		c = input('(space/Q) ', 's');
+
+		if c == 'q'
+			print_text('Quitting.');
+		    return;
+		end
+	end;
+
 	data.index = data.index + 1;
 
 	% End of sequence
