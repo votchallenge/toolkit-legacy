@@ -62,24 +62,27 @@ if ~debug_console
     mexargs = [mexargs, 'Log', log_file];
 end;
 
+failure = [];
+
 try
     data = traxclient(tracker.command, callback, ...
         'Directory', directory, 'Timeout', timeout, ...
         'Environment', environment, 'Connection', connection, ...
         'Data', data, mexargs{:});
-    success = true;
 catch e
-    print_text('Tracker execution interrupted: %s.', e.message)
+    print_text('Tracker execution interrupted: %s', e.message)
     print_text('Writing log output to a file %s, working directory of the tracker was %s.', log_file, directory);
-    success = false;
+    failure = e;
 end;
 
-delpath(directory, 'Empty', ~success);
+delpath(directory, 'Empty', ~isempty(failure));
 
-if success
+if isempty(failure)
     if cleanup && ~debug_console
-       delpath(log_file); 
+       delpath(log_file);
     end
+else
+	rethrow(failure);
 end
 
 end

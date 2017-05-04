@@ -94,13 +94,29 @@ if isempty(state.region)
     return;
 end;
 o = region_overlap(state.region, get_region(data.sequence, data.index));
+
 % Handle tracker failure
-%disp(sprintf('%d - %f', data.index, o(1)));
 if o(1) <= data.context.failure_overlap
     data.result{data.index} = 2;
     data.timing(data.index) = state.time;
 
-    data.index = data.index + data.context.skip_initialize;
+    start = data.index + data.context.skip_initialize;
+
+    if ~isempty(data.context.skip_tags)
+	    data.index = data.sequence.length + 1; % Set to terminate position
+        for i = start:data.sequence.length
+            if isempty(intersect(get_tags(data.sequence, i), data.context.skip_tags))
+                data.index = i; % Frame is valid, can be used for initializaiton
+                break;
+            end;
+        end;
+	else
+		data.index = start;
+    end;
+
+    if data.index > data.sequence.length
+        return;
+    end
 
     region = get_region(data.sequence, data.index);
     image = get_image(data.sequence, data.index);

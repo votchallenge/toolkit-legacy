@@ -150,9 +150,9 @@ if current_timestamp > previous_timestamp + update_interval
 
     version = toolkit_version();
 
-    try 
+    try
         snapshot = [urlread(sprintf('%srelease_%d_%d.id', native_url, version.major, version.minor)), '/'];
-    catch 
+    catch
         % legacy builds
         snapshot = '';
     end
@@ -180,14 +180,14 @@ if current_timestamp > previous_timestamp + update_interval
 
     updated = true;
 
-    try 
-        
+    try
+
         remote_hash = urlread(trax_hash_url);
         if ~strcmp(trax_hash, remote_hash)
 
             mkpath(tempdir);
-            
-            try 
+
+            try
                 print_debug('Downloading from %s.', trax_bundle_url);
                 urlwrite(trax_bundle_url, fullfile(tempdir, 'trax.zip'));
                 unzip(fullfile(tempdir, 'trax.zip'), native_dir);
@@ -197,7 +197,7 @@ if current_timestamp > previous_timestamp + update_interval
                 print_debug('Error downloading %s.', trax_bundle_url);
                 updated = false;
             end
-            
+
         end;
 
         set_global_variable('native_component_trax', remote_hash(remote_hash ~= sprintf('\n')));
@@ -213,14 +213,14 @@ if current_timestamp > previous_timestamp + update_interval
       vot_hash = '';
     end;
 
-    try 
-        
+    try
+
         remote_hash = urlread(vot_hash_url);
         if ~strcmp(vot_hash, remote_hash)
 
             mkpath(tempdir);
-            
-            try 
+
+            try
                 print_debug('Downloading from %s.', vot_bundle_url);
                 urlwrite(vot_bundle_url, fullfile(tempdir, 'vot.zip'));
                 unzip(fullfile(tempdir, 'vot.zip'), native_dir);
@@ -267,7 +267,7 @@ else
     return;
 end
 
-if exist(fullfile(native_dir, 'python'), 'dir') == 7 
+if exist(fullfile(native_dir, 'python'), 'dir') == 7
     set_global_variable('trax_python', fullfile(native_dir, 'python'));
 else
     print_debug('Cannot find python/');
@@ -292,7 +292,7 @@ function success = download_trax_source(trax_dir)
 % - success (boolean): True on success.
 %
 
-trax_branch = get_global_variable('trax_soruce_branch', 'master');
+trax_branch = get_global_variable('trax_source_branch', 'master');
 
 trax_url = get_global_variable('trax_url', sprintf('https://github.com/votchallenge/trax/archive/%s.zip', trax_branch));
 
@@ -325,9 +325,9 @@ else
 end;
 
 if success
-    if exist(fullfile(trax_dir, 'python'), 'dir') == 7 
+    if exist(fullfile(trax_dir, 'python'), 'dir') == 7
         set_global_variable('trax_python', fullfile(trax_dir, 'python'));
-    end 
+    end
 end
 
 end

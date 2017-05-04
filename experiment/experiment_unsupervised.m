@@ -2,8 +2,8 @@ function [files, metadata] = experiment_unsupervised(tracker, sequence, director
 
     files = {};
     metadata.completed = true;
-    cache = get_global_variable('experiment.cache', 0);
-    silent = get_global_variable('experiment.silent', 0);
+	cache = get_global_variable('experiment_cache', true);
+	silent = get_global_variable('experiment_silent', false);
 
     defaults = struct('repetitions', 15);
     context = struct_merge(parameters, defaults);
@@ -22,6 +22,8 @@ function [files, metadata] = experiment_unsupervised(tracker, sequence, director
 	if isfield(tracker, 'metadata') && isfield(tracker.metadata, 'deterministic') && tracker.metadata.deterministic
 		r = 1;
 	end
+
+	check_deterministic = ~(scan && nargout < 2); % Ensure faster execution when we only want a list of files by ommiting determinisim check.
 
     for i = 1:r
 
