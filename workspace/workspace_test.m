@@ -29,8 +29,8 @@ debug_state = get_global_variable('trax_debug', false);
 set_global_variable('trax_debug', true);
 set_global_variable('trax_debug_console', true);
 
-if ~is_octave()
-use_gui = get_global_variable('gui', true);    
+if is_octave()
+use_gui = get_global_variable('gui', true);
 else
 use_gui = get_global_variable('gui', usejava('awt'));
 end;
@@ -58,10 +58,11 @@ try
 
     end
 
-catch
+catch e
     % Restore debug flag
     set_global_variable('trax_debug', debug_state);
     set_global_variable('trax_debug_console', false);
+    rethrow(e);
 end
 
 end

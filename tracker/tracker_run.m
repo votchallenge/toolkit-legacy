@@ -57,8 +57,12 @@ mkpath(log_directory);
 
 mexargs = {'Debug', debug};
 
+timestamp = datestr(now, 30);
+
+log_file = [];
+
 if ~debug_console
-    log_file = fullfile(log_directory, [datestr(now, 30), '.log']);
+    log_file = fullfile(log_directory, [timestamp, '.log']);
     mexargs = [mexargs, 'Log', log_file];
 end;
 
@@ -70,10 +74,15 @@ try
         'Environment', environment, 'Connection', connection, ...
         'Data', data, mexargs{:});
 catch e
-    print_text('Tracker execution interrupted: %s', e.message)
-    print_text('Writing log output to a file %s, working directory of the tracker was %s.', log_file, directory);
+    print_text('Tracker execution interrupted: %s', e.message);
     failure = e;
 end;
+
+if ~isempty(failure)
+    if exist(fullfile(directory, 'runtime.log'), 'file')
+        movefile(fullfile(directory, 'runtime.log'), fullfile(log_directory, [timestamp, '_runtime.log']));
+    end
+end
 
 delpath(directory, 'Empty', ~isempty(failure));
 
