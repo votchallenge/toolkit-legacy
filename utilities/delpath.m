@@ -6,6 +6,8 @@ function [status] = delpath(root, varargin)
 %
 % Input:
 % - root (string): Path to file or root directory to delete.
+% - varargin[Empty] (boolean): Delete directory only if it is.
+% - varargin[Root] (boolean): Also delete root directory.
 %
 % Output:
 % - status (boolean): True on success.
@@ -14,7 +16,7 @@ function [status] = delpath(root, varargin)
 
     if_empty = false;
     delete_root = true;
-    
+
     args = varargin;
     for j=1:2:length(args)
         switch lower(varargin{j})
@@ -30,22 +32,22 @@ function [status] = delpath(root, varargin)
             status = 1;
         else
             status = 0;
-        end;        
+        end;
         return;
     end;
 
     status = true;
 
     data = dir(root);
-    
-    isdir = [data.isdir]; 
+
+    isdir = [data.isdir];
     files = {data(~isdir).name}';
 
     sdirs = {data(isdir).name};
     for sdir = find(~ismember(sdirs, {'.', '..'}))
-        status = status && delpath(fullfile(root, sdirs{sdir}), 'Root', true); 
+        status = status && delpath(fullfile(root, sdirs{sdir}), 'Root', true);
     end
-    
+
     if isempty(files) || ~if_empty
         if ~isempty(files)
             for i = 1:length(files)
@@ -58,5 +60,9 @@ function [status] = delpath(root, varargin)
     end
 
     if (status && delete_root)
-        rmdir(root);
+		if ispc()
+			system(sprintf('rmdir /Q "%s"', root));
+		else
+		    rmdir(root);
+		end;
     end;
