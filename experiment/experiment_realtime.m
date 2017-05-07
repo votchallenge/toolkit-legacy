@@ -114,8 +114,6 @@ data.time = data.time + max(1000 / data.fps, state.time * 1000);
 previous = data.index;
 current = round(floor(data.time * data.fps) / 1000) + data.offset;
 
-fprintf('%d %d %g %g \n', previous, current, data.time, floor(data.time * data.fps) / 1000);
-
 data.timing(previous) = state.time;
 
 failed = 0;
@@ -150,16 +148,21 @@ else
 		data.time = 0;
 		data.offset = data.index - 1;
 
+		% Should be initalzed after the end of the sequence
+		if data.index > data.sequence.length
+		    return;
+		end
         region = get_region(data.sequence, data.index);
         image = get_image(data.sequence, data.index);
         data.initialized = false;
         return;
     end
 
+	% Tracked over the end of the sequence
     if current > data.sequence.length
         return;
     end
-    
+
     data.result{current} = state.region;
 	data.region = state.region;
 
@@ -174,7 +177,7 @@ if o(1) <= data.context.failure_overlap
 		data.time = 0;
 		data.offset = data.index - 1;
 
-        % End of sequence
+        % Should be initalzed after the end of the sequence
         if data.index > data.sequence.length
             return;
         end
@@ -187,7 +190,7 @@ end;
 
 data.index = current + 1;
 
-% End of sequence
+% At the end of sequence
 if data.index > data.sequence.length
     return;
 end
