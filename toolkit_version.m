@@ -9,7 +9,7 @@ function version = toolkit_version()
 %     - minor (integer): Minor version of the toolkit
 %     - patch (integer): Patch version of the toolkit
 
-version = struct('major', 4, 'minor', 1);
+version = struct('major', 5, 'minor', 0, 'patch', 0);
 
 % BUILD VERSION PLACEHOLDER %
 
