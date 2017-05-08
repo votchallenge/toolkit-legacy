@@ -59,7 +59,7 @@ function [handle, image, region] = tracker_initialize(format)
         return;
     end;
 
-    traxserver('status', region);
+	handle.initialization = region;
 
 end
 
@@ -78,6 +78,11 @@ function [handle, image] = tracker_frame(handle)
     if ~isstruct(handle)
         error('VOT: Handle should be a structure.');
     end;
+
+	if ~isempty(handle.initialization)
+	    traxserver('status', handle.initialization);
+		handle.initialization = [];
+	end;
 
     [image, region] = traxserver('wait');
 
@@ -107,6 +112,10 @@ function handle = tracker_report(handle, region)
     if ~isstruct(handle)
         error('VOT: Handle should be a structure.');
     end;
+
+	if ~isempty(handle.initialization)
+		handle.initialization = [];
+	end;
 
     traxserver('status', region);
 
