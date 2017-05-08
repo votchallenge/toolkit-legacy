@@ -184,6 +184,8 @@ if current_timestamp > previous_timestamp + check_interval
     latest = strtrim(latest); % Remove trailing whitespace/newline
     updated = ~strcmp(version, latest);
 
+    fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
+    
 end;
     
 end
