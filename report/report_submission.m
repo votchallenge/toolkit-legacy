@@ -1,4 +1,4 @@
-function [document] = report_submission(context, trackers, sequences, experiments, varargin)
+function [document] = report_submission(context, tracker, sequences, experiments, varargin)
 % report_submission Basic performance scores for given trackers
 %
 % This function generates basic report with some performance scores that
@@ -7,45 +7,33 @@ function [document] = report_submission(context, trackers, sequences, experiment
 %
 % Input:
 % - context (structure): Report context structure.
-% - trackers (struct): An array of tracker structures.
+% - tracker (struct): A tracker structure.
 % - experiments (cell): An array of experiment structures.
 % - sequences (cell): An array of sequence structures.
 %
 % Output:
 % - document (structure): Resulting document structure.
 
-if ~iscell(trackers)
-    trackers = {trackers};
-end;
+document = create_document(context, 'submission', 'title', sprintf('Submission report for tracker %s', tracker.label));
 
-document = create_document(context, 'submission', 'title', 'Submission report');
+context.sequences = sequences;
+context.scores = cell(numel(experiments), 1);
 
+context = iterate(experiments, tracker, sequences, 'iterator', @evaluate_iterator, 'context', context);
 
-for t = 1:numel(trackers)
-    tracker = trackers{t};
+sequence_tags = cellfun(@(x) x.name, sequences, 'UniformOutput', 0)';
 
-    document.section('Tracker %s', tracker.tag);
+for i = 1:numel(experiments)
 
-    context.sequences = sequences;
-    context.scores = cell(numel(experiments), 1);
+    row_tags = [sequence_tags; 'Average'];
 
-    context = iterate(experiments, tracker, sequences, 'iterator', @evaluate_iterator, 'context', context);
+    data = context.scores{i}.data;
+    data(end+1, :) = sum(bsxfun(@times, context.scores{i}.data, context.scores{i}.sequence_lengths')) ./ sum(context.scores{i}.sequence_lengths); %#ok<AGROW>
 
-    sequence_tags = cellfun(@(x) x.name, sequences, 'UniformOutput', 0)';
+    document.section('Experiment %s', experiments{i}.name);
+    document.table(data, 'columnLabels', context.scores{i}.tags, 'rowLabels', row_tags, 'title', 'Scores');
 
-    for i = 1:numel(experiments)
-
-        row_tags = [sequence_tags; 'Average'];
-
-        data = context.scores{i}.data;
-        data(end+1, :) = sum(bsxfun(@times, context.scores{i}.data, context.scores{i}.sequence_lengths')) ./ sum(context.scores{i}.sequence_lengths); %#ok<AGROW>
-
-        document.subsection('Experiment %s', experiments{i}.name);
-        document.table(data, 'columnLabels', context.scores{i}.tags, 'rowLabels', row_tags, 'title', 'Scores');
-
-    end
-
-end;
+end
 
 document.write();
 
@@ -70,6 +58,15 @@ switch (event.type)
                     @(trajectory, sequence, experiment, tracker) estimate_failures(trajectory, sequence), ...
                     @estimate_speed};
                 context.scores{event.experiment_index}.data = nan(numel(context.sequences), 3);
+            case {'realtime'}
+                defaults = struct('repetitions', 15, 'skip_tags', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
+                context.experiment_parameters = struct_merge(event.experiment.parameters, defaults);
+                context.scores{event.experiment_index}.tags = {'Overlap', 'Failures', 'Speed'};
+                context.scores{event.experiment_index}.measures = {@(trajectory, sequence, experiment, tracker) ...
+                    estimate_accuracy(trajectory, sequence), ...
+                    @(trajectory, sequence, experiment, tracker) estimate_failures(trajectory, sequence), ...
+                    @estimate_speed};
+                context.scores{event.experiment_index}.data = nan(numel(context.sequences), 3);
             case {'chunked', 'unsupervised'}
                 defaults = struct('repetitions', 15, 'skip_tags', {{}}, 'skip_initialize', 0, 'failure_overlap',  -1);
                 context.experiment_parameters = struct_merge(event.experiment.parameters, defaults);
@@ -78,7 +75,7 @@ switch (event.type)
                     estimate_accuracy(trajectory, sequence, 'burnin', experiment.parameters.burnin, 'IgnoreUnknown', false), ...
                     @estimate_speed};
                 context.scores{event.experiment_index}.data = nan(numel(context.sequences), 2);
-            otherwise, error(['unrecognized type ' type]);
+            otherwise, error(['unrecognized type ', event.experiment.type]);
         end
 
         context.scores{event.experiment_index}.sequence_lengths = cellfun(@(x) x.length, context.experiment_sequences, 'UniformOutput', true);
@@ -98,7 +95,7 @@ switch (event.type)
             sequence.name);
 
         switch event.experiment.type
-            case {'supervised', 'unsupervised', 'chunked'}
+            case {'supervised', 'unsupervised', 'chunked', 'realtime'}
 
                 scores = nan(context.experiment_parameters.repetitions, numel(context.scores{event.experiment_index}.measures));
 
@@ -125,7 +122,7 @@ switch (event.type)
 
                 context.scores{event.experiment_index}.data(event.sequence_index, :) = nanmean(scores, 1);
 
-            otherwise, error(['unrecognized type ' type]);
+            otherwise, error(['unrecognized type ', event.experiment.type]);
         end
 
 end;
