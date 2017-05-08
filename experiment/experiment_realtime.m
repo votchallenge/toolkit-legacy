@@ -102,7 +102,7 @@ properties = struct();
 
 % Handle initial frame (initialize for the first time)
 if isempty(state.region)
-    region = get_region(data.sequence, data.index);
+    region = data.sequence.initialize(data.sequence, data.index, data.context);
     image = get_image(data.sequence, data.index);
     data.time = 0;
 	data.offset = 0;
@@ -152,7 +152,8 @@ else
 		if data.index > data.sequence.length
 		    return;
 		end
-        region = get_region(data.sequence, data.index);
+
+        region = data.sequence.initialize(data.sequence, data.index, data.context);
         image = get_image(data.sequence, data.index);
         data.initialized = false;
         return;

@@ -84,7 +84,7 @@ function [image, region, properties, data] = callback(state, data)
 
 	% Handle initial frame (initialize for the first time)
 	if isempty(state.region)
-		region = get_region(data.sequence, data.index);
+		region = data.sequence.initialize(data.sequence, data.index, data.context);
 		image = get_image(data.sequence, data.index);
 		return;
 	end;
