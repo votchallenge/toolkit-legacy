@@ -84,8 +84,19 @@ if ~isempty(failure)
     end
 end
 
-delpath(directory, 'Empty', ~isempty(failure));
-
+if ispc()
+    % On Windows working directory frequently remains locked for some short
+    % time so we have to try it several times.
+    for i = 1:4
+        if delpath(directory, 'Empty', ~isempty(failure))
+            break;
+        end
+        sleep(0.5);
+    end;
+else
+    delpath(directory, 'Empty', ~isempty(failure));
+end;
+    
 if isempty(failure)
     if cleanup && ~debug_console
        delpath(log_file);

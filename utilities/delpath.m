@@ -60,9 +60,9 @@ function [status] = delpath(root, varargin)
     end
 
     if (status && delete_root)
-		if ispc()
-			system(sprintf('rmdir /Q "%s"', root));
-		else
+		try
 		    rmdir(root);
+		catch
+			status = false;
 		end;
     end;
