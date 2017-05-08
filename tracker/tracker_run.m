@@ -91,7 +91,7 @@ if ispc()
         if delpath(directory, 'Empty', ~isempty(failure))
             break;
         end
-        sleep(0.5);
+        pause(0.5);
     end;
 else
     delpath(directory, 'Empty', ~isempty(failure));
