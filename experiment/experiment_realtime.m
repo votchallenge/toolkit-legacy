@@ -169,6 +169,11 @@ else
 
 end;
 
+% Tracked over the end of the sequence
+if current > data.sequence.length
+    return;
+end
+
 o = region_overlap(state.region, get_region(data.sequence, current));
 
 if o(1) <= data.context.failure_overlap
