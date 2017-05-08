@@ -97,6 +97,21 @@ catch e
     end;
 end;
 
+% Check for potential updates
+if get_global_variable('check_updates', true) && check_updates()
+    print_text('');
+    print_text('***************************************************************************');
+    print_text('');
+    print_text('                        *** Toolkit update ***');
+    print_text('');
+    print_text('The VOT toolkit has been updated, a new version is available online. Please');
+    print_text('consider updating your local copy or conclult the release log for more');
+    print_text('information.');
+    print_text('');
+    print_text('***************************************************************************');
+    print_text('');
+end;
+
 native_dir = fullfile(get_global_variable('toolkit_path'), 'native');
 mkpath(native_dir);
 rmpath(native_dir); rehash; % Try to avoid locked files on Windows
@@ -130,3 +145,45 @@ else
 
 end;
 
+end
+
+function updated = check_updates()
+% Check for toolkit updates online.
+
+updated = false;
+
+toolkit_path = get_global_variable('toolkit_path');
+
+timestamp_file = fullfile(toolkit_path, '.update_check');
+
+check_interval = get_global_variable('check_interval', 0.1);
+
+current_timestamp = datenum(clock());
+previous_timestamp = 0;
+
+fd = fopen(timestamp_file, 'r');
+if fd > 0
+    previous_timestamp = fscanf(fd, '%f');
+    fclose(fd);
+end
+
+if current_timestamp > previous_timestamp + check_interval
+
+    status_url = get_global_variable('updates_url', 'http://data.votchallenge.net/toolkit/');
+
+    version = toolkit_version();
+    version = sprintf('%d.%d.%d', version.major, version.minor, version.patch);
+    
+    try
+        latest = urlread(sprintf('%slatest.txt', status_url));
+    catch
+        updated = false;
+        return;
+    end
+
+    latest = strtrim(latest); % Remove trailing whitespace/newline
+    updated = ~strcmp(version, latest);
+
+end;
+    
+end

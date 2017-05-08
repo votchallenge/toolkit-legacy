@@ -1,7 +1,7 @@
 function initialize_native(output_path)
 % initialize_native Initialize all native components
 %
-% A script that downloads or compiles all native components (MEX functions) and places
+% A script that compiles all native components (MEX functions) and places
 % them in a given output directory.
 %
 % Input:
@@ -10,29 +10,12 @@ function initialize_native(output_path)
 
 toolkit_path = get_global_variable('toolkit_path');
 
-% First attempt to download precompiled binaries
-if get_global_variable('native_download', true) && download_native(output_path)
-    return;
-end;
-
-if get_global_variable('native_download', true)
-    print_text('');
-    print_text('***************************************************************************');
-    print_text('');
-    print_text('Warning: The toolkit was unable to download precompiled native components.');
-    print_text('It will not attempt to compile them from source, however, some components');
-    print_text('have to be compiled manually. Consult the documentation for more information.');
-    print_text('');
-    print_text('***************************************************************************');
-    print_text('');
-end;
-
 trax_path = get_global_variable('trax_source', fullfile(output_path, 'trax'));
 if ~download_trax_source(trax_path)
-    error('Unable to compile all native resources.');
+    error('Unable to compile native resources.');
 end;
 
-print_text('Compiling native files ...');
+print_text('Verifying native components ...');
 
 success = true;
 
@@ -97,184 +80,6 @@ if ~success
 end;
 
 set_global_variable('trax_mex', trax_mex_path);
-
-end
-
-function success = download_native(native_dir)
-% download_trax_source Download external components from TraX repository.
-%
-% To reduce redundant code, a part of the source for MEX files is provided
-% by the TraX library. This function downloads and unpacks the source of
-% the library and places it in a desired directory.
-%
-% Input:
-% - trax_path (string): Path to the destination directory.
-%
-% Output:
-% - success (boolean): True on success.
-%
-
-success = false;
-
-timestamp_file = fullfile(native_dir, 'timestamp.txt');
-
-update_interval = get_global_variable('native_update_interval', 0.1);
-
-current_timestamp = datenum(clock());
-previous_timestamp = 0;
-
-fd = fopen(timestamp_file, 'r');
-if fd > 0
-    previous_timestamp = fscanf(fd, '%f');
-    fclose(fd);
-end
-
-if current_timestamp > previous_timestamp + update_interval
-
-    if ispc()
-        ostype = 'windows';
-    elseif ismac()
-        ostype = 'mac';
-    else
-        ostype = 'linux';
-    end
-
-    if ~isempty(strfind(computer('arch'), '64'))
-        arch = '64';
-    else
-        arch = '32';
-    end;
-
-    native_url = get_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
-    tempdir = tempname;
-
-    version = toolkit_version();
-
-    try
-        snapshot = [urlread(sprintf('%srelease_%d_%d.id', native_url, version.major, version.minor)), '/'];
-    catch
-        % legacy builds
-        snapshot = '';
-    end
-
-    snapshot = strtrim(snapshot); % Remove trailing whitespace/newline
-
-    trax_hash_url = sprintf('%s%strax-%s%s.md5', native_url, snapshot, ostype, arch);
-    trax_bundle_url = sprintf('%s%strax-%s%s.zip', native_url, snapshot, ostype, arch);
-    trax_hash_file = fullfile(native_dir, 'trax.md5');
-
-    vot_hash_url = sprintf('%s%svot-%s%s.md5', native_url, snapshot, ostype, arch);
-    vot_bundle_url = sprintf('%s%svot-%s%s.zip', native_url, snapshot, ostype, arch);
-    vot_hash_file = fullfile(native_dir, 'vot.md5');
-
-    if exist(trax_hash_file, 'file') == 2
-      trax_hash = fileread(trax_hash_file);
-    else
-      trax_hash = '';
-    end;
-
-    % Remove the native directory from the path
-    if exist('read_trajectory', 'file') == 3
-        rmpath(native_dir);
-    end
-
-    updated = true;
-
-    try
-
-        remote_hash = urlread(trax_hash_url);
-        if ~strcmp(trax_hash, remote_hash)
-
-            mkpath(tempdir);
-
-            try
-                print_debug('Downloading from %s.', trax_bundle_url);
-                urlwrite(trax_bundle_url, fullfile(tempdir, 'trax.zip'));
-                unzip(fullfile(tempdir, 'trax.zip'), native_dir);
-                delete(fullfile(tempdir, 'trax.zip'));
-                fd = fopen(trax_hash_file, 'w'); fprintf(fd, '%s', remote_hash); fclose(fd);
-            catch
-                print_debug('Error downloading %s.', trax_bundle_url);
-                updated = false;
-            end
-
-        end;
-
-        set_global_variable('native_component_trax', remote_hash(remote_hash ~= sprintf('\n')));
-
-    catch
-        print_debug('Error downloading %s.', trax_hash_url);
-        updated = false;
-    end
-
-    if exist(vot_hash_file, 'file') == 2
-      vot_hash = fileread(vot_hash_file);
-    else
-      vot_hash = '';
-    end;
-
-    try
-
-        remote_hash = urlread(vot_hash_url);
-        if ~strcmp(vot_hash, remote_hash)
-
-            mkpath(tempdir);
-
-            try
-                print_debug('Downloading from %s.', vot_bundle_url);
-                urlwrite(vot_bundle_url, fullfile(tempdir, 'vot.zip'));
-                unzip(fullfile(tempdir, 'vot.zip'), native_dir);
-                delete(fullfile(tempdir, 'vot.zip'));
-                fd = fopen(vot_hash_file, 'w'); fprintf(fd, '%s', remote_hash); fclose(fd);
-            catch
-                print_debug('Error downloading %s.', vot_bundle_url);
-                updated = false;
-            end
-
-        end;
-
-        set_global_variable('native_component_vot', remote_hash(remote_hash ~= sprintf('\n')));
-
-    catch
-        print_debug('Error downloading %s.', vot_hash_url);
-        updated = false;
-    end
-
-    delpath(tempdir);
-
-    rehash;
-
-    if updated
-        fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
-    end;
-else
-    print_debug('Skipping updating native (last update on %s)', datestr(previous_timestamp));
-end;
-
-
-if exist(fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')), 'file') == 2
-    set_global_variable('trax_client', fullfile(native_dir, iff(ispc(), 'traxclient.exe', 'traxclient')));
-else
-    print_debug('Cannot find traxclient.exe');
-    return;
-end
-
-if exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 2 || ...
-    exist(fullfile(native_dir, 'mex', ['traxserver.', mexext]), 'file') == 3
-    set_global_variable('trax_mex', fullfile(native_dir, 'mex'));
-else
-    print_debug('Cannot find traxserver.%s', mexext);
-    return;
-end
-
-if exist(fullfile(native_dir, 'python'), 'dir') == 7
-    set_global_variable('trax_python', fullfile(native_dir, 'python'));
-else
-    print_debug('Cannot find python/');
-    return;
-end
-
-success = true;
 
 end
 

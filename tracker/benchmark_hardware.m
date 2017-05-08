@@ -7,7 +7,7 @@ function filename = benchmark_hardware(varargin)
 % Output:
 % - filename: Path to the local performance profile.
 %
-filename = fullfile(get_global_variable('directory'), 'results', 'performance.txt');
+filename = fullfile(get_global_variable('directory'), 'cache', 'performance.txt');
 
 if exist(filename, 'file')
     print_debug('Skipping hardware performance benchmark');

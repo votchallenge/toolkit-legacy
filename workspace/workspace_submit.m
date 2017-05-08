@@ -45,6 +45,8 @@ function workspace_submit(tracker, sequences, experiments, varargin)
     
     context.files{end+1} = write_manifest(tracker);
 
+    tracker.performance = readstruct(benchmark_hardware());
+    
     tracker_performance_profile = fullfile(tracker.directory, 'performance.txt');
     writestruct(tracker_performance_profile, tracker.performance);
     context.files{end+1} = tracker_performance_profile;

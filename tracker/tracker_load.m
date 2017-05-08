@@ -133,7 +133,7 @@ performance_filename = fullfile(tracker.directory, 'performance.txt');
 if exist(performance_filename, 'file')
     tracker.performance = readstruct(performance_filename);
 else
-    tracker.performance = readstruct(benchmark_hardware());
+    tracker.performance = [];
 end;
 
 
