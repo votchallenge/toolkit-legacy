@@ -85,7 +85,7 @@ function [image, region, properties, data] = callback(state, data)
 
 		image_path = get_image(data.sequence, data.index);
 		hf = sfigure(data.figure);
-		set(hf, 'Name', sprintf('%s (%d / %d)', data.sequence.name, data.index, data.sequence.length), 'NumberTitle', 'off');
+		set(hf, 'Name', sprintf('%s (%d/%d t=%.3fs)', data.sequence.name, data.index, data.sequence.length, state.time), 'NumberTitle', 'off');
 		imshow(imread(image_path));
 		hold on;
 		draw_region(get_region(data.sequence, data.index), [1 0 0], 2);
