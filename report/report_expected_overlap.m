@@ -68,7 +68,7 @@ for e = 1:length(experiments)
 
     result_scores = report_cache(context, cache_identifier_scores, ...
         @analyze_average_expected_overlap, experiments{e}, trackers, ...
-        sequences, 'Tags', tags, 'RangeThreshold', range_threshold);
+        sequences, 'Tags', tags);
 
     document.section('Experiment %s', experiments{e}.name);
 
@@ -100,7 +100,7 @@ for e = 1:length(experiments)
         end;
 
         if ~hidelegend
-            legend(phandles(valid), cellfun(@(x) x.tag, trackers(valid), 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none');
+            legend(phandles(valid), cellfun(@(x) x.label, trackers(valid), 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none');
         end;
 
         xlabel('Sequence length');
@@ -135,7 +135,7 @@ for e = 1:length(experiments)
         end;
 
         if ~hidelegend
-            legend(phandles, cellfun(@(x) x.tag, trackers(order), 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none');
+            legend(phandles, cellfun(@(x) x.label, trackers(order), 'UniformOutput', false), 'Location', 'NorthWestOutside', 'interpreter', 'none');
         end;
 
         xlabel('Order');
