@@ -113,12 +113,13 @@ if ~exist(trax_header, 'file')
     print_text('Downloading TraX source from "%s". Please wait ...', trax_url);
     working_directory = tempname;
     mkdir(working_directory);
+    mkdir(trax_dir);
     bundle = [tempname, '.zip'];
     try
         urlwrite(trax_url, bundle);
         unzip(bundle, working_directory);
         delete(bundle);
-        movefile(fullfile(working_directory, sprintf('trax-%s', trax_branch)), trax_dir);
+        movefile(fullfile(working_directory, sprintf('trax-%s', trax_branch), '*'), trax_dir);
         success = true;
     catch
         print_text('Unable to unpack TraX source code.');

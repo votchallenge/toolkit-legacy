@@ -68,7 +68,7 @@ set_global_variable('debug', 0);
 set_global_variable('cache', 1);
 set_global_variable('bundle', []);
 set_global_variable('cleanup', 1);
-set_global_variable('updates_url', 'http://data.votchallenge.net/toolkit/');
+set_global_variable('updates_url', 'http://builds.votchallenge.net');
 set_global_variable('trax_mex', []);
 set_global_variable('trax_client', []);
 set_global_variable('trax_timeout', 30);
@@ -165,7 +165,7 @@ updated = false;
 toolkit_path = get_global_variable('toolkit_path');
 
 if ~exist(fullfile(toolkit_path, 'BUILD'), 'file')
-	print_debug('Porbably a Github checkout, skipping update check.');
+	print_debug('Probably a Github checkout, skipping update check.');
 	return;
 end;
 
@@ -188,11 +188,10 @@ if current_timestamp > previous_timestamp + check_interval
 
     status_url = get_global_variable('updates_url');
 
-
     version = fileread(fullfile(toolkit_path, 'BUILD'));
 
     try
-        latest = urlread(sprintf('%slatest.txt', status_url));
+        latest = urlread(sprintf('%s/toolkit_latest.txt', status_url));
     catch
         updated = false;
         return;
