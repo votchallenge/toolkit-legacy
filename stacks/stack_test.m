@@ -1,6 +1,6 @@
 function experiments = stack_test()
 
-set_global_variable('bundle', 'http://box.vicos.si/vot/test.zip');
+set_global_variable('bundle', 'http://data.votchallenge.net/toolkit/test.zip');
 
 baseline.name = 'baseline';
 baseline.converter = [];
