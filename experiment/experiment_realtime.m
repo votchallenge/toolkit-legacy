@@ -114,6 +114,7 @@ end;
 % Handle grace period
 if data.grace > 0
     data.time = data.time + 1000 / data.fps;
+    data.grace = data.grace - 1;
 else
     data.time = data.time + max(1000 / data.fps, state.time * 1000);
 end;
