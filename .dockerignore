@@ -1,0 +1,6 @@
+native
+build
+*~
+Dockerfile
+.*
+appveryor.yml
