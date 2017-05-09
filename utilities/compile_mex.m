@@ -15,7 +15,6 @@ function [success] = compile_mex(name, files, includes, directory, varargin)
 % - success (boolean): True if successful.
 %
 
-
     function datenum = file_timestamp(filename)
         if ~exist(filename, 'file')
             datenum = 0;
@@ -75,6 +74,15 @@ function [success] = compile_mex(name, files, includes, directory, varargin)
                 return;
             end;
 
+            % Cleanup mess
+            for i = 1:numel(files)
+                [pathstr,name,ext] = fileparts(files{i});
+                tmpfile = fullfile(directory, [name, '.o']);
+                if exist(tmpfile, 'file')
+                  delete(tmpfile);
+                end
+            end
+            
         else
 
             mex('-output', name, varargin{:}, includes{:}, files{:}, arguments{:});
