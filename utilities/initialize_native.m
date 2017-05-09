@@ -20,20 +20,22 @@ print_text('Verifying native components ...');
 
 success = true;
 
+include_paths = {fullfile(trax_path, 'src'), fullfile(trax_path, 'include')};
+
 success = success && compile_mex('region_overlap', {fullfile(toolkit_path, 'sequence', 'region_overlap.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('region_mask', {fullfile(toolkit_path, 'sequence', 'region_mask.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('region_convert', {fullfile(toolkit_path, 'sequence', 'region_convert.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('read_trajectory', {fullfile(toolkit_path, 'sequence', 'read_trajectory.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('write_trajectory', {fullfile(toolkit_path, 'sequence', 'write_trajectory.cpp'), ...
-    fullfile(trax_path, 'src', 'region.c')}, {fullfile(trax_path, 'src')}, output_path);
+    fullfile(trax_path, 'src', 'region.c')}, include_paths, output_path);
 
 success = success && compile_mex('benchmark_native', {fullfile(toolkit_path, 'tracker', 'benchmark_native.cpp')}, ...
     {}, output_path);
