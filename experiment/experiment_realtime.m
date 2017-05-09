@@ -6,7 +6,8 @@ cache = get_global_variable('experiment_cache', true);
 silent = get_global_variable('experiment_silent', false);
 
 defaults = struct('repetitions', 1, 'failure_overlap', 0, ...
-    'default_fps', 25, 'override_fps', false, 'critical', true);
+    'default_fps', 25, 'override_fps', false, 'critical', true, ...
+    'grace', 0);
 context = struct_merge(parameters, defaults);
 metadata.deterministic = false;
 
@@ -106,10 +107,16 @@ if isempty(state.region)
     image = get_image(data.sequence, data.index);
     data.time = 0;
 	data.offset = 0;
+    data.grace = data.context.grace;
     return;
 end;
 
-data.time = data.time + max(1000 / data.fps, state.time * 1000);
+% Handle grace period
+if data.grace > 0
+    data.time = data.time + 1000 / data.fps;
+else
+    data.time = data.time + max(1000 / data.fps, state.time * 1000);
+end;
 
 previous = data.index;
 current = round(floor(data.time * data.fps) / 1000) + data.offset;
@@ -156,6 +163,7 @@ else
         region = data.sequence.initialize(data.sequence, data.index, data.context);
         image = get_image(data.sequence, data.index);
         data.initialized = false;
+        data.grace = data.context.grace;
         return;
     end
 
@@ -191,6 +199,7 @@ if o(1) <= data.context.failure_overlap
         region = get_region(data.sequence, data.index);
         image = get_image(data.sequence, data.index);
         data.initialized = false;
+        data.grace = data.context.grace;
         return;
 end;
 
