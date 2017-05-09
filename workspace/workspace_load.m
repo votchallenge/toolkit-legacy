@@ -15,6 +15,8 @@ function [sequences, experiments] = workspace_load(varargin)
 % - varargin[Force] (boolean): Force reloading the sequences and experiments.
 % - varargin[Directory] (string): Set the directory of the workspace (otherwise
 %   current directory is used.
+% - varargin[OnlyDefaults] (boolean): Only set default global variables and skip
+%   workspace initialization.
 %
 % Output:
 % - sequences (cell): Array of sequence structures.
@@ -23,12 +25,14 @@ function [sequences, experiments] = workspace_load(varargin)
 
 force = false;
 directory = pwd();
+only_defaults = false;
 
 args = varargin;
 for j=1:2:length(args)
     switch lower(varargin{j})
         case 'directory', directory = args{j+1};
         case 'force', force = args{j+1};
+        case 'onlydefaults', only_defaults = args{j+1};
         otherwise, error(['unrecognized argument ' args{j}]);
     end
 end
@@ -56,12 +60,6 @@ else
 
 end;
 
-configuration_file = fullfile(directory, 'configuration.m');
-
-if ~exist(configuration_file, 'file')
-    error('Directory is probably not a VOT workspace. Please run workspace_create first.');
-end;
-
 % Some defaults
 set_global_variable('toolkit_path', fileparts(fileparts(mfilename('fullpath'))));
 set_global_variable('indent', 0);
@@ -70,14 +68,27 @@ set_global_variable('debug', 0);
 set_global_variable('cache', 1);
 set_global_variable('bundle', []);
 set_global_variable('cleanup', 1);
-set_global_variable('native_url', 'http://box.vicos.si/vot/toolkit/');
+set_global_variable('updates_url', 'http://data.votchallenge.net/toolkit/');
 set_global_variable('trax_mex', []);
 set_global_variable('trax_client', []);
 set_global_variable('trax_timeout', 30);
 set_global_variable('matlab_startup_model', [923.5042, -4.2525]);
 set_global_variable('legacy_rasterization', false);
+set_global_variable('native_path', fullfile(get_global_variable('toolkit_path'), 'native'));
 
-print_text('Initializing VOT workspace ...');
+if only_defaults
+	sequences = {};
+	experiments = {};
+	return;
+end;
+
+configuration_file = fullfile(directory, 'configuration.m');
+
+if ~exist(configuration_file, 'file')
+    error('Directory is probably not a VOT workspace. Please run workspace_create first.');
+end;
+
+print_text('Initializing workspace ...');
 
 configuration_script = get_global_variable('select_configuration', 'configuration');
 
@@ -112,11 +123,10 @@ if get_global_variable('check_updates', true) && check_updates()
     print_text('');
 end;
 
-native_dir = fullfile(get_global_variable('toolkit_path'), 'native');
-mkpath(native_dir);
-rmpath(native_dir); rehash; % Try to avoid locked files on Windows
-initialize_native(native_dir);
-addpath(native_dir);
+mkpath(get_global_variable('native_path'));
+rmpath(get_global_variable('native_path')); rehash; % Try to avoid locked files on Windows
+initialize_native();
+addpath(get_global_variable('native_path'));
 
 experiment_stack = get_global_variable('stack', 'vot2013');
 
@@ -154,6 +164,13 @@ updated = false;
 
 toolkit_path = get_global_variable('toolkit_path');
 
+if ~exist(fullfile(toolkit_path, 'BUILD'), 'file')
+	print_debug('Porbably a Github checkout, skipping update check.');
+	return;
+end;
+
+print_text('Checking for toolkit updates.')
+
 timestamp_file = fullfile(toolkit_path, '.update_check');
 
 check_interval = get_global_variable('check_interval', 0.1);
@@ -169,11 +186,11 @@ end
 
 if current_timestamp > previous_timestamp + check_interval
 
-    status_url = get_global_variable('updates_url', 'http://data.votchallenge.net/toolkit/');
+    status_url = get_global_variable('updates_url');
 
-    version = toolkit_version();
-    version = sprintf('%d.%d.%d', version.major, version.minor, version.patch);
-    
+
+    version = fileread(fullfile(toolkit_path, 'BUILD'));
+
     try
         latest = urlread(sprintf('%slatest.txt', status_url));
     catch
@@ -185,7 +202,7 @@ if current_timestamp > previous_timestamp + check_interval
     updated = ~strcmp(version, latest);
 
     fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
-    
+
 end;
-    
+
 end

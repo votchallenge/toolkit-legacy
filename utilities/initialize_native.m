@@ -1,4 +1,4 @@
-function initialize_native(output_path)
+function initialize_native()
 % initialize_native Initialize all native components
 %
 % A script that compiles all native components (MEX functions) and places
@@ -9,6 +9,7 @@ function initialize_native(output_path)
 %
 
 toolkit_path = get_global_variable('toolkit_path');
+output_path = get_global_variable('native_path');
 
 trax_path = get_global_variable('trax_source', fullfile(output_path, 'trax'));
 if ~download_trax_source(trax_path)
