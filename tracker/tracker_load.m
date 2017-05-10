@@ -119,6 +119,10 @@ else
 
     tracker.environment = tracker_environment;
 
+    if ~isascii(tracker.command)
+        warning('Tracker command contains non-ASCII characters. This may cause problems.')
+    end;
+
     tracker_test(tracker);
 
 	if isstruct(tracker_metadata)

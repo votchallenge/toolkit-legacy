@@ -42,10 +42,17 @@ for i = 1:length(files)
     end;
 end
 
-directory = pwd();
+directory = get_global_variable('directory');
+
+if ~isascii(get_global_variable('toolkit_path'))
+    warning('Toolkit path contains non-ASCII characters. This may cause problems.')
+end;
+
+if ~isascii(directory)
+    warning('Workspace path contains non-ASCII characters. This may cause problems.')
+end;
 
 % Check if the directory is already a valid VOT workspace ...
-
 configuration_file = fullfile(directory, 'configuration.m');
 
 if exist(configuration_file, 'file')

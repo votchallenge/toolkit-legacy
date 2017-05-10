@@ -84,6 +84,14 @@ end;
 
 configuration_file = fullfile(directory, 'configuration.m');
 
+if ~isascii(get_global_variable('toolkit_path'))
+    warning('Toolkit path contains non-ASCII characters. This may cause problems.')
+end;
+
+if ~isascii(directory)
+    warning('Workspace path contains non-ASCII characters. This may cause problems.')
+end;
+
 if ~exist(configuration_file, 'file')
     error('Directory is probably not a VOT workspace. Please run workspace_create first.');
 end;
