@@ -29,8 +29,8 @@ end;
 
 variables = {'tracker', identifier};
 
-interpreter_names = {'Matlab', 'Python', 'C/C++', 'None of the above'};
-interpreter_ids = {'matlab', 'python', '', ''};
+interpreter_names = {'Matlab', 'Python', 'C/C++', 'Octave', 'None of the above'};
+interpreter_ids = {'matlab', 'python', '', 'octave', ''};
 
 print_text('Is your tracker written in any of the following languages?');
 print_indent(1);
