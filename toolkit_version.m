@@ -9,7 +9,19 @@ function version = toolkit_version()
 %     - minor (integer): Minor version of the toolkit
 %     - patch (integer): Patch version of the toolkit
 
-version = struct('major', 5, 'minor', 0, 'patch', 0);
+version = struct('major', 0, 'minor', 0, 'patch', 0);
 
-% BUILD VERSION PLACEHOLDER %
+try
+
+	root = fileparts(mfilename('fullpath'));
+
+	tokens = strsplit(fileread(fullfile(root, 'VERSION')), '.');
+
+	version.major = int32(str2double(tokens{1}));
+	version.minor = int32(str2double(tokens{2}));
+	version.patch = int32(str2double(tokens{3}));
+
+catch
+
+end
 
