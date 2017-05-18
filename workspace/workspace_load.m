@@ -68,7 +68,6 @@ set_global_variable('debug', 0);
 set_global_variable('cache', 1);
 set_global_variable('bundle', []);
 set_global_variable('cleanup', 1);
-set_global_variable('updates_url', 'http://builds.votchallenge.net');
 set_global_variable('trax_mex', []);
 set_global_variable('trax_client', []);
 set_global_variable('trax_timeout', 30);
@@ -117,18 +116,8 @@ catch e
 end;
 
 % Check for potential updates
-if get_global_variable('check_updates', true) && check_updates()
-    print_text('');
-    print_text('***************************************************************************');
-    print_text('');
-    print_text('                        *** Toolkit update ***');
-    print_text('');
-    print_text('The VOT toolkit has been updated, a new version is available online. Please');
-    print_text('consider updating your local copy or conclult the release log for more');
-    print_text('information.');
-    print_text('');
-    print_text('***************************************************************************');
-    print_text('');
+if get_global_variable('check_updates', true)
+    check_updates();
 end;
 
 mkpath(get_global_variable('native_path'));
@@ -165,23 +154,19 @@ end;
 
 end
 
-function updated = check_updates()
+function [updated, latest] = check_updates()
 % Check for toolkit updates online.
 
 updated = false;
+latest = [];
 
 toolkit_path = get_global_variable('toolkit_path');
+workspace_path = get_global_variable('workspace_path');
 
-if ~exist(fullfile(toolkit_path, 'BUILD'), 'file')
-	print_debug('Probably a Github checkout, skipping update check.');
-	return;
-end;
+mkpath(fullfile(workspace_path, 'cache'));
+timestamp_file = fullfile(workspace_path, 'cache', '.update_check');
 
-print_text('Checking for toolkit updates.')
-
-timestamp_file = fullfile(toolkit_path, '.update_check');
-
-check_interval = get_global_variable('check_interval', 0.1);
+check_interval = get_global_variable('update_check_interval', 0.1);
 
 current_timestamp = datenum(clock());
 previous_timestamp = 0;
@@ -194,22 +179,71 @@ end
 
 if current_timestamp > previous_timestamp + check_interval
 
-    status_url = get_global_variable('updates_url');
+	v = toolkit_version();
 
-    version = fileread(fullfile(toolkit_path, 'BUILD'));
-
-    try
-        latest = urlread(sprintf('%s/toolkit_latest.txt', status_url));
-    catch
+	version = sprintf('%d.%d.%d', v.major, v.minor, v.patch);
+    
+    if exist(fullfile(toolkit_path, 'PACKAGE'), 'file')
+        package = fileread(fullfile(toolkit_path, 'PACKAGE'));
+        print_text('Checking for toolkit updates on BinTray.')
+        latest = get_bintray_version(package);
+    else
+        print_text('Checking for toolkit updates on GitHub.')
+        latest = get_github_version();
+    end;
+        
+    if isempty(latest) 
         updated = false;
         return;
-    end
-
-    latest = strtrim(latest); % Remove trailing whitespace/newline
+    end;
+    
     updated = ~strcmp(version, latest);
 
     fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
 
+    if updated
+        print_text('');
+        print_text('***************************************************************************');
+        print_text('');
+        print_text('                  *** Toolkit update available ***');
+        print_text('');
+        print_text('The VOT toolkit has been updated, a new version is available online. Please');
+        print_text('consider updating your local copy or consult the release log for more');
+        print_text('information.');
+        print_text('');
+        print_text('Local version %s, remote version %s', version, latest);
+        print_text('');
+        print_text('***************************************************************************');
+        print_text(''); 
+
+    end
+    
 end;
 
 end
+
+function version = get_bintray_version(package)
+
+    api_server = 'https://api.bintray.com/';
+
+    try
+        meta = json_decode(urlread(sprintf('%s/packages/votchallenge/toolkit/%s', api_server, package)));
+		version = meta.latest_version;
+    catch
+        version = [];
+        return;
+    end
+    
+end
+
+function version = get_github_version()
+
+    try
+        version = urlread('https://raw.githubusercontent.com/votchallenge/vot-toolkit/master/VERSION');
+    catch
+        version = [];
+        return;
+    end
+    
+end
+
