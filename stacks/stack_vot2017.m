@@ -29,6 +29,8 @@ realtime.parameters.repetitions = 1;
 realtime.parameters.default_fps = 20;
 realtime.parameters.grace = 3;
 realtime.parameters.override_fps = true;
+realtime.parameters.skip_initialize = 5;
+realtime.parameters.realtime_type = 'real';
 
 experiments = {baseline, unsupervised, realtime};
 
