@@ -121,8 +121,9 @@ if ~exist(trax_header, 'file')
         urlwrite(trax_url, bundle);
         unzip(bundle, working_directory);
         delete(bundle);
-        movefile(fullfile(working_directory, sprintf('trax-%s', trax_branch), '*'), trax_dir);
+        copyfile(fullfile(working_directory, sprintf('trax-%s', trax_branch), '*'), trax_dir);
         success = true;
+		delpath(working_directory);
     catch
         print_text('Unable to unpack TraX source code.');
         success = false;
