@@ -84,7 +84,7 @@ end;
 
 if ~isempty(failure)
     if exist(fullfile(directory, 'runtime.log'), 'file')
-        movefile(fullfile(directory, 'runtime.log'), fullfile(log_directory, [timestamp, '_runtime.log']));
+        copyfile(fullfile(directory, 'runtime.log'), fullfile(log_directory, [timestamp, '_runtime.log']));
     end
 end
 
@@ -100,7 +100,7 @@ if ispc()
 else
     delpath(directory, 'Empty', ~isempty(failure));
 end;
-    
+
 if isempty(failure)
     if cleanup && ~debug_console
        delpath(log_file);
