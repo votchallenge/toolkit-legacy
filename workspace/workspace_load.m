@@ -179,10 +179,6 @@ end
 
 if current_timestamp > previous_timestamp + check_interval
 
-	v = toolkit_version();
-
-	version = sprintf('%d.%d.%d', v.major, v.minor, v.patch);
-    
     if exist(fullfile(toolkit_path, 'PACKAGE'), 'file')
         package = fileread(fullfile(toolkit_path, 'PACKAGE'));
         print_text('Checking for toolkit updates on BinTray.')
@@ -197,7 +193,7 @@ if current_timestamp > previous_timestamp + check_interval
         return;
     end;
     
-    updated = ~strcmp(version, latest);
+    updated = toolkit_version(latest) > 0;
 
     fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
 
