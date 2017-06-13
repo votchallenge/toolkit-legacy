@@ -64,6 +64,7 @@ for i = 1:r
     context.repetition = i;
 
     data.sequence = sequence;
+    data.bounds = [sequence.width, sequence.height] - 1;
     data.index = 1;
     data.context = context;
     data.time = 0;
@@ -137,7 +138,7 @@ else
         %        and the state.region used to update this model
 
         for i = previous:min(data.sequence.length, current-1)
-            o = region_overlap(data.region, get_region(data.sequence, i));
+            o = region_overlap(data.region, get_region(data.sequence, i), data.bounds);
             if o(1) <= data.context.failure_overlap
                 failed = i;
                 break;
@@ -146,7 +147,7 @@ else
         end
 
         if current <= data.sequence.length
-            o = region_overlap(state.region, get_region(data.sequence, current));
+            o = region_overlap(state.region, get_region(data.sequence, current), data.bounds);
             if o(1) <= data.context.failure_overlap
                 failed = current;
             else
@@ -154,7 +155,7 @@ else
             end
         end
     else   % realtime_type = 'delayed' by default
-        o = region_overlap(state.region, get_region(data.sequence, previous));
+        o = region_overlap(state.region, get_region(data.sequence, previous), data.bounds);
         if o(1) <= data.context.failure_overlap
             failed = previous;
         else
@@ -173,7 +174,7 @@ if failed > 0
         data.index = current + data.context.skip_initialize;
     else
         data.result{failed} = 2;
-        data.index = failed + data.context.skip_initialize; 
+        data.index = failed + data.context.skip_initialize;
     end
     data.time = 0;
     data.offset = data.index - 1;

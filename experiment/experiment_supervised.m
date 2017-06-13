@@ -60,6 +60,7 @@ for i = 1:r
     data.sequence = sequence;
     data.index = 1;
     data.context = context;
+    data.bounds = [sequence.width, sequence.height] - 1;
     data.result = repmat({0}, sequence.length, 1);
     data.timing = nan(sequence.length, 1);
     data.initialized = false;
@@ -93,7 +94,7 @@ if isempty(state.region)
     image = get_image(data.sequence, data.index);
     return;
 end;
-o = region_overlap(state.region, get_region(data.sequence, data.index));
+o = region_overlap(state.region, get_region(data.sequence, data.index), data.bounds);
 
 % Handle tracker failure
 if o(1) <= data.context.failure_overlap
