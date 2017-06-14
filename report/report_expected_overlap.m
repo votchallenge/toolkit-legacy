@@ -39,6 +39,7 @@ end
 
 document = create_document(context, 'expected_overlap', 'title', 'Expected overlap analysis');
 
+% TODO: This may no longer be necessary?
 % Filter out all experiments that are not of type "supervised"
 experiments = experiments(cellfun(@(e) strcmp(e.type, 'supervised'), experiments, 'UniformOutput', true));
 
