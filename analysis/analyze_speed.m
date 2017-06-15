@@ -103,7 +103,7 @@ function context = speed_iterator(event, context)
 			end;
 
             valid = any(times > 0, 1) & ~isnan(reliability)';
-            average_speed = mean(times(:, valid), 1)';
+            average_speed = nanmean(times(:, valid), 1)';
             average_original = mean(average_speed);
             
             if isfield(event.tracker, 'performance')           
