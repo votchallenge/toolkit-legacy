@@ -114,11 +114,8 @@ function context = aggregate_iterator(event, context)
                 execution_parameters = event.experiment.parameters;
             end;
 
-            sequence_directory = fullfile(event.tracker.directory, event.experiment.name, ...
-                event.sequence.name);
-
-            [~, metadata] = tracker_evaluate(event.tracker, event.sequence, sequence_directory, ...
-                'type', event.experiment.type, 'parameters', execution_parameters, 'scan', true);
+            [~, metadata] = tracker_evaluate(event.tracker, event.sequence, event.experiment, ...
+                'scan', true);
 
             context.completed = context.completed && metadata.completed;
 

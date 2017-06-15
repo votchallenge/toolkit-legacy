@@ -42,6 +42,10 @@ for e = 1:numel(experiments)
 
     for s = 1:length(experiment_sequences)
 
+        if numel(experiment_sequences{s}.tags.names) == 0
+            continue
+        end
+
         document.subsection('Sequence %s',  experiment_sequences{s}.name);
 
         document.raw('<div class="imagegrid">\n');
