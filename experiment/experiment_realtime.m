@@ -64,7 +64,7 @@ for i = 1:r
     context.repetition = i;
 
     data.sequence = sequence;
-	data.bounds = [sequence.width, sequence.height] - 1;
+    data.bounds = [sequence.width, sequence.height] - 1;
     data.index = 1;
     data.context = context;
     data.time = 0;

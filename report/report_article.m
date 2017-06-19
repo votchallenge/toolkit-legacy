@@ -46,6 +46,9 @@ switch lower(methodology)
         error(['Unknown methodology ', methodology, '!']) ;
 end
 
+is_supervised = cellfun(@(e) strcmp(e.type, 'supervised'), experiments, 'UniformOutput', true);
+experiments = experiments(is_supervised);
+
 document = create_document(context, 'article', 'title', 'VOT article report');
 
 print_text('Generating article report'); print_indent(1);
@@ -119,10 +122,11 @@ column_labels(1, :) = repmat({struct()}, 1, size(column_labels, 2));
 column_labels(1, 1:N_scores:end-1) = cellfun(@(x) struct('text', x.name, 'columns', N_scores), experiments,'UniformOutput',false);
 column_labels(2, :) = [score_tags(repmat(1:length(score_tags), 1, numel(experiments))), {'Overall'}];
 
-experiments_ranking_data = zeros(N_scores * numel(experiments), numel(trackers));
+experiments_ranking_data = zeros(N_scores, numel(experiments), numel(trackers));
 for i = 1:N_scores
-    experiments_ranking_data(i:N_scores:end) = scores(:, :, i);
+    experiments_ranking_data(i, :, :) = scores(:, :, i);
 end
+experiments_ranking_data = reshape(experiments_ranking_data, N_scores * numel(experiments), numel(trackers));
 experiments_ranking_data = num2cell(experiments_ranking_data);
 overall_ranking_data = num2cell(overall_scores);
 

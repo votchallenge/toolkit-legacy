@@ -63,12 +63,13 @@ mexargs = {'Debug', debug};
 
 timestamp = datestr(now, 30);
 
-log_file = [];
-
 if ~debug_console
     log_file = fullfile(log_directory, [timestamp, '.log']);
-    mexargs = [mexargs, 'Log', log_file];
+else
+    log_file = '#'; % Print to command window.
 end;
+
+mexargs = [mexargs, 'Log', log_file];
 
 failure = [];
 

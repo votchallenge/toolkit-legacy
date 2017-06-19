@@ -45,7 +45,7 @@
 #define VOT_READ_BUFFER 2024
 
 // Define VOT_OPENCV after including OpenCV core header to enable better OpenCV support
-#ifdef __OPENCV_CORE_HPP__
+#if defined(__OPENCV_CORE_HPP__) || defined(OPENCV_CORE_HPP)
 #  define VOT_OPENCV
 #endif
 

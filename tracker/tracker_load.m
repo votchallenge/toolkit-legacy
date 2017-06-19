@@ -120,10 +120,12 @@ else
     tracker.environment = tracker_environment;
 
     if ~isascii(tracker.command)
-        warning('Tracker command contains non-ASCII characters. This may cause problems.')
+        warning('Tracker command contains non-ASCII characters. This may cause problems.');
     end;
 
-    tracker_test(tracker);
+    if ~tracker_test(tracker)
+		error('Tracker has not passed the TraX support test.');
+	end
 
 	if isstruct(tracker_metadata)
 		tracker.metadata = tracker_metadata;
