@@ -121,7 +121,7 @@ column_labels(2, :) = [score_tags(repmat(1:length(score_tags), 1, numel(experime
 
 experiments_ranking_data = zeros(N_scores * numel(experiments), numel(trackers));
 for i = 1:N_scores
-    experiments_ranking_data(1:i:end) = scores(:, :, i);
+    experiments_ranking_data(i:N_scores:end) = scores(:, :, i);
 end
 experiments_ranking_data = num2cell(experiments_ranking_data);
 overall_ranking_data = num2cell(overall_scores);

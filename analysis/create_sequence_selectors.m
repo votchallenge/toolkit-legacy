@@ -73,7 +73,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
 
         if (size(trajectory, 1) < size(groundtruth, 1))
             print_debug('Warning: Trajectory too short. Expanding with empty frames.');
-            trajectory{end+1:length(groundtruth)} = 0;
+            trajectory(end+1:length(groundtruth)) = {0};
         end;
 
         [~, frames] = estimate_accuracy(trajectory, groundtruth, 'burnin', burnin);

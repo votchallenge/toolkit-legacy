@@ -143,8 +143,8 @@ switch lower(methodology)
         score_weights = [0.5, 0.5];
         score_format = '%.2f';
     case 'vot2015'
-        scores = expected_overlap_scores;
-        score_tags = {'Expected overlap'};
+        scores = expected_overlap_scores';
+        score_labels = {'Expected overlap'};
         score_sorting_partial = {'descending'};
         score_sorting_overall = 'descending';
         sort_direction = 'descend';

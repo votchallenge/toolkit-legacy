@@ -102,31 +102,43 @@ function context = execute_iterator(event, context)
 
 switch (event.type)
     case 'experiment_enter'
-        
+
         print_text('Experiment %s', event.experiment.name);
-        
+
         print_indent(1);
     case 'experiment_exit'
-        
+
         print_indent(-1);
-        
+
     case 'tracker_enter'
-        
+
         print_text('Tracker %s', event.tracker.identifier);
-        
+
         print_indent(1);
-        
+
     case 'tracker_exit'
-        
+
         print_indent(-1);
-        
+
     case 'sequence_enter'
-        
+
         print_text('Sequence %s', event.sequence.name);
-        
-        tracker_evaluate(event.tracker, event.sequence, event.experiment);
-        
-end;
+
+        try
+
+            tracker_evaluate(event.tracker, event.sequence, event.experiment);
+
+        catch e
+			context.errors = context.errors + 1;
+            if context.persist
+            	disp(getReport(e));
+            else
+                rethrow(e);
+            end
+
+        end;
+
+    end;
 
 end
 
@@ -164,7 +176,7 @@ while true
         fetchNext(context.tasks(:));
     catch
     end;
-    
+
     completed = [context.tasks.Read];
     if all(completed)
         break;
@@ -186,81 +198,81 @@ function context = makefile_iterator(event, context)
 
 switch (event.type)
     case 'enter'
-        
+
         context.file = fopen(context.makefilename, 'w');
         context.jobdir = fullfile(get_global_variable('directory'), ...
             'cache', 'makejobs');
         context.current = 0;
         context.list = {};
         mkpath(context.jobdir);
-        
+
         fprintf(context.file, 'JOBDIR="%s"\n', context.jobdir);
         if ~isempty(context.logdir)
             fprintf(context.file, 'LOGDIR="%s"\n', context.logdir);
         end;
         fprintf(context.file, 'WORKSPACE="%s"\n', fullfile(get_global_variable('directory')));
         fprintf(context.file, 'TOOLKIT="%s"\n', fullfile(get_global_variable('toolkit_path')));
-        
+
         fprintf(context.file, '.DEFAULT_GOAL := all\n\n');
 
     case 'exit'
-        
+
         fprintf(context.file, 'all: ');
         fprintf(context.file, strjoin(context.list, ' '));
         fprintf(context.file, '\n\t@echo "[100%%] Done."\n');
-        
+
         fclose(context.file);
-        
+
     case 'experiment_enter'
-        
+
         print_text('Experiment %s', event.experiment.name);
-        
+
         print_indent(1);
     case 'experiment_exit'
-        
+
         print_indent(-1);
-        
+
     case 'tracker_enter'
-        
+
         print_text('Tracker %s', event.tracker.identifier);
-        
+
         print_indent(1);
-        
+
     case 'tracker_exit'
-        
+
         print_indent(-1);
-        
+
     case 'sequence_enter'
-        
+
         print_text('Sequence %s', event.sequence.name);
-        
+
         tracker = event.tracker;
         sequence = event.sequence;
         experiment = event.experiment;
         globals = get_global_variable(); %#ok<NASGU>
-        
+
         job_file = fullfile(context.jobdir, sprintf('%s_%s_%s.mat', ...
             tracker.identifier, experiment.name, sequence.name));
-        
+
         job_path = fullfile('${JOBDIR}', sprintf('%s_%s_%s.mat', ...
             tracker.identifier, experiment.name, sequence.name));
-        
+
         save(job_file, 'tracker', 'sequence', 'experiment', 'globals');
-        
+
         fprintf(context.file, 'job_%s_%s_%s:\n', tracker.identifier, ...
             experiment.name, sequence.name);
 
         context.list{end+1} = sprintf( 'job_%s_%s_%s', tracker.identifier, ...
             experiment.name, sequence.name);
-        
+
         script = sprintf('addpath(''${TOOLKIT}''); toolkit_path; load(''%s''); workspace_evaluate(tracker, sequence, experiment, ''Variables'', globals)', job_path);
-        
+
         log = '';
         if ~isempty(context.logdir)
             log = sprintf('diary ''%s'';', fullfile('${LOGDIR}', ...
                 sprintf('%s-%s-%s.log', event.tracker.identifier, event.experiment.name, event.sequence.name)));
         end
-        
+
         if is_octave()
             octave_flags = {};
             if ispc()
@@ -268,7 +280,7 @@ switch (event.type)
             else
                 octave_executable = fullfile(matlabroot, 'bin', 'octave');
             end
-            
+
             if compare_versions(version(), '4.0.0', '>=')
                 octave_flags{end+1} = '--no-gui';
             end
@@ -282,19 +294,18 @@ switch (event.type)
                 matlab_executable = fullfile(matlabroot, 'bin', 'matlab');
                 matlab_flags = {'-nodesktop', '-nosplash'};
             end
-            
+
             matlab_script = sprintf('try; %s; catch ex; disp(getReport(ex)); end; quit;', script);
             command = sprintf('%s %s -r "%s%s"', matlab_executable, strjoin(matlab_flags, ' '), log, matlab_script);
-            
+
         end
-        
+
         fprintf(context.file, '\t@echo "[%*d%%] %s %s %s"\n', 3, round((context.current * 100) / context.total), ...
             tracker.identifier, experiment.name, sequence.name);
         fprintf(context.file, '\t@%s > /dev/null\n\n', command);
-        
-        context.current = context.current + 1;
-        
-end;
 
+        context.current = context.current + 1;
+
+	end;
 
 end

@@ -32,6 +32,7 @@ end
 
 if compare_versions(version(), '4.0.0', '>=')
 	octave_flags{end+1} = '--no-gui';
+	octave_flags{end+1} = '--no-window-system';
 end
 
 argument_string = strjoin(octave_flags, ' ');

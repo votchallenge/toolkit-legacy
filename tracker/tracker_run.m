@@ -26,7 +26,11 @@ debug = get_global_variable('trax_debug', false);
 cleanup = get_global_variable('log_autocleanup', true);
 
 % Specify timeout period
-timeout = get_global_variable('trax_timeout', 30);
+if isfield(tracker.parameters, 'timeout')
+    timeout = tracker.parameters.timeout;
+else
+    timeout = get_global_variable('trax_timeout', 30);
+end;
 
 % Hint to tracker that it should use trax
 environment.TRAX = '1';
@@ -80,7 +84,7 @@ end;
 
 if ~isempty(failure)
     if exist(fullfile(directory, 'runtime.log'), 'file')
-        movefile(fullfile(directory, 'runtime.log'), fullfile(log_directory, [timestamp, '_runtime.log']));
+        copyfile(fullfile(directory, 'runtime.log'), fullfile(log_directory, [timestamp, '_runtime.log']));
     end
 end
 
@@ -96,7 +100,7 @@ if ispc()
 else
     delpath(directory, 'Empty', ~isempty(failure));
 end;
-    
+
 if isempty(failure)
     if cleanup && ~debug_console
        delpath(log_file);

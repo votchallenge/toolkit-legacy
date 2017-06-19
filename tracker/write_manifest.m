@@ -32,12 +32,10 @@ fid = fopen(manifest, 'w');
 
 votversion = toolkit_version();
 
-fprintf(fid, 'toolkit.version=%d.%d\n', votversion.major, votversion.minor);
+fprintf(fid, 'toolkit.version=%d.%d.%d\n', votversion.major, votversion.minor, votversion.patch);
 if isfield(votversion, 'build')
 fprintf(fid, 'toolkit.build=%d\n', votversion.build);
 end;
-fprintf(fid, 'toolkit.mex.hash=%s\n', get_global_variable('native_component_vot', 'unknown'));
-fprintf(fid, 'toolkit.trax.hash=%s\n', get_global_variable('native_component_trax', 'unknown'));
 fprintf(fid, 'tracker.identifier=%s\n', tracker.identifier);
 fprintf(fid, 'tracker.interpreter=%s\n', tracker.interpreter);
 fprintf(fid, 'timestamp=%s\n', datestr(now, 31));

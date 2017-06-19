@@ -59,7 +59,7 @@ function [success] = compile_mex(name, files, includes, directory, varargin)
     old_dir = pwd;
 
     try
-
+        
         if ~isempty(directory)
             cd(directory)
         end;
@@ -68,20 +68,18 @@ function [success] = compile_mex(name, files, includes, directory, varargin)
 
             [out, status] = mkoctfile('-mex', '-o', name, varargin{:}, includes{:}, files{:}, arguments{:});
 
-            if status
-                print_text('ERROR: Unable to compile MEX function.');
-                success = false;
-                return;
-            end;
-
-            % Cleanup mess
+            % Clean up mess
             for i = 1:numel(files)
-                [pathstr,name,ext] = fileparts(files{i});
+                [pathstr, name, ext] = fileparts(files{i});
                 tmpfile = fullfile(directory, [name, '.o']);
                 if exist(tmpfile, 'file')
                   delete(tmpfile);
                 end
             end
+            
+            if status
+                error('Compile problem, see compiler output.');
+            end;
             
         else
 
@@ -94,7 +92,6 @@ function [success] = compile_mex(name, files, includes, directory, varargin)
         success = true;
 
     catch e
-
         cd(old_dir);
         print_text('ERROR: Unable to compile MEX function: "%s".', e.message);
         success = false;

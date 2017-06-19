@@ -7,7 +7,7 @@ silent = get_global_variable('experiment_silent', false);
 
 defaults = struct('repetitions', 1, 'failure_overlap', 0, ...
     'default_fps', 25, 'override_fps', false, 'critical', true, ...
-    'grace', 0);
+    'grace', 0, 'skip_initialize', 1, 'realtime_type', 'real');
 context = struct_merge(parameters, defaults);
 metadata.deterministic = false;
 
@@ -64,6 +64,7 @@ for i = 1:r
     context.repetition = i;
 
     data.sequence = sequence;
+	data.bounds = [sequence.width, sequence.height] - 1;
     data.index = 1;
     data.context = context;
     data.time = 0;
@@ -129,86 +130,72 @@ failed = 0;
 % Store initialization
 if ~data.initialized
     data.result{previous} = 1;
-    data.region = state.region;
     data.initialized = true;
 else
+    if strcmpi(data.context.realtime_type, 'real')
+        % NOTE : this assumes 0-motion model, in "real" algorithm the data.region would
+        %        be computed using motion model continuously for each frame in "real-time" fps
+        %        and the state.region used to update this model
 
-    for i = previous:min(data.sequence.length, current-1)
-
-        o = region_overlap(data.region, get_region(data.sequence, i));
-
-        if o(1) <= data.context.failure_overlap
-            failed = i;
-            break;
-        end;
-
-        data.result{i} = data.region;
-    end
-
-    if failed > 0
-        if data.context.critical
-            data.result{failed} = 2;
-            data.index = current + 1;
-        else
-            data.result{failed} = 2;
-            data.index = failed + 1;
+        for i = previous:min(data.sequence.length, current-1)
+            o = region_overlap(data.region, get_region(data.sequence, i), data.bounds);
+            if o(1) <= data.context.failure_overlap
+                failed = i;
+                break;
+            end
+            data.result{i} = data.region;
         end
-		data.time = 0;
-		data.offset = data.index - 1;
 
-		% Should be initalzed after the end of the sequence
-		if data.index > data.sequence.length
-		    return;
-		end
-
-        region = data.sequence.initialize(data.sequence, data.index, data.context);
-        image = get_image(data.sequence, data.index);
-        data.initialized = false;
-        data.grace = data.context.grace;
-        return;
+        if current <= data.sequence.length
+            o = region_overlap(state.region, get_region(data.sequence, current), data.bounds);
+            if o(1) <= data.context.failure_overlap
+                failed = current;
+            else
+                data.result{current} = state.region;
+            end
+        end
+    else   % realtime_type = 'delayed' by default
+        o = region_overlap(state.region, get_region(data.sequence, previous), data.bounds);
+        if o(1) <= data.context.failure_overlap
+            failed = previous;
+        else
+            % NOTE : state.region here can be also replaced with a motion model
+            range = previous:min(data.sequence.length, current);
+            for i = range
+                data.result{i} = state.region;
+            end
+        end;
     end
-
-	% Tracked over the end of the sequence
-    if current > data.sequence.length
-        return;
-    end
-
-    data.result{current} = state.region;
-	data.region = state.region;
-
-end;
-
-% Tracked over the end of the sequence
-if current > data.sequence.length
-    return;
 end
 
-o = region_overlap(state.region, get_region(data.sequence, current));
+if failed > 0
+    if data.context.critical
+        data.result{failed} = 2;
+        data.index = current + data.context.skip_initialize;
+    else
+        data.result{failed} = 2;
+        data.index = failed + data.context.skip_initialize;
+    end
+    data.time = 0;
+    data.offset = data.index - 1;
 
-if o(1) <= data.context.failure_overlap
-
-        data.result{current} = 2;
-        data.index = current + 1;
-		data.time = 0;
-		data.offset = data.index - 1;
-
-        % Should be initalzed after the end of the sequence
-        if data.index > data.sequence.length
-            return;
-        end
-
-        region = get_region(data.sequence, data.index);
-        image = get_image(data.sequence, data.index);
-        data.initialized = false;
-        data.grace = data.context.grace;
+    % Should be initalzed after the end of the sequence
+    if data.index > data.sequence.length
         return;
-end;
+    end
 
-data.index = current + 1;
+    region = data.sequence.initialize(data.sequence, data.index, data.context);
+    data.initialized = false;
+    data.grace = data.context.grace;
+else
+    data.region = state.region;
+    data.index = current + 1;
 
-% At the end of sequence
-if data.index > data.sequence.length
-    return;
+    % At the end of sequence
+    if data.index > data.sequence.length
+        return;
+    end
+
 end
 
 image = get_image(data.sequence, data.index);

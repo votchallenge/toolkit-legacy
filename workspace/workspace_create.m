@@ -2,11 +2,11 @@ function workspace_create(varargin)
 % workspace_create Initialize a new VOT workspace
 %
 % This function serves as a guided initialization of a workspace. It generates
-% all the basic scripts to run your tracker on an experiment stack based on a 
+% all the basic scripts to run your tracker on an experiment stack based on a
 % series of questions.
 %
 % Input:
-% - varargin[Tracker] (boolean, string): Generate a new tracker, if boolean, the 
+% - varargin[Tracker] (boolean, string): Generate a new tracker, if boolean, the
 %   identifier of a tracker will be obtained interactively.
 % - varargin[Stack] (string): Select a stack as an input.
 %
@@ -42,10 +42,17 @@ for i = 1:length(files)
     end;
 end
 
-directory = pwd();
+directory = get_global_variable('directory');
+
+if ~isascii(get_global_variable('toolkit_path'))
+    warning('Toolkit path contains non-ASCII characters. This may cause problems.')
+end;
+
+if ~isascii(directory)
+    warning('Workspace path contains non-ASCII characters. This may cause problems.')
+end;
 
 % Check if the directory is already a valid VOT workspace ...
-
 configuration_file = fullfile(directory, 'configuration.m');
 
 if exist(configuration_file, 'file')
@@ -135,12 +142,11 @@ generate_from_template(fullfile(directory, 'run_browse.m'), ...
 generate_from_template(fullfile(directory, 'run_analysis.m'), ...
     fullfile(templates_directory, 'run_analysis.tpl'), variables{:});
 
-native_dir = fullfile(get_global_variable('toolkit_path'), 'native');
-mkpath(native_dir);
-rmpath(native_dir); rehash; % Try to avoid locked files on Windows
-set_global_variable('native_path', native_dir);
+set_global_variable('native_path', fullfile(get_global_variable('toolkit_path'), 'native'));
+mkpath(get_global_variable('native_path'));
+rmpath(get_global_variable('native_path')); rehash; % Try to avoid locked files on Windows
 initialize_native();
-addpath(native_dir);
+addpath(get_global_variable('native_path'));
 
 % Print further instructions ...
 

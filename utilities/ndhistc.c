@@ -6,23 +6,23 @@
 /*=============================================================
 % function qHistogram = ndHistc (mData, vEdge1, vEdge2, ... )
 %
-% * Input Arguments: 
+% * Input Arguments:
 %
 %      + mData: nRecord by nDim 2-dimensional array of doubles
 %      + vEdge1, vEdge2, ... : nDim vectors of histogram edges
 %
 % * Return value:
 %
-%      + qHistogram: nDim-dimensional data cube 
-%           containing number of points in each cell 
-%           defined by histogram edges. For instance, 
+%      + qHistogram: nDim-dimensional data cube
+%           containing number of points in each cell
+%           defined by histogram edges. For instance,
 %           qHistogram(1,1,1,...) means number of data points
-%           satisfying 
+%           satisfying
 %               vEdge1(1) <= mData(:,1) < vEdge1(2) & ...
 %               vEdge2(1) <= mData(:,2) < vEdge1(2) & ...
 %               vEdge3(1) <= mData(:,3) < vEdge1(3) & ...
 %               ...
-%      
+%
 % * Comparison with ndhist.m (compiled using mcc -x ndhist)
 %      + 1e6 by 2 data -> 5 by 6
 %          ndhist.m    79.49   sec
@@ -55,22 +55,22 @@ int search(const double *pveX, const int nX, const double rX);
 /*Function entry point*/
 void mexFunction(int nOut, mxArray *paramOut[], int nIn, const mxArray *paramIn[])
 {
-  /* Declare variables. */ 
-  int nNonZero = 0, count = 0; 
+  /* Declare variables. */
+  int nNonZero = 0, count = 0;
   const int *vnDimIn;
-  
-  /* Check for proper number of input and output arguments. */    
-  if(nIn < 2) 
+
+  /* Check for proper number of input and output arguments. */
+  if(nIn < 2)
   {
     mexErrMsgTxt("At least two input arguments required.");
-  } 
-  
+  }
+
   /* Check data type of input argument. */
-  if(!(mxIsDouble(paramIn[0]))) 
+  if(!(mxIsDouble(paramIn[0])))
   {
     mexErrMsgTxt("Input array must be of type double.");
   }
-/******************************************************************************************/    
+/******************************************************************************************/
   vnDimIn = mxGetDimensions(paramIn[0]);
 
 #ifdef DEBUG
@@ -84,7 +84,7 @@ void mexFunction(int nOut, mxArray *paramOut[], int nIn, const mxArray *paramIn[
     mexPrintf("nDimIn == %d : nIn == %d\n",vnDimIn[1], nIn);
     mexErrMsgTxt("# edges < # Input array column.");
   }
-  
+
   if ((vnDimIn[1]+1) < nIn)
   {
     mexPrintf("nDimIn == %d : nIn == %d\n",vnDimIn[1], nIn);
@@ -92,7 +92,7 @@ void mexFunction(int nOut, mxArray *paramOut[], int nIn, const mxArray *paramIn[
     nIn = (vnDimIn[1]+1);
   }
 
-/******************************************************************************************/    
+/******************************************************************************************/
     paramOut[0] = ndhistc(nIn, paramIn);
 
 }
@@ -100,9 +100,9 @@ void mexFunction(int nOut, mxArray *paramOut[], int nIn, const mxArray *paramIn[
 /******************************************************************************************
 
     Build writing address multipler
-    
+
     vnMul = [1, lenDim1, lenDim1 * lenDim2, ... ]
-    
+
     iAddress = vnMul * vCoord'
 
     2D array
@@ -117,7 +117,7 @@ void mexFunction(int nOut, mxArray *paramOut[], int nIn, const mxArray *paramIn[
     [11]  4   = 1 x 1 + 1 x 3
     [21]  5   = 2 x 1 + 1 x 3
 %                   ^       ^ multiplier for dim 2 == size of dim 1
-    
+
 ******************************************************************************************/
 int* vnDim2vnMul (const int*vnDim, const int nDim)
 {
@@ -126,7 +126,7 @@ int* vnDim2vnMul (const int*vnDim, const int nDim)
 #ifdef DEBUG
     mexPrintf("vnDim2vnMul\n");
 #endif
-    
+
     vnMul[0] = 1;
     for ( iDim = 1; iDim < nDim; iDim ++ )
     {
@@ -137,20 +137,20 @@ int* vnDim2vnMul (const int*vnDim, const int nDim)
         mexPrintf("iDim %d/%d, iDimPrev %d, vnMul[iDimPrev] %d, vnMul[iDim] %d\n",
             iDim, nDim, iDimPrev, vnMul[iDimPrev], vnMul[iDim]);
 #endif
-        
+
     }
-    
+
     return vnMul;
 }
 
 /******************************************************************************************
 
     Converting multi dimensional indices into an address
-    
+
     iAddress = vnMul * vCoord'
 
     vnMul = [1, lenDim1, lenDim1 * lenDim2, ... ]
-    
+
     2D array
     [00 01]
     [10 11]
@@ -163,7 +163,7 @@ int* vnDim2vnMul (const int*vnDim, const int nDim)
     [11]  4   = 1 x 1 + 1 x 3
     [21]  5   = 2 x 1 + 1 x 3
 %                   ^       ^ multiplier for dim 2 == size of dim 1
-    
+
 ******************************************************************************************/
 int vCoord2iAddr (const int*vCoord, const int*vnMul, const int nDim)
 {
@@ -180,27 +180,27 @@ int vCoord2iAddr (const int*vCoord, const int*vnMul, const int nDim)
 /******************************************************************************************
 
     Function ndhistc - Major part of the program
-    
-    
-    
+
+
+
 ******************************************************************************************/
-mxArray * ndhistc(const int nIn, const mxArray *paramIn[]) 
+mxArray * ndhistc(const int nIn, const mxArray *paramIn[])
 /* const mxArray *pmData, const mxArray *pveY, const mxArray *pveX) */
 {
     /*Table Data*/
     const mxArray *pmData = paramIn[0];                 /* Input data table */
-    int *vnDimIn = mxGetDimensions(pmData);       /* Input table size */
+    const int *vnDimIn = mxGetDimensions(pmData);       /* Input table size */
     const int nRecord = vnDimIn[0], nDim = vnDimIn[1];  /* Input table size */
     const double * pData = mxGetPr(pmData);             /* Pointer to input data table */
 
     /*Edge Data*/
-    int *vnDimOut = (int *)mxCalloc (nDim, sizeof(int)), 
-        *vnMulOut = 0, 
-        *vnEdge = mxCalloc (nDim, sizeof(int)), 
+    int *vnDimOut = (int *)mxCalloc (nDim, sizeof(int)),
+        *vnMulOut = 0,
+        *vnEdge = mxCalloc (nDim, sizeof(int)),
         *vCoord = mxCalloc (nDim, sizeof(int));
     double ** vpvEdge = (double **)mxCalloc (nDim, sizeof(double *));
-    int *vnAdd = (int *)mxCalloc (nDim, sizeof(int)); 
-    
+    int *vnAdd = (int *)mxCalloc (nDim, sizeof(int));
+
     /*control variables : loop, break*/
     int iRecord = 0;
     int bError = 0;
@@ -218,7 +218,7 @@ mxArray * ndhistc(const int nIn, const mxArray *paramIn[])
     vnAdd    : to calculate address of input data within the table
     vnMulOut : to calculate address of output data within the histogram
     */
-    
+
     int iDim = 0;
     /*(int )vnDimIn &*/
 /*    if (!((int )vnDimOut & (int )vnEdge & (int )vCoord & (int )vpvEdge & (int )vnAdd))
@@ -227,14 +227,14 @@ mxArray * ndhistc(const int nIn, const mxArray *paramIn[])
             (int )vnDimOut, (int )vnEdge, (int )vCoord, (int )vpvEdge, (int )vnAdd);
         mexErrMsgTxt("Memory allocation error (1)");
     }*/
-    
+
 
     for(iDim = 0;iDim < nDim; iDim++)
     {
         const mxArray * pveDim = paramIn[iDim + 1];
-        
+
         /*mexEvalString("pause");     */
-        
+
         vnEdge[iDim] = mxGetNumberOfElements(pveDim);
         vnDimOut[iDim] = vnEdge[iDim]-1;
         vpvEdge[iDim] = mxGetPr(pveDim);
@@ -243,22 +243,22 @@ mxArray * ndhistc(const int nIn, const mxArray *paramIn[])
         mexPrintf("iDim %d | vnDimOut[iDim] %d| vpvEdge[iDim] %x| vnEdge[iDim] %d| vnAdd[iDim] %d\n",
             iDim, vnDimOut[iDim], vpvEdge[iDim], vnEdge[iDim], vnAdd[iDim]);
 #endif
-        
+
         /*iDim++*/;
     }
-    
+
     vnMulOut = vnDim2vnMul (vnDimOut, nDim);
 
     if (!(vnMulOut))
     {
         mexErrMsgTxt("Memory allocation error (2)");
     }
-    
+
     /* Output : Histogram */
     mxHist = mxCreateNumericArray(nDim, (const int *)vnDimOut, mxDOUBLE_CLASS, mxREAL);
     pmHist = mxGetPr(mxHist);
     nSizeHist = mxGetNumberOfElements(mxHist);
-    
+
 #ifdef DEBUG
     for (iDim = 0; iDim < nDim; iDim ++)
     {
@@ -274,12 +274,12 @@ mxArray * ndhistc(const int nIn, const mxArray *paramIn[])
     10    11    12    13    14
     20    21    22    23    24
     30    31    32    33    34
-    
+
      0     4     8    12    16
      1     5     9    13    17
      2     6    10    14    18
      3     7    11    15    19
-     
+
      1     5     9    13    17
      iRec + 0
            iRec + nRow
@@ -293,30 +293,30 @@ mxArray * ndhistc(const int nIn, const mxArray *paramIn[])
         /*Begin - dimension loop*/
         int iInTable = iRecord, iOutTable;
         bError = 0;
-        
-        
+
+
 #ifdef DEBUG
         mexPrintf("iRecord %d\n",iRecord);
         /*mexEvalString("pause");  */
 #endif
-        
+
         for (iDim = 0; iDim < nDim; iDim ++)
         {
             /*Begin dimension loop*/
             const double rX = pData[iInTable];
-            
+
 #ifdef DEBUG
             mexPrintf("iDim %d rX %g ",iDim, rX);
             /*mexEvalString("pause");     */
 #endif
-            
+
             /*Find the index for xX within vpvEdge[iDim]*/
             vCoord[iDim] = search(vpvEdge[iDim], vnDimOut[iDim], rX);
 
 #ifdef DEBUG
             mexPrintf("vCoord[%d] %d\n", iDim, vCoord[iDim]);
 #endif
-            
+
             if (vCoord[iDim] < 0)
             {
                 bError = 1;
@@ -325,18 +325,18 @@ mxArray * ndhistc(const int nIn, const mxArray *paramIn[])
 #endif
                 break;
             }
-            
+
             /*End dimension loop*/
             iInTable += nRecord;
-            
+
         }
         /*End - dimension loop*/
-        
+
         if(bError)
         {
             break;
         }
-        
+
         iOutTable = vCoord2iAddr (vCoord, vnMulOut, nDim);
 #ifdef DEBUG
         mexPrintf("iOutTable %d\n", iOutTable);
@@ -346,19 +346,19 @@ mxArray * ndhistc(const int nIn, const mxArray *paramIn[])
             mexErrMsgTxt("Histogram out of bound");
         }
         pmHist[iOutTable] += 1.;
-        
+
 #ifdef DEBUG
         mexPrintf("iRecord %d/%d : pmHist[%d/%d] == %f\n", iRecord, nRecord, iOutTable, nSizeHist, pmHist[iOutTable]);
 #endif
-        
+
     }
     /*Free allocated memory*/
-    
+
 /*#ifdef DEBUG
         mexPrintf("Free vnDimIn\n");
 #endif
     mxDestroyArray (vnDimIn);*/
-    
+
 
 #ifdef DEBUG
         mexPrintf("Free vnMulOut\n");
@@ -384,8 +384,8 @@ mxArray * ndhistc(const int nIn, const mxArray *paramIn[])
         mexPrintf("Free vCoord\n");
 #endif
     mxFree (vCoord);
-    
-    
+
+
     /*Return*/
     return mxHist;
 }
