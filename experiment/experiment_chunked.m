@@ -96,14 +96,14 @@ function [image, region, properties, data] = callback(state, data)
     properties = struct();
 
 	% Handle initial frame (initialize for the first time)
-	if isempty(state.region))
+	if isempty(state.region)
 		region = data.sequence.initialize(data.sequence, data.index, data.context);
 		image = get_image(data.sequence, data.index);
 		return;
 	end;
 
 	% Handle tracker failure
-	if region_overlap(state.region, get_region(data.sequence, data.index) <= data.context.failure_overlap
+	if region_overlap(state.region, get_region(data.sequence, data.index) <= data.context.failure_overlap)
 		return;
 	end;
 

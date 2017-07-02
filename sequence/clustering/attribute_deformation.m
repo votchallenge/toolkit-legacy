@@ -18,7 +18,7 @@ numOfCells = 8;
 frames = zeros(sequence.length, 1);
 
 image = rgb2gray(imread(get_image(sequence, 1)));
-patch = cut_patch(image, region_convert(get_region(sequence, 1), 'rectangle'););
+patch = cut_patch(image, region_convert(get_region(sequence, 1), 'rectangle'));
 
 
 bb = region_convert(get_region(sequence, 1), 'rectangle');
