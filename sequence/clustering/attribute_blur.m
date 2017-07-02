@@ -25,7 +25,7 @@ for i = 1:sequence.length
     full_image_name = fullfile(sequence.directory, image_name);
     image = double(rgb2gray(imread(full_image_name)));
 
-    region = round(region_convert(get_region(sequence, i), 'rectangle'););
+    region = round(region_convert(get_region(sequence, i), 'rectangle'));
 
     if isnan(region(1))
         frames(i) = NaN;
