@@ -10,7 +10,7 @@ function paths = toolkit_path()
 script_directory = fileparts(mfilename('fullpath'));
 include_dirs = cellfun(@(x) fullfile(script_directory, x), {'', 'utilities', ...
     'workspace', 'tracker', 'sequence', 'stacks' ,'report', 'analysis', ...
-    'sequence/clustering', 'experiment'}, 'UniformOutput', false); 
+    'experiment'}, 'UniformOutput', false);
 
 if exist(fullfile(script_directory, 'native'), 'dir')
    include_dirs{end+1} = fullfile(script_directory, 'native');

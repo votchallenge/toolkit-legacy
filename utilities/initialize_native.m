@@ -43,9 +43,6 @@ success = success && compile_mex('benchmark_native', {fullfile(toolkit_path, 'tr
 success = success && compile_mex('md5hash', {fullfile(toolkit_path, 'utilities', 'md5hash.cpp')}, ...
     {}, output_path);
 
-success = success && compile_mex('ndhistc', {fullfile(toolkit_path, 'utilities', 'ndhistc.c')}, ...
-    {}, output_path);
-
 trax_mex_path = fullfile(output_path, 'mex');
 mkpath(trax_mex_path);
 
