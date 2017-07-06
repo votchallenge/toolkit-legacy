@@ -59,7 +59,7 @@ success = success && compile_mex('traxserver', ...
 
 % Additional OS-specific flags for traxclient MEX
 os_specific = {};
-if isunix() && !ismac()
+if isunix() && ~ismac()
     % clock_gettime() in trax/support/client/timer.cpp requires librt on
     % linux systems with glibc < 2.17 (so to be safe, we always add it)
     os_specific{end+1} = '-lrt';
