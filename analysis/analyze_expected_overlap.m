@@ -39,7 +39,7 @@ function [result] = analyze_expected_overlap(experiment, trackers, sequences, va
         end
     end
 
-    if ~strcmp(experiment.type, 'supervised')
+    if ~any(strcmp(experiment.type, {'supervised', 'realtime'}))
         error('Ranking analysis can only be used in supervised experiment scenario.');
     end;
 

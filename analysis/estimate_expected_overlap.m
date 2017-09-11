@@ -185,7 +185,7 @@ switch (event.type)
             sequence.name);
 
         switch event.experiment.type
-            case 'supervised'
+            case {'supervised', 'realtime'}
 
                 for i = 1:event.experiment.parameters.repetitions
 
@@ -219,7 +219,7 @@ switch (event.type)
 
                 end;
 
-            otherwise, error(['unrecognized type ' type]);
+            otherwise, error(['unsupported type ', event.experiment.type]);
         end
 
 end;

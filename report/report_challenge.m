@@ -55,10 +55,6 @@ switch lower(methodology)
         error(['Unknown methodology ', methodology, '!']) ;
 end
 
-is_supervised = cellfun(@(e) strcmp(e.type, 'supervised'), experiments, 'UniformOutput', true);
-experiments = experiments(is_supervised);
-
-
 document = create_document(context, 'challenge', 'title', 'VOT competition report');
 
 print_text('Generating competition report'); print_indent(1);
@@ -80,11 +76,10 @@ if master_legend
 
 end;
 
-print_text('Ranking report ...');print_indent(1);
+print_text('AR report ...');print_indent(1);
 
-[ranking_document, ranks_scores] = report_ranking(context, trackers, sequences, experiments, ...
-    'usetags', true, 'usepractical', true, ...
-    'hidelegend', master_legend, 'adaptation', ranking_adaptation, 'average', 'weighted_mean');
+[ranking_document, ranks_scores] = report_ar(context, trackers, sequences, experiments, ...
+    'usetags', true, 'hidelegend', master_legend, 'average', 'weighted_mean');
 
 print_indent(-1);
 
@@ -146,8 +141,8 @@ switch lower(methodology)
         score_weights = [0.5, 0.5];
         score_format = '%.2f';
     case 'vot2015'
-        scores = expected_overlap_scores';
-        score_labels = {'Expected overlap'};
+        scores = expected_overlap_scores;
+        score_tags = {'Expected overlap'};
         score_sorting_partial = {'descending'};
         score_sorting_overall = 'descending';
         sort_direction = 'descend';
@@ -163,7 +158,7 @@ N_scores = numel(score_tags);
 combined_scores = squeeze(mean(scores, 1));
 
 overall_scores = sum(combined_scores(:) .* repmat(score_weights, numel(trackers), 1), 2) ./ sum(score_weights(:));
-[~, order] = sort(overall_scores, sort_direction)  ;
+[~, order] = sort(overall_scores, sort_direction);
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
 
@@ -173,11 +168,11 @@ column_labels(1, :) = repmat({struct()}, 1, size(column_labels, 2));
 column_labels(1, 1:N_scores:end-1) = cellfun(@(x) struct('text', x.name, 'columns', N_scores), experiments,'UniformOutput',false);
 column_labels(2, :) = [score_tags(repmat(1:length(score_tags), 1, numel(experiments))), {'Overall'}];
 
-experiments_ranking_data = zeros(N_scores, numel(experiments), numel(trackers));
+experiments_ranking_data = zeros(N_scores * numel(experiments), numel(trackers));
 for i = 1:N_scores
-    experiments_ranking_data(i, :, :) = scores(:, :, i);
+    experiments_ranking_data(i:N_scores:end, :) = scores(:, :, i);
 end
-experiments_ranking_data = reshape(experiments_ranking_data, N_scores * numel(experiments), numel(trackers));
+
 experiments_ranking_data = num2cell(experiments_ranking_data);
 
 overall_ranking_data = num2cell(overall_scores);

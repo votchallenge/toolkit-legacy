@@ -41,13 +41,15 @@ document = create_document(context, 'expected_overlap', 'title', 'Expected overl
 
 % TODO: This may no longer be necessary?
 % Filter out all experiments that are not of type "supervised"
-experiments = experiments(cellfun(@(e) strcmp(e.type, 'supervised'), experiments, 'UniformOutput', true));
+experiments = experiments(cellfun(@(e) any(strcmp(e.type, {'supervised', 'realtime'})), experiments, 'UniformOutput', true));
 
 trackers_hash = md5hash(strjoin((cellfun(@(x) x.identifier, trackers, 'UniformOutput', false)), '-'), 'Char', 'hex');
 parameters_hash = md5hash(sprintf('%d-%d', usetags, usepractical));
 sequences_hash = md5hash(strjoin((cellfun(@(x) x.name, sequences, 'UniformOutput', false)), '-'), 'Char', 'hex');
 
 expected_overlap_scores = zeros(numel(experiments), numel(trackers), 1);
+
+tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
 
 for e = 1:length(experiments)
 
@@ -129,9 +131,6 @@ for e = 1:length(experiments)
         for t = 1:numel(order)
             tracker = trackers{order(t)};
             plot([t, t], [0, ordered_scores(t)], ':', 'Color', [0.8, 0.8, 0.8]);
-%             if experiment_practical(t) > 0.001 && usepractical
-%                 draw_interval(t, ordered_scores(t), experiment_practical(t), experiment_practical(t), 'Color', [0.6, 0.6, 0.6]);
-%             end
             phandles(t) = plot(t, ordered_scores(t), tracker.style.symbol, 'Color', tracker.style.color, 'MarkerSize', 10, 'LineWidth', tracker.style.width);
         end;
 
@@ -167,7 +166,14 @@ for e = 1:length(experiments)
 
     end
 
+	[~, order] = sort(result_scores.scores(:, 1), 'descend');
+
     expected_overlap_scores(e, :, 1) = result_scores.scores(:, 1);
+
+	tabledata = num2cell(result_scores.scores);
+	tabledata = highlight_best_rows(tabledata, repmat({'descending'}, 1, numel(tags)));
+
+	document.table(tabledata(order, :), 'columnLabels', tags, 'rowLabels', tracker_labels(order));
 
 end;
 

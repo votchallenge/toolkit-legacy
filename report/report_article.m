@@ -46,7 +46,7 @@ switch lower(methodology)
         error(['Unknown methodology ', methodology, '!']) ;
 end
 
-is_supervised = cellfun(@(e) strcmp(e.type, 'supervised'), experiments, 'UniformOutput', true);
+is_supervised = cellfun(@(e) any(strcmp(e.type, {'supervised', 'realtime'})), experiments, 'UniformOutput', true);
 experiments = experiments(is_supervised);
 
 document = create_document(context, 'article', 'title', 'VOT article report');
@@ -137,7 +137,7 @@ document.section('Ranking');
 
 document.table(tabledata(order, :), 'columnLabels', column_labels, 'rowLabels', tracker_labels(order), 'format', score_format);
 
-document.link(ranking_document.url, 'Detailed ranking results');
+%document.link(ranking_document.url, 'Detailed ranking results');
 
 document.link(expected_overlap_document.url, 'Detailed expected overlap results');
 
