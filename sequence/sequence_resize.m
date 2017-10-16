@@ -24,7 +24,7 @@ cache_groundtruth = fullfile(cache_directory, 'groundtruth.txt');
 sequence_groundtruth = fullfile(sequence.directory, 'groundtruth.txt');
 
 if file_newer_than(cache_groundtruth, sequence_groundtruth)
-    resized_sequence = create_sequence(cache_directory, 'name', sequence.name);
+    resized_sequence = sequence_create(cache_directory, 'name', sequence.name);
     resized_sequence.tags.names = sequence.tags.names;
     resized_sequence.tags.data = sequence.tags.data;
     resized_sequence.values.names = sequence.values.names;
@@ -54,7 +54,7 @@ end
 
 write_trajectory(cache_groundtruth, cellfun(@(x) rescale_region(x), sequence.groundtruth, 'UniformOutput', false));
 
-resized_sequence = create_sequence(cache_directory, 'name', sequence.name);
+resized_sequence = sequence_create(cache_directory, 'name', sequence.name);
 
 resized_sequence.tags.names = sequence.tags.names;
 resized_sequence.tags.data = sequence.tags.data;

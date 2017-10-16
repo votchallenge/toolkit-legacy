@@ -34,7 +34,7 @@ for j=1:2:length(varargin)
         case 'persist', persist = varargin{j+1};
         case 'pool', pool = varargin{j+1};
         case 'log', log = varargin{j+1};
-        otherwise, error(['unrecognized argument ' varargin{j}]);
+        otherwise, error(['unrecognized argument ', varargin{j}]);
     end
 end
 
@@ -87,7 +87,7 @@ switch lower(mode)
             mkpath(log);
             context.logdir = log;
         end
-    otherwise, error(['unrecognized mode ' mode]);
+    otherwise, error(['unrecognized mode ', mode]);
 end
 
 context = iterate(experiments, trackers, sequences, 'iterator', iterator, 'context', context);
@@ -100,7 +100,7 @@ end
 
 function context = execute_iterator(event, context)
 
-switch (event.type)
+    switch (event.type)
     case 'experiment_enter'
 
         print_text('Experiment %s', event.experiment.name);
@@ -196,7 +196,7 @@ end
 
 function context = makefile_iterator(event, context)
 
-switch (event.type)
+    switch (event.type)
     case 'enter'
 
         context.file = fopen(context.makefilename, 'w');

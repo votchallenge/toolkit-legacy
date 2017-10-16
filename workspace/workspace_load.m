@@ -143,7 +143,7 @@ else
 
     print_text('Loading sequences ...');
 
-    sequences = load_sequences(sequences_directory, ...
+    sequences = sequence_load(sequences_directory, ...
         'list', get_global_variable('sequences', 'list.txt'));
 
     if isempty(sequences)
@@ -187,12 +187,12 @@ if current_timestamp > previous_timestamp + check_interval
         print_text('Checking for toolkit updates on GitHub.')
         latest = get_github_version();
     end;
-        
-    if isempty(latest) 
+
+    if isempty(latest)
         updated = false;
         return;
     end;
-    
+
     updated = toolkit_version(latest) > 0;
 
     fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
@@ -210,10 +210,10 @@ if current_timestamp > previous_timestamp + check_interval
         print_text('Local version %s, remote version %s', version, latest);
         print_text('');
         print_text('***************************************************************************');
-        print_text(''); 
+        print_text('');
 
     end
-    
+
 end;
 
 end
@@ -229,7 +229,7 @@ function version = get_bintray_version(package)
         version = [];
         return;
     end
-    
+
 end
 
 function version = get_github_version()
@@ -240,6 +240,6 @@ function version = get_github_version()
         version = [];
         return;
     end
-    
+
 end
 

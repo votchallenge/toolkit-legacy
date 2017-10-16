@@ -20,7 +20,7 @@ cache_groundtruth = fullfile(cache_directory, 'groundtruth.txt');
 sequence_groundtruth = fullfile(sequence.directory, 'groundtruth.txt');
 
 if file_newer_than(cache_groundtruth, sequence_groundtruth)
-    grayscale_sequence = create_sequence(cache_directory, 'name', sequence.name);
+    grayscale_sequence = sequence_create(cache_directory, 'name', sequence.name);
     grayscale_sequence.tags.names = sequence.tags.names;
     grayscale_sequence.tags.data = sequence.tags.data;
     grayscale_sequence.properties = sequence.properties;
@@ -41,7 +41,7 @@ end;
 
 write_trajectory(cache_groundtruth, sequence.groundtruth);
 
-grayscale_sequence = create_sequence(cache_directory, 'name', sequence.name);
+grayscale_sequence = sequence_create(cache_directory, 'name', sequence.name);
 
 grayscale_sequence.tags.names = sequence.tags.names;
 grayscale_sequence.tags.data = sequence.tags.data;

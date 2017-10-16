@@ -71,8 +71,8 @@ Module functions
 
 ### Loading
 
--   [create_sequence](create_sequence.m) - Create a new sequence descriptor
--   [load_sequences](load_sequences.m) - Load a set of sequences
+-   [sequence_create](sequence_create.m) - Create a new sequence descriptor
+-   [sequence_load](sequence_load.m) - Load a set of sequences
 
 ### Conversion
 

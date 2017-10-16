@@ -1,6 +1,6 @@
 function ncc
 % ncc VOT integration example
-% 
+%
 % This function is an example of tracker integration into the toolkit.
 % The implemented tracker is a very simple NCC tracker that is also used as
 % the baseline tracker for challenge entries.
@@ -15,6 +15,15 @@ cleanup = onCleanup(@() exit() );
 % VOT: Set random seed to a different value every time.
 % *************************************************************
 RandStream.setGlobalStream(RandStream('mt19937ar', 'Seed', sum(clock)));
+
+image = uint8(rand(240, 320, 3) * 255);
+imwrite(image, 'test.jpg');
+image = imread('test.jpg');
+region = [30, 30, 30, 30];
+[state, ~] = ncc_initialize(image, region);
+[state, region] = ncc_update(state, image);
+[state, region] = ncc_update(state, image);
+[state, region] = ncc_update(state, image);
 
 % **********************************
 % VOT: Get initialization data
@@ -34,15 +43,15 @@ while true
     if isempty(image)
         break;
     end;
-    
+
 	% Perform a tracking step, obtain new region
     [state, region] = ncc_update(state, imread(image));
-    
+
     % **********************************
     % VOT: Report position for frame
     % **********************************
     handle = handle.report(handle, region);
-    
+
 end;
 
 % **********************************
@@ -66,7 +75,7 @@ function [state, location] = ncc_initialize(I, region, varargin)
         y2 = round(max(region(2:2:end)));
         region = round([x1, y1, x2 - x1, y2 - y1]);
     else
-        region = round([round(region(1)), round(region(2)), ... 
+        region = round([round(region(1)), round(region(2)), ...
             round(region(1) + region(3)) - round(region(1)), ...
             round(region(2) + region(4)) - round(region(2))]);
     end;
@@ -88,7 +97,7 @@ end
 
 function [state, location] = ncc_update(state, I, varargin)
 
-    gray = double(rgb2gray(I)) ; 
+    gray = double(rgb2gray(I)) ;
 
     [height, width] = size(gray);
 
