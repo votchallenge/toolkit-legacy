@@ -27,7 +27,7 @@ if ispc()
 	matlab_flags = {'-nodesktop', '-nosplash', '-wait', '-minimize'};
 else
 	matlab_executable = fullfile(matlabroot, 'bin', 'matlab');
-	matlab_flags = {'-nodesktop', '-nosplash'};
+	matlab_flags = {'-nodesktop', '-nosplash', '-singleCompThread'};
 end
 
 argument_string = strjoin(matlab_flags, ' ');

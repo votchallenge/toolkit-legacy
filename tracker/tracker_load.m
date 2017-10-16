@@ -123,7 +123,7 @@ else
         warning('Tracker command contains non-ASCII characters. This may cause problems.');
     end;
 
-    if ~tracker_test(tracker)
+    if ~isempty(tracker.command) && ~tracker_test(tracker)
 		error('Tracker has not passed the TraX support test.');
 	end
 
@@ -141,5 +141,6 @@ if exist(performance_filename, 'file')
 else
     tracker.performance = [];
 end;
+
 
 

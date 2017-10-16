@@ -13,8 +13,8 @@ function [result] = analyze_overlap(experiment, trackers, sequences, varargin)
 % Output:
 % - result (structure): A structure with the following fields
 %     - curves: overlap threshold curves
-%     - practical: corresponding practical differences
-%     - lengths: lengths for which the expected overlap was evaluated
+%     - thresholds: corresponding thresholds (x values)
+%     - auc: computed AUC values
 %
 
     resolution = 100;

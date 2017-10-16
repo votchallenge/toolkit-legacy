@@ -85,7 +85,8 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_tag(experimen
                 trajectory(end+1:length(groundtruth)) = {0};
             end;
 
-            [~, frames] = estimate_accuracy(trajectory(filter), groundtruth(filter), 'burnin', burnin);
+            [~, frames] = estimate_accuracy(trajectory(filter), groundtruth(filter), ...
+						 'Burnin', burnin, 'BindWithin', [sequences{s}.width, sequences{s}.height]);
 
             accuracy(j, :) = frames;
 

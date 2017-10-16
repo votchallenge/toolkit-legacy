@@ -16,7 +16,7 @@ function selectors = create_sequence_selectors(experiment, sequences) %#ok<INUSL
         'aggregate', @(experiment, tracker, sequences) ...
         aggregate_for_sequence(experiment, tracker, sequence), ...
         'practical', @(sequences) get_frame_value(sequence, 'practical'), 'length', @(sequences) count_frames(sequences, i)), ...
-        sequences, num2cell(1:length(sequences)), 'UniformOutput', false);        
+        sequences, num2cell(1:length(sequences)), 'UniformOutput', false);
 
 end
 
@@ -27,7 +27,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
 
 
     cache = get_global_variable('cache_selectors', true);
-    
+
     if cache
 
         result_hash = calculate_results_fingerprint(tracker, experiment, {sequence});
@@ -42,10 +42,10 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
             if ~isempty(aggregated_overlap) && ~isempty(aggregated_failures)
                 return;
             end;
-        end;    
+        end;
 
     end;
-    
+
     repeat = experiment.parameters.repetitions;
     burnin = experiment.parameters.burnin;
 
@@ -65,7 +65,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
 
         result_file = fullfile(directory, sprintf('%s_%03d.txt', sequence.name, j));
 
-        try 
+        try
             trajectory = read_trajectory(result_file);
         catch
             continue;
@@ -73,10 +73,10 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
 
         if (size(trajectory, 1) < size(groundtruth, 1))
             print_debug('Warning: Trajectory too short. Expanding with empty frames.');
-            trajectory{end+1:length(groundtruth)} = 0;
+            trajectory(end+1:length(groundtruth)) = {0};
         end;
 
-        [~, frames] = estimate_accuracy(trajectory, groundtruth, 'burnin', burnin);
+        [~, frames] = estimate_accuracy(trajectory, groundtruth, 'burnin', burnin, 'BindWithin', [sequence.width, sequence.height]);
 
         accuracy(j, :) = frames;
 
@@ -89,7 +89,7 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
 
     failures(isnan(failures)) = nanmean(failures);
     aggregated_failures = failures';
-    
+
     if cache
         save(cache_file, 'aggregated_overlap', 'aggregated_failures');
     end;
@@ -100,7 +100,7 @@ function [count, partial] = count_frames(sequences, i)
 	count = sequences{i}.length;
 
     partial = zeros(1, length(sequences));
-    
+
     partial(i) = count;
 
 end
