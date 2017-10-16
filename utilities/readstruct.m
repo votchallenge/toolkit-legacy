@@ -1,4 +1,4 @@
-function [s] = readstruct(filename)
+function [s] = readstruct(filename, defaults)
 % readstruct Read a key-value file to a structure
 %
 % This function reads a key-value file to a structure. If possible, the
@@ -6,6 +6,8 @@ function [s] = readstruct(filename)
 %
 % Input:
 % - filename (string): Path to the file.
+% - defaults (struct): A structure merged with read data, can be used to
+%   set defaults.
 %
 % Output:
 % - s (structure): Resulting structure.
@@ -31,6 +33,10 @@ for i = 1:numel(lines)
 
 end;
 
+if nargin > 1
+	s = struct_merge(defaults, s);
+end
+
 end
 
 function [key, value] = parse_line(line)
@@ -41,7 +47,7 @@ function [key, value] = parse_line(line)
 		key = []; value = [];
 		return;
 	end;
-        
+
 	key = line(1:delimiter-1);
 	value = line(delimiter+1:end);
 
@@ -52,4 +58,7 @@ function [key, value] = parse_line(line)
 	end
 
 end
+
+
+
 
