@@ -34,4 +34,4 @@ The evaluation toolkit code and the documentation is available under GPL 3 licen
 Enquiries, Question and Comments
 --------------------------------
 
-If you have any further enquiries, question, or comments, please refer to the contact infromation link on the [VOT homepage](http://votchallenge.net/). If you would like to file a bug report or a feature request, use the  [Github issue tracker](https://github.com/vicoslab/vot-toolkit/issues).
+If you have any further enquiries, question, or comments, please refer to the contact infromation link on the [VOT homepage](http://votchallenge.net/). If you would like to file a bug report or a feature request, use the  [Github issue tracker](https://github.com/vicoslab/vot-toolkit/issues). **The issue tracker is for toolkit issues only**, if you have a problem with tracker integration or any other questions, please use our [support forum](https://groups.google.com/forum/?hl=en#!forum/votchallenge-help).
