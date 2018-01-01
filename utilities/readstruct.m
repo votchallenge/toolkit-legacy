@@ -34,7 +34,7 @@ for i = 1:numel(lines)
 end;
 
 if nargin > 1
-	s = struct_merge(defaults, s);
+	s = struct_merge(s, defaults);
 end
 
 end

@@ -36,15 +36,12 @@ end;
 
 library_path = '';
 output = '';
-status = -1;
 
 if ispc
     library_var = 'PATH';
 else
     library_var = 'LD_LIBRARY_PATH';
 end;
-
-error_message = [];
 
 old_directory = pwd;
 try
@@ -70,9 +67,7 @@ try
             if length(linkpath) > 1
                 userpath = [sprintf(['%s', pathsep], linkpath{1:end-1}), userpath];
             end;
-            setenv(library_var, [userpath, pathsep, getenv('PATH')]);
-        else
-		    setenv(library_var, getenv('PATH'));
+            setenv(library_var, [userpath, pathsep, library_path]);
         end;
 
 		if verLessThan('matlab', '7.14.0')

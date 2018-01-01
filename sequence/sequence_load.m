@@ -56,13 +56,12 @@ while true
         break;
     end
 
-    if exist(fullfile(directory, [sequence_name, '.sequence']), 'file')
-        sequence_path = fullfile(directory, [sequence_name, '.sequence']);
-		elseif ~exist(fullfile(directory, sequence_name), 'dir')
-			sequence_path = fullfile(directory, sequence_name);
-		else
-			continue;
-		end;
+    if exist(fullfile(directory, sequence_name, 'sequence'), 'file')
+        sequence_path = fullfile(directory, sequence_name, 'sequence');
+    elseif exist(fullfile(directory, sequence_name), 'dir')
+        sequence_path = fullfile(directory, sequence_name);
+    else
+        continue;
     end;
 
     print_debug('Loading sequence %s', sequence_name);

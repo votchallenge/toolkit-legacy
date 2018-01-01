@@ -51,10 +51,8 @@ while 1
             option = input('Select experiment: ', 's');
             
             switch option
-                case 'q'
-                    break;
-                case 'e'
-                    break;
+                case {'q', 'e'}                    
+                    return;
                 case 'b'
                     break;
                 otherwise
@@ -90,10 +88,8 @@ while 1
             
             option = input('Select sequence: ', 's');
             switch option
-                case 'q'
-                    break;
-                case 'e'
-                    break;
+                case {'q', 'e'}                    
+                    return;
                 case 'b'
                     selected_experiment = [];
                     selected_sequence = [];
@@ -136,10 +132,8 @@ while 1
             option = input('Selected tracker: ', 's');
             
             switch option
-                case 'q'
-                    continue;
-                case 'e'
-                    continue;
+                case {'q', 'e'}                    
+                    return;
                 case 'b'
                     selected_sequence = [];
                     selected_tracker = [];
@@ -159,17 +153,44 @@ while 1
     end;
     
     tracker = trackers{selected_tracker};
+    experiment = experiments{selected_experiment};
     
-    experiment_directory = fullfile(tracker.directory, experiments{selected_experiment}.name);
+    sequence = convert_sequences(sequences(selected_sequence), experiment.converter);
+	sequence = sequence{1};
     
-    sequence_directory = fullfile(experiment_directory, sequences{selected_sequence}.name);
+    switch experiment.type
+        case {'supervised', 'unsupervised', 'chunked'}
+            visualize_default(experiment, tracker, sequence);
+        otherwise            
+            experiment_function = str2func(['experiment_', experiment.type, '_visualize']);
+        	experiment_function(experiment, tracker, sequence);
+    end
+        
+    selected_tracker = [];
+    if length(trackers) == 1
+        selected_sequence = [];        
+    end;
+    
+    if length(sequences) == 1
+        selected_experiment = [];        
+    end;
+    
+end;
+
+end
+
+function visualize_default(experiment, tracker, sequence)
+
+    experiment_directory = fullfile(tracker.directory, experiment.name);
+    
+    sequence_directory = fullfile(experiment_directory, sequence.name);
     
     trajectories = {};
     
-    for i = 1:experiments{selected_experiment}.parameters.repetitions;
+    for i = 1:experiment.parameters.repetitions;
         
         tfile = fullfile(sequence_directory, ...
-            sprintf('%s_%03d.txt', sequences{selected_sequence}.name, i));
+            sprintf('%s_%03d.txt', sequence.name, i));
         
         if exist(tfile, 'file')
             trajectories{end+1} = read_trajectory(tfile); %#ok<AGROW>
@@ -179,18 +200,12 @@ while 1
     
     if isempty(trajectories)
         print_text('No results found for sequence');
-        selected_tracker = [];
-        continue;
+        return;
     end;
     
-    visualize_sequence(sequences{selected_sequence}, trajectories{:});
-    
-    selected_tracker = [];
-    selected_sequence = [];
-    selected_experiment = [];
-end;
+    visualize_sequence(sequence, trajectories{:});
 
-
+end
 
 
 

@@ -15,23 +15,29 @@ function [sequence] = sequence_create(sequence_path, varargin)
 
 start = 1;
 dummy = false;
-
-metadata = struct('format', 'default');
+metadata = struct();
 
 if exist(sequence_path, 'file') == 2
-    metadata = readstruct(sequence_path, metadata);
+    metadata = readstruct(sequence_path);
 	directory = fileparts(sequence_path);
 else
     directory = sequence_path;
 end;
+
+mask = [];
+
+if isfield(metadata, 'format')
+    sequence_function = str2func(['sequence_create_', metadata.format]);
+    sequence = sequence_function(directory, metadata);
+    sequence.format = metadata.format;
+    return;
+end
 
 if ~isfield(metadata, 'mask')
 	if all(size(dir([directory, '/*.jpg'])))
 		mask = '%08d.jpg';
 	elseif all(size(dir([directory, '/*.png'])))
 		mask = '%08d.png';
-	else
-		error('Unkown file ending for sequence frames');
 	end;
 end;
 
@@ -51,6 +57,10 @@ for i = 1:2:length(varargin)
             error(['Unknown switch ', varargin{i},'!']) ;
     end
 end
+
+if isempty(mask)
+    error('Unkown file ending for sequence frames');
+end;
 
 sequence = struct('name', name, 'directory', directory, ...
         'mask', mask, 'length', 0, ...
