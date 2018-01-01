@@ -84,12 +84,7 @@ if isempty(stack)
 
 else
 
-    for i = 1:length(stacks)
-        if strcmp(stacks{i}, stack)
-            selected_stack = stacks{i};
-            break;
-        end;
-    end;
+    selected_stack = stack;
 
     if isempty(selected_stack)
         error('Not a valid stack!');
