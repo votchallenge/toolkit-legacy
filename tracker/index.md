@@ -61,7 +61,7 @@ Module functions
 -   [tracker_list](tracker_list.m) - Create a set of tracker descriptor structures
 -   [generate_matlab_command](generate_matlab_command.m) - Generate command line for Matlab trackers
 -   [generate_python_command](generate_python_command.m) - Generate command line for Python trackers
--   [generate_python_command](generate_octave_command.m) - Generate command line for Octave trackers
+-   [generate_octave_command](generate_octave_command.m) - Generate command line for Octave trackers
 
 ### Execution
 
