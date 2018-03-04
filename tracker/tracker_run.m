@@ -55,14 +55,12 @@ if ~isempty(tracker.linkpath)
 else
     environment.(library_var) = getenv('PATH');
 end;
-
 log_directory = fullfile(get_global_variable('directory'), 'logs', tracker.identifier);
 mkpath(log_directory);
 
 mexargs = {'Debug', debug};
 
 timestamp = datestr(now, 30);
-
 if ~debug_console
     log_file = fullfile(log_directory, [timestamp, '.log']);
 else
@@ -72,7 +70,6 @@ end;
 mexargs = [mexargs, 'Log', log_file];
 
 failure = [];
-
 try
     data = traxclient(tracker.command, callback, ...
         'Directory', directory, 'Timeout', timeout, ...
@@ -82,7 +79,6 @@ catch e
     print_text('Tracker execution interrupted: %s', e.message);
     failure = e;
 end;
-
 if ~isempty(failure)
     if exist(fullfile(directory, 'runtime.log'), 'file')
         copyfile(fullfile(directory, 'runtime.log'), fullfile(log_directory, [timestamp, '_runtime.log']));

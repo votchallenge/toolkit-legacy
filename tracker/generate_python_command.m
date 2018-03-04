@@ -14,7 +14,13 @@ function command = generate_python_command(script, paths)
 %
 
 trax_python = get_global_variable('trax_python');
-python_exec = get_global_variable('python');
+virtual_env = get_global_variable('WORKON_HOME'); % That should be setup by the virtualenv
+if ~isempty(virtual_env)
+    venv = 'vot'
+    python_exec = sprintf('%s/%s/%s', virtual_env, venv, 'bin/python');
+else
+    python_exec = get_global_variable('python');
+end
 
 % If path to python trax implementatin is set then we attempt to export it to tracker
 if ~isempty(trax_python)

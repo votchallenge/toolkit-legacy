@@ -31,9 +31,7 @@ print_text('Testing TraX protocol support for tracker %s.', tracker.identifier);
 try
 
     data.header = false;
-
     data = tracker_run(tracker, @callback, data);
-
     supported = data.header;
 
 catch
@@ -41,7 +39,6 @@ catch
     supported = false;
 
 end
-
 if supported
     % Only cache if support is detected
     save(cache_file, 'supported');
