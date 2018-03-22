@@ -34,18 +34,99 @@ mkpath(directory);
 bundle_url = get_global_variable('bundle');
 
 if ~exist(list_file, 'file') && ~isempty(bundle_url)
-    print_text('Downloading sequence bundle from "%s". This may take a while ...', bundle_url);
-    bundle = [tempname, '.zip'];
-    try
-        urlwrite(bundle_url, bundle);
-        unzip(bundle, directory);
-		delete(bundle);
+
+    if strsuffix(bundle_url, '.zip')
+
+        print_text('Downloading sequence bundle from "%s". This may take a while ...', bundle_url);
+        bundle = [tempname, '.zip'];
+        try
+            urlwrite(bundle_url, bundle);
+            unzip(bundle, directory);
+		    delete(bundle);
+            list_file = fullfile(directory, 'list.txt');
+        catch
+            print_text('Unable to retrieve sequence bundle from the server. This is either a connection problem or the server is temporary offline.');
+            print_text('Please try to download the bundle manually from %s and uncompress it to %s', bundle_url, directory);
+            return;
+        end;
+
+    elseif strsuffix(bundle_url, '.json')
+        listing = tempname;
+        urlwrite(bundle_url, listing);
+        meta = json_decode(fileread(listing));
+
+        print_text('Downloading sequence dataset "%s" with %d sequences.', meta.name, numel(meta.sequences));
+        
+        slashes = strfind(bundle_url, '/');
+        base_url = bundle_url(1:slashes(end));
+        
+        print_indent(1);
+        
+        for i = 1:numel(meta.sequences)
+            sequence = meta.sequences{i};
+            print_text('Downloading sequence "%s" ...', sequence.name);
+            sequence_directory = fullfile(directory, sequence.name);
+            %if exist(sequence_directory, 'dir')
+            %    continue;
+            %end;
+            mkpath(sequence_directory);
+            data = struct('name', sequence.name, 'fps', sequence.fps, 'format', 'default');
+            data.channels = struct();
+            
+            annotations_url = [base_url, sequence.annotations.url];
+
+            try
+                bundle = [tempname, '.zip'];
+                urlwrite(annotations_url, bundle);
+                unzip(bundle, sequence_directory);
+                delete(bundle);
+            catch
+                print_text('Unable to retrieve sequence bundle from the server. This is either a connection problem or the server is temporary offline.');
+                return;
+            end;
+
+            channels = fieldnames(sequence.channels);
+            
+            for c = 1:numel(channels)
+                channel = sequence.channels.(channels{c});
+                channel_directory = fullfile(sequence_directory, channels{c});
+                mkpath(channel_directory);
+                channel_url = [base_url, channel.url];
+                try
+                    bundle = [tempname, '.zip'];
+                    urlwrite(channel_url, bundle);
+                    unzip(bundle, channel_directory);
+                    delete(bundle);
+                catch
+                    print_text('Unable to retrieve sequence bundle from the server. This is either a connection problem or the server is temporary offline.');
+                    return;
+                end;
+
+                if isfield(channel, 'pattern')
+                    data.channels.(channels{c}) = [channels{c}, filesep, channel.pattern];
+                else
+                    data.channels.(channels{c}) = [channels{c}, filesep];
+                end
+            end
+            
+            writestruct(fullfile(sequence_directory, 'sequence'), data);
+            
+        end
+        
         list_file = fullfile(directory, 'list.txt');
-    catch
-        print_text('Unable to retrieve sequence bundle from the server. This is either a connection problem or the server is temporary offline.');
-        print_text('Please try to download the bundle manually from %s and uncompress it to %s', bundle_url, directory);
-        return;
+        % Save list file
+        fid = fopen(list_file, 'w');
+        for i = 1:numel(meta.sequences)
+            fprintf(fid, '%s\n', meta.sequences{i}.name);
+        end
+        fclose(fid);
+        
+        print_indent(-1);
+
+    else
+        error('Unknown dataset type!');
     end;
+
 end;
 
 fid = fopen(list_file, 'r');
