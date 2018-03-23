@@ -3,7 +3,7 @@ function [files, metadata] = experiment_chunked(tracker, sequence, directory, pa
     scan = false;
     files = {};
     metadata.completed = true;
-    cache = get_global_variable('experiment.cache', 0);
+    cache = get_global_variable('experiment.cache', true);
     silent = get_global_variable('experiment.silent', 0);
 
     defaults = struct('repetitions', 15, 'failure_overlap',  -1, 'chunk_length', 50);
@@ -24,7 +24,9 @@ function [files, metadata] = experiment_chunked(tracker, sequence, directory, pa
 
 	if isfield(tracker, 'metadata') && isfield(tracker.metadata, 'deterministic') && tracker.metadata.deterministic
 		r = 1;
-	end
+    end
+    
+    check_deterministic = ~(scan && nargout < 2);
 
     for i = 1:r
 
@@ -67,15 +69,13 @@ function [files, metadata] = experiment_chunked(tracker, sequence, directory, pa
 
 			data = tracker_run(tracker, @callback, data);
 
-            [chunk_trajectory, chunk_time] = tracker.run(tracker, chunks{c}, context);
-
-            trajectory(chunk_offset(c):chunk_offset(c)+numel(chunk_trajectory)-1) = data.result;
-            time(chunk_offset(c):chunk_offset(c)+numel(chunk_trajectory)-1) = data.timing;
+            trajectory(chunk_offset(c):chunk_offset(c)+numel(data.result)-1) = data.result;
+            time(chunk_offset(c):chunk_offset(c)+numel(data.result)-1) = data.timing;
 
         end;
 
 		times(:, i) = time;
-		write_trajectory(result_file, data.result);
+		write_trajectory(result_file, trajectory);
 		csvwrite(time_file, times);
 
         print_indent(-1);
@@ -103,7 +103,7 @@ function [image, region, properties, data] = callback(state, data)
 	end;
 
 	% Handle tracker failure
-	if region_overlap(state.region, get_region(data.sequence, data.index) <= data.context.failure_overlap)
+	if region_overlap(state.region, get_region(data.sequence, data.index)) <= data.context.failure_overlap
 		return;
 	end;
 
