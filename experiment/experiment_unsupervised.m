@@ -58,12 +58,15 @@ function [files, metadata] = experiment_unsupervised(tracker, sequence, director
 		data.context = context;
 		data.result = repmat({0}, sequence.length, 1);
 		data.timing = nan(sequence.length, 1);
+        data.properties = properties_create(sequence);
 
 		data = tracker_run(tracker, @callback, data);
 
 	    times(:, i) = data.timing;
 	    write_trajectory(result_file, data.result);
 		csvwrite(time_file, times);
+
+        properties_save(directory, sprintf('%s_%03d', sequence.name, i), data.properties);
 
         print_indent(-1);
     end;
@@ -96,6 +99,8 @@ function [image, region, properties, data] = callback(state, data)
 		data.result{data.index} = state.region;
 	end;
 	data.timing(data.index) = state.time;
+
+    data.properties = properties_set(data.properties, data.index, state.properties);
 
 	data.index = data.index + 1;
 

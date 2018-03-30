@@ -78,13 +78,15 @@ for i = 1:r
     data.result = repmat({0}, sequence.length, 1);
     data.timing = nan(sequence.length, 1);
     data.initialized = false;
+    data.properties = properties_create(sequence);
 
     data = tracker_run(tracker, @callback, data);
 
     times(:, i) = data.timing;
     write_trajectory(result_file, data.result);
     csvwrite(time_file, times);
-
+    properties_save(directory, sprintf('%s_%03d', sequence.name, i), data.properties);
+    
     print_indent(-1);
 end;
 
@@ -124,6 +126,7 @@ previous = data.index;
 current = round(floor(data.time * data.fps) / 1000) + data.offset;
 
 data.timing(previous) = state.time;
+data.properties = properties_set(data.properties, previous, state.properties);
 
 failed = 0;
 

@@ -64,6 +64,7 @@ for i = 1:r
     data.result = repmat({0}, sequence.length, 1);
     data.timing = nan(sequence.length, 1);
     data.initialized = false;
+    data.properties = properties_create(sequence);
 
     data = tracker_run(tracker, @callback, data);
 
@@ -71,6 +72,8 @@ for i = 1:r
     write_trajectory(result_file, data.result);
     csvwrite(time_file, times);
 
+    properties_save(directory, sprintf('%s_%03d', sequence.name, i), data.properties);
+    
     print_indent(-1);
 end;
 
@@ -100,7 +103,8 @@ o = region_overlap(state.region, get_region(data.sequence, data.index), data.bou
 if o(1) <= data.context.failure_overlap
     data.result{data.index} = 2;
     data.timing(data.index) = state.time;
-
+    data.properties = properties_set(data.properties, data.index, state.properties);
+    
     start = data.index + data.context.skip_initialize;
 
     if ~isempty(data.context.skip_tags)
@@ -133,6 +137,7 @@ else
     data.result{data.index} = state.region;
 end;
 data.timing(data.index) = state.time;
+data.properties = properties_set(data.properties, data.index, state.properties);
 
 data.index = data.index + 1;
 
