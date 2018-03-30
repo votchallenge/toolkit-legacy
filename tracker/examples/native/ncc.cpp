@@ -46,6 +46,7 @@
 class NCCTracker
 {
 public:
+
     inline void init(cv::Mat & img, cv::Rect rect)
     {
         p_window = MAX(rect.width, rect.height) * 2;
@@ -69,8 +70,11 @@ public:
         p_size = cv::Size2f(rect.width, rect.height);
 
     }
-    inline cv::Rect track(cv::Mat img)
+
+    inline cv::Rect track(cv::Mat img, float& confidence)
     {
+
+        confidence = 0;
 
         cv::Mat gray;
         cv::cvtColor(img, gray, CV_BGR2GRAY);
@@ -100,7 +104,10 @@ public:
         cv::matchTemplate(cut, p_template, matches, CV_TM_CCOEFF_NORMED);
 
         cv::Point matchLoc;
-        cv::minMaxLoc(matches, NULL, NULL, NULL, &matchLoc, cv::Mat());
+        double matchVal;
+        cv::minMaxLoc(matches, NULL, &matchVal, NULL, &matchLoc, cv::Mat());
+
+        confidence = (float) matchVal;
 
         cv::Rect result;
 
@@ -143,9 +150,11 @@ int main( int argc, char** argv) {
 
         cv::Mat image = cv::imread(imagepath);
 
-        cv::Rect rect = tracker.track(image);
+        float confidence;
 
-        vot.report(rect);
+        cv::Rect rect = tracker.track(image, confidence);
+
+        vot.report(rect, confidence);
 
     }
 

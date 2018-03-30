@@ -328,9 +328,9 @@ public:
         return VOTRegion(_region);
     }
 
-    void report(const VOTRegion& region) {
+    void report(const VOTRegion& region, float confidence = 1) {
 
-        vot_report(region._region);
+        vot_report2(region._region, confidence);
 
     }
 
@@ -358,6 +358,8 @@ private:
     const char* vot_frame();
 
     void vot_report(vot_region* region);
+
+    void vot_report2(vot_region* region, float confidence);
 
     int vot_end();
 
@@ -524,6 +526,24 @@ void VOT_PREFIX(vot_report)(vot_region* region) {
         trax_region* _trax_region = _region_to_trax(region);
         trax_server_reply(_trax_handle, _trax_region, NULL);
         trax_region_release(&_trax_region);
+        return;
+    }
+
+}
+
+/**
+ * Used to report position of the object. This function also advances the
+ * current position.
+ */
+void VOT_PREFIX(vot_report2)(vot_region* region, float confidence) {
+
+    if (_trax_handle) {
+        trax_region* _trax_region = _region_to_trax(region);
+        trax_properties* _trax_properties = trax_properties_create();
+        trax_properties_set_float(_trax_properties, "confidence", confidence);
+        trax_server_reply(_trax_handle, _trax_region, _trax_properties);
+        trax_region_release(&_trax_region);
+        trax_properties_release(&_trax_properties);
         return;
     }
 

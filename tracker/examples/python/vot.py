@@ -52,7 +52,7 @@ def convert_region(region, to):
             left = sys.float_info.max
             right = sys.float_info.min
 
-            for point in region.points: 
+            for point in region.points:
                 top = min(top, point.y)
                 bottom = max(bottom, point.y)
                 left = min(left, point.x)
@@ -61,7 +61,7 @@ def convert_region(region, to):
             return Rectangle(left, top, right - left, bottom - top)
 
         else:
-            return None  
+            return None
     if to == 'polygon':
 
         if isinstance(region, Rectangle):
@@ -75,7 +75,7 @@ def convert_region(region, to):
         elif isinstance(region, Polygon):
             return copy.copy(region)
         else:
-            return None  
+            return None
 
     return None
 
@@ -83,8 +83,8 @@ class VOT(object):
     """ Base class for Python VOT integration """
     def __init__(self, region_format):
         """ Constructor
-        
-        Args: 
+
+        Args:
             region_format: Region format options
         """
         assert(region_format in ['rectangle', 'polygon'])
@@ -105,24 +105,24 @@ class VOT(object):
             self._frame = 0
             self._region = convert_region(parse_region(open('region.txt', 'r').readline()), region_format)
             self._result = []
-        
+
     def region(self):
         """
-        Send configuration message to the client and receive the initialization 
-        region and the path of the first image 
-        
+        Send configuration message to the client and receive the initialization
+        region and the path of the first image
+
         Returns:
-            initialization region 
-        """          
+            initialization region
+        """
 
         return self._region
 
-    def report(self, region):
+    def report(self, region, confidence = 0):
         """
         Report the tracking results to the client
-        
+
         Arguments:
-            region: region for the frame    
+            region: region for the frame
         """
         assert(isinstance(region, Rectangle) or isinstance(region, Polygon))
         if TRAX:
@@ -130,15 +130,15 @@ class VOT(object):
                 tregion = trax.region.Polygon([(x.x, x.y) for x in region.points])
             else:
                 tregion = trax.region.Rectangle(region.x, region.y, region.width, region.height)
-            self._trax.status(tregion)
+            self._trax.status(tregion, {"confidence" : confidence})
         else:
             self._result.append(region)
             self._frame += 1
-        
+
     def frame(self):
         """
-        Get a frame (image path) from client 
-        
+        Get a frame (image path) from client
+
         Returns:
             absolute path of the image
         """
@@ -170,5 +170,5 @@ class VOT(object):
                     f.write('\n')
 
     def __del__(self):
-        self.quit()            
+        self.quit()
 

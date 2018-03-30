@@ -40,7 +40,7 @@ class NCCTracker(object):
 
         self.position = (left + max_loc[0] + float(self.size[0]) / 2, top + max_loc[1] + float(self.size[1]) / 2)
 
-        return vot.Rectangle(left + max_loc[0], top + max_loc[1], self.size[0], self.size[1])
+        return vot.Rectangle(left + max_loc[0], top + max_loc[1], self.size[0], self.size[1]), max_val
 
 handle = vot.VOT("rectangle")
 selection = handle.region()
@@ -56,6 +56,6 @@ while True:
     if not imagefile:
         break
     image = cv2.imread(imagefile, cv2.IMREAD_GRAYSCALE)
-    region = tracker.track(image)
-    handle.report(region)
+    region, confidence = tracker.track(image)
+    handle.report(region, confidence)
 

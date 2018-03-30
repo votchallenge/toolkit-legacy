@@ -92,7 +92,7 @@ function [handle, image] = tracker_frame(handle)
 
 end
 
-function handle = tracker_report(handle, region)
+function handle = tracker_report(handle, region, confidence)
 % tracker_report Report region for current frame and advance
 %
 % This function stores the region for the current frame and advances
@@ -101,6 +101,8 @@ function handle = tracker_report(handle, region)
 % Input:
 % - handle (structure): Communication handle structure.
 % - region (vector): Predicted region as a rectangle or a polygon.
+% - confidence (float): Optional number that indicates confidence of prediction.
+%   Can be on arbitrary scale, higher value means more confidence.
 %
 % Output:
 % - handle (structure): Updated communication handle structure.
@@ -117,7 +119,13 @@ function handle = tracker_report(handle, region)
 		handle.initialization = [];
 	end;
 
-    traxserver('status', region);
+    parameters = struct();
+
+    if nargin > 2
+        parameters = {'confidence', confidence};
+    end
+
+    traxserver('status', region, parameters);
 
 end
 

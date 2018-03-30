@@ -7,23 +7,9 @@ function ncc
 %
 
 % *************************************************************
-% VOT: Always call exit command at the end to terminate Matlab!
-% *************************************************************
-cleanup = onCleanup(@() exit() );
-
-% *************************************************************
 % VOT: Set random seed to a different value every time.
 % *************************************************************
 RandStream.setGlobalStream(RandStream('mt19937ar', 'Seed', sum(clock)));
-
-image = uint8(rand(240, 320, 3) * 255);
-imwrite(image, 'test.jpg');
-image = imread('test.jpg');
-region = [30, 30, 30, 30];
-[state, ~] = ncc_initialize(image, region);
-[state, region] = ncc_update(state, image);
-[state, region] = ncc_update(state, image);
-[state, region] = ncc_update(state, image);
 
 % **********************************
 % VOT: Get initialization data
@@ -45,12 +31,12 @@ while true
     end;
 
 	% Perform a tracking step, obtain new region
-    [state, region] = ncc_update(state, imread(image));
+    [state, region, confidence] = ncc_update(state, imread(image));
 
     % **********************************
     % VOT: Report position for frame
     % **********************************
-    handle = handle.report(handle, region);
+    handle = handle.report(handle, region, confidence);
 
 end;
 
@@ -95,8 +81,9 @@ function [state, location] = ncc_initialize(I, region, varargin)
 
 end
 
-function [state, location] = ncc_update(state, I, varargin)
+function [state, location, confidence] = ncc_update(state, I, varargin)
 
+    confidence = 0;
     gray = double(rgb2gray(I)) ;
 
     [height, width] = size(gray);
@@ -122,7 +109,7 @@ function [state, location] = ncc_update(state, I, varargin)
 
     x1 = x1 + pad(2);
     y1 = y1 + pad(1);
-    [~, imax] = max(C(:));
+    [confidence, imax] = max(C(:));
     [my, mx] = ind2sub(size(C),imax(1));
 
     position = [x1 + mx - state.size(1) / 2, y1 + my - state.size(2) / 2];
