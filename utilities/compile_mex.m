@@ -38,6 +38,8 @@ function [success] = compile_mex(name, files, includes, directory, varargin)
         end;
     end
 
+    mexdebug = get_global_variable('mex_debug', false);
+
     arguments = {};
 
     if is_octave()
@@ -45,6 +47,10 @@ function [success] = compile_mex(name, files, includes, directory, varargin)
     else
         arguments{end+1} = '-lut';
     end
+
+    if mexdebug
+       arguments{end+1} = '-g';
+    end;
 
     if nargin < 3
         includes = cell(0);
@@ -59,7 +65,7 @@ function [success] = compile_mex(name, files, includes, directory, varargin)
     old_dir = pwd;
 
     try
-        
+
         if ~isempty(directory)
             cd(directory)
         end;
@@ -76,11 +82,11 @@ function [success] = compile_mex(name, files, includes, directory, varargin)
                   delete(tmpfile);
                 end
             end
-            
+
             if status
                 error('Compile problem, see compiler output.');
             end;
-            
+
         else
 
             mex('-output', name, varargin{:}, includes{:}, files{:}, arguments{:});
