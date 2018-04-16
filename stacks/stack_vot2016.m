@@ -1,6 +1,6 @@
 function experiments = stack_vot2016()
 
-set_global_variable('bundle', 'http://data.votchallenge.net/vot2016/vot2016.zip');
+set_global_variable('bundle', 'http://data.votchallenge.net/vot2016/dataset/description.json');
 
 baseline.name = 'baseline';
 baseline.converter = [];

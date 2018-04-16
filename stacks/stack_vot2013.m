@@ -1,6 +1,12 @@
 function experiments = stack_vot2013()
 
-set_global_variable('bundle', 'http://data.votchallenge.net/vot2013/vot2013.zip');
+print_text('');
+print_text(' **** Deprecation warning **** ');
+print_text('Note that VOT2013 benchmark is deprecated.');
+print_text('You can still use it, the toolkit may no longer produce results that are the same as in the challenge paper.');
+print_text('');
+
+set_global_variable('bundle', 'http://data.votchallenge.net/vot2013/dataset/description.json');
 set_global_variable('legacy_rasterization', true);
 set_global_variable('bounded_overlap', false);
 
