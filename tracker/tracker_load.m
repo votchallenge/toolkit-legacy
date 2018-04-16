@@ -125,7 +125,7 @@ else
 
     if ~isempty(tracker.command) && ~tracker_test(tracker)
 		error('Tracker has not passed the TraX support test.');
-	end
+    end
 
 	if isstruct(tracker_metadata)
 		tracker.metadata = tracker_metadata;

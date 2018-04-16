@@ -1,5 +1,5 @@
-function handle = generate_trackers_legend(trackers, varargin)
-% generate_ar_plot Generate a tracker legend plot
+function handle = plot_trackers_legend(trackers, varargin)
+% plot_trackers_legend Generate a tracker legend plot
 %
 % The function generates dedicated tracker legend plot. Tracker labels and
 % their symbols are ordered in a grid.
@@ -21,19 +21,19 @@ function handle = generate_trackers_legend(trackers, varargin)
     height = [];
     handle = [];
     sorted = false;
-    
+
     columns = 1;
-    rows = numel(trackers); 
+    rows = numel(trackers);
     visible = false;
 
     for i = 1:2:length(varargin)
-        switch lower(varargin{i})   
+        switch lower(varargin{i})
             case 'width'
                 width = varargin{i+1};
             case 'height'
                 height = varargin{i+1};
             case 'visible'
-                visible = varargin{i+1};                
+                visible = varargin{i+1};
             case 'handle'
                 handle = varargin{i+1};
             case 'columns'
@@ -42,21 +42,21 @@ function handle = generate_trackers_legend(trackers, varargin)
                 rows = varargin{i+1};
             case 'sorted'
                 sorted = varargin{i+1};
-            otherwise 
+            otherwise
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
-    end 
+    end
 
     if isempty(width)
         width = columns;
     end
-    
+
     if isempty(height)
         height = rows / 10;
     end
-    
+
     [Y, X] = meshgrid(1:rows, 1:columns);
-    
+
     if isempty(handle)
         if ~visible
             handle = figure('Visible', 'off');
@@ -67,14 +67,14 @@ function handle = generate_trackers_legend(trackers, varargin)
         figure(handle);
     end;
 
-    hold on; 
+    hold on;
 
     if sorted
         labels = cellfun(@(x) lower(x.label), trackers, 'UniformOutput', false);
         [~, order] = sort(labels);
         trackers = trackers(order);
     end
-    
+
     for t = 1:length(trackers)
 
         plot(X(t), Y(t), trackers{t}.style.symbol, 'Color', ...
@@ -85,15 +85,15 @@ function handle = generate_trackers_legend(trackers, varargin)
         else
             font_color = [0, 0, 0];
         end;
-        
+
         if isfield(trackers{t}.style, 'font_bold')
             font_bold = trackers{t}.style.font_bold;
         else
             font_bold = false;
         end;
-        
+
         args = {'Interpreter', 'none', 'Color', font_color};
-        
+
         if font_bold
            args(end+1:end+2) = {'FontWeight', 'bold'};
         end

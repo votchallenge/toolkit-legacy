@@ -1,5 +1,5 @@
-function handle = generate_plot(varargin)
-% generate_plot Generate an blank plot
+function handle = plot_blank(varargin)
+% plot_blank Generate a blank plot
 %
 % The function creates and configures an new plot that can be then populated.
 %
@@ -18,20 +18,20 @@ function handle = generate_plot(varargin)
 %
 
     plot_title = [];
-    visible = false;    
+    visible = false;
     width = 4;
     height = 4;
     axis_box = true;
     axis_grid = true;
     handle = [];
     axis_settings = {};
-    
+
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
             case 'title'
                 plot_title = varargin{i+1};
             case 'visible'
-                visible = varargin{i+1};    
+                visible = varargin{i+1};
             case 'width'
                 width = varargin{i+1};
             case 'height'
@@ -42,11 +42,11 @@ function handle = generate_plot(varargin)
                 axis_grid = varargin{i+1};
             case 'handle'
                 handle = varargin{i+1};
-            otherwise 
+            otherwise
                 axis_settings{end+1} = varargin{i}; %#ok<AGROW>
                 axis_settings{end+1} = varargin{i+1}; %#ok<AGROW>
         end
-    end 
+    end
 
     if ~isempty(handle) && ishandle(handle)
         if strcmp(get(handle, 'type'),'figure')
@@ -59,7 +59,7 @@ function handle = generate_plot(varargin)
     else
         handle = [];
     end
-    
+
     if isempty(handle)
         if ~visible
             handle = figure('Visible', 'off');
@@ -68,26 +68,26 @@ function handle = generate_plot(varargin)
         end
     end;
 
-    hold on; 
+    hold on;
     if axis_box
-        box on; 
+        box on;
     end;
     if axis_grid
         grid on;
     end
-    
+
     if ~isempty(plot_title)
-        title(plot_title, 'interpreter', 'none'); 
+        title(plot_title, 'interpreter', 'none');
     end;
-    
+
     if ~isempty(axis_settings)
         set(gca, axis_settings{:});
     end;
-    
+
     if strcmp(get(handle, 'type'),'figure')
         set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
     end;
-    
+
     hold off;
-    
+
 end

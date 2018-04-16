@@ -12,6 +12,8 @@ baseline.parameters.burnin = 10;
 baseline.parameters.skip_initialize = 5;
 baseline.parameters.failure_overlap = 0;
 
+baseline.analysis = {'ar', 'expected_overlap', 'speed'};
+
 unsupervised.name = 'unsupervised';
 unsupervised.converter = [];
 unsupervised.type = 'unsupervised';
@@ -19,6 +21,8 @@ unsupervised.tags = {'camera_motion', 'illum_change', 'occlusion', 'size_change'
 
 unsupervised.parameters.repetitions = 1;
 unsupervised.parameters.burnin = 0;
+
+unsupervised.analysis = {'overlap', 'speed'};
 
 experiments = {baseline, unsupervised};
 

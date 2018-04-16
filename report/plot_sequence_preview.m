@@ -1,5 +1,5 @@
-function file = generate_sequence_preview(sequence, trajectories, file, varargin)
-% generate_sequence_preview Generates a sequence preview image
+function file = plot_sequence_preview(sequence, trajectories, file, varargin)
+% plot_sequence_preview Generates a sequence preview image
 %
 % Generates a preview animation for the sequence as an animated GIF.
 %
@@ -34,7 +34,7 @@ groundtruth_color = [0, 1, 0];
 trajectories_colors = repmat([1, 0, 0], length(trajectories), 1);
 
 for i = 1:2:length(varargin)
-    switch lower(varargin{i})   
+    switch lower(varargin{i})
         case 'samples'
             samples = varargin{i+1};
         case 'scale'
@@ -48,17 +48,17 @@ for i = 1:2:length(varargin)
         case 'trajectorycolor'
             trajectories_colors = varargin{i+1};
         case 'palette'
-            palette = max(2, min(256, varargin{i+1})); 
+            palette = max(2, min(256, varargin{i+1}));
         case 'delay'
             delay = max(0, min(655, varargin{i+1}));
         case 'loops'
             loops = max(0, varargin{i+1});
         case 'static'
             static = max(0, varargin{i+1});
-        otherwise 
+        otherwise
             error(['Unknown switch ', varargin{i},'!']) ;
     end
-end 
+end
 
 if size(trajectories_colors, 1) < length(trajectories)
     trajectories_colors = repmat(trajectories_colors(1, :), length(trajectories), 1);
@@ -73,27 +73,27 @@ for i = 1:length(indices)
     image = double(imread(get_image(sequence, indices(i)))) / 255;
 
     if size(image, 3) == 1
-       image = repmat(image, 1, 1, 3); 
+       image = repmat(image, 1, 1, 3);
     end
-    
+
     image = imresize(image, scale);
 
     image_red = image(:, :, 1);
     image_green = image(:, :, 2);
     image_blue = image(:, :, 3);
-    
+
     for t = 1:length(trajectories)
-    
+
         region = trajectories{t}(indices(i), :);
-        
+
         if any(isnan(region))
             continue;
         end;
-        
+
         region = region_convert(region, 'polygon') .* scale;
-    
+
         rasterized = edge(poly2mask(region(1:2:end), region(2:2:end), size(image, 1), size(image, 2)), 'canny');
-        
+
         image_red(rasterized) = trajectories_colors(t, 1);
         image_green(rasterized) = trajectories_colors(t, 2);
         image_blue(rasterized) = trajectories_colors(t, 3);
@@ -101,7 +101,7 @@ for i = 1:length(indices)
     end;
 
     if ~isempty(groundtruth_color)
-    
+
         region = get_region(sequence, indices(i));
 
         region = region_convert(region, 'polygon') .* scale;
@@ -111,11 +111,11 @@ for i = 1:length(indices)
         image_red(rasterized) = groundtruth_color(1);
         image_green(rasterized) = groundtruth_color(2);
         image_blue(rasterized) = groundtruth_color(3);
-    
+
     end;
-    
+
     animation(:, :, i, :) = cat(3, image_red, image_green, image_blue);
-        
+
 end
 
 strip = reshape(animation, size(animation, 1), size(animation, 2) * size(animation, 3), 3);

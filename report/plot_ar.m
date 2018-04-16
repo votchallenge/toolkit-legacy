@@ -1,5 +1,5 @@
-function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
-% generate_ar_plot Generate an A-R plot
+function handle = plot_ar(trackers, accuracy, robustness, varargin)
+% plot_ar Generate an A-R plot
 %
 % The function generates an A-R plot for a sequence of measurements.
 %
@@ -22,16 +22,16 @@ function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
 
     plot_title = [];
     sensitivity = 30;
-    visible = false;    
+    visible = false;
     width = [];
     height = [];
 
     handle = [];
-    
+
     plot_callback = @default_plot_ar;
-    
+
     show_legend = true;
-    
+
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
             case 'title'
@@ -39,7 +39,7 @@ function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
             case 'sensitivity'
                 sensitivity = varargin{i+1};
             case 'visible'
-                visible = varargin{i+1};    
+                visible = varargin{i+1};
             case 'width'
                 width = varargin{i+1};
             case 'height'
@@ -49,11 +49,11 @@ function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
             case 'handle'
                 handle = varargin{i+1};
             case 'legend'
-                show_legend = varargin{i+1};      
-            otherwise 
+                show_legend = varargin{i+1};
+            otherwise
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
-    end 
+    end
 
     if isempty(width)
         width = iff(show_legend, 6, 4);
@@ -74,7 +74,7 @@ function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
     else
         handle = [];
     end
-    
+
     if isempty(handle)
         if ~visible
             handle = figure('Visible', 'off');
@@ -84,9 +84,9 @@ function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
     end;
 
     hold on; box on; grid on;
-    
+
     if ~isempty(plot_title)
-        title(plot_title, 'interpreter', 'none'); 
+        title(plot_title, 'interpreter', 'none');
     end;
     available = true(length(trackers), 1);
 
@@ -98,39 +98,39 @@ function handle = generate_ar_plot(trackers, accuracy, robustness, varargin)
         end;
 
         ar_mean = squeeze(mean([accuracy(:, t, :), robustness(:, t, :)], 1));
-        
+
         if size(ar_mean, 1) == 1
             plot_robustness = exp(-ar_mean(2) * sensitivity);
             plot_accuracy = ar_mean(1);
         else
             plot_robustness = exp(-ar_mean(2, :) * sensitivity);
-            plot_accuracy = ar_mean(1, :);   
-            
+            plot_accuracy = ar_mean(1, :);
+
         end;
-        
+
         plot_callback(plot_robustness, plot_accuracy, ...
                 trackers{t}.style.symbol, trackers{t}.style.color, ...
                 trackers{t}.style.width);
-        
+
     end;
-    
+
     tracker_labels = cellfun(@(x) x.label, trackers, 'UniformOutput', 0);
 
     if show_legend
-        legend(tracker_labels(available), 'Location', 'NorthWestOutside', 'interpreter', 'none'); 
+        legend(tracker_labels(available), 'Location', 'NorthWestOutside', 'interpreter', 'none');
     end;
-    
+
     xlabel(sprintf('Robustness (S = %.2f)', sensitivity));
     ylabel('Accuracy');
-    xlim([0, 1]); 
+    xlim([0, 1]);
     ylim([0, 1]);
 
     if strcmp(get(handle, 'type'),'figure')
         set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
     end;
-    
+
     hold off;
-    
+
 end
 
 function default_plot_ar(robustness, accuracy, symbol, color, width)

@@ -1,5 +1,5 @@
-function document = create_document(context, name, varargin)
-% create_document Create a document handle
+function document = document_create(context, name, varargin)
+% document_create Create a document handle
 %
 % Create a handle structure for a new HTML document that resides in a given report.
 %
@@ -16,13 +16,13 @@ function document = create_document(context, name, varargin)
 title = name;
 
 for i = 1:2:length(varargin)
-    switch lower(varargin{i}) 
+    switch lower(varargin{i})
         case 'title'
             title = varargin{i+1};
-        otherwise 
+        otherwise
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
-end 
+end
 
 temporary_file = tempname;
 temporary_metadata = [tempname, '.mat'];
@@ -81,7 +81,7 @@ function write_report_document(document)
 
     resources = struct2cell(metadata.resources);
     head_tokens = cell(numel(resources), 1);
-    
+
     for i = 1:numel(resources)
         url = resources{i}.url;
 
@@ -91,7 +91,7 @@ function write_report_document(document)
             case 'css'
                 head_tokens{i} = sprintf('<link rel="stylesheet" type="text/css" href="%s"/>\n', url);
             otherwise
-                head_tokens{i} = '';   
+                head_tokens{i} = '';
         end;
 
     end;
@@ -101,23 +101,23 @@ function write_report_document(document)
     else
         head = strjoin(head_tokens, '');
     end;
-    
+
     version = toolkit_version();
 
     generate_from_template(document.target_file, document.template_file, ...
         'body', fileread(document.temporary_file), 'title', document.title, ...
-        'timestamp', datestr(now, 31), 'head', head, ... 
+        'timestamp', datestr(now, 31), 'head', head, ...
         'toolkit', sprintf('VOT toolkit %d.%d', version.major, version.minor));
-    
+
     delete(document.temporary_file);
     delete(document.temporary_metadata);
-    
+
 end
 
 function insert_section(document, text)
 
     fprintf(document.fid, '<h2>%s</h2>', text);
-    
+
 end
 
 function insert_subsection(document, text)
@@ -149,7 +149,7 @@ function insert_table(context, document, data, varargin)
     document.include('js', 'jquery.export.js');
 
     fprintf(document.fid, '<div class="table-wrapper">');
-    
+
     matrix2html(data, document.fid, varargin{:}, 'class', 'table');
 
     fprintf(document.fid, '</div>');
@@ -163,7 +163,7 @@ function include_resource(context, document, type, name)
     if ~exist(resource_source, 'file')
         return;
     end;
-    
+
     metadata = struct('resources', struct());
 
     if exist(document.temporary_metadata, 'file')
@@ -174,8 +174,8 @@ function include_resource(context, document, type, name)
     resource_id = strrep(strrep(strrep(resource_id, '/', '_'), '.', '_'), '-', '_');
 
         if ~isfield(metadata.resources, resource_id)
-            
-                
+
+
         if context.standalone
 
             resource_destination = fullfile(context.root, 'resources', type, name);
@@ -191,20 +191,20 @@ function include_resource(context, document, type, name)
 
             resource_relative = relativepath(resource_source, context.root);
 
-        end  
+        end
 
             if ispc()
                 resource_url = strrep(resource_relative, '\', '/');
             else
                 resource_url = resource_relative;
             end;
-            
+
             metadata.resources.(resource_id) = struct('type', type, 'name', name, 'url', resource_url);
             save(document.temporary_metadata, 'metadata');
         end;
 
 
-    
+
 end
 
 function insert_figure(context, fid, handle, id, title)
@@ -221,15 +221,15 @@ function insert_figure(context, fid, handle, id, title)
     end;
 
     if context.exportraw
-            
+
         file = export_figure(handle, fullfile(context.raw, [context.prefix, id]), 'fig', 'cache', context.cache);
-        
+
         % Hack : try to fix potential figure invisibility
         try
             f = load(file, '-mat');
             n = fieldnames(f);
             f.(n{1}).properties.Visible = 'on';
-            save(file, '-struct', 'f'); 
+            save(file, '-struct', 'f');
         catch e
             print_debug('Warning: unable to fix figure visibility: %s', e.message);
         end;
@@ -242,5 +242,5 @@ function insert_figure(context, fid, handle, id, title)
         context.imagesurl, context.prefix, id, title, data, title);
 
     fprintf(fid, '</div>\n');
-    
+
 end

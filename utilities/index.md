@@ -21,6 +21,7 @@ Module functions
 -   [plotc](plotc.m) - Plot closed polygon
 -   [sfigure](sfigure.m) - Silently creates a figure window
 -   [export_figure](export_figure.m) - Export a figure to various formats
+-   [tight_subplots](tight_subplots.m) - Initializes a grid of axes
 
 ### General
 

@@ -1,5 +1,5 @@
-function handle = generate_ordering_plot(trackers, values, criteria, varargin)
-% generate_ordering_plot Generate a per-selector ordering plot.
+function handle = plot_ordering(trackers, values, criteria, varargin)
+% plot_ordering Generate a per-selector ordering plot.
 %
 % Generate a per-selector ordering plot for either accuracy of robustness
 % for a set of criteria.
@@ -32,15 +32,15 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
     show_legend = 1;
     visible = false;
     handle = [];
-    
+
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
             case 'title'
-                plot_title = varargin{i+1}; 
+                plot_title = varargin{i+1};
             case 'visible'
-                visible = varargin{i+1}; 
+                visible = varargin{i+1};
             case 'normalized'
-                normalized = varargin{i+1};      
+                normalized = varargin{i+1};
             case 'width'
                 width = varargin{i+1};
             case 'height'
@@ -50,15 +50,15 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
             case 'type'
                 type = varargin{i+1};
             case 'flip'
-                flip = varargin{i+1}; 
+                flip = varargin{i+1};
             case 'handle'
                 handle = varargin{i+1};
             case 'legend'
                 show_legend = varargin{i+1};
-            otherwise 
+            otherwise
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
-    end 
+    end
 
     if isempty(handle)
         if ~visible
@@ -75,16 +75,16 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
     hold on; grid on; box on;
 
     phandles = zeros(1, length(trackers));
-    
+
     if ~normalized
-    
+
         for t = 1:length(trackers)
 
             x = values(:, t);
 
             c = rgb2hsv(trackers{t}.style.color); c(2) = 0.3;
             c = hsv2rgb(c);
-            
+
             plot(x, 1:length(criteria), '--', ...
                 'Color', c, 'LineWidth', trackers{t}.style.width);
 
@@ -98,12 +98,12 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
                 'Color', trackers{t}.style.color, 'MarkerSize', 10,  'LineWidth', trackers{t}.style.width);
 
         end;
-        
+
         if ~isempty(plot_title)
             title(plot_title,'interpreter','none');
         end;
     else
-       
+
         for t = 1:length(trackers)
 
             x = mod(find(I' == t)-1, length(trackers))+1;
@@ -117,12 +117,12 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
             title([plot_title, '(normalized)'],'interpreter', 'none');
         end;
     end;
-    
+
     plot_labels = cellfun(@(tracker) tracker.label, trackers, 'UniformOutput', 0);
     if show_legend
-        legend(phandles, plot_labels, 'Location', 'NorthEastOutside', 'interpreter', 'none'); 
+        legend(phandles, plot_labels, 'Location', 'NorthEastOutside', 'interpreter', 'none');
     end;
-    xlabel(type); 
+    xlabel(type);
     set(gca,'ytick', 1:numel(criteria),'yticklabel', criteria, 'YDir','Reverse', 'ylim', [0.9, numel(criteria)+0.1]);
     set(gca,'xtick', floor(scope(1)):ceil(scope(2)), 'xlim', scope + [-1, 1] * (diff(scope) / 100));
 
@@ -131,7 +131,7 @@ function handle = generate_ordering_plot(trackers, values, criteria, varargin)
     end;
     set(gca, 'LineWidth', 2);
     hold off;
-    
+
     set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
 
-    
+

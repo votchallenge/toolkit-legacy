@@ -14,6 +14,8 @@ baseline.parameters.burnin = 10;
 baseline.parameters.skip_initialize = 5;
 baseline.parameters.failure_overlap = 0;
 
+baseline.analysis = {'ar', 'expected_overlap', 'speed'};
+
 experiments = {baseline};
 
 end

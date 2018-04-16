@@ -1,5 +1,5 @@
-function result = report_cache(context, identifier, fun, varargin)
-% report_cache Cache proxy for report generation
+function result = document_cache(context, identifier, fun, varargin)
+% document_cache Cache proxy for report generation
 %
 % Can be used with report context to cache results of a certain function.
 %
@@ -15,8 +15,8 @@ function result = report_cache(context, identifier, fun, varargin)
 cache_file = fullfile(context.cachedir, sprintf('%s.mat', identifier));
 
 result = {};
-if exist(cache_file, 'file')         
-    load(cache_file);       
+if exist(cache_file, 'file')
+    load(cache_file);
 end;
 
 if isempty(result)
@@ -24,7 +24,7 @@ if isempty(result)
     clear result;
 
     result = fun(varargin{:});
-    
+
     save(cache_file, 'result');
 
 end;

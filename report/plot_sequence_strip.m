@@ -1,5 +1,5 @@
-function handle = generate_sequence_strip(sequence, trajectories, varargin)
-% generate_ar_plot Generate an preview of a sequence as a strip of frames
+function handle = plot_sequence_strip(sequence, trajectories, varargin)
+% plot_sequence_strip Generate an preview of a sequence as a strip of frames
 %
 % The function generates dedicated tracker legend plot. Tracker labels and
 % their symbols are ordered in a grid.
@@ -32,9 +32,9 @@ trajectories_colors = mat2cell(repmat([1, 0, 0], length(trajectories), 1), ...
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'handle'
-            handle = varargin{i+1}; 
+            handle = varargin{i+1};
         case 'visible'
-            visible = varargin{i+1};    
+            visible = varargin{i+1};
         case 'window'
             window = varargin{i+1};
         case 'samples'
@@ -42,17 +42,17 @@ for i = 1:2:length(varargin)
         case 'scale'
             scale = varargin{i+1};
         case 'framenumbers'
-            frame_numbers = varargin{i+1};            
+            frame_numbers = varargin{i+1};
         case 'groundtruthcolor'
             groundtruth_color = varargin{i+1};
         case 'trajectorycolor'
             trajectories_colors = varargin{i+1};
         case 'trajectorymarkers'
-            trajectories_markers = varargin{i+1};            
-        otherwise 
+            trajectories_markers = varargin{i+1};
+        otherwise
             error(['Unknown switch ', varargin{i},'!']) ;
     end
-end 
+end
 
 if numel(samples) > 1
     indices = samples(samples > 0 & samples <= sequence.length);
@@ -94,7 +94,7 @@ for i = 1:length(indices)
 	end;
 
     axes(handles(i)); %#ok<LAXES>
-    
+
     if ~visible
         set(handle, 'Visible', 'off');
     end;
@@ -104,11 +104,11 @@ for i = 1:length(indices)
     imshow(uint8(patch));
 
     hold on;
-    
+
     for t = 1:length(trajectories)
-    
+
         region = trajectories{t}{indices(i)};
-        
+
         if numel(region) < 2;
             continue;
         end;
@@ -116,7 +116,7 @@ for i = 1:length(indices)
         region = region_offset(region, -offset);
 
         draw_region(region, trajectories_colors{t}, 2);
-        
+
         if ~isempty(trajectories_markers)
             bounds = region_convert(region, 'rectangle');
             center = bounds(1:2) + bounds(3:4) / 2;
@@ -124,11 +124,11 @@ for i = 1:length(indices)
             plot(center(1), center(2), trajectories_markers{t}, 'MarkerSize', 7, 'LineWidth', 1.5, 'Color', trajectories_colors{t});
 
         end;
-        
+
     end;
 
     if ~isempty(groundtruth_color)
-    
+
         region = get_region(sequence, indices(i));
 
         region = region_offset(region, -offset);
@@ -136,12 +136,12 @@ for i = 1:length(indices)
         draw_region(region, groundtruth_color, 2);
 
     end;
-    
+
     if frame_numbers
         text(10, 10, sprintf('%d', indices(i)), 'Color', 'w', 'BackgroundColor', [0, 0, 0]);
-        
+
     end;
-    
+
     hold off;
 end
 

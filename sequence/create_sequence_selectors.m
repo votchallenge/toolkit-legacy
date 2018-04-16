@@ -25,27 +25,6 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
     aggregated_overlap = [];
     aggregated_failures = [];
 
-
-    cache = get_global_variable('cache_selectors', true);
-
-    if cache
-
-        result_hash = calculate_results_fingerprint(tracker, experiment, {sequence});
-
-        cache_directory = fullfile(get_global_variable('directory'), 'cache', 'selectors', tracker.identifier, experiment.name);
-        mkpath(cache_directory);
-
-        cache_file = fullfile(cache_directory, sprintf('sequence-%s-%s.mat', sequence.name, result_hash));
-
-        if exist(cache_file, 'file')
-            load(cache_file);
-            if ~isempty(aggregated_overlap) && ~isempty(aggregated_failures)
-                return;
-            end;
-        end;
-
-    end;
-
     repeat = experiment.parameters.repetitions;
     burnin = experiment.parameters.burnin;
 
@@ -90,9 +69,6 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
     failures(isnan(failures)) = nanmean(failures);
     aggregated_failures = failures';
 
-    if cache
-        save(cache_file, 'aggregated_overlap', 'aggregated_failures');
-    end;
 end
 
 function [count, partial] = count_frames(sequences, i)

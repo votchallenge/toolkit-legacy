@@ -10,9 +10,5 @@ error('Analysis not configured! Please edit run_analysis.m file.'); % Remove thi
 
 trackers = tracker_list('{{tracker}}', 'TODO'); % TODO: add more trackers here
 
-context = create_report_context('report_{{stack}}_{{tracker}}');
+workspace_analyze(experiments, trackers, sequences);
 
-report_article(context, experiments, trackers, sequences, 'spotlight', '{{tracker}}'); % This report is more suitable for results included in a paper
-
-% report_challenge(context, experiments, trackers, sequences); % Use this report for official challenge report
-% report_visualization(context, experiments, trackers, sequences);  % Use this report to generate images of visual (bounding box) results of trackers

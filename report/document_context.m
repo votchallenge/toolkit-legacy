@@ -1,5 +1,5 @@
-function context = create_report_context(name, varargin)
-% create_report_context Create report context structure
+function context = document_context(name, varargin)
+% document_context Create report context structure
 %
 % Creates a new report context structure that can be used to generate
 % report documents.
@@ -24,7 +24,7 @@ standalone = true;
 cache = false;
 
 for i = 1:2:length(varargin)
-    switch lower(varargin{i}) 
+    switch lower(varargin{i})
         case 'title'
             title = varargin{i+1};
         case 'figureeps'
@@ -35,10 +35,10 @@ for i = 1:2:length(varargin)
             standalone = varargin{i+1};
         case 'cache'
             cache = varargin{i+1};
-        otherwise 
+        otherwise
             error(['Unknown switch ', varargin{i}, '!']) ;
     end
-end 
+end
 
 
 context.root = fullfile(get_global_variable('directory'), 'reports', name);

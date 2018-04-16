@@ -1,5 +1,5 @@
-function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
-% analyze_ranks Performs ranking analysis
+function [result] = analyze_accuracy_robustness(experiment, trackers, sequences, varargin)
+% analyze_accuracy_robustness Performs ranking analysis
 %
 % Performs ranking analysis for a given experiment on a set trackers and sequences.
 %
@@ -7,6 +7,7 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 % - experiment (structure): A valid experiment structures.
 % - trackers (cell): A cell array of valid tracker descriptor structures.
 % - sequences (cell): A cell array of valid sequence descriptor structures.
+% - varargin[Ranking] (boolean): Perform ranking analysis, used by default.
 % - varargin[Tags] (cell): An array of tag names that should be used
 % instead of sequences.
 % - varargin[UsePractical] (boolean): Use practical difference for accuracy.
@@ -18,20 +19,24 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 % - result (structure): A structure with the following fields
 %     - accuracy
 %          - values: average overlap matrix
-%          - ranks: accuracy ranks matrix
+%          - ranks: accuracy ranks matrix (if applicable)
 %     - robustness
 %          - values: number of failures matrix
-%          - ranks: robustness ranks matrix
+%          - normalized: number of failures matrix (normalized)
+%          - ranks: robustness ranks matrix (if applicable)
 %     - lengths: number of frames for individual selectors
 %     - tags: names of individual selectors
 
     usepractical = false;
+    ranking = true;
     tags = {};
 	adaptation = 'mean';
     alpha = 0.05;
 
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
+            case 'ranking'
+                ranking = varargin{i+1} ;
             case 'tags'
                 tags = varargin{i+1} ;
             case 'usepractical'
@@ -76,7 +81,12 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
     end;
 
-    [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers, ...
+    if ~ranking
+        % Disable ranking
+        alpha = -1;
+    end;
+    
+    [accuracy, robustness, lengths] = trackers_ar(experiment, trackers, ...
         experiment_sequences, selectors, alpha, usepractical, adaptation);
 
     result = struct('accuracy', accuracy, 'robustness', robustness, 'lengths', lengths);
@@ -86,20 +96,20 @@ function [result] = analyze_ranks(experiment, trackers, sequences, varargin)
 
 end
 
-function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers, ...
+function [accuracy, robustness, lengths] = trackers_ar(experiment, trackers, ...
     sequences, selectors, alpha, usepractical, adaptation)
 
     N_trackers = length(trackers) ;
     N_selectors = length(selectors) ;
 
-    % initialize accuracy outputs
     accuracy.values = zeros(N_selectors, N_trackers);
-    accuracy.ranks = zeros(N_selectors, N_trackers);
-
-    % initialize robustness outputs
     robustness.values = zeros(N_selectors, N_trackers);
     robustness.normalized = zeros(N_selectors, N_trackers);
-    robustness.ranks = zeros(N_selectors, N_trackers);
+    
+    if alpha > 0
+        accuracy.ranks = zeros(N_selectors, N_trackers);
+        robustness.ranks = zeros(N_selectors, N_trackers);
+    end;
 
     lengths = zeros(N_selectors, 1);
 
@@ -113,30 +123,32 @@ function [accuracy, robustness, lengths] = trackers_ranking(experiment, trackers
         [average_overlap, average_failures, average_failurerate, HA, HR, available] = ...
             trackers_raw_scores_selector(experiment, trackers, sequences, selectors{a}, alpha, usepractical);
 
-        [~, order_by_accuracy] = sort(average_overlap(available), 'descend');
-        accuracy_ranks = ones(size(available)) * length(available);
-        [~, accuracy_ranks(available)] = sort(order_by_accuracy, 'ascend') ;
-
-        [~, order_by_robustness] = sort(average_failures(available), 'ascend');
-        robustness_ranks = ones(size(available)) * length(available);
-        [~, robustness_ranks(available)] = sort(order_by_robustness,'ascend');
-
-        % get adapted ranks
-        adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA, adaptation);
-        adapted_robustness_ranks = adapted_ranks(robustness_ranks, HR, adaptation);
-
-        % mask out results that are not available
-	    adapted_accuracy_ranks(~available) = nan;
-	    adapted_robustness_ranks(~available) = nan;
-
-        % write results to output structures
         accuracy.values(a, :) = average_overlap;
-        accuracy.ranks(a, :) = adapted_accuracy_ranks;
-
         robustness.values(a, :) = average_failures;
         robustness.normalized(a, :) = average_failurerate;
-        robustness.ranks(a, :) = adapted_robustness_ranks;
+        
+        if alpha > 0
+        
+            [~, order_by_accuracy] = sort(average_overlap(available), 'descend');
+            accuracy_ranks = ones(size(available)) * length(available);
+            [~, accuracy_ranks(available)] = sort(order_by_accuracy, 'ascend') ;
 
+            [~, order_by_robustness] = sort(average_failures(available), 'ascend');
+            robustness_ranks = ones(size(available)) * length(available);
+            [~, robustness_ranks(available)] = sort(order_by_robustness,'ascend');
+
+            % get adapted ranks
+            adapted_accuracy_ranks = adapted_ranks(accuracy_ranks, HA, adaptation);
+            adapted_robustness_ranks = adapted_ranks(robustness_ranks, HR, adaptation);
+
+            % mask out results that are not available
+            adapted_accuracy_ranks(~available) = nan;
+            adapted_robustness_ranks(~available) = nan;
+            accuracy.ranks(a, :) = adapted_accuracy_ranks;
+            robustness.ranks(a, :) = adapted_robustness_ranks;
+
+        end;
+            
         lengths(a) = selectors{a}.length(sequences);
 
 	    print_indent(-1);
@@ -160,7 +172,7 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
 
     available = true(length(trackers), 1);
 
-    if usepractical
+    if alpha > 0 && usepractical
         practical = selector.practical(sequences);
     else
         practical = [];
@@ -174,7 +186,7 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
 		print_text('Processing tracker %s ...', trackers{t1}.identifier);
 
         if isempty(cacheA{t1})
-            [O1, F1] = selector.aggregate(experiment, trackers{t1}, sequences);
+            [O1, F1] = calculate_accuracy_overlap(selector, experiment, trackers{t1}, sequences);
             cacheA{t1} = O1; cacheR{t1} = F1;
         else
             O1 = cacheA{t1}; F1 = cacheR{t1};
@@ -196,11 +208,11 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
         % F1 ... fragments (rows) x repeats (columns) of raw failure count.
 
         % Average accuracy is average over valid frames (non NaN).
-	if all(valid_frames == 0)
-		average_accuracy(t1) = 0;
-	else
-		average_accuracy(t1) = mean(O1(valid_frames));
-	end;
+        if all(valid_frames == 0)
+            average_accuracy(t1) = 0;
+        else
+            average_accuracy(t1) = mean(O1(valid_frames));
+        end;
 
         % Average failures are sum of failures in fragments averaged over
         % repetitions
@@ -210,40 +222,43 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
         % total length of selector, averaged over repetitions
         average_failurerate(t1) = mean(sum(F1, 1) ./ sum(lengths));
 
-        for t2 = t1+1:length(trackers)
+        if alpha > 0
+        
+            for t2 = t1+1:length(trackers)
 
-            if isempty(cacheA{t1})
-                [O1, F1] = selector.aggregate(experiment, trackers{t1}, sequences);
-                cacheA{t1} = O1; cacheR{t1} = F1;
-            else
-                O1 = cacheA{t1}; F1 = cacheR{t1};
+                if isempty(cacheA{t1})
+                    [O1, F1] = calculate_accuracy_overlap(selector, experiment, trackers{t1}, sequences);
+                    cacheA{t1} = O1; cacheR{t1} = F1;
+                else
+                    O1 = cacheA{t1}; F1 = cacheR{t1};
+                end;
+
+                if isempty(cacheA{t2})
+                    [O2, F2] = calculate_accuracy_overlap(selector, experiment, trackers{t2}, sequences);
+                    cacheA{t2} = O2; cacheR{t2} = F2;
+                else
+                    O2 = cacheA{t2}; F2 = cacheR{t2};
+                end;
+
+                if isempty(O2)
+                    available(t2) = false;
+                    continue;
+                end
+
+                % If alpha is 0 then we disable the equivalence testing
+                if alpha == 0
+
+                    ha = true; hr = true;
+
+                else
+
+                    [ha, hr] = test_significance(O1, F1, O2, F2, alpha, practical);
+
+                end;
+
+                HA(t1, t2) = ha; HA(t2, t1) = HA(t1, t2);
+                HR(t1, t2) = hr; HR(t2, t1) = HR(t1, t2);
             end;
-
-            if isempty(cacheA{t2})
-                [O2, F2] = selector.aggregate(experiment, trackers{t2}, sequences);
-                cacheA{t2} = O2; cacheR{t2} = F2;
-            else
-                O2 = cacheA{t2}; F2 = cacheR{t2};
-            end;
-
-            if isempty(O2)
-                available(t2) = false;
-                continue;
-            end
-
-            % If alpha is 0 then we disable the equivalence testing
-            if alpha <= 0
-
-                ha = true; hr = true; hp = 0;
-
-            else
-
-                [ha, hr] = test_significance(O1, F1, O2, F2, alpha, practical);
-
-            end;
-
-            HA(t1, t2) = ha; HA(t2, t1) = HA(t1, t2);
-            HR(t1, t2) = hr; HR(t2, t1) = HR(t1, t2);
         end;
     end;
 
@@ -252,6 +267,57 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
     average_accuracy(isnan(average_accuracy)) = 0;
 
 
+end
+
+function [aggregated_overlap, aggregated_failures] = calculate_accuracy_overlap(selector, experiment, tracker, sequences)
+
+    aggregated_overlap = [];
+    aggregated_failures = [];
+    
+    burnin = experiment.parameters.burnin;
+    
+    groundtruth = selector.aggregate_groundtruth(experiment, sequences);
+    trajectories = selector.aggregate_results(experiment, tracker, sequences);
+    
+    repeat = experiment.parameters.repetitions;
+    
+    for s = 1:numel(groundtruth)
+    
+        accuracy = nan(repeat, length(groundtruth{s}));
+        failures = nan(repeat, 1);
+        
+        for r = 1:size(trajectories, 2)
+        
+            if isempty(trajectories{s, r})
+                continue;
+            end;
+            
+            [~, frames] = estimate_accuracy(trajectories{s, r}, groundtruth{s}, 'burnin', burnin, 'BindWithin', [sequences{s}.width, sequences{s}.height]);
+
+            accuracy(r, :) = frames;
+
+            failures(r) = estimate_failures(trajectories{s, r}, groundtruth{s});
+
+        end;
+        
+        frames = num2cell(accuracy, 1);
+        sequence_overlaps = cellfun(@(frame) nanmean(frame), frames);
+
+        failures(isnan(failures)) = nanmean(failures);
+        sequence_failures = failures';
+
+        if ~isempty(sequence_overlaps)
+            aggregated_overlap = [aggregated_overlap, sequence_overlaps]; %#ok<AGROW>
+        end;
+
+        if ~isempty(sequence_failures)
+            aggregated_failures = [aggregated_failures; sequence_failures]; %#ok<AGROW>
+        end;
+        
+    end;
+    
+    aggregated_failures = aggregated_failures(~isnan(aggregated_failures(:, 1)), :);
+    
 end
 
 function [ha, hr, hp] = test_significance(A1, R1, A2, R2, alpha, practical)

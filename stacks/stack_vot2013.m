@@ -13,6 +13,7 @@ baseline.parameters.repetitions = 15;
 baseline.parameters.burnin = 10;
 baseline.parameters.skip_initialize = 5;
 baseline.parameters.failure_overlap = 0;
+baseline.analysis = {'ar_rank', 'speed'};
 
 region_noise.name = 'region_noise';
 region_noise.converter = @(sequence) sequence_transform_initialization(...
@@ -24,6 +25,7 @@ region_noise.parameters.repetitions = 15;
 region_noise.parameters.burnin = 10;
 region_noise.parameters.skip_initialize = 5;
 region_noise.parameters.failure_overlap = 0;
+region_noise.analysis = {'ar_rank', 'speed'};
 
 grayscale.name = 'grayscale';
 grayscale.converter = 'sequence_grayscale';
@@ -34,6 +36,7 @@ grayscale.parameters.repetitions = 15;
 grayscale.parameters.burnin = 10;
 grayscale.parameters.skip_initialize = 5;
 grayscale.parameters.failure_overlap = 0;
+grayscale.analysis = {'ar_rank', 'speed'};
 
 experiments = {baseline, region_noise, grayscale};
 

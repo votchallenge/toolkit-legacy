@@ -1,5 +1,5 @@
-function handle = generate_ranking_plot(trackers, accuracy, robustness, varargin)
-% generate_ar_plot Generate an A-R ranking plot
+function handle = plot_ranking(trackers, accuracy, robustness, varargin)
+% plot_ranking Generate an A-R ranking plot
 %
 % The function generates an A-R ranking plot for a sequence of measurements.
 %
@@ -20,7 +20,7 @@ function handle = generate_ranking_plot(trackers, accuracy, robustness, varargin
 %
 
     plot_title = [];
-    visible = false; 
+    visible = false;
     plot_limit = numel(trackers);
     width = [];
     height = [];
@@ -28,7 +28,7 @@ function handle = generate_ranking_plot(trackers, accuracy, robustness, varargin
     handle = [];
 
     show_legend = true;
-    
+
     for i = 1:2:length(varargin)
         switch lower(varargin{i})
             case 'title'
@@ -36,7 +36,7 @@ function handle = generate_ranking_plot(trackers, accuracy, robustness, varargin
             case 'limit'
                 plot_limit = varargin{i+1};
             case 'visible'
-                visible = varargin{i+1};    
+                visible = varargin{i+1};
             case 'width'
                 width = varargin{i+1};
             case 'height'
@@ -44,11 +44,11 @@ function handle = generate_ranking_plot(trackers, accuracy, robustness, varargin
             case 'handle'
                 handle = varargin{i+1};
             case 'legend'
-                show_legend = varargin{i+1};                    
-            otherwise 
+                show_legend = varargin{i+1};
+            otherwise
                 error(['Unknown switch ', varargin{i},'!']) ;
         end
-    end 
+    end
 
     if isempty(handle)
         if ~visible
@@ -86,13 +86,13 @@ function handle = generate_ranking_plot(trackers, accuracy, robustness, varargin
     end;
     plot_labels = cellfun(@(tracker) tracker.label, trackers, 'UniformOutput', 0);
     if show_legend
-        legend(plot_labels(available), 'Location', 'NorthWestOutside', 'interpreter', 'none', 'FontSize', 9); 
+        legend(plot_labels(available), 'Location', 'NorthWestOutside', 'interpreter', 'none', 'FontSize', 9);
     end;
     xlabel('Robustness rank'); set(gca, 'XDir', 'Reverse');
     ylabel('Accuracy rank'); set(gca, 'YDir', 'Reverse');
     xlim([0.9, plot_limit + 0.1]);
     ylim([0.9, plot_limit + 0.1]);
-    
+
     set(handle, 'PaperUnits', 'inches', 'PaperSize', [width, height], 'PaperPosition', [0, 0, width, height]);
-    
+
     hold off;
