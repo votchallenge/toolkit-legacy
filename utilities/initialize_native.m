@@ -123,7 +123,12 @@ if ~exist(trax_header, 'file')
     mkdir(trax_dir);
     bundle = [tempname, '.zip'];
     try
-        urlwrite(trax_url, bundle);
+        % Avoid certificate problems with Matlab
+        if is_octave()
+            urlwrite(trax_url, bundle);
+        else
+            websave(bundle, trax_url);
+        end
         unzip(bundle, working_directory);
         delete(bundle);
         copyfile(fullfile(working_directory, sprintf('trax-%s', trax_branch), '*'), trax_dir);
