@@ -3,7 +3,7 @@ The VOT evaluation kit
 
 This repository contains the official evaluation kit for the [Visual Object Tracking (VOT) challenge](http://votchallenge.net/). The repository contains the actual evaluation toolkit as a set of Matlab (Octave compatible) scripts, a documentation and a set of integration examples for different programming languages.
 
-For more detailed informations consult the documentation available in the source or a compiled version of the documentation [here](http://box.vicos.si/vot/toolkit/docs/). You can also subscribe to the VOT [mailing list](https://service.ait.ac.at/mailman/listinfo/votchallenge) to receive news about challenges and important software updates or join our [support form](https://groups.google.com/forum/?hl=en#!forum/votchallenge-help) to ask questions.
+For more detailed informations consult the documentation available in the source or a compiled version of the documentation [here](http://www.votchallenge.net/howto/). You can also subscribe to the VOT [mailing list](https://service.ait.ac.at/mailman/listinfo/votchallenge) to receive news about challenges and important software updates or join our [support form](https://groups.google.com/forum/?hl=en#!forum/votchallenge-help) to ask questions.
 
 Click [here](http://toolkit.votchallenge.net) to browse and download the latest official releases of the toolkit.
 
