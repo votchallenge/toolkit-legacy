@@ -122,7 +122,7 @@ function handle = tracker_report(handle, region, confidence)
     parameters = struct();
 
     if nargin > 2
-        parameters = {'confidence', confidence};
+        parameters.confidence = confidence;
     end
 
     traxserver('status', region, parameters);
