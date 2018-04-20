@@ -72,12 +72,12 @@ function [result] = analyze_accuracy_robustness(experiment, trackers, sequences,
 
         tags = unique(tags); % Remove any potential duplicates.
 
-        selectors = create_tag_selectors(experiment, ...
+        selectors = sequence_tag_selectors(experiment, ...
             experiment_sequences, tags);
 
     else
 
-        selectors = create_sequence_selectors(experiment, experiment_sequences);
+        selectors = sequence_selectors(experiment, experiment_sequences);
 
     end;
 
@@ -173,7 +173,8 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
     available = true(length(trackers), 1);
 
     if alpha > 0 && usepractical
-        practical = selector.practical(sequences);
+        practical = selector.groundtruth_values(sequences, 'practical');
+        practical = cat(1, practical{:});
     else
         practical = [];
     end
@@ -276,8 +277,8 @@ function [aggregated_overlap, aggregated_failures] = calculate_accuracy_overlap(
     
     burnin = experiment.parameters.burnin;
     
-    groundtruth = selector.aggregate_groundtruth(experiment, sequences);
-    trajectories = selector.aggregate_results(experiment, tracker, sequences);
+    groundtruth = selector.groundtruth(sequences);
+    trajectories = selector.results(experiment, tracker, sequences);
     
     repeat = experiment.parameters.repetitions;
     

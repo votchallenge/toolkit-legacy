@@ -44,12 +44,12 @@ function [result] = analyze_overlap(experiment, trackers, sequences, varargin)
 
         tags = unique(tags); % Remove any potential duplicates.
 
-        selectors = create_tag_selectors(experiment, ...
+        selectors = sequence_tag_selectors(experiment, ...
             experiment_sequences, tags);
 
     else
 
-        selectors = create_sequence_selectors(experiment, experiment_sequences);
+        selectors = sequence_selectors(experiment, experiment_sequences);
 
     end;
 
@@ -81,8 +81,8 @@ function [curve, auc] = calculate_auc(selector, experiment, tracker, sequences, 
 
     aggregated_overlap = [];
 
-    groundtruth = selector.aggregate_groundtruth(experiment, sequences);
-    trajectories = selector.aggregate_results(experiment, tracker, sequences);
+    groundtruth = selector.groundtruth(sequences);
+    trajectories = selector.results(experiment, tracker, sequences);
 
     repeat = experiment.parameters.repetitions;
     burnin = experiment.parameters.burnin;

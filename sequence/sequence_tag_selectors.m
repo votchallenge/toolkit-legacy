@@ -1,5 +1,5 @@
-function selectors = create_tag_selectors(experiment, sequences, tags) %#ok<INUSL>
-% create_tag_selectors Create per-tag selector
+function selectors = sequence_tag_selectors(experiment, sequences, tags) %#ok<INUSL>
+% sequence_tag_selectors Create per-tag selector
 %
 % Create a set of selectors for a set of tags upon a set of sequences.
 %
@@ -14,18 +14,18 @@ function selectors = create_tag_selectors(experiment, sequences, tags) %#ok<INUS
 
     selectors = cellfun(@(tag) struct('name', sprintf('tag_%s', tag), ...
         'title', tag, ...
-        'aggregate_groundtruth', @(experiment, sequences) groundtruth_for_tag(experiment, sequences, tag), ...
-        'aggregate_results', @(experiment, tracker, sequences) results_for_tag(experiment, tracker, sequences, tag), ...
-        'aggregate_results_values', @(experiment, tracker, sequences, value) ...
+        'groundtruth', @(sequences) groundtruth_for_tag(sequences, tag), ...
+        'groundtruth_values', @(sequences, value) groundtruth_value_for_tag(sequences, tag, value), ...
+        'results', @(experiment, tracker, sequences) results_for_tag(experiment, tracker, sequences, tag), ...
+        'results_values', @(experiment, tracker, sequences, value) ...
         result_values_for_tag(experiment, tracker, sequences, tag, value), ...
-        'practical', @(sequences) practical_for_tag(sequences, tag), ...
         'length', @(sequences) count_for_tag(sequences, tag)), ...
         tags, 'UniformOutput', false);
 
 end
 
 
-function [groundtruth] = groundtruth_for_tag(experiment, sequences, tag)
+function [groundtruth] = groundtruth_for_tag(sequences, tag)
 
     groundtruth = cell(numel(sequences), 1);
 
@@ -115,17 +115,41 @@ function [results] = result_values_for_tag(experiment, tracker, sequences, tag, 
         
         for j = 1:repeat
 
-            result_file = fullfile(directory, sprintf('%s_%03d.txt', sequences{s}.name, j));
+            values_file = fullfile(directory, sprintf('%s_%03d_%s.value', sequences{s}.name, j, value));
 
+            data = nan(groundtruth.length, 1);
+            
+            i = 0;
+            
             try
-                trajectory = read_trajectory(result_file);
-                
-                if (size(results{s, j}, 1) < size(groundtruth, 1))
-                    %print_debug('Warning: Trajectory too short. Expanding with empty frames.');
-                    trajectory(end+1:length(groundtruth)) = {0};
+                fp = fopen(values_file, 'r');
+
+                while true
+                     line = fgets(fp);
+
+                     if line == -1
+                         break;
+                     end
+
+                     [value, numeric] = str2num(line(1:end-1)); %#ok<ST2NM>
+
+                     if ~numeric
+                        value = line(1:end-1); 
+                     end
+
+                     i = i + 1;
+                     
+                     if isempty(value) 
+                         continue;
+                     end;
+
+                     data(i) = value;
+
                 end;
+
+                fclose(fp);
                 
-                results{s, j} = trajectory(filter);
+                results{s, j} = data(filter);
                 
             catch
                 continue;
@@ -159,9 +183,9 @@ function [count, partial] = count_for_tag(sequences, tag)
 end
 
 
-function practical = practical_for_tag(sequences, tag)
+function values = groundtruth_value_for_tag(sequences, tag, value)
 
-    practical = [];
+    values = cell(numel(sequences), 1);
 
     for s = 1:length(sequences)
 
@@ -171,11 +195,7 @@ function practical = practical_for_tag(sequences, tag)
             continue;
         end;
 
-        p = get_frame_value(sequences{s}, 'practical', filter);
-
-        if ~isempty(p)
-            practical = [practical; p]; %#ok<AGROW>
-        end;
+        values{s} = get_frame_value(sequences{s}, value, filter);
 
     end;
 

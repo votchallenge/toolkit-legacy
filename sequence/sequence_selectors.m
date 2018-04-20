@@ -1,5 +1,5 @@
-function selectors = create_sequence_selectors(experiment, sequences) %#ok<INUSL>
-% create_sequence_selectors Create per-sequence selectors
+function selectors = sequence_selectors(experiment, sequences) %#ok<INUSL>
+% sequence_selectors Create per-sequence selectors
 %
 % Creates a set of selectors for a given set of sequences where each selector corresponds to a single selector.
 %
@@ -13,20 +13,37 @@ function selectors = create_sequence_selectors(experiment, sequences) %#ok<INUSL
 
     selectors = cellfun(@(sequence, i) struct('name', sprintf('sequence_%s', sequence.name), ...
         'title', sequence.name, ...
-        'aggregate', @(experiment, tracker, sequences) ...
-        aggregate_for_sequence(experiment, tracker, sequence), ...
-        'practical', @(sequences) get_frame_value(sequence, 'practical'), 'length', @(sequences) count_frames(sequences, i)), ...
+        'groundtruth', @(sequences) groundtruth_for_sequence(sequences, i), ...
+        'groundtruth_values', @(sequences, value) groundtruth_value_for_sequence(sequences, i, value), ...
+        'results', @(experiment, tracker, sequences) results_for_sequence(experiment, tracker, sequences, i), ...
+        'results_values', @(experiment, tracker, sequences, value) ...
+        result_values_for_sequence(experiment, tracker, sequences, i, value), ...
+        'length', @(sequences) count_frames(sequences, i)), ...
         sequences, num2cell(1:length(sequences)), 'UniformOutput', false);
 
 end
 
-function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(experiment, tracker, sequence)
+function groundtruth = groundtruth_for_sequence(sequences, i)
 
-    aggregated_overlap = [];
-    aggregated_failures = [];
+    groundtruth = cell(numel(sequences), 1);
+    
+    groundtruth{i} = sequences{i}.groundtruth;
+
+end
+
+function groundtruth = groundtruth_value_for_sequence(sequences, i, value)
+
+    groundtruth = cell(numel(sequences), 1);
+    
+    groundtruth{i} = get_frame_value(sequences{i}, value);
+
+end
+
+function results = results_for_sequence(experiment, tracker, sequences, i)
 
     repeat = experiment.parameters.repetitions;
-    burnin = experiment.parameters.burnin;
+
+    results = cell(numel(sequences), repeat);
 
     if ~exist(fullfile(tracker.directory, experiment.name), 'dir')
         print_debug('Warning: Results not available %s', tracker.identifier);
@@ -37,12 +54,9 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
 
     directory = fullfile(tracker.directory, experiment.name, sequence.name);
 
-    accuracy = nan(repeat, sequence.length);
-    failures = nan(repeat, 1);
-
     for j = 1:repeat
 
-        result_file = fullfile(directory, sprintf('%s_%03d.txt', sequence.name, j));
+        result_file = fullfile(directory, sprintf('%s_%03d.txt', sequences{i}.name, j));
 
         try
             trajectory = read_trajectory(result_file);
@@ -55,19 +69,70 @@ function [aggregated_overlap, aggregated_failures] = aggregate_for_sequence(expe
             trajectory(end+1:length(groundtruth)) = {0};
         end;
 
-        [~, frames] = estimate_accuracy(trajectory, groundtruth, 'burnin', burnin, 'BindWithin', [sequence.width, sequence.height]);
-
-        accuracy(j, :) = frames;
-
-        failures(j) = estimate_failures(trajectory, sequence);
+        results{i, j} = trajectory;
 
     end;
 
-    frames = num2cell(accuracy, 1);
-    aggregated_overlap = cellfun(@(frame) nanmean(frame), frames);
+end
 
-    failures(isnan(failures)) = nanmean(failures);
-    aggregated_failures = failures';
+function values = result_values_for_sequence(experiment, tracker, sequences, s, value)
+
+    repeat = experiment.parameters.repetitions;
+
+    values = cell(numel(sequences), repeat);
+
+    if ~exist(fullfile(tracker.directory, experiment.name), 'dir')
+        print_debug('Warning: Results not available %s', tracker.identifier);
+        return;
+    end;
+
+    groundtruth = sequence.groundtruth;
+
+    directory = fullfile(tracker.directory, experiment.name, sequences{s}.name);
+
+    for j = 1:repeat
+
+        values_file = fullfile(directory, sprintf('%s_%03d_%s.value', sequences{s}.name, j, value));
+
+        data = nan(groundtruth.length, 1);
+
+        i = 0;
+
+        try
+            fp = fopen(values_file, 'r');
+
+            while true
+                 line = fgets(fp);
+
+                 if line == -1
+                     break;
+                 end
+
+                 [value, numeric] = str2num(line(1:end-1)); %#ok<ST2NM>
+
+                 if ~numeric
+                    value = line(1:end-1); 
+                 end
+
+                 i = i + 1;
+
+                 if isempty(value) 
+                     continue;
+                 end;
+
+                 data(i) = value;
+
+            end;
+
+            fclose(fp);
+
+            values{s, j} = data(filter);
+
+        catch
+            continue;
+        end;
+
+    end;
 
 end
 
