@@ -109,15 +109,13 @@ function [results] = result_values_for_tag(experiment, tracker, sequences, tag, 
             continue;
         end;
 
-        groundtruth = sequences{s}.groundtruth;
-
         directory = fullfile(tracker.directory, experiment.name, sequences{s}.name);
         
         for j = 1:repeat
 
             values_file = fullfile(directory, sprintf('%s_%03d_%s.value', sequences{s}.name, j, value));
 
-            data = nan(groundtruth.length, 1);
+            data = nan(sequences{s}.length, 1);
             
             i = 0;
             
@@ -131,19 +129,19 @@ function [results] = result_values_for_tag(experiment, tracker, sequences, tag, 
                          break;
                      end
 
-                     [value, numeric] = str2num(line(1:end-1)); %#ok<ST2NM>
+                     [v, numeric] = str2num(line(1:end-1)); %#ok<ST2NM>
 
                      if ~numeric
-                        value = line(1:end-1); 
+                        v = line(1:end-1); 
                      end
 
                      i = i + 1;
                      
-                     if isempty(value) 
+                     if isempty(v) 
                          continue;
                      end;
 
-                     data(i) = value;
+                     data(i) = v;
 
                 end;
 
@@ -152,6 +150,7 @@ function [results] = result_values_for_tag(experiment, tracker, sequences, tag, 
                 results{s, j} = data(filter);
                 
             catch
+                results{s, j} = nan(numel(filter), 1);
                 continue;
             end;
 

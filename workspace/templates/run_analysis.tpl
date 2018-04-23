@@ -10,5 +10,5 @@ error('Analysis not configured! Please edit run_analysis.m file.'); % Remove thi
 
 trackers = tracker_list('{{tracker}}', 'TODO'); % TODO: add more trackers here
 
-workspace_analyze(experiments, trackers, sequences);
+workspace_analyze(trackers, sequences, experiments, 'report_{{tracker}}', 'Title', 'Report for {{stack}}');
 

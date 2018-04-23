@@ -50,9 +50,9 @@ function results = results_for_sequence(experiment, tracker, sequences, i)
         return;
     end;
 
-    groundtruth = sequence.groundtruth;
+    groundtruth = sequences{i}.groundtruth;
 
-    directory = fullfile(tracker.directory, experiment.name, sequence.name);
+    directory = fullfile(tracker.directory, experiment.name, sequences{i}.name);
 
     for j = 1:repeat
 
@@ -86,15 +86,13 @@ function values = result_values_for_sequence(experiment, tracker, sequences, s, 
         return;
     end;
 
-    groundtruth = sequence.groundtruth;
-
     directory = fullfile(tracker.directory, experiment.name, sequences{s}.name);
 
     for j = 1:repeat
 
         values_file = fullfile(directory, sprintf('%s_%03d_%s.value', sequences{s}.name, j, value));
 
-        data = nan(groundtruth.length, 1);
+        data = nan(sequences{s}.length, 1);
 
         i = 0;
 
@@ -108,25 +106,25 @@ function values = result_values_for_sequence(experiment, tracker, sequences, s, 
                      break;
                  end
 
-                 [value, numeric] = str2num(line(1:end-1)); %#ok<ST2NM>
+                 [v, numeric] = str2num(line(1:end-1)); %#ok<ST2NM>
 
                  if ~numeric
-                    value = line(1:end-1); 
+                    v = line(1:end-1); 
                  end
 
                  i = i + 1;
 
-                 if isempty(value) 
+                 if isempty(v) 
                      continue;
                  end;
 
-                 data(i) = value;
+                 data(i) = v;
 
             end;
 
             fclose(fp);
 
-            values{s, j} = data(filter);
+            values{s, j} = data;
 
         catch
             continue;
