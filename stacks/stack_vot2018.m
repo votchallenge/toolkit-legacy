@@ -1,6 +1,6 @@
-function experiments = stack_vot2016()
+function experiments = stack_vot2018()
 
-set_global_variable('bundle', 'http://data.votchallenge.net/vot2016/main/description.json');
+set_global_variable('bundle', 'http://data.votchallenge.net/vot2018/main/description.json');
 
 baseline.name = 'baseline';
 baseline.converter = [];
@@ -24,7 +24,22 @@ unsupervised.parameters.burnin = 0;
 
 unsupervised.analysis = {'overlap', 'speed'};
 
-experiments = {baseline, unsupervised};
+realtime.name = 'realtime';
+realtime.converter = [];
+realtime.type = 'realtime';
+realtime.tags = {'camera_motion', 'illum_change', 'occlusion', 'size_change', 'motion_change', 'empty'};
+
+realtime.parameters.repetitions = 1;
+realtime.parameters.default_fps = 20;
+realtime.parameters.grace = 3;
+realtime.parameters.burnin = 10;
+realtime.parameters.override_fps = true;
+realtime.parameters.skip_initialize = 5;
+realtime.parameters.realtime_type = 'real';
+
+realtime.analysis = {'expected_overlap'};
+
+experiments = {baseline, unsupervised, realtime};
 
 end
 
