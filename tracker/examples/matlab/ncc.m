@@ -9,7 +9,15 @@ function ncc
 % *************************************************************
 % VOT: Set random seed to a different value every time.
 % *************************************************************
-RandStream.setGlobalStream(RandStream('mt19937ar', 'Seed', sum(clock)));
+try
+    % Simple check for Octave environment
+    OCTAVE_VERSION;
+    rand("seed", sum(clock));
+    pkg load image;
+catch
+    RandStream.setGlobalStream(RandStream('mt19937ar', 'Seed', sum(clock)));
+end
+
 
 % **********************************
 % VOT: Get initialization data
