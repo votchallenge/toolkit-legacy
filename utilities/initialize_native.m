@@ -107,7 +107,7 @@ function success = download_trax_source(trax_dir)
 
 trax_branch = get_global_variable('trax_source_branch', 'master');
 
-trax_url = get_global_variable('trax_url', sprintf('https://github.com/votchallenge/trax/archive/%s.zip', trax_branch));
+trax_url = get_global_variable('trax_url', sprintf('https://codeload.github.com/votchallenge/trax/zip/%s.zip', trax_branch));
 
 if isempty(trax_url)
     success = false;
@@ -123,12 +123,7 @@ if ~exist(trax_header, 'file')
     mkdir(trax_dir);
     bundle = [tempname, '.zip'];
     try
-        % Avoid certificate problems with Matlab
-        if is_octave()
-            urlwrite(trax_url, bundle);
-        else
-            websave(bundle, trax_url);
-        end
+        urlwrite(trax_url, bundle);
         unzip(bundle, working_directory);
         delete(bundle);
         copyfile(fullfile(working_directory, sprintf('trax-%s', trax_branch), '*'), trax_dir);
