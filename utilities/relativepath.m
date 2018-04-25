@@ -17,7 +17,6 @@ function  relative_path = relativepath( target_path, root_path )
 % - relative_path (string): Relative path.
 %
 
-
 % 2nd parameter is optional:
 if  nargin < 2
    root_path = cd;
@@ -34,13 +33,14 @@ if  isempty(target_path)  ||   ~isequal(target_path(end),filesep)
    target_path = [target_path filesep];
 end
 
+[root_path] = fileparts(root_path);
+[target_path] = fileparts(target_path);
+
 if isunix()
-	[root_path] = fileparts(root_path);
-	[target_path] = fileparts(target_path);
+    compare = @strcmp;
 else
-	% Convert to all lowercase:
-	[root_path] = fileparts(lower(root_path));
-	[target_path] = fileparts(lower(target_path));
+    % File names are not case-sensitive on Windows
+	compare = @strcmpi;
 end;
 
 % Create a cell-array containing the directory levels:
@@ -48,10 +48,10 @@ act_path_cell = pathparts(root_path);
 tgt_path_cell = pathparts(target_path);
 
 % If volumes are different, return absolute path:
-if  isempty(act_path_cell)  ||   isempty(tgt_path_cell)
+if  isempty(act_path_cell)  || isempty(tgt_path_cell)
    return  % rel_path = ''
 else
-   if  ~isequal( act_path_cell{1} , tgt_path_cell{1} )
+   if ~compare( act_path_cell{1} , tgt_path_cell{1} )
       relative_path = target_path;
       return
    end
@@ -59,7 +59,7 @@ end
 
 % Remove level by level, as long as both are equal:
 while  ~isempty(act_path_cell) > 0   &&   ~isempty(tgt_path_cell)
-   if  isequal( act_path_cell{1}, tgt_path_cell{1} )
+   if  compare( act_path_cell{1}, tgt_path_cell{1} )
       act_path_cell(1) = [];
       tgt_path_cell(1) = [];
    else
@@ -80,22 +80,24 @@ end
 % Start with '.' or '..' :
 if  isempty(relative_path)
    relative_path = ['.', filesep];
-elseif  ~isequal(relative_path(1),'.')
+elseif  ~compare(relative_path(1),'.')
    relative_path = fullfile('.', relative_path);
 end
 
 return
 
-% -------------------------------------------------
+end
 
 function  path_cell = pathparts(path_str)
 
 path_str = [filesep path_str filesep];
-path_cell = {};
 
-sep_pos = findstr( path_str, filesep );
+sep_pos = strfind(path_str, filesep);
+path_cell = cell(length(sep_pos)-1, 1);
 for i = 1 : length(sep_pos)-1
-   path_cell{i} = path_str( sep_pos(i)+1 : sep_pos(i+1)-1 );
+   path_cell{i} = path_str( sep_pos(i)+1 : sep_pos(i+1)-1);
 end
 
 return
+
+end
