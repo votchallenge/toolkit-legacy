@@ -59,15 +59,7 @@ function workspace_submit(tracker, sequences, experiments, varargin)
     files = cellfun(@(f) relativepath(f, rootdir), context.files, 'UniformOutput', false);
 
     print_indent(-1);
-    
-    print_text('Generating submission report ...');
-    
-    print_indent(1);
-    
-    report = report_submission(create_report_context(sprintf('submission_%s', tracker.identifier)), tracker, sequences, experiments);
-
-    print_indent(-1);
-    
+        
     try    
         
         print_text('Generating results archive, compressing %d files ...', numel(files));
@@ -81,7 +73,6 @@ function workspace_submit(tracker, sequences, experiments, varargin)
         print_text('');
         print_text('The submission material is now ready.');
         print_text('You can find the archive with raw results in %s.', resultfile);
-        print_text('The report with basic results can be found in %s.', report.target_file);
         print_text('You can copy the tables in the report to the supporting document of the submission.');
         print_text('Submit the archive and the document using the online form.');
         print_text('');
