@@ -1,4 +1,4 @@
-function out_sequence = sequence_redetection(sequence, varargin)
+function out_sequence = sequence_test_redetection(sequence, varargin)
 
 new_length = 200;
 init_frames = 5;
@@ -7,10 +7,10 @@ enlarge_image_factor = 3;
 
 for j=1:2:length(varargin)
     switch lower(varargin{j})
-        case 'new_length', new_length = varargin{j+1};
-        case 'init_frames', init_frames = varargin{j+1};
-        case 'pad', pad = varargin{j+1};
-        case 'enlarge_image_factor', enlarge_image_factor = varargin{j+1};
+        case 'length', new_length = varargin{j+1};
+        case 'initialization', init_frames = varargin{j+1};
+        case 'padding', pad = varargin{j+1};
+        case 'scaling', enlarge_image_factor = varargin{j+1};
         otherwise, error(['unrecognized argument ' varargin{j}]);
     end
 end
@@ -62,7 +62,7 @@ for i = 1:sequence_length
         gt_new{i} = gt_redet;
         images_new{i} = 'redet_image.jpg';
     end
-    
+
 end;
 
 out_sequence = sequence;

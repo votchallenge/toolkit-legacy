@@ -2,27 +2,20 @@ function experiments = stack_votlt2018()
 
 set_global_variable('bundle', 'http://data.votchallenge.net/vot2018/longterm/description.json');
 
-longterm.name = 'longterm';
-longterm.converter = [];
-longterm.type = 'unsupervised';
-longterm.tags = {};
+baseline.name = 'longterm';
+baseline.converter = [];
+baseline.type = 'unsupervised';
+baseline.tags = {};
 
-longterm.parameters.repetitions = 1;
-longterm.parameters.burnin = 0;
+baseline.parameters.repetitions = 1;
+baseline.parameters.burnin = 0;
 
-longterm.analysis = {'overlap', 'speed'};
-
-% redetection experiment
-% parameter for frame modification
-new_length = 200;
-init_frames = 5;
-pad = 2;
-enlarge_image_factor = 3;
+baseline.analysis = {'precision_recall', 'speed'};
 
 redetect.name = 'redetection';
-redetect.converter = @(sequence) sequence_redetection(sequence, ...
-    'new_length',new_length, 'init_frames',init_frames, 'pad',pad, ...
-    'enlarge_image_factor',enlarge_image_factor);
+redetect.converter = @(sequence) sequence_test_redetection(sequence, ...
+    'Length', 200, 'Initialization', 5, 'Padding',2, ...
+    'Scaling', 3);
 
 redetect.type = 'unsupervised';
 redetect.tags = {};
@@ -32,8 +25,7 @@ redetect.parameters.burnin = 0;
 
 redetect.analysis = {'overlap', 'speed'};
 
-
-experiments = {redetect, longterm};
+experiments = {redetect, baseline};
 
 end
 
