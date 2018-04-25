@@ -100,7 +100,7 @@ scores.order = {'descending'};
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
 
-print_text('Writing tracking precition-recall table ...');
+print_text('Writing tracking precision-recall table ...');
 
 document.section('Experiment %s', experiment.name);
 

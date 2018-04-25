@@ -51,7 +51,7 @@ column_labels = cat(2, cellfun(@(x) x.name, sequences, 'UniformOutput', false), 
 
 document.subsection('Raw FPS');
 
-tabledata = num2cell(cat(2, squeeze(speed.original), averaged_original'));
+tabledata = num2cell(cat(2, reshape(squeeze(speed.original), numel(trackers), numel(sequences)), averaged_original'));
 tabledata = highlight_best_rows(tabledata, repmat({'descend'}, 1, numel(sequences)+1));
 
 document.table(tabledata, 'columnLabels', column_labels, 'rowLabels', tracker_labels);
