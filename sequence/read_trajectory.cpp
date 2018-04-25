@@ -46,9 +46,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 			line++;
 
-			ifs.getline(line_buffer, line_size);
-
-			if (!ifs.good()) break;
+			if (!ifs.getline(line_buffer, line_size)) break;
 
 			region_container* region = NULL;
 
