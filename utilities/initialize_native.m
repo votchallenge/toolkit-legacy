@@ -107,7 +107,7 @@ function success = download_trax_source(trax_dir)
 
 trax_branch = get_global_variable('trax_source_branch', 'master');
 
-trax_url = get_global_variable('trax_url', sprintf('https://codeload.github.com/votchallenge/trax/zip/%s.zip', trax_branch));
+trax_url = get_global_variable('trax_url', sprintf('https://codeload.github.com/votchallenge/trax/zip/%s', trax_branch));
 
 if isempty(trax_url)
     success = false;
