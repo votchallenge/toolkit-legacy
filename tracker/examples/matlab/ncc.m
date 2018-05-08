@@ -12,7 +12,7 @@ function ncc
 try
     % Simple check for Octave environment
     OCTAVE_VERSION;
-    rand("seed", sum(clock));
+    rand('seed', sum(clock));
     pkg load image;
 catch
     RandStream.setGlobalStream(RandStream('mt19937ar', 'Seed', sum(clock)));
