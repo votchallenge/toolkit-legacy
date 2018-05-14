@@ -35,7 +35,7 @@ end
 
 document = document_create(context, 'expected_overlap', 'title', 'Expected overlap analysis');
 
-if ~strcmp(experiment.type, 'supervised')
+if ~strcmp(experiment.type, 'supervised') && ~strcmp(experiment.type, 'realtime')
    error('EAO analysis only suitable for supervised experiments!');
 end
 
