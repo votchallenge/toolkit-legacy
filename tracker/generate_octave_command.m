@@ -37,6 +37,6 @@ end
 
 argument_string = strjoin(octave_flags, ' ');
 
-octave_script = sprintf('try; diary ''runtime.log''; %s%s; catch ex; disp(ex.message); for i = 1:size(ex.stack) disp(''filename''); disp(ex.stack(i).file); disp(''line''); disp(ex.stack(i).line); endfor; quit; end;', path_string, script);
+octave_script = sprintf('try; diary ''runtime.log''; %s%s; catch ex; disp(ex.message); for i = 1:size(ex.stack) disp(''filename''); disp(ex.stack(i).file); disp(''line''); disp(ex.stack(i).line); endfor; end; quit;', path_string, script);
 
 command = sprintf('%s %s --eval "%s"', octave_executable, argument_string, octave_script);
