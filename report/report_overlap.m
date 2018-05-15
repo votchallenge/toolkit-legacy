@@ -95,7 +95,7 @@ document.section('Experiment %s', experiment.name);
 overlap_plot(document, sprintf('%s_average', experiment.name), ...
     sprintf('Experiment %s (average)', experiment.name), ...
     trackers, result.thresholds, ...
-    squeeze(average_curve), hidelegend);
+    reshape(average_curve, numel(trackers), numel(result.thresholds)), hidelegend);
 
 table_data = highlight_best_rows(num2cell(cat(2, tag_auc, average_auc)), repmat({'descending'}, 1, size(tag_auc, 2) + 1));
 
@@ -120,7 +120,8 @@ for t = 1:size(tag_curve, 2)
         selector_tags{t}, experiment.name);
     plot_id = sprintf('overlap_%s_%s', experiment.name, selector_tags{t});
 
-    overlap_plot(document, plot_id, plot_title, trackers, result.thresholds, squeeze(tag_curve(:, t, :)), ~hidelegend);
+    overlap_plot(document, plot_id, plot_title, trackers, result.thresholds, ...
+        reshape(tag_curve(:, t, :), numel(trackers), numel(result.thresholds)), ~hidelegend);
 
 end;
 
