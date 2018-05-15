@@ -16,7 +16,7 @@ function [document, scores] = report_expected_overlap(context, experiment, track
 % - document (structure): Resulting document structure.
 % - scores (matrix): Averaged EAO scores.
 
-usetags = get_global_variable('report_tags', true);
+usetags = false;
 usepractical = false;
 hidelegend = get_global_variable('report_legend_hide', false);
 
