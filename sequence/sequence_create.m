@@ -148,7 +148,7 @@ for file = tagfiles
         data(end+1:sequence.length) = 0;
     end;
 
-    sequence.tags.names{end+1} = file.name(1:end-6);
+    sequence.tags.names{end+1} = file.name(1:max(strfind(file.name, '.'))-1);
     tagdata = cat(2, tagdata, data > 0);
 
 end;
