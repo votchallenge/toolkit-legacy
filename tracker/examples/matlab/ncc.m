@@ -127,7 +127,12 @@ function [state, location, confidence] = ncc_update(state, I, varargin)
     x1 = x1 + pad(2);
     y1 = y1 + pad(1);
     [confidence, imax] = max(C(:));
-    [my, mx] = ind2sub(size(C),imax(1));
+    if isempty(imax)
+        mx = 0;
+        my = 0;
+    else
+        [my, mx] = ind2sub(size(C),imax(1));
+    end
 
     position = [x1 + mx - state.size(1) / 2, y1 + my - state.size(2) / 2];
 
