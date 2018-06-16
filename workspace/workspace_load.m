@@ -198,6 +198,8 @@ if current_timestamp > previous_timestamp + check_interval
     fd = fopen(timestamp_file, 'w'); fprintf(fd, '%f', current_timestamp); fclose(fd);
 
     if updated
+        version = toolkit_version();
+        version = sprintf('%d.%d.%d', version.major, version.minor, version.patch);
         print_text('');
         print_text('***************************************************************************');
         print_text('');
