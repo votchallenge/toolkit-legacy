@@ -35,6 +35,8 @@ for i = 1:r
 
     if cache && exist(result_file, 'file')
         files{end+1} = result_file; %#ok<AGROW>
+        values = dir(fullfile(directory, sprintf('%s_%03d_*.value', sequence.name, i)));
+        files(end+1:end+length(values)) = cellfun(@(x) fullfile(directory, x.name), num2cell(values), 'UniformOutput', false);
         continue;
     end;
 
@@ -73,7 +75,11 @@ for i = 1:r
     csvwrite(time_file, times);
 
     properties_save(directory, sprintf('%s_%03d', sequence.name, i), data.properties);
-    
+
+    files{end+1} = result_file; %#ok<AGROW>
+    values = dir(fullfile(directory, sprintf('%s_%03d_*.value', sequence.name, i)));
+    files(end+1:end+length(values)) = cellfun(@(x) fullfile(directory, x.name), num2cell(values), 'UniformOutput', false);
+
     print_indent(-1);
 end;
 

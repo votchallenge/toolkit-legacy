@@ -1,6 +1,5 @@
 function [files, metadata] = experiment_chunked(tracker, sequence, directory, parameters, scan)
 
-    scan = false;
     files = {};
     metadata.completed = true;
     cache = get_global_variable('experiment.cache', true);
@@ -34,6 +33,8 @@ function [files, metadata] = experiment_chunked(tracker, sequence, directory, pa
 
         if cache && exist(result_file, 'file')
             files{end+1} = result_file; %#ok<AGROW>
+            values = dir(fullfile(directory, sprintf('%s_%03d_*.value', sequence.name, i)));
+            files(end+1:end+length(values)) = cellfun(@(x) fullfile(directory, x.name), num2cell(values), 'UniformOutput', false);
             continue;
         end;
 
@@ -78,6 +79,10 @@ function [files, metadata] = experiment_chunked(tracker, sequence, directory, pa
 		write_trajectory(result_file, trajectory);
 		csvwrite(time_file, times);
 
+        files{end+1} = result_file; %#ok<AGROW>
+        values = dir(fullfile(directory, sprintf('%s_%03d_*.value', sequence.name, i)));
+        files(end+1:end+length(values)) = cellfun(@(x) fullfile(directory, x.name), num2cell(values), 'UniformOutput', false);
+        
         print_indent(-1);
     end;
 
