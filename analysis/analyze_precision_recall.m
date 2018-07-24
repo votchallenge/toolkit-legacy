@@ -106,16 +106,21 @@ function [thresholds] = determine_thresholds(experiment, tracker, sequences, res
             end;
 
             certanty(i:i+size(values{s, r})-1, r) = values{s, r};
+            i = i + size(values{s, r});
 
         end;
     end;
     
-    thresholds = unique(certanty(~isnan(certanty)));
+    thresholds = sort(certanty(~isnan(certanty)));
     
     if numel(thresholds) > resolution
         delta = floor(numel(thresholds) / (resolution - 2));
         idxs = round(linspace(delta, numel(thresholds)-delta, resolution-2));
         thresholds = thresholds(idxs);
+    end
+    
+    if isempty(thresholds)
+        thresholds = ones(resolution-2, 1);
     end
     
     thresholds = [-Inf; thresholds; Inf];
@@ -164,7 +169,9 @@ function [curve, fmeasure, fbest] = calculate_tpr_fscore(selector, experiment, t
             frames(isnan(frames)) = 0;
             
             overlaps(i:i+size(groundtruth{s})-1, r) = frames;
-            certanty(i:i+size(groundtruth{s})-1, r) = values{s, r};
+            if ~isempty(values{s, r})
+                certanty(i:i+size(groundtruth{s})-1, r) = values{s, r};
+            end
 
         end;
 
@@ -179,7 +186,7 @@ function [curve, fmeasure, fbest] = calculate_tpr_fscore(selector, experiment, t
        thresholds = certanty(~isnan(certanty));
     end
     
-    thresholds = sort(thresholds, iff(confidence_inverse, 'descend', 'ascend')); 
+    thresholds = sort(thresholds, iff(confidence_inverse, 'ascend', 'descend'));
     
     curve = zeros(numel(thresholds), 3);
     
