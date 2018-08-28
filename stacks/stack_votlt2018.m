@@ -23,7 +23,7 @@ redetect.tags = {};
 redetect.parameters.repetitions = 1;
 redetect.parameters.burnin = 0;
 
-redetect.analysis = {'overlap', 'speed'};
+redetect.analysis = {'redetection'};
 
 experiments = {redetect, baseline};
 
