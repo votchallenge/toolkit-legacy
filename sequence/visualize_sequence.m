@@ -13,6 +13,43 @@ print_text('Press arrow keys or S,D,F,G to navigate the sequence, Q to quit.');
 
 fh = figure;
 
+run = true;
+i = 1;
+
+  function getposition(src, ~)
+      xyz = get(src, 'CurrentPoint');
+      i = min(max(round(xyz(1,1)), 1), sequence.length);
+  end
+
+  function getkey(src, ~)
+      c = get(src, 'CurrentKey');
+          if c == ' ' || c == 'f' || uint8(c) == 29
+              i = i + 1;
+              if i > sequence.length
+                  i = sequence.length;
+              end;
+          elseif c == 'd' || uint8(c) == 28
+              i = i - 1;
+              if i < 1
+                  i = 1;
+              end;
+          elseif c == 'g' || uint8(c) == 30
+              i = i + 10;
+              if i > sequence.length
+                  i = sequence.length;
+              end;
+          elseif c == 's' || uint8(c) == 31
+              i = i - 10;
+              if i < 1
+                  i = 1;
+              end;
+          elseif c == 'q' || c == -1
+              run = false;
+          else
+              disp(uint8(c));
+          end
+  end
+
 if ~isempty(sequence.tags.names)
 
     names = sequence.tags.names;
@@ -31,17 +68,20 @@ if ~isempty(sequence.tags.names)
     starts = cellfun(@(x) find(diff([0; x; 0]) > 0), tagsplit, 'UniformOutput', 0);
     ends = cellfun(@(x) find(diff([0; x; 0]) < 0), tagsplit, 'UniformOutput', 0);
 
+
     subplot(2,1,2);
     hold on;
-    generate_timeline(names, starts, ends);
-    set(gca,'xlim',[0 sequence.length]);
+    plot_timeline(names, starts, ends);
+    set(gca, 'xlim',[0 sequence.length]);
+    set(gca, 'ButtonDownFcn', @getposition);
+    set(gcf, 'KeyPressFcn', @getkey);
+    
     slider = line([1 1], [0 numel(names)+1], 'LineWidth', 3, 'Color', [0 0 0 ]);
     hold off;
 
 end;
 
-i = 1;
-while 1
+while run
     image_path = get_image(sequence, i);
     image = imread(image_path);
     hf = sfigure(fh);
@@ -72,43 +112,21 @@ while 1
     if ~isempty(sequence.tags.names)
         set(slider, 'XData', [i i]);
     end;
-    drawnow;
-    try
-        [~, ~, c] = ginput(1);
-    catch
-        break
-    end
-    try
-        if c == ' ' || c == 'f' || uint8(c) == 29
-            i = i + 1;
-            if i > sequence.length
-                i = sequence.length;
-            end;
-        elseif c == 'd' || uint8(c) == 28
-            i = i - 1;
-            if i < 1
-                i = 1;
-            end;
-        elseif c == 'g' || uint8(c) == 30
-            i = i + 10;
-            if i > sequence.length
-                i = sequence.length;
-            end;
-        elseif c == 's' || uint8(c) == 31
-            i = i - 10;
-            if i < 1
-                i = 1;
-            end;
-        elseif c == 'q' || c == -1
-            break;
-        else
-            disp(uint8(c));
-        end
-    catch e
-        print_text('Error %s', e.message);
-    end
+    waitforbuttonpress;
+%     try
+%         [x, ~, c] = ginput(1);
+%     catch
+%         break
+%     end
+
 
 end;
 
 close(fh);
+
+
+
+end
+
+
 
