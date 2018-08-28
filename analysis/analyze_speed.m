@@ -102,6 +102,10 @@ function context = speed_iterator(event, context)
 				times = cat(2, times, zeros(event.sequence.length, repeat - size(times, 2)));
 			end;
 
+			if size(times, 2) > repeat
+				times = times(:, 1:repeat);
+			end;
+            
             valid = any(times > 0, 1) & ~isnan(reliability)';
             average_speed = nanmean(times(:, valid), 1)';
             average_original = mean(average_speed);

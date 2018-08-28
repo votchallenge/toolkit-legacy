@@ -52,15 +52,15 @@ function [result] = analyze_accuracy_robustness(experiment, trackers, sequences,
 
     print_text('Ranking analysis for experiment %s ...', experiment.name);
 
-    if ~strcmp(experiment.type, 'supervised')
+    if ~any(strcmp(experiment.type, {'supervised', 'realtime'}))
         error('Ranking analysis can only be used in supervised experiment scenario.');
     end;
 
-    if experiment.parameters.repetitions < 5
+    if experiment.parameters.repetitions < 5 && ranking
         error('The experiment specifies less than 5 repetitions. Not valid for statistical consideration.');
     end
 
-    if experiment.parameters.repetitions < 15
+    if experiment.parameters.repetitions < 15 && ranking
         print_text('Warning: the experiment specifies less than 15 repetitions, the results may be statistically unstable.');
     end;
 
@@ -227,6 +227,8 @@ function [average_accuracy, average_failures, average_failurerate, HA, HR, avail
         
             for t2 = t1+1:length(trackers)
 
+                t2
+                
                 if isempty(cacheA{t1})
                     [O1, F1] = calculate_accuracy_overlap(selector, experiment, trackers{t1}, sequences);
                     cacheA{t1} = O1; cacheR{t1} = F1;

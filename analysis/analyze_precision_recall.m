@@ -50,7 +50,7 @@ function [result] = analyze_precision_recall(experiment, trackers, sequences, va
     end;
 
     result.curves = cell(numel(trackers), numel(selectors));
-    result.fmeasure = zeros(numel(trackers), numel(selectors));
+    result.measures = zeros(numel(trackers), numel(selectors), 3);
     result.selectors = cellfun(@(x) x.name, selectors, 'UniformOutput', false);
     
     
@@ -66,10 +66,10 @@ function [result] = analyze_precision_recall(experiment, trackers, sequences, va
 
         for s = 1:numel(selectors)
             
-            [curves, fmeasure] = calculate_tpr_fscore(selectors{s}, experiment, trackers{i}, experiment_sequences, thresholds);
+            [curves, measures] = calculate_tpr_fscore(selectors{s}, experiment, trackers{i}, experiment_sequences, thresholds);
 
             result.curves{i, s} = curves;
-            result.fmeasure(i, s) = fmeasure;
+            result.measures(i, s, :) = measures;
 
         end;
 
@@ -126,7 +126,7 @@ function [thresholds] = determine_thresholds(experiment, tracker, sequences, res
     thresholds = [-Inf; thresholds; Inf];
 end
 
-function [curve, fmeasure, fbest] = calculate_tpr_fscore(selector, experiment, tracker, sequences, thresholds)
+function [curve, measures, fbest] = calculate_tpr_fscore(selector, experiment, tracker, sequences, thresholds)
 
     confidence_name = 'confidence';
     confidence_inverse = false;
@@ -213,7 +213,7 @@ function [curve, fmeasure, fbest] = calculate_tpr_fscore(selector, experiment, t
     
     [fmax, fidx] = max(f);
     
-    fmeasure = fmax;
+    measures = [fmax, curve(fidx, 1), curve(fidx, 2)];
     fbest = thresholds(fidx);
     
  end

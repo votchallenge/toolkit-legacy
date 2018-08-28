@@ -66,37 +66,39 @@ if usetags
     mask = strcmp('tag_all', result.selectors);
 
     average_curve = result.curves(:, mask);
-    average_fmeasure = result.fmeasure(:, mask);
+    average_measures = result.measures(:, mask);
 
     % Now remove the 'all' tag from results
     tag_curve = result.curves(:, ~mask);
-    tag_fmeasure = result.fmeasure(:, ~mask);
+    tag_measures = result.measures(:, ~mask);
 
     selector_tags = cat(2, result.selectors(~mask), result.selectors(mask));
     
 else
     
     average_curve = cell(numel(trackers), 1);
-    average_fmeasure = zeros(numel(trackers), 1);
+    average_measures = zeros(numel(trackers), 3);
     
     for t = 1:numel(trackers)
         average_curve{t} = mean(cat(3, result.curves{t, :}), 3);
         f = 2 * (average_curve{t}(:, 1) .* average_curve{t}(:, 2)) ./ (average_curve{t}(:, 1) + average_curve{t}(:, 2));
-        [average_fmeasure(t), ~] = max(f);
+        [average_measures(t, 1), idx] = max(f);
+        average_measures(t, 2) = average_curve{t}(idx, 1);
+        average_measures(t, 3) = average_curve{t}(idx, 2);
     end;
         
     tag_curve = result.curves;
-    tag_fmeasure = result.fmeasure;
+    tag_measures = result.measures;
     
     selector_tags = result.selectors;
     
 end
 
 scores.name = 'TPR';
-scores.values = average_fmeasure;
-scores.ids = {'f'};
-scores.names = {'F'};
-scores.order = {'descending'};
+scores.values = average_measures;
+scores.ids = {'f', 'tp', 'tr'};
+scores.names = {'F', 'TP', 'TR'};
+scores.order = {'descending', 'descending', 'descending'};
 
 tracker_labels = cellfun(@(x) iff(isfield(x.metadata, 'verified') && x.metadata.verified, [x.label, '*'], x.label), trackers, 'UniformOutput', 0);
 
@@ -108,8 +110,7 @@ pr_plot(document, sprintf('%s_average', experiment.name), ...
     sprintf('Experiment %s (average)', experiment.name), ...
     trackers, average_curve, hidelegend);
 
-table_data = highlight_best_rows(num2cell(cat(2, tag_fmeasure, average_fmeasure)), repmat({'descending'}, 1, size(tag_fmeasure, 2) + 1));
-
+table_data = highlight_best_rows(num2cell(cat(2, tag_measures(:, : , 1), average_measures(:, 1))), repmat({'descending'}, 1, size(tag_measures, 2) + 1));
 
 document.table(table_data, 'columnLabels', selector_tags, 'rowLabels', tracker_labels, 'title', 'Tracking precision-recall overview');
 
