@@ -16,7 +16,7 @@ function matrix2html(matrix, filename, varargin)
 
     rowLabels = [];
     colLabels = [];
-    format = '%.2f';
+    format = '%.4f';
     css_class = [];
     title = [];
     embed_numbers = true;
