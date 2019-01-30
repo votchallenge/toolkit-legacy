@@ -6,20 +6,16 @@ function sequences = sequence_load(directory, varargin)
 % Input:
 % - directory: Path to the directory with sequences.
 % - varargin[List]: Name of the file that lists all the sequences. By default `list.txt` is used.
-% - varargin[Dummy]: Create the sequence structures without checking if all the images exist.
 %
 % Output:
 % - sequences: A cell array of new sequence structures.
 
 list = 'list.txt';
-dummy = false;
 
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'list'
             list = varargin{i+1};
-        case 'dummy'
-            dummy = varargin{i+1};
         otherwise
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -147,7 +143,7 @@ while true
 
     print_debug('Loading sequence %s', sequence_name);
 
-    sequences{end+1} = sequence_create(sequence_path, 'dummy', dummy); %#ok<AGROW>
+    sequences{end+1} = sequence_create(sequence_path); %#ok<AGROW>
 
 end;
 

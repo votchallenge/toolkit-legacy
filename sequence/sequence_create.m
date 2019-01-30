@@ -6,14 +6,10 @@ function [sequence] = sequence_create(sequence_path, varargin)
 % Input:
 % - sequence_path: Path to the sequence directory or to the sequence metadata file.
 % - varargin[Name]: Name of the sequence. By default the name of the directory is taken as the name of the sequence.
-% - varargin[Dummy]: Create the sequence structure without checking if all the images exist.
-% - varargin[Start]: The number of the first frame in the sequence (1 by default).
 %
 % Output:
 % - sequence: A new sequence structure.
 
-start = 1;
-dummy = false;
 metadata = struct();
 
 if exist(sequence_path, 'file') == 2
@@ -33,13 +29,13 @@ if isfield(metadata, 'format') && ~strcmpi(metadata.format, 'default')
 end
 
 if isfield(metadata, 'channels') && isfield(metadata.channels, 'default')
-   default_channel = metadata.channels.default;    
+   default_channel = metadata.channels.default;
 end
 
 % At the moment we only load default channel, multi-channel sequences will
 % be supported someday
 
-channel_directory = directory;
+channels = struct();
 
 if ~isfield(metadata, 'channels') || ~isfield(metadata.channels, default_channel)
 	if all(size(dir([directory, '/*.jpg'])))
@@ -47,17 +43,31 @@ if ~isfield(metadata, 'channels') || ~isfield(metadata.channels, default_channel
 	elseif all(size(dir([directory, '/*.png'])))
 		mask = '%08d.png';
 	end;
+
+    channels.(default_channel) = fullfile(directory, mask);
+
 else
-    [sdir, sfile, sext] = fileparts(metadata.channels.(default_channel));
-    
-    channel_directory = fullfile(directory, sdir);
-    
-    if isempty(sfile)
-        mask = '%08d.jpg';
-    else
-        mask = [sfile, sext];
+
+    fields = fieldnames(metadata.channels);
+
+    for i=1:numel(fields)
+
+        channel = fields{i};
+
+        [sdir, sfile, sext] = fileparts(metadata.channels.(channel));
+
+        channel_directory = fullfile(directory, sdir);
+
+        if isempty(sfile)
+            mask = '%08d.jpg';
+        else
+            mask = [sfile, sext];
+        end
+
+        channels.(channel) = fullfile(channel_directory, mask);
+
     end
-    
+
 end;
 
 [~, name] = fileparts(directory);
@@ -66,10 +76,6 @@ for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'name'
             name = varargin{i+1};
-        case 'dummy'
-            dummy = varargin{i+1};
-        case 'start'
-            start = varargin{i+1};
         otherwise
             error(['Unknown switch ', varargin{i},'!']) ;
     end
@@ -80,49 +86,30 @@ if isempty(mask)
 end;
 
 sequence = struct('name', name, 'directory', directory, ...
-        'mask', mask, 'length', 0, ...
-        'file', 'groundtruth.txt', 'images_directory', channel_directory);
+        'channels', channels, 'length', 0, 'default', default_channel, ...
+        'file', 'groundtruth.txt');
 
 sequence.groundtruth = read_trajectory(fullfile(sequence.directory, sequence.file));
 
-sequence.images = cell(numel(sequence.groundtruth), 1);
+sequence.initialize = @(sequence, index, context) sequence_get_region(sequence, index);
 
-sequence.initialize = @(sequence, index, context) get_region(sequence, index);
-
-while true
-    image_name = sprintf(mask, sequence.length + start);
-
-    if ~exist(fullfile(channel_directory, image_name), 'file')
-        if dummy && sequence.length > 0 && sequence.length <= numel(sequence.groundtruth)
-            sequence.images{sequence.length + 1} = sequence.images{1};
-        else
-            break;
-        end;
-    else
-        sequence.images{sequence.length + 1} = image_name;
-    end;
-
-	sequence.length = sequence.length + 1;
-end;
+sequence.length = numel(sequence.groundtruth);
 
 sequence.indices = 1:sequence.length;
-
-sequence.length = min(sequence.length, numel(sequence.groundtruth));
 
 if sequence.length < 1
     error('Empty sequence: %s', name);
 end;
 
-imdata = imread(get_image(sequence, 1));
+imdata = imread(sequence_get_image(sequence, 1, default_channel));
 
-[height, width, channels] = size(imdata);
+[height, width, colorchannels] = size(imdata);
 
-sequence.grayscale = channels == 1 || isequal(imdata(:, :, 1), ...
+sequence.grayscale = colorchannels == 1 || isequal(imdata(:, :, 1), ...
 		imdata(:, :, 2), imdata(:, :, 3));
 
 sequence.width = width;
 sequence.height = height;
-sequence.channels = channels;
 
 sequence.tags.names = {};
 tagdata = false(sequence.length, 0);

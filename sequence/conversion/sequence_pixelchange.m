@@ -48,7 +48,7 @@ tags_cache_data = false(sequence.length, 0);
 
 for i = 1:sequence.length
 
-    original_image = imread(get_image(sequence, i));
+    original_image = imread(sequence_get_image(sequence, i));
     original_tags = get_tags(sequence, i);
 
     [transformed_image, transformed_tags] = operation(original_image, ...

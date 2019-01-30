@@ -26,7 +26,7 @@ end
 function groundtruth = groundtruth_for_sequence(sequences, i)
 
     groundtruth = cell(numel(sequences), 1);
-    
+
     groundtruth{i} = sequences{i}.groundtruth;
 
 end
@@ -34,8 +34,8 @@ end
 function groundtruth = groundtruth_value_for_sequence(sequences, i, value)
 
     groundtruth = cell(numel(sequences), 1);
-    
-    groundtruth{i} = get_frame_value(sequences{i}, value);
+
+    groundtruth{i} = sequence_get_frame_value(sequences{i}, value);
 
 end
 
@@ -109,12 +109,12 @@ function values = result_values_for_sequence(experiment, tracker, sequences, s, 
                  [v, numeric] = str2num(line(1:end-1)); %#ok<ST2NM>
 
                  if ~numeric
-                    v = line(1:end-1); 
+                    v = line(1:end-1);
                  end
 
                  i = i + 1;
 
-                 if isempty(v) 
+                 if isempty(v)
                      continue;
                  end;
 

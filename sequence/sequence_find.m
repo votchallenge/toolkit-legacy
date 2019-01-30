@@ -1,5 +1,5 @@
-function [index, sequence] = find_sequence(sequences, name)
-% find_sequence Find a sequence by its name
+function [index, sequence] = sequence_find(sequences, name)
+% sequence_find Find a sequence by its name
 %
 % Find a sequence by its name in a cell array of sequence structures. Returns index of sequence and its structure.
 % If a sequence is not found the function returns an empty matrix.
@@ -9,7 +9,7 @@ function [index, sequence] = find_sequence(sequences, name)
 % - name: A string containing sequence namer.
 %
 % Output:
-% - index: Index of the sequence in the cell array or empty matrix if not found. 
+% - index: Index of the sequence in the cell array or empty matrix if not found.
 % - sequence: The sequence structure.
 
 index = find(cellfun(@(t) strcmp(t.name, name), sequences, 'UniformOutput', true), 1);

@@ -26,7 +26,7 @@ if ~exist(cache_groundtruth, 'file')
 
     print_debug('Generating cached long-term check sequence ''%s''...', sequence.name);
 
-    image = imread(get_image(sequence, 1));
+    image = imread(sequence_get_image(sequence, 1));
     initial_region = sequence.groundtruth{1};
     target_template = get_patch(image, initial_region, padding);
 

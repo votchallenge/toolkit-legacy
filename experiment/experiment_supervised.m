@@ -41,7 +41,7 @@ for i = 1:r
     end;
 
     if check_deterministic && i == 4 && is_deterministic(sequence, 3, directory)
-        if ~silent
+        if ~silentm
             print_debug('Detected a deterministic tracker, skipping remaining trials.');
         end;
         metadata.deterministic = true;
@@ -67,7 +67,8 @@ for i = 1:r
     data.timing = nan(sequence.length, 1);
     data.initialized = false;
     data.properties = properties_create(sequence);
-
+    data.channels = {};
+    
     data = tracker_run(tracker, @callback, data);
 
     times(:, i) = data.timing;
@@ -97,13 +98,20 @@ region = [];
 image = [];
 properties = struct();
 
+if isempty(data.channels)
+    if ~all(ismember(state.channels, fieldnames(data.sequence.channels)));
+        error('Sequence does not contain all channels required by the tracker.');
+    end;
+    data.channels = state.channels;
+end;
+
 % Handle initial frame (initialize for the first time)
 if isempty(state.region)
     region = data.sequence.initialize(data.sequence, data.index, data.context);
-    image = get_image(data.sequence, data.index);
+    image = sequence_get_image(data.sequence, data.index, data.channels);
     return;
 end;
-o = region_overlap(state.region, get_region(data.sequence, data.index), data.bounds);
+o = region_overlap(state.region, sequence_get_region(data.sequence, data.index), data.bounds);
 
 % Handle tracker failure
 if o(1) <= data.context.failure_overlap
@@ -130,7 +138,7 @@ if o(1) <= data.context.failure_overlap
     end
 
     region = data.sequence.initialize(data.sequence, data.index, data.context);
-    image = get_image(data.sequence, data.index);
+    image = sequence_get_image(data.sequence, data.index, data.channels);
     data.initialized = false;
     return;
 end;
@@ -152,7 +160,7 @@ if data.index > data.sequence.length
     return;
 end
 
-image = get_image(data.sequence, data.index);
+image = sequence_get_image(data.sequence, data.index, data.channels);
 
 end
 

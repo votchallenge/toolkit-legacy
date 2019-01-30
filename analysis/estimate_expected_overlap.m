@@ -205,7 +205,7 @@ switch (event.type)
 
                     [~, failures] = estimate_failures(trajectory, sequence);
 
-                    practical = get_frame_value(sequence, 'practical');
+                    practical = sequence_get_frame_value(sequence, 'practical');
 
                     context.failures{end+1} = failures(failures <= sequence.length);
                     context.overlaps{end+1} = frames;

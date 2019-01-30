@@ -61,6 +61,7 @@ function [files, metadata] = experiment_unsupervised(tracker, sequence, director
 		data.result = repmat({0}, sequence.length, 1);
 		data.timing = nan(sequence.length, 1);
         data.properties = properties_create(sequence);
+        data.channels = {};
 
 		data = tracker_run(tracker, @callback, data);
 
@@ -92,10 +93,17 @@ function [image, region, properties, data] = callback(state, data)
 	image = [];
     properties = struct();
 
+    if isempty(data.channels)
+        if ~all(ismember(state.channels, fieldnames(data.sequence.channels)));
+            error('Sequence does not contain all channels required by the tracker.');
+        end;
+        data.channels = state.channels;
+    end;
+    
 	% Handle initial frame (initialize for the first time)
 	if isempty(state.region)
 		region = data.sequence.initialize(data.sequence, data.index, data.context);
-		image = get_image(data.sequence, data.index);
+		image = sequence_get_image(data.sequence, data.index, data.channels);
 		return;
 	end;
 
@@ -116,7 +124,7 @@ function [image, region, properties, data] = callback(state, data)
 		return;
 	end
 
-    image = get_image(data.sequence, data.index);
+    image = sequence_get_image(data.sequence, data.index, data.channels);
 
 end
 

@@ -68,7 +68,7 @@ else
 end;
 
 if isstruct(sequence)
-    frames = calculate_overlap(trajectory, get_region(sequence, 1:sequence.length), bounds);
+    frames = calculate_overlap(trajectory, sequence_get_region(sequence, 1:sequence.length), bounds);
 else
     frames = calculate_overlap(trajectory, sequence, bounds);
 end;

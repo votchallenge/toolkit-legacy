@@ -26,7 +26,7 @@ end
 
 function [region] = transform_initialization(sequence, index, context)
         
-    region = get_region(sequence, index);
+    region = sequence_get_region(sequence, index);
 
     transform = sequence.initialize_transform(sequence, index, context);
     

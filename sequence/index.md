@@ -76,7 +76,6 @@ Module functions
 
 ### Conversion
 
-
 -   [convert_sequences](convert_sequences.m) - Converts sequences using a converter
 -   [sequence_grayscale](sequence_grayscale.m) - Returns grayscale sequence
 -   [sequence_pixelchange](sequence_pixelchange.m) - Returns sequence with arbitrary pixel transformation
@@ -88,19 +87,20 @@ Module functions
 
 ### Access
 
--   [get_image](get_image.m) - Returns image path for the given sequence
--   [get_region](get_region.m) - Returns region, or multiple regions for the given sequence
--   [get_frame_value](get_frame_value.m) - Returns frame values for the given sequence
+-   [sequence_get_image](sequence_get_image.m) - Returns image paths for the given sequence
+-   [sequence_get_region](sequence_get_region.m) - Returns region, or multiple regions for the given sequence
+-   [sequence_get_frame_value](sequence_get_frame_value.m) - Returns frame values for the given sequence
 -   [sequence_get_tags](sequence_get_tags.m) - Returns all tags for a given frame
 -   [sequence_query_tag](sequence_query_tag.m) - Find tag occurences in a sequence
+-   [sequence_find](sequence_find.m) - Find a sequence by its name
 
 ### Visualization
 
 These functions are used to maniputate visualization information for
 sequences.
 
--   [visualize_sequence](visualize_sequence.m) - Interactive sequence visualization
--   [select_sequence](select_sequence.m) - Select sequence from a list interactively
+-   [sequence_visualize](sequence_visualize.m) - Interactive sequence visualization
+-   [sequence_select](sequence_select.m) - Select sequence from a list interactively
 
 ### Trajectory
 
@@ -110,7 +110,7 @@ sequences.
 
 ### Region
 
--   [draw_region](draw_region.m) - Draw a region on the current figure
+-   [region_draw](region_draw.m) - Draw a region on the current figure
 -   [region_offset](region_offset.m) - Translates the region
 -   region_overlap - A MEX function that calculates the overlap between two regions
 -   region_convert - A MEX function that converts between different region formats

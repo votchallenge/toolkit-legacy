@@ -1,5 +1,5 @@
-function visualize_sequence(sequence, varargin)
-% visualize_sequence Interactive sequence visualization
+function sequence_visualize(sequence, varargin)
+% sequence_visualize Interactive sequence visualization
 %
 % The function intereactivelly visualizes the given sequence and a set of results.
 %
@@ -75,14 +75,14 @@ if ~isempty(sequence.tags.names)
     set(gca, 'xlim',[0 sequence.length]);
     set(gca, 'ButtonDownFcn', @getposition);
     set(gcf, 'KeyPressFcn', @getkey);
-    
+
     slider = line([1 1], [0 numel(names)+1], 'LineWidth', 3, 'Color', [0 0 0 ]);
     hold off;
 
 end;
 
 while run
-    image_path = get_image(sequence, i);
+    image_path = sequence_get_image(sequence, i);
     image = imread(image_path);
     hf = sfigure(fh);
     if ~isempty(sequence.tags.names)
@@ -91,7 +91,7 @@ while run
 	set(hf, 'Name', sprintf('%s (%d / %d)', sequence.name, i, sequence.length), 'NumberTitle', 'off');
     imshow(image);
     hold on;
-    draw_region(get_region(sequence, i), [1 0 0], 2);
+    region_draw(sequence_get_region(sequence, i), [1 0 0], 2);
     for j = 2:nargin
         if ~iscell(varargin{j-1}) || i > numel(varargin{j-1})
             continue;
@@ -100,7 +100,7 @@ while run
 		if numel(trajectory{i}) == 1
 			continue;
 		end;
-        draw_region(trajectory{i}, [0 1 0], 1);
+        region_draw(trajectory{i}, [0 1 0], 1);
     end;
     if ~isempty(sequence.tags.names)
         active = sequence.tags.names(sequence.tags.data(i, :));

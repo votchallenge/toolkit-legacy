@@ -65,21 +65,21 @@ function [results] = results_for_tag(experiment, tracker, sequences, tag)
         groundtruth = sequences{s}.groundtruth;
 
         directory = fullfile(tracker.directory, experiment.name, sequences{s}.name);
-        
+
         for j = 1:repeat
 
             result_file = fullfile(directory, sprintf('%s_%03d.txt', sequences{s}.name, j));
 
             try
                 trajectory = read_trajectory(result_file);
-                
+
                 if (size(results{s, j}, 1) < size(groundtruth, 1))
                     %print_debug('Warning: Trajectory too short. Expanding with empty frames.');
                     trajectory(end+1:length(groundtruth)) = {0};
                 end;
-                
+
                 results{s, j} = trajectory(filter);
-                
+
             catch
                 continue;
             end;
@@ -87,7 +87,7 @@ function [results] = results_for_tag(experiment, tracker, sequences, tag)
         end;
 
     end
-    
+
 end
 
 function [results] = result_values_for_tag(experiment, tracker, sequences, tag, value)
@@ -110,15 +110,15 @@ function [results] = result_values_for_tag(experiment, tracker, sequences, tag, 
         end;
 
         directory = fullfile(tracker.directory, experiment.name, sequences{s}.name);
-        
+
         for j = 1:repeat
 
             values_file = fullfile(directory, sprintf('%s_%03d_%s.value', sequences{s}.name, j, value));
 
             data = nan(sequences{s}.length, 1);
-            
+
             i = 0;
-            
+
             try
                 fp = fopen(values_file, 'r');
 
@@ -132,12 +132,12 @@ function [results] = result_values_for_tag(experiment, tracker, sequences, tag, 
                      [v, numeric] = str2num(line(1:end-1)); %#ok<ST2NM>
 
                      if ~numeric
-                        v = line(1:end-1); 
+                        v = line(1:end-1);
                      end
 
                      i = i + 1;
-                     
-                     if isempty(v) 
+
+                     if isempty(v)
                          continue;
                      end;
 
@@ -146,9 +146,9 @@ function [results] = result_values_for_tag(experiment, tracker, sequences, tag, 
                 end;
 
                 fclose(fp);
-                
+
                 results{s, j} = data(filter);
-                
+
             catch
                 results{s, j} = nan(numel(filter), 1);
                 continue;
@@ -157,7 +157,7 @@ function [results] = result_values_for_tag(experiment, tracker, sequences, tag, 
         end;
 
     end
-    
+
 end
 
 function [count, partial] = count_for_tag(sequences, tag)
@@ -194,7 +194,7 @@ function values = groundtruth_value_for_tag(sequences, tag, value)
             continue;
         end;
 
-        values{s} = get_frame_value(sequences{s}, value, filter);
+        values{s} = sequence_get_frame_value(sequences{s}, value, filter);
 
     end;
 

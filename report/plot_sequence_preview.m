@@ -70,7 +70,7 @@ animation = zeros(ceil(sequence.height * scale), ceil(sequence.width * scale), n
 
 for i = 1:length(indices)
 
-    image = double(imread(get_image(sequence, indices(i)))) / 255;
+    image = double(imread(sequence_get_image(sequence, indices(i)))) / 255;
 
     if size(image, 3) == 1
        image = repmat(image, 1, 1, 3);
@@ -102,7 +102,7 @@ for i = 1:length(indices)
 
     if ~isempty(groundtruth_color)
 
-        region = get_region(sequence, indices(i));
+        region = sequence_get_region(sequence, indices(i));
 
         region = region_convert(region, 'polygon') .* scale;
 

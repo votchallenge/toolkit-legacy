@@ -1,5 +1,5 @@
-function draw_region(region, color, width)
-% draw_region Draw a region on the current figure
+function region_draw(region, color, width)
+% region_draw Draw a region on the current figure
 %
 % This functions is an utility that draws a region with a given color and stroke width.
 % A region can be a rectangle or a polygon.
@@ -18,7 +18,7 @@ if nargin < 3
     width = 1;
 end;
 
-if isnumeric(region) 
+if isnumeric(region)
 	if numel(region) == 4
 
         for i = 1:size(region, 1)
@@ -33,9 +33,9 @@ if isnumeric(region)
     elseif numel(region) >= 6 && mod(numel(region), 2) == 0
 
         x = region(1:2:end);
-        y = region(2:2:end);        
-        
+        y = region(2:2:end);
+
         plotc(x, y, 'Color', color, 'LineWidth', width);
 	end;
-        
+
 end;

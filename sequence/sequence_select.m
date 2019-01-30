@@ -1,5 +1,5 @@
-function [selected_sequence] = select_sequence(sequences)
-% select_sequence Select sequence from a list interactively 
+function [selected_sequence] = sequence_select(sequences)
+% sequence_select Select sequence from a list interactively
 %
 % The function provides an interactive interface for selecting a sequence from
 % a given array of sequence descriptor structures.

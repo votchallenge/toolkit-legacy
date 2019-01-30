@@ -31,7 +31,7 @@ print_debug('Generating cached grayscale sequence ''%s''...', sequence.name);
 
 for i = 1:sequence.length
 
-    color_image = imread(get_image(sequence, i));
+    color_image = imread(sequence_get_image(sequence, i));
 
     gray_image = repmat(rgb2gray(color_image), [1 1 3]);
 

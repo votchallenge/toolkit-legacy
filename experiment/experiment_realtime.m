@@ -81,7 +81,8 @@ for i = 1:r
     data.timing = nan(sequence.length, 1);
     data.initialized = false;
     data.properties = properties_create(sequence);
-
+    data.channels = {};
+    
     data = tracker_run(tracker, @callback, data);
 
     times(:, i) = data.timing;
@@ -110,10 +111,17 @@ region = [];
 image = [];
 properties = struct();
 
+if isempty(data.channels)
+    if ~all(ismember(state.channels, fieldnames(data.sequence.channels)));
+        error('Sequence does not contain all channels required by the tracker.');
+    end;
+    data.channels = state.channels;
+end;
+
 % Handle initial frame (initialize for the first time)
 if isempty(state.region)
     region = data.sequence.initialize(data.sequence, data.index, data.context);
-    image = get_image(data.sequence, data.index);
+    image = sequence_get_image(data.sequence, data.index, data.channels);
     data.time = 0;
 	data.offset = 0;
     data.grace = data.context.grace;
@@ -147,7 +155,7 @@ else
         %        and the state.region used to update this model
 
         for i = previous:min(data.sequence.length, current-1)
-            o = region_overlap(data.region, get_region(data.sequence, i), data.bounds);
+            o = region_overlap(data.region, sequence_get_region(data.sequence, i), data.bounds);
             if o(1) <= data.context.failure_overlap
                 failed = i;
                 break;
@@ -156,7 +164,7 @@ else
         end
 
         if current <= data.sequence.length
-            o = region_overlap(state.region, get_region(data.sequence, current), data.bounds);
+            o = region_overlap(state.region, sequence_get_region(data.sequence, current), data.bounds);
             if o(1) <= data.context.failure_overlap
                 failed = current;
             else
@@ -164,7 +172,7 @@ else
             end
         end
     else   % realtime_type = 'delayed' by default
-        o = region_overlap(state.region, get_region(data.sequence, previous), data.bounds);
+        o = region_overlap(state.region, sequence_get_region(data.sequence, previous), data.bounds);
         if o(1) <= data.context.failure_overlap
             failed = previous;
         else
@@ -207,7 +215,7 @@ else
 
 end
 
-image = get_image(data.sequence, data.index);
+image = sequence_get_image(data.sequence, data.index, data.channels);
 
 end
 

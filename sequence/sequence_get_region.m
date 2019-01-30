@@ -1,5 +1,5 @@
-function region = get_region(sequence, index)
-% get_region Returns region, or multiple regions for the given sequence
+function region = sequence_get_region(sequence, index)
+% sequence_get_region Returns region, or multiple regions for the given sequence
 %
 % Input:
 % - sequence: A valid sequence structure.

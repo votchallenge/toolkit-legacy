@@ -39,7 +39,7 @@ try
 
     while 1
 
-        current_sequence = select_sequence(sequences);
+        current_sequence = sequence_select(sequences);
 
         if ~isempty(current_sequence)
 
@@ -49,6 +49,7 @@ try
             data.sequence = sequences{current_sequence};
             data.index = 1;
 			data.gui = use_gui;
+            data.channels = {};
 
             tracker_run(tracker, @callback, data);
 
@@ -74,22 +75,29 @@ function [image, region, properties, data] = callback(state, data)
 	image = [];
     properties = struct();
 
+    if isempty(data.channels)
+        if ~all(ismember(state.channels, fieldnames(data.sequence.channels)));
+            error('Sequence does not contain all channels required by the tracker.');
+        end;
+        data.channels = state.channels;
+    end;
+    
 	% Handle initial frame (initialize for the first time)
 	if isempty(state.region)
-		region = get_region(data.sequence, data.index);
-		image = get_image(data.sequence, data.index);
+		region = sequence_get_region(data.sequence, data.index);
+		image = sequence_get_image(data.sequence, data.index, data.channels);
 		return;
 	end;
 
 	if data.gui
 
-		image_path = get_image(data.sequence, data.index);
+		image_path = sequence_get_image(data.sequence, data.index);
 		hf = sfigure(data.figure);
 		set(hf, 'Name', sprintf('%s (%d/%d t=%.3fs)', data.sequence.name, data.index, data.sequence.length, state.time), 'NumberTitle', 'off');
 		imshow(imread(image_path));
 		hold on;
-		draw_region(get_region(data.sequence, data.index), [1 0 0], 2);
-		draw_region(state.region, [0 1 0], 1);
+		region_draw(sequence_get_region(data.sequence, data.index), [1 0 0], 2);
+		region_draw(state.region, [0 1 0], 1);
 		hold off;
 		drawnow;
 		try
@@ -125,7 +133,7 @@ function [image, region, properties, data] = callback(state, data)
 		return;
 	end
 
-    image = get_image(data.sequence, data.index);
+    image = sequence_get_image(data.sequence, data.index, data.channels);
 
 end
 

@@ -50,7 +50,7 @@ end
 
 function [transform] = noisy_transform(sequence, index, context)
 
-    bounds = region_convert(get_region(sequence, index), 'rectangle');
+    bounds = region_convert(sequence_get_region(sequence, index), 'rectangle');
 
     scale = 0.9 + rand(1, 2) * 0.2;
     move = bounds(3:4) .* (0.1 - rand(1, 2) * 0.2);

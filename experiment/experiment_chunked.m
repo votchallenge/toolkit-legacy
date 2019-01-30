@@ -67,7 +67,8 @@ function [files, metadata] = experiment_chunked(tracker, sequence, directory, pa
 			data.context = context;
 			data.result = repmat({0}, chunks{c}.length, 1);
 			data.timing = nan(chunks{c}.length, 1);
-
+            data.channels = {};
+            
 			data = tracker_run(tracker, @callback, data);
 
             trajectory(chunk_offset(c):chunk_offset(c)+numel(data.result)-1) = data.result;
@@ -100,15 +101,22 @@ function [image, region, properties, data] = callback(state, data)
 	image = [];
     properties = struct();
 
+    if isempty(data.channels)
+        if ~all(ismember(state.channels, fieldnames(data.sequence.channels)));
+            error('Sequence does not contain all channels required by the tracker.');
+        end;
+        data.channels = state.channels;
+    end;
+    
 	% Handle initial frame (initialize for the first time)
 	if isempty(state.region)
 		region = data.sequence.initialize(data.sequence, data.index, data.context);
-		image = get_image(data.sequence, data.index);
+		image = sequence_get_image(data.sequence, data.index, data.channels);
 		return;
 	end;
 
 	% Handle tracker failure
-	if region_overlap(state.region, get_region(data.sequence, data.index)) <= data.context.failure_overlap
+	if region_overlap(state.region, sequence_get_region(data.sequence, data.index)) <= data.context.failure_overlap
 		return;
 	end;
 
@@ -127,7 +135,7 @@ function [image, region, properties, data] = callback(state, data)
 		return;
 	end
 
-    image = get_image(data.sequence, data.index);
+    image = sequence_get_image(data.sequence, data.index, data.channels);
 
 end
 

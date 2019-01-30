@@ -36,7 +36,7 @@ print_debug('Generating cached resized sequence ''%s'' for scaling factor %.2f..
 
 for i = 1:sequence.length
 
-    color_image = imread(get_image(sequence, i));
+    color_image = imread(sequence_get_image(sequence, i));
 
     scaled_image = imresize(color_image, ratio);
 

@@ -1,4 +1,4 @@
-function [handle, image, region] = vot(format)
+function [handle, image, region] = vot(format, channels)
 % vot Initialize communication and obtain communication structure
 %
 % This function is used to initialize communication with the toolkit.
@@ -11,6 +11,11 @@ function [handle, image, region] = vot(format)
 %
 % Input:
 % - format (string): Desired region input format.
+% - channels (string): Which channels are required by the trackers
+%     - (default): only color
+%     - rgbd: color and depth
+%     - ir: only ir
+%     - rgbt: color and ir
 %
 % Output:
 % - handle (structure): Updated communication handle structure.
@@ -21,20 +26,31 @@ function [handle, image, region] = vot(format)
        format = 'rectangle';
     end
 
-    [handle, image, region] = tracker_initialize(format);
+    if nargin < 2 || strcmp(channels, 'color')
+       channels = {'color'};
+    elseif strcmp(channels, 'rgbd')
+        channels = {'color', 'depth'};
+    elseif strcmp(channels, 'ir')
+        channels = {'ir'};
+    elseif strcmp(channels, 'rgbt')
+        channels = {'color', 'ir'};
+    end
+
+    [handle, image, region] = tracker_initialize(format, channels);
     handle.frame = @tracker_frame;
     handle.report = @tracker_report;
     handle.quit = @tracker_quit;
 
 end
 
-function [handle, image, region] = tracker_initialize(format)
+function [handle, image, region] = tracker_initialize(format, channels)
 % tracker_initialize Initialize communication structure
 %
 % This function is used to initialize communication with the toolkit.
 %
 % Input:
 % - format (string): Desired region input format.
+% - channels (string, cell): Which channels are required by the trackers
 %
 % Output:
 % - handle (structure): Updated communication handle structure.
@@ -45,10 +61,15 @@ function [handle, image, region] = tracker_initialize(format)
         error('VOT: Illegal region format.');
     end;
 
+    if ~all(ismember(channels,  {'color', 'depth', 'ir'}))
+        error('VOT: Illegal channel type.');
+    end;
+
     if ~isempty(getenv('TRAX_MEX'))
         addpath(getenv('TRAX_MEX'));
     end;
-    traxserver('setup', format, 'path');
+
+    traxserver('setup', format, 'path', 'Channels', channels);
 
     [image, region] = traxserver('wait');
 
@@ -57,6 +78,10 @@ function [handle, image, region] = tracker_initialize(format)
     if isempty(image) || isempty(region)
         tracker_quit(handle);
         return;
+    end;
+
+    if iscell(image) && numel(image) == 1
+        image = image{1}
     end;
 
 	handle.initialization = region;
@@ -88,6 +113,10 @@ function [handle, image] = tracker_frame(handle)
 
     if isempty(image) || ~isempty(region)
         handle.quit(handle);
+    end;
+
+    if iscell(image) && numel(image) == 1
+        image = image{1}
     end;
 
 end

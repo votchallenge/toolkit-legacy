@@ -1,5 +1,5 @@
-function [value] = get_frame_value(sequence, key, index)
-% get_frame_value Returns frame values for the given sequence
+function [value] = sequence_get_frame_value(sequence, key, index)
+% sequence_get_frame_value Returns frame values for the given sequence
 %
 % Input:
 % - sequence (structure): A valid sequence structure.
@@ -17,9 +17,9 @@ if isempty(value_index)
 end;
 
 if nargin == 2
-    
+
     value = sequence.values.data(:, value_index);
-    
+
 else
 
 	value = sequence.values.data(index, value_index);

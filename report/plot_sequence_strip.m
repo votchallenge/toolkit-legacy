@@ -77,17 +77,17 @@ for i = 1:length(indices)
 
 		offset = [0, 0];
 
-		patch = imread(get_image(sequence, indices(i)));
+		patch = imread(sequence_get_image(sequence, indices(i)));
 
 	else
 
 	    patch = zeros(window, window, 3);
 
-		region = region_convert(get_region(sequence, indices(i)), 'rectangle');
+		region = region_convert(sequence_get_region(sequence, indices(i)), 'rectangle');
 
 		offset = region(1:2) + (region(3:4) - window) / 2;
 
-		source = imread(get_image(sequence, indices(i)));
+		source = imread(sequence_get_image(sequence, indices(i)));
 
 		patch = patch_operation(patch, source, -offset([2, 1]), '=');
 
@@ -115,7 +115,7 @@ for i = 1:length(indices)
 
         region = region_offset(region, -offset);
 
-        draw_region(region, trajectories_colors{t}, 2);
+        region_draw(region, trajectories_colors{t}, 2);
 
         if ~isempty(trajectories_markers)
             bounds = region_convert(region, 'rectangle');
@@ -129,11 +129,11 @@ for i = 1:length(indices)
 
     if ~isempty(groundtruth_color)
 
-        region = get_region(sequence, indices(i));
+        region = sequence_get_region(sequence, indices(i));
 
         region = region_offset(region, -offset);
 
-        draw_region(region, groundtruth_color, 2);
+        region_draw(region, groundtruth_color, 2);
 
     end;
 
