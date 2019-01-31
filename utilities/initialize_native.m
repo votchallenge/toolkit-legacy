@@ -141,7 +141,7 @@ end;
 
 if success
     if exist(fullfile(trax_dir, 'python'), 'dir') == 7
-        set_global_variable('trax_python', fullfile(trax_dir, 'python'));
+        set_global_variable('trax_python', fullfile(trax_dir, 'support', 'python'));
     end
 end
 

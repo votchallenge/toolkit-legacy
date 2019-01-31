@@ -53,6 +53,21 @@
 #define VOT_POLYGON
 #endif
 
+typedef struct vot_image {
+#ifdef VOT_RGBD
+    char visible[VOT_READ_BUFFER];
+    char depth[VOT_READ_BUFFER];
+#elif defined(VOT_IR)
+    char ir[VOT_READ_BUFFER];
+#elif defined(VOT_RGBT)
+    char visible[VOT_READ_BUFFER];
+    char ir[VOT_READ_BUFFER];
+#else
+    char visible[VOT_READ_BUFFER];
+#endif
+} vot_image;
+
+
 #ifdef VOT_POLYGON
 typedef struct vot_region {
     float* x;
@@ -145,6 +160,20 @@ vot_region* vot_region_copy(const vot_region* region) {
 using namespace std;
 
 class VOT;
+
+typedef struct VOTImage {
+#ifdef VOT_RGBD
+    string visible;
+    string depth;
+#elif defined(VOT_IR)
+    string ir;
+#elif defined(VOT_RGBT)
+    string visible;
+    string ir;
+#else
+    string visible;
+#endif
+} VOTImage;
 
 class VOTRegion {
     friend class VOT;
@@ -334,19 +363,42 @@ public:
 
     }
 
+#if defined(VOT_RGBD) || defined(VOT_RGBT)
+    const VOTImage frame() {
+#else
     const string frame() {
+#endif
 
-        const char* result = vot_frame();
+        const vot_image* result = vot_frame();
+
+#if defined(VOT_RGBD) || defined(VOT_RGBT)
+        VOTImage wrapper;
+#else
+        string wrapper;
+#endif
 
         if (!result)
-            return string();
+            return wrapper;
 
-        return string(result);
+#if defined(VOT_RGBD)
+        wrapper.visible = string(_image.visible);
+        wrapper.depth = string(_image.depth);
+#elif defined(VOT_RGBT)
+        wrapper.visible = string(_image.visible);
+        wrapper.ir = string(_image.ir);
+#elif defined(VOT_IR)
+        wrapper = string(_image.ir);
+#else
+        wrapper = string(_image.visible);
+#endif
+        return wrapper;
     }
 
     bool end() {
         return vot_end() != 0;
     }
+
+
 
 
 private:
@@ -355,7 +407,7 @@ private:
 
     void vot_quit();
 
-    const char* vot_frame();
+    const vot_image* vot_frame();
 
     void vot_report(vot_region* region);
 
@@ -363,9 +415,9 @@ private:
 
     int vot_end();
 
-    vot_region* _region;
-
 #endif
+
+    vot_region* _region;
 
     // Current position in the sequence
     int _vot_sequence_position;
@@ -377,7 +429,8 @@ private:
     vot_region** _vot_result;
 
     trax_handle* _trax_handle;
-    char _trax_image_buffer[VOT_READ_BUFFER];
+
+    vot_image _image;
 
 #ifdef VOT_POLYGON
 
@@ -439,7 +492,7 @@ vot_region* VOT_PREFIX(vot_initialize)() {
     _vot_sequence_size = 0;
 
     trax_configuration config;
-    trax_image* _trax_image = NULL;
+    trax_image_list* _trax_image = NULL;
     trax_region* _trax_region = NULL;
     _trax_handle = NULL;
     int response;
@@ -449,7 +502,17 @@ vot_region* VOT_PREFIX(vot_initialize)() {
     int region_format = TRAX_REGION_RECTANGLE;
     #endif
 
-    trax_metadata* metadata = trax_metadata_create(region_format, TRAX_IMAGE_PATH, NULL, NULL, NULL);
+    #ifdef VOT_RGBD
+    int channels = TRAX_CHANNEL_COLOR | TRAX_CHANNEL_DEPTH;
+    #elif defined(VOT_IR)
+    int channels = TRAX_CHANNEL_IR;
+    #elif defined(VOT_RGBT)
+    int channels = TRAX_CHANNEL_COLOR | TRAX_CHANNEL_IR;
+    #else
+    int channels = TRAX_CHANNEL_COLOR;
+    #endif
+
+    trax_metadata* metadata = trax_metadata_create(region_format, TRAX_IMAGE_PATH, channels, NULL, NULL, NULL);
 
     _trax_handle = trax_server_setup(metadata, trax_no_log);
 
@@ -459,14 +522,25 @@ vot_region* VOT_PREFIX(vot_initialize)() {
 
     assert(response == TRAX_INITIALIZE);
 
-    strcpy(_trax_image_buffer, trax_image_get_path(_trax_image));
+#if defined(VOT_RGBD)
+        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
+        strcpy(_image.depth, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_DEPTH)));
+#elif defined(VOT_RGBT)
+        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
+        strcpy(_image.ir, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_IR)));
+#elif defined(VOT_IR)
+        strcpy(_image.ir, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_IR)));
+#else
+        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
+#endif
 
     trax_server_reply(_trax_handle, _trax_region, NULL);
 
     vot_region* region = _trax_to_region(_trax_region);
 
     trax_region_release(&_trax_region);
-    trax_image_release(&_trax_image);
+    trax_image_list_clear(_trax_image);
+    trax_image_list_release(&_trax_image);
 
     return region;
 
@@ -489,29 +563,41 @@ void VOT_PREFIX(vot_quit)() {
  * Returns the file name of the current frame. This function does not advance
  * the current position.
  */
-const char* VOT_PREFIX(vot_frame)() {
+const vot_image* VOT_PREFIX(vot_frame)() {
 
     if (_trax_handle) {
         int response;
-        trax_image* _trax_image = NULL;
+        trax_image_list* _trax_image = NULL;
         trax_region* _trax_region = NULL;
 
         if (_vot_sequence_position == 0) {
             _vot_sequence_position++;
-            return _trax_image_buffer;
+            return &_image;
         }
 
         response = trax_server_wait(_trax_handle, &_trax_image, &_trax_region, NULL);
 
         if (response != TRAX_FRAME) {
             vot_quit();
-            exit(0);
+            return NULL;
         }
 
-        strcpy(_trax_image_buffer, trax_image_get_path(_trax_image));
-        trax_image_release(&_trax_image);
 
-        return _trax_image_buffer;
+#if defined(VOT_RGBD)
+        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
+        strcpy(_image.depth, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_DEPTH)));
+#elif defined(VOT_RGBT)
+        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
+        strcpy(_image.ir, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_IR)));
+#elif defined(VOT_IR)
+        strcpy(_image.ir, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_IR)));
+#else
+        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
+#endif
+        trax_image_list_clear(_trax_image);
+        trax_image_list_release(&_trax_image);
+
+        return &_image;
 
     }
 }

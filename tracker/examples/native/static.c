@@ -51,8 +51,8 @@ int main( int argc, char** argv)
     vot_region* selection = vot_initialize();
 
     // Process the first frame
-    const char* imagefile = vot_frame();
-    if (!imagefile) {
+    const vot_image* image = vot_frame();
+    if (!image) {
         vot_quit();
         exit(0);
     }
@@ -65,8 +65,8 @@ int main( int argc, char** argv)
         //      current image frame. If the result is
         //      null, the sequence is over.
         // *****************************************
-        const char* imagefile = vot_frame();
-        if (!imagefile) break;
+        const vot_image* image = vot_frame();
+        if (!image) break;
 
         // *****************************************
         // VOT: Report the position of the object

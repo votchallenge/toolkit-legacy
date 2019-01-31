@@ -16,9 +16,9 @@ function command = generate_python_command(script, paths)
 trax_python = get_global_variable('trax_python');
 python_exec = get_global_variable('python');
 
-% If path to python trax implementatin is set then we attempt to export it to tracker
+% If path to python trax implementation is set then we attempt to export it to tracker
 if ~isempty(trax_python)
-    paths = cat(1, {trax_python}, paths);
+    paths = cat(1, {trax_python}, paths(:));
 end
 
 path_string = strjoin(cellfun(@(p) sprintf('sys.path.append(''%s'');', p), paths, 'UniformOutput', false), '');

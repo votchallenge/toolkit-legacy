@@ -36,6 +36,8 @@
 
 // Uncomment line below if you want to use rectangles
 // #define VOT_RECTANGLE
+
+#define VOT_RGBD
 #include "vot.h"
 
 int main(int argc, char* argv[])
@@ -46,12 +48,12 @@ int main(int argc, char* argv[])
 
     // get region and first frame
     VOTRegion region = vot.region();
-    string image = vot.frame();
+    VOTImage image = vot.frame();
 
     //track
     while (true) {
         image = vot.frame();
-        if (image.empty()) break;
+        if (image.visible.empty()) break;
         vot.report(region);
     }
 
