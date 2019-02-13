@@ -34,7 +34,9 @@ else
     image_paths = cell(numel(channels), numel(index));
     
     for i = 1:numel(channels)
-        image_paths(i, :) = cellfun(@(x) sprintf(sequence.channels.(channels{i}), x), num2cell(sequence.indices(index)), 'UniformOutput', false);
+        %image_paths(i, :) = cellfun(@(x) sprintf(sequence.channels.(channels{i}), x), num2cell(sequence.indices(index)), 'UniformOutput', false);
+        image_paths(i, :) = cellfun(@(x) sprintf(strrep(sequence.channels.(channels{i}), '\', '\\'), x), ...
+            num2cell(sequence.indices(index)), 'UniformOutput', false);
     end;
     if numel(image_paths) == 1
         image_paths = image_paths{1};

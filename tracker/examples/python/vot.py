@@ -108,7 +108,8 @@ class VOT(object):
 
 
     def quit(self):
-        self._trax.quit()
+        if hasattr(self, '_trax'):
+            self._trax.quit()
 
     def __del__(self):
         self.quit()
