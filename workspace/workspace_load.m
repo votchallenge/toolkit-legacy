@@ -120,11 +120,6 @@ if get_global_variable('check_updates', true)
     check_updates();
 end;
 
-mkpath(get_global_variable('native_path'));
-rmpath(get_global_variable('native_path')); rehash; % Try to avoid locked files on Windows
-initialize_native();
-addpath(get_global_variable('native_path'));
-
 experiment_stack = get_global_variable('stack', 'vot2013');
 
 if exist(['stack_', experiment_stack]) ~= 2 %#ok<EXIST>
@@ -134,6 +129,11 @@ end;
 stack_configuration = str2func(['stack_', experiment_stack]);
 
 experiments = stack_configuration();
+
+mkpath(get_global_variable('native_path'));
+rmpath(get_global_variable('native_path')); rehash; % Try to avoid locked files on Windows
+initialize_native();
+addpath(get_global_variable('native_path'));
 
 if cached
     print_debug('Skipping loading sequence data (using cached structures)');
