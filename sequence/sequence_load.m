@@ -68,9 +68,13 @@ if ~exist(list_file, 'file') && ~isempty(bundle_url)
             mkpath(sequence_directory);
             data = struct('name', sequence.name, 'fps', sequence.fps, 'format', 'default');
             data.channels = struct();
-            
-            annotations_url = [base_url, sequence.annotations.url];
 
+            if strncmp(sequence.annotations.url, 'http://', 7) || strncmp(sequence.annotations.url, 'https://', 8)
+                annotations_url = sequence.annotations.url;
+            else
+                annotations_url = [base_url, sequence.annotations.url];
+            end
+            
             try
                 bundle = [tempname, '.zip'];
                 urlwrite(annotations_url, bundle);
