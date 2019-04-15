@@ -5,7 +5,7 @@
 
 @author Luka Cehovin, Alessio Dore
 
-@date 2016
+@date 2016, 2019
 
 """
 
@@ -33,11 +33,11 @@ class VOT(object):
         assert(region_format in [trax.Region.RECTANGLE, trax.Region.POLYGON])
 
         if channels is None:
-            channels = ['color']
+            channels = ['visible']
         elif channels == 'rgbd':
-            channels = ['color', 'depth']
+            channels = ['visible', 'depth']
         elif channels == 'rgbt':
-            channels = ['color', 'ir']
+            channels = ['visible', 'ir']
         elif channels == 'ir':
             channels = ['ir']
         else:

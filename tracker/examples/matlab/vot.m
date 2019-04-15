@@ -12,10 +12,10 @@ function [handle, image, region] = vot(format, channels)
 % Input:
 % - format (string): Desired region input format.
 % - channels (string): Which channels are required by the trackers
-%     - (default): only color
-%     - rgbd: color and depth
+%     - (default): only visible
+%     - rgbd: visible and depth
 %     - ir: only ir
-%     - rgbt: color and ir
+%     - rgbt: visible and ir
 %
 % Output:
 % - handle (structure): Updated communication handle structure.
@@ -26,14 +26,14 @@ function [handle, image, region] = vot(format, channels)
        format = 'rectangle';
     end
 
-    if nargin < 2 || strcmp(channels, 'color')
-       channels = {'color'};
+    if nargin < 2 || strcmp(channels, 'visible')
+       channels = {'visible'};
     elseif strcmp(channels, 'rgbd')
-        channels = {'color', 'depth'};
+        channels = {'visible', 'depth'};
     elseif strcmp(channels, 'ir')
         channels = {'ir'};
     elseif strcmp(channels, 'rgbt')
-        channels = {'color', 'ir'};
+        channels = {'visible', 'ir'};
     end
 
     [handle, image, region] = tracker_initialize(format, channels);
@@ -61,7 +61,7 @@ function [handle, image, region] = tracker_initialize(format, channels)
         error('VOT: Illegal region format.');
     end;
 
-    if ~all(ismember(channels,  {'color', 'depth', 'ir'}))
+    if ~all(ismember(channels,  {'visible', 'depth', 'ir'}))
         error('VOT: Illegal channel type.');
     end;
 
