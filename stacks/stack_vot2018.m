@@ -12,7 +12,7 @@ baseline.parameters.burnin = 10;
 baseline.parameters.skip_initialize = 5;
 baseline.parameters.failure_overlap = 0;
 
-baseline.analysis = {'ar', 'expected_overlap', 'speed'};
+baseline.analysis = {'expected_overlap', 'ar', 'speed'};
 
 unsupervised.name = 'unsupervised';
 unsupervised.converter = [];
