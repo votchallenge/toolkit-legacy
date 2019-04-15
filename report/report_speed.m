@@ -60,7 +60,7 @@ if ~all(isnan(speed.normalized(:)))
 
     document.subsection('Normalized (EFO)');
 
-    tabledata = num2cell(cat(2, squeeze(speed.normalized), averaged_normalized'));
+    tabledata = num2cell(cat(2, reshape(squeeze(speed.normalized), numel(trackers), numel(sequences)), averaged_normalized'));
     tabledata = highlight_best_rows(tabledata, repmat({'descend'}, 1, numel(sequences)+1));
 
     document.table(tabledata, 'columnLabels', column_labels, 'rowLabels', tracker_labels);
