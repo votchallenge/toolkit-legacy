@@ -87,7 +87,11 @@ if ~exist(list_file, 'file') && ~isempty(bundle_url)
                 channel = sequence.channels.(channels{c});
                 channel_directory = fullfile(sequence_directory, channels{c});
                 mkpath(channel_directory);
-                channel_url = [base_url, channel.url];
+                if strncmp(channel.url, 'http://', 7) || strncmp(channel.url, 'https://', 8)
+                    channel_url = channel.url;
+                else
+                    channel_url = [base_url, channel.url];
+                end
                 try
                     bundle = [tempname, '.zip'];
                     urlwrite(channel_url, bundle);
