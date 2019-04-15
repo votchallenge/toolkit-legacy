@@ -12,6 +12,9 @@ baseline.parameters.burnin = 10;
 baseline.parameters.skip_initialize = 5;
 baseline.parameters.failure_overlap = 0;
 
+baseline.analysis = {'expected_overlap', 'ar', 'speed'};
+
+
 realtime.name = 'realtime';
 realtime.converter = [];
 realtime.type = 'realtime';
@@ -23,6 +26,8 @@ realtime.parameters.skip_initialize = 5;
 realtime.parameters.failure_overlap = 0;
 realtime.parameters.fps_override = true;
 realtime.parameters.fps_default = 20;
+
+realtime.analysis = {'expected_overlap'};
 
 experiments = {baseline, realtime};
 
