@@ -55,15 +55,15 @@
 
 typedef struct vot_image {
 #ifdef VOT_RGBD
-    char visible[VOT_READ_BUFFER];
+    char color[VOT_READ_BUFFER];
     char depth[VOT_READ_BUFFER];
 #elif defined(VOT_IR)
     char ir[VOT_READ_BUFFER];
 #elif defined(VOT_RGBT)
-    char visible[VOT_READ_BUFFER];
+    char color[VOT_READ_BUFFER];
     char ir[VOT_READ_BUFFER];
 #else
-    char visible[VOT_READ_BUFFER];
+    char color[VOT_READ_BUFFER];
 #endif
 } vot_image;
 
@@ -163,15 +163,15 @@ class VOT;
 
 typedef struct VOTImage {
 #ifdef VOT_RGBD
-    string visible;
+    string color;
     string depth;
 #elif defined(VOT_IR)
     string ir;
 #elif defined(VOT_RGBT)
-    string visible;
+    string color;
     string ir;
 #else
-    string visible;
+    string color;
 #endif
 } VOTImage;
 
@@ -381,15 +381,15 @@ public:
             return wrapper;
 
 #if defined(VOT_RGBD)
-        wrapper.visible = string(_image.visible);
+        wrapper.color = string(_image.color);
         wrapper.depth = string(_image.depth);
 #elif defined(VOT_RGBT)
-        wrapper.visible = string(_image.visible);
+        wrapper.color = string(_image.color);
         wrapper.ir = string(_image.ir);
 #elif defined(VOT_IR)
         wrapper = string(_image.ir);
 #else
-        wrapper = string(_image.visible);
+        wrapper = string(_image.color);
 #endif
         return wrapper;
     }
@@ -503,13 +503,13 @@ vot_region* VOT_PREFIX(vot_initialize)() {
     #endif
 
     #ifdef VOT_RGBD
-    int channels = TRAX_CHANNEL_VISIBLE | TRAX_CHANNEL_DEPTH;
+    int channels = TRAX_CHANNEL_COLOR | TRAX_CHANNEL_DEPTH;
     #elif defined(VOT_IR)
     int channels = TRAX_CHANNEL_IR;
     #elif defined(VOT_RGBT)
-    int channels = TRAX_CHANNEL_VISIBLE | TRAX_CHANNEL_IR;
+    int channels = TRAX_CHANNEL_COLOR | TRAX_CHANNEL_IR;
     #else
-    int channels = TRAX_CHANNEL_VISIBLE;
+    int channels = TRAX_CHANNEL_COLOR;
     #endif
 
     trax_metadata* metadata = trax_metadata_create(region_format, TRAX_IMAGE_PATH, channels, NULL, NULL, NULL);
@@ -523,15 +523,15 @@ vot_region* VOT_PREFIX(vot_initialize)() {
     assert(response == TRAX_INITIALIZE);
 
 #if defined(VOT_RGBD)
-        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_VISIBLE)));
+        strcpy(_image.color, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
         strcpy(_image.depth, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_DEPTH)));
 #elif defined(VOT_RGBT)
-        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_VISIBLE)));
+        strcpy(_image.color, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
         strcpy(_image.ir, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_IR)));
 #elif defined(VOT_IR)
         strcpy(_image.ir, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_IR)));
 #else
-        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_VISIBLE)));
+        strcpy(_image.color, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
 #endif
 
     trax_server_reply(_trax_handle, _trax_region, NULL);
@@ -584,15 +584,15 @@ const vot_image* VOT_PREFIX(vot_frame)() {
 
 
 #if defined(VOT_RGBD)
-        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_VISIBLE)));
+        strcpy(_image.color, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
         strcpy(_image.depth, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_DEPTH)));
 #elif defined(VOT_RGBT)
-        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_VISIBLE)));
+        strcpy(_image.color, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
         strcpy(_image.ir, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_IR)));
 #elif defined(VOT_IR)
         strcpy(_image.ir, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_IR)));
 #else
-        strcpy(_image.visible, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_VISIBLE)));
+        strcpy(_image.color, trax_image_get_path(trax_image_list_get(_trax_image, TRAX_CHANNEL_COLOR)));
 #endif
         trax_image_list_clear(_trax_image);
         trax_image_list_release(&_trax_image);

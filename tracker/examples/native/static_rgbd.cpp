@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     //track
     while (true) {
         image = vot.frame();
-        if (image.visible.empty()) break;
+        if (image.color.empty()) break;
         vot.report(region);
     }
 

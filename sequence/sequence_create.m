@@ -57,7 +57,7 @@ else
         if strcmp(channel, 'default')
             continue;
         end;
-        
+
         [sdir, sfile, sext] = fileparts(metadata.channels.(channel));
 
         channel_directory = fullfile(directory, sdir);
@@ -68,18 +68,10 @@ else
             mask = [sfile, sext];
         end
 
-        if strcmp(channel, 'color') % We are using visible instead of color
-            channel = 'visible';
-        end;
-
         channels.(channel) = fullfile(channel_directory, mask);
 
     end
 
-end;
-
-if strcmp(default_channel, 'color') % We are using visible instead of color
-    default_channel = 'visible';
 end;
 
 [~, name] = fileparts(directory);
