@@ -19,7 +19,7 @@ else
     directory = sequence_path;
 end;
 
-default_channel = 'visible';
+default_channel = 'color';
 
 if isfield(metadata, 'format') && ~strcmpi(metadata.format, 'default')
     sequence_function = str2func(['sequence_create_', metadata.format]);
@@ -28,8 +28,8 @@ if isfield(metadata, 'format') && ~strcmpi(metadata.format, 'default')
     return;
 end
 
-if isfield(metadata, 'channel') && isfield(metadata.channel, 'default')
-   default_channel = metadata.channel.default;
+if isfield(metadata, 'channels') && isfield(metadata.channels, 'default')
+   default_channel = metadata.channels.default;
 end
 
 % At the moment we only load default channel, multi-channel sequences will
@@ -37,7 +37,7 @@ end
 
 channels = struct();
 
-if ~isfield(metadata, 'channel') || ~isfield(metadata.channel, default_channel)
+if ~isfield(metadata, 'channels') || ~isfield(metadata.channels, default_channel)
 	if all(size(dir([directory, '/*.jpg'])))
 		mask = '%08d.jpg';
 	elseif all(size(dir([directory, '/*.png'])))
@@ -48,7 +48,7 @@ if ~isfield(metadata, 'channel') || ~isfield(metadata.channel, default_channel)
 
 else
 
-    fields = fieldnames(metadata.channel);
+    fields = fieldnames(metadata.channels);
 
     for i=1:numel(fields)
 
@@ -58,7 +58,7 @@ else
             continue;
         end;
         
-        [sdir, sfile, sext] = fileparts(metadata.channel.(channel));
+        [sdir, sfile, sext] = fileparts(metadata.channels.(channel));
 
         channel_directory = fullfile(directory, sdir);
 
