@@ -41,7 +41,7 @@ for i = 1:r
     end;
 
     if check_deterministic && i == 4 && is_deterministic(sequence, 3, directory)
-        if ~silentm
+        if ~silent
             print_debug('Detected a deterministic tracker, skipping remaining trials.');
         end;
         metadata.deterministic = true;
