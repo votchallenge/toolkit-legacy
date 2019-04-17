@@ -5,14 +5,16 @@
 #include "mex.h"
 #include "region.h"
 
-#if defined(__OS2__) || defined(__WINDOWS__) || defined(WIN32) || defined(WIN64) || defined(_MSC_VER) 
+#if defined(__OS2__) || defined(__WINDOWS__) || defined(WIN32) || defined(WIN64) || defined(_MSC_VER)
 #define strcmpi _strcmpi
 #else
 #define strcmpi strcasecmp
 #endif
 
+#define PRINT_REGION(R) { char* S = region_string(R); mexPrintf("%s\n", S); free(S); }
+
 region_bounds get_bounds(const mxArray * input) {
-    
+
     region_bounds bounds;
 
     if (!mxIsDouble(input)) {
@@ -23,33 +25,33 @@ region_bounds get_bounds(const mxArray * input) {
     int l = MAX(mxGetN(input), mxGetM(input));
 
     if (l == 4) {
-        
+
         bounds.left = r[0];
         bounds.top = r[1];
         bounds.right = r[2];
         bounds.bottom = r[3];
-   
+
     } else if (l == 2) {
-        
+
         bounds.left = 0;
         bounds.top = 0;
         bounds.right = r[0];
         bounds.bottom = r[1];
-   
+
     } else if (l == 0) {
-        
+
         bounds = region_no_bounds;
-   
+
     } else {
         mexErrMsgTxt("Bounds can only be formulated as [left, top, right, bottom] or [width, height] or []");
     }
-    
+
     return bounds;
-    
+
 }
 
 region_container* get_polygon(const mxArray * input) {
-    
+
     if (!mxIsDouble(input)) {
         mexErrMsgTxt("Polygon has to be an array of doubles");
     }
@@ -61,30 +63,30 @@ region_container* get_polygon(const mxArray * input) {
     if (l % 2 == 0 && l > 6) {
 
         p = region_create_polygon(l / 2);
-        
+
         for (int i = 0; i < p->data.polygon.count; i++) {
             p->data.polygon.x[i] = r[i*2];
             p->data.polygon.y[i] = r[i*2+1];
         }
-        
+
     } else if (l == 4) {
-        
+
         p = region_create_polygon(4);
-        
+
         p->data.polygon.x[0] = r[0];
-        p->data.polygon.x[1] = r[0] + r[2];
-        p->data.polygon.x[2] = r[0] + r[2];
+        p->data.polygon.x[1] = r[0] + r[2] - 1;
+        p->data.polygon.x[2] = r[0] + r[2] - 1;
         p->data.polygon.x[3] = r[0];
 
         p->data.polygon.y[0] = r[1];
         p->data.polygon.y[1] = r[1];
-        p->data.polygon.y[2] = r[1] + r[3];
-        p->data.polygon.y[3] = r[1] + r[3];
-   
-    }  
-    
+        p->data.polygon.y[2] = r[1] + r[3] - 1;
+        p->data.polygon.y[3] = r[1] + r[3] - 1;
+
+    }
+
     return p;
-    
+
 }
 
 region_overlap compute_overlap(const mxArray* r1, const mxArray* r2, region_bounds bounds) {
@@ -104,19 +106,19 @@ region_overlap compute_overlap(const mxArray* r1, const mxArray* r2, region_boun
 
     p1 = get_polygon(r1);
     p2 = get_polygon(r2);
-    
+
     region_overlap overlap;
 
     if (p1 != NULL && p2 != NULL) {
 
         overlap = region_compute_overlap(p1, p2, bounds);
-	   
+
     } else {
 
         overlap.overlap = -1;
-      
+
     }
-    
+
     if (p1) region_release(&p1);
     if (p2) region_release(&p2);
 
@@ -131,7 +133,7 @@ char* get_string(const mxArray *arg) {
     int l = (int) mxGetN(arg);
 
     char* cstr = (char *) malloc(sizeof(char) * (l + 1));
-    
+
     mxGetString(arg, cstr, (l + 1));
 
     return cstr;
@@ -151,13 +153,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     region_clear_flags(REGION_LEGACY_RASTERIZATION);
     if (nrhs > 3) {
 	    char* codestr = get_string(prhs[3]);
-	    if (strcmpi(codestr, "legacy") == 0) 
+	    if (strcmpi(codestr, "legacy") == 0)
 		    region_set_flags(REGION_LEGACY_RASTERIZATION);
 	    free(codestr);
     }
 
     if (mxIsCell(prhs[0]) && mxIsCell(prhs[1])) {
-	
+
         if ( MIN(mxGetM(prhs[0]), mxGetN(prhs[0])) != 1 ) mexErrMsgTxt("Cell array must be a vector");
         if ( MIN(mxGetM(prhs[1]), mxGetN(prhs[1])) != 1 ) mexErrMsgTxt("Cell array must be a vector");
 
@@ -191,7 +193,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
         plhs[0] = mxCreateDoubleMatrix(1, 3, mxREAL);
         double *result = (double*) mxGetPr(plhs[0]);
-                
+
         region_overlap overlap = compute_overlap(prhs[0], prhs[1], bounds);
         if (overlap.overlap < 0) {
             result[0] = mxGetNaN();
