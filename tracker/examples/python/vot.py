@@ -101,7 +101,7 @@ class VOT(object):
         if request.type == 'frame':
             image = [str(x) for k, x in request.image.items()]
             if len(image) == 1:
-                image = image[0]
+                return image[0]
             return tuple(image)
         else:
             return None
