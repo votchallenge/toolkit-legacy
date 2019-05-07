@@ -51,9 +51,10 @@ class VOT(object):
             self._region = Polygon([Point(x[0], x[1]) for x in request.region])
         else:
             self._region = Rectangle(*request.region.bounds())
-        self._image = [str(x) for k, x in request.image.items()]
+        self._image = [str(x.path()) for k, x in request.image.items()]
         if len(self._image) == 1:
             self._image = self._image[0]
+        
         self._trax.status(request.region)
 
     def region(self):
@@ -94,15 +95,15 @@ class VOT(object):
         if hasattr(self, "_image"):
             image = self._image
             del self._image
-            return tuple(image)
+            return image
 
         request = self._trax.wait()
 
         if request.type == 'frame':
-            image = [str(x) for k, x in request.image.items()]
+            image = [str(x.path()) for k, x in request.image.items()]
             if len(image) == 1:
                 return image[0]
-            return tuple(image)
+            return image
         else:
             return None
 
