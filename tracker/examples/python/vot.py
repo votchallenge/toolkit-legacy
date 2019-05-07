@@ -51,7 +51,7 @@ class VOT(object):
             self._region = Polygon([Point(x[0], x[1]) for x in request.region])
         else:
             self._region = Rectangle(*request.region.bounds())
-        self._image = [str(x.path()) for k, x in request.image.items()]
+        self._image = [x.path() for k, x in request.image.items()]
         if len(self._image) == 1:
             self._image = self._image[0]
         
@@ -100,7 +100,7 @@ class VOT(object):
         request = self._trax.wait()
 
         if request.type == 'frame':
-            image = [str(x.path()) for k, x in request.image.items()]
+            image = [x.path() for k, x in request.image.items()]
             if len(image) == 1:
                 return image[0]
             return image
