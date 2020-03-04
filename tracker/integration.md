@@ -9,9 +9,7 @@ When designing the integration interface the main goal was that the adaptation o
 
 Tracking eXchange protocol is a simple protocol that enables easier evaluation of computer vision tracking algorithms. The basic idea is that a tracker communicates with the evaluation software using a set of textual commands over the standard input/output streams of each process.
 
-Integration of TraX protocol into a C/C++ or Matlab tracker is quite simple as there are [examples](https://github.com/votchallenge/trax/tree/master/trackers) available in the repository of the reference implementation.
+Integration of TraX protocol into a C/C++ or Matlab tracker is quite simple as there are [examples](https://github.com/votchallenge/integration) available in the examples repository.
 
 VOT toolkit is tightly connected to the TraX reference implementation as it shares some native code with it. For the execution the toolkit uses a `traxclient` MEX library to execute a tracker and control it. This way the tracker can be monitored and reinitialized when required. While the TraX reference implementation source code is automatically downloaded and compiled by the toolkit (if a MEX compiler is properly configured), the native TraX library that is used for C/C++ trackers has to be compiled manually using [CMake](http://www.cmake.org/). If possible, the toolkit also downloads pre-compiled version of the libraries, however, it has been reported that this approach does not work all the time.
-
-
 
