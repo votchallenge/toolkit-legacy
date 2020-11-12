@@ -26,6 +26,25 @@ Contributors
 * Alan Torres
 * Rok Mandeljc
 
+Citing
+------
+
+If you use VOT toolkit in your work, consider citing the following cover publication:
+
+```
+@article{vot-toolkit,
+   title = "A modular toolkit for visual tracking performance evaluation",
+   journal = "SoftwareX",
+   volume = "12",
+   pages = "100623",
+   year = "2020",
+   issn = "2352-7110",
+   doi = "https://doi.org/10.1016/j.softx.2020.100623",
+   url = "http://www.sciencedirect.com/science/article/pii/S2352711020303368",
+   author = "Luka {Čehovin Zajc}"
+}
+```
+
 License
 -------
 
