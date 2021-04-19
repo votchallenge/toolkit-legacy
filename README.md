@@ -1,11 +1,9 @@
-The VOT evaluation kit
-======================
+The VOT evaluation kit (legacy)
+===============================
 
-This repository contains the official evaluation kit for the [Visual Object Tracking (VOT) challenge](http://votchallenge.net/). The repository contains the actual evaluation toolkit as a set of Matlab (Octave compatible) scripts, a documentation and a set of integration examples for different programming languages.
+This repository contains the **legacy version** of the evaluation toolkit for the [Visual Object Tracking (VOT) challenge](http://votchallenge.net/). The toolkit is a set of Matlab (Octave compatible) scripts, a documentation and a set of integration examples for different programming languages. A new toolkit, written in Python 3 is avalable [here](https://github.com/votchallenge/toolkit).
 
 For more detailed informations consult the documentation available in the source or a compiled version of the documentation [here](http://www.votchallenge.net/howto/). You can also subscribe to the VOT [mailing list](https://service.ait.ac.at/mailman/listinfo/votchallenge) to receive news about challenges and important software updates or join our [support form](https://groups.google.com/forum/?hl=en#!forum/votchallenge-help) to ask questions.
-
-Click [here](http://toolkit.votchallenge.net) to browse and download the latest official releases of the toolkit.
 
 Developers
 ----------
@@ -29,7 +27,7 @@ Contributors
 Citing
 ------
 
-If you use VOT toolkit in your work, consider citing the following cover publication:
+If you use this version of the VOT toolkit in your work, consider citing the following cover publication:
 
 ```
 @article{vot-toolkit,
